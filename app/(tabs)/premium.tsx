@@ -1,102 +1,103 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Crown, Check, Star, Users, Shield, Zap } from 'lucide-react-native';
-import { useTheme } from '@/hooks/useTheme';
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/Button';
-import { Fonts, FontSizes } from '@/constants/Fonts';
+import React from "react"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
+import { Crown, Check, Star, Users, Shield, Zap } from "lucide-react-native"
+import { useTheme } from "@/hooks/useTheme"
+import { useAuth } from "@/hooks/useAuth"
+import { Button } from "@/components/Button"
+import { Fonts, FontSizes } from "@/constants/Fonts"
 
 export default function PremiumScreen() {
-  const { colors } = useTheme();
-  const { user } = useAuth();
+  const { colors } = useTheme()
+  const { user } = useAuth()
 
   const plans = [
     {
-      id: 'free',
-      name: 'Free',
-      price: '$0',
-      interval: 'forever',
+      id: "free",
+      name: "Free",
+      price: "$0",
+      interval: "forever",
       features: [
-        '5 documents per month',
-        'Basic AI analysis',
-        'Text-to-speech',
-        'Standard support',
+        "5 documents per month",
+        "Basic AI analysis",
+        "Text-to-speech",
+        "Standard support",
       ],
       limitations: [
-        'Limited document formats',
-        'Basic risk assessment',
-        'No collaboration features',
+        "Limited document formats",
+        "Basic risk assessment",
+        "No collaboration features",
       ],
-      current: user?.subscriptionTier === 'free',
+      current: user?.subscriptionTier === "free",
     },
     {
-      id: 'pro',
-      name: 'Pro',
-      price: '$19.99',
-      interval: 'per month',
+      id: "pro",
+      name: "Pro",
+      price: "$19.99",
+      interval: "per month",
       features: [
-        'Unlimited documents',
-        'Advanced AI analysis',
-        'All document formats',
-        'Priority support',
-        'Collaboration tools',
-        'Advanced security',
-        'Custom templates',
+        "Unlimited documents",
+        "Advanced AI analysis",
+        "All document formats",
+        "Priority support",
+        "Collaboration tools",
+        "Advanced security",
+        "Custom templates",
       ],
       popular: true,
-      current: user?.subscriptionTier === 'pro',
+      current: user?.subscriptionTier === "pro",
     },
     {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: '$49.99',
-      interval: 'per month',
+      id: "enterprise",
+      name: "Enterprise",
+      price: "$49.99",
+      interval: "per month",
       features: [
-        'Everything in Pro',
-        'Team management',
-        'Advanced analytics',
-        'Custom integrations',
-        'Dedicated support',
-        'GDPR compliance',
-        'Bulk processing',
-        'API access',
+        "Everything in Pro",
+        "Team management",
+        "Advanced analytics",
+        "Custom integrations",
+        "Dedicated support",
+        "GDPR compliance",
+        "Bulk processing",
+        "API access",
       ],
-      current: user?.subscriptionTier === 'enterprise',
+      current: user?.subscriptionTier === "enterprise",
     },
-  ];
+  ]
 
   const features = [
     {
       icon: Zap,
-      title: 'Advanced AI Analysis',
-      description: 'Get deeper insights with our enhanced AI models',
+      title: "Advanced AI Analysis",
+      description: "Get deeper insights with our enhanced AI models",
     },
     {
       icon: Shield,
-      title: 'Enhanced Security',
-      description: 'Bank-level encryption and secure document storage',
+      title: "Enhanced Security",
+      description: "Bank-level encryption and secure document storage",
     },
     {
       icon: Users,
-      title: 'Team Collaboration',
-      description: 'Share and collaborate on documents with your team',
+      title: "Team Collaboration",
+      description: "Share and collaborate on documents with your team",
     },
     {
       icon: Star,
-      title: 'Priority Support',
-      description: '24/7 premium support from our legal tech experts',
+      title: "Priority Support",
+      description: "24/7 premium support from our legal tech experts",
     },
-  ];
+  ]
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.header}>
         <View style={[styles.crownContainer, { backgroundColor: colors.accent }]}>
           <Crown size={32} color="#FFFFFF" />
         </View>
-        <Text style={[styles.title, { color: colors.text }]}>
-          Upgrade to Premium
-        </Text>
+        <Text style={[styles.title, { color: colors.text }]}>Upgrade to Premium</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           Unlock the full potential of legal document analysis
         </Text>
@@ -109,9 +110,7 @@ export default function PremiumScreen() {
               <feature.icon size={24} color={colors.primary} />
             </View>
             <View style={styles.featureContent}>
-              <Text style={[styles.featureTitle, { color: colors.text }]}>
-                {feature.title}
-              </Text>
+              <Text style={[styles.featureTitle, { color: colors.text }]}>{feature.title}</Text>
               <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>
                 {feature.description}
               </Text>
@@ -121,10 +120,8 @@ export default function PremiumScreen() {
       </View>
 
       <View style={styles.plansContainer}>
-        <Text style={[styles.plansTitle, { color: colors.text }]}>
-          Choose Your Plan
-        </Text>
-        {plans.map((plan) => (
+        <Text style={[styles.plansTitle, { color: colors.text }]}>Choose Your Plan</Text>
+        {plans.map(plan => (
           <View
             key={plan.id}
             style={[
@@ -136,20 +133,14 @@ export default function PremiumScreen() {
           >
             {plan.popular && (
               <View style={[styles.popularBadge, { backgroundColor: colors.primary }]}>
-                <Text style={[styles.popularText, { color: '#FFFFFF' }]}>
-                  Most Popular
-                </Text>
+                <Text style={[styles.popularText, { color: "#FFFFFF" }]}>Most Popular</Text>
               </View>
             )}
-            
+
             <View style={styles.planHeader}>
-              <Text style={[styles.planName, { color: colors.text }]}>
-                {plan.name}
-              </Text>
+              <Text style={[styles.planName, { color: colors.text }]}>{plan.name}</Text>
               <View style={styles.planPricing}>
-                <Text style={[styles.planPrice, { color: colors.text }]}>
-                  {plan.price}
-                </Text>
+                <Text style={[styles.planPrice, { color: colors.text }]}>{plan.price}</Text>
                 <Text style={[styles.planInterval, { color: colors.textSecondary }]}>
                   {plan.interval}
                 </Text>
@@ -179,7 +170,7 @@ export default function PremiumScreen() {
               ) : (
                 <Button
                   title={`Upgrade to ${plan.name}`}
-                  variant={plan.popular ? 'primary' : 'outline'}
+                  variant={plan.popular ? "primary" : "outline"}
                   fullWidth
                   onPress={() => {
                     // Handle subscription upgrade
@@ -197,7 +188,7 @@ export default function PremiumScreen() {
         </Text>
       </View>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -206,7 +197,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 20,
     paddingBottom: 32,
   },
@@ -214,20 +205,20 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 16,
   },
   title: {
     fontSize: FontSizes.xxl,
     fontFamily: Fonts.bold,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
   },
   featuresContainer: {
@@ -235,8 +226,8 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -245,8 +236,8 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 16,
   },
   featureContent: {
@@ -268,7 +259,7 @@ const styles = StyleSheet.create({
   plansTitle: {
     fontSize: FontSizes.xl,
     fontFamily: Fonts.bold,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 24,
   },
   planCard: {
@@ -276,24 +267,24 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    position: 'relative',
+    position: "relative",
   },
   popularBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: -12,
     left: 20,
     right: 20,
     borderRadius: 6,
     paddingVertical: 4,
     paddingHorizontal: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   popularText: {
     fontSize: FontSizes.sm,
     fontFamily: Fonts.semiBold,
   },
   planHeader: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   planName: {
@@ -302,8 +293,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   planPricing: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
+    flexDirection: "row",
+    alignItems: "baseline",
     gap: 4,
   },
   planPrice: {
@@ -318,8 +309,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   featureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   featureText: {
@@ -329,15 +320,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   planAction: {
-    marginTop: 'auto',
+    marginTop: "auto",
   },
   footer: {
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   footerText: {
     fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
-    textAlign: 'center',
+    textAlign: "center",
   },
-});
+})
+

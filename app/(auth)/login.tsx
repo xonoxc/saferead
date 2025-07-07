@@ -4,15 +4,17 @@ import { Link, router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/Button"
+import { GoogleSignInButton } from "@/components/GoogleSignInButton"
 import { TextInput } from "@/components/TextInput"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 
 export default function LoginScreen() {
   const { colors } = useTheme()
-  const { login } = useAuth()
+  const { login, loginWithGoogle } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
 
   const validateForm = () => {
@@ -48,6 +50,18 @@ export default function LoginScreen() {
     }
   }
 
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true)
+    try {
+      await loginWithGoogle()
+      router.replace("/(tabs)")
+    } catch (error) {
+      Alert.alert("Google Login Failed", "Please try again")
+    } finally {
+      setIsGoogleLoading(false)
+    }
+  }
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.content}>
@@ -60,6 +74,16 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.form}>
+          <GoogleSignInButton onPress={handleGoogleLogin} loading={isGoogleLoading} fullWidth />
+
+          <View style={styles.divider}>
+            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+            <Text style={[styles.dividerText, { color: colors.textMuted }]}>
+              or continue with email
+            </Text>
+            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+          </View>
+
           <TextInput
             label="Email"
             value={email}
@@ -133,6 +157,20 @@ const styles = StyleSheet.create({
   form: {
     gap: 24,
   },
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 8,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+  },
+  dividerText: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.regular,
+    paddingHorizontal: 16,
+  },
   buttonContainer: {
     marginTop: 8,
   },
@@ -150,4 +188,3 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 })
-

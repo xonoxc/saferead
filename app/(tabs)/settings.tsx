@@ -1,110 +1,115 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
-import { User, Moon, Sun, Globe, Volume2, Shield, Bell, CircleHelp as HelpCircle, LogOut } from 'lucide-react-native';
-import { useTheme } from '@/hooks/useTheme';
-import { useAuth } from '@/hooks/useAuth';
-import { Fonts, FontSizes } from '@/constants/Fonts';
+import React from "react"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from "react-native"
+import {
+  User,
+  Moon,
+  Sun,
+  Globe,
+  Volume2,
+  Shield,
+  Bell,
+  CircleHelp as HelpCircle,
+  LogOut,
+} from "lucide-react-native"
+import { useTheme } from "@/hooks/useTheme"
+import { useAuth } from "@/hooks/useAuth"
+import { Fonts, FontSizes } from "@/constants/Fonts"
 
 export default function SettingsScreen() {
-  const { colors, mode, setTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { colors, mode, setTheme } = useTheme()
+  const { user, logout } = useAuth()
 
   const handleLogout = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: logout },
-      ]
-    );
-  };
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Sign Out", style: "destructive", onPress: logout },
+    ])
+  }
 
   const settingsGroups = [
     {
-      title: 'Account',
+      title: "Account",
       items: [
         {
           icon: User,
-          title: 'Profile',
+          title: "Profile",
           value: `${user?.firstName} ${user?.lastName}`,
           onPress: () => {},
         },
         {
           icon: Shield,
-          title: 'Privacy & Security',
+          title: "Privacy & Security",
           onPress: () => {},
         },
       ],
     },
     {
-      title: 'Preferences',
+      title: "Preferences",
       items: [
         {
-          icon: mode === 'dark' ? Moon : Sun,
-          title: 'Theme',
-          value: mode === 'dark' ? 'Dark' : 'Light',
-          onPress: () => setTheme(mode === 'dark' ? 'light' : 'dark'),
+          icon: mode === "dark" ? Moon : Sun,
+          title: "Theme",
+          value: mode === "dark" ? "Dark" : "Light",
+          onPress: () => setTheme(mode === "dark" ? "light" : "dark"),
         },
         {
           icon: Globe,
-          title: 'Language',
-          value: 'English',
+          title: "Language",
+          value: "English",
           onPress: () => {},
         },
         {
           icon: Volume2,
-          title: 'Text-to-Speech',
+          title: "Text-to-Speech",
           value: user?.preferences?.textToSpeech,
-          type: 'toggle',
+          type: "toggle",
           onPress: () => {},
         },
         {
           icon: Bell,
-          title: 'Notifications',
+          title: "Notifications",
           value: user?.preferences?.notifications,
-          type: 'toggle',
+          type: "toggle",
           onPress: () => {},
         },
       ],
     },
     {
-      title: 'Support',
+      title: "Support",
       items: [
         {
           icon: HelpCircle,
-          title: 'Help & Support',
+          title: "Help & Support",
           onPress: () => {},
         },
       ],
     },
     {
-      title: 'Account Actions',
+      title: "Account Actions",
       items: [
         {
           icon: LogOut,
-          title: 'Sign Out',
+          title: "Sign Out",
           onPress: handleLogout,
           danger: true,
         },
       ],
     },
-  ];
+  ]
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          Settings
-        </Text>
+        <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
       </View>
 
       <View style={styles.content}>
         {settingsGroups.map((group, groupIndex) => (
           <View key={groupIndex} style={styles.group}>
-            <Text style={[styles.groupTitle, { color: colors.textSecondary }]}>
-              {group.title}
-            </Text>
+            <Text style={[styles.groupTitle, { color: colors.textSecondary }]}>{group.title}</Text>
             <View style={[styles.groupItems, { backgroundColor: colors.card }]}>
               {group.items.map((item, itemIndex) => (
                 <TouchableOpacity
@@ -136,7 +141,7 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                   <View style={styles.itemRight}>
-                    {item.type === 'toggle' ? (
+                    {item.type === "toggle" ? (
                       <Switch
                         value={item.value}
                         onValueChange={() => {}}
@@ -159,12 +164,10 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: colors.textMuted }]}>
-          LegalAssist v1.0.0
-        </Text>
+        <Text style={[styles.footerText, { color: colors.textMuted }]}>LegalAssist v1.0.0</Text>
       </View>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -190,31 +193,31 @@ const styles = StyleSheet.create({
   groupTitle: {
     fontSize: FontSizes.sm,
     fontFamily: Fonts.semiBold,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 8,
   },
   groupItems: {
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
   },
   itemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
   itemIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   itemTitle: {
@@ -222,8 +225,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
   },
   itemRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   itemValue: {
     fontSize: FontSizes.sm,
@@ -231,10 +234,11 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   footerText: {
     fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
   },
-});
+})
+

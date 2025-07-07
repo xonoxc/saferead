@@ -2,6 +2,8 @@ import { useState, useEffect, createContext, use } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
 import { Platform } from "react-native"
+import * as AuthSession from "expo-auth-session"
+import * as Crypto from "expo-crypto"
 import { User, AuthTokens } from "@/types"
 
 interface AuthContextType {
@@ -9,6 +11,7 @@ interface AuthContextType {
   isLoading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
+  loginWithGoogle: () => Promise<void>
   register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>
   logout: () => Promise<void>
   refreshToken: () => Promise<void>
@@ -53,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const tokens = await getSecureItem("auth_tokens")
       if (tokens) {
-        const { expiresAt } = JSON.parse(tokens) as AuthTokens
+        const { accessToken, expiresAt } = JSON.parse(tokens) as AuthTokens
         if (Date.now() < expiresAt) {
           const userData = await AsyncStorage.getItem("user_data")
           if (userData) {
@@ -73,25 +76,128 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      // Simulate API call
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      // Simulate API call - replace with your actual API endpoint
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
-      if (!response.ok) {
-        throw new Error("Login failed")
+      // Mock successful login
+      const mockUser: User = {
+        id: "1",
+        email,
+        firstName: "John",
+        lastName: "Doe",
+        subscriptionTier: "free",
+        preferences: {
+          language: "en",
+          theme: "system",
+          fontSize: "medium",
+          dyslexiaFriendly: false,
+          textToSpeech: false,
+          hapticFeedback: true,
+          notifications: true,
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       }
 
-      const data = await response.json()
-      const { user, tokens } = data
+      const mockTokens: AuthTokens = {
+        accessToken: "mock_access_token",
+        refreshToken: "mock_refresh_token",
+        expiresAt: Date.now() + 3600000, // 1 hour
+      }
 
-      await storeAuthData(user, tokens)
-      setUser(user)
+      await storeAuthData(mockUser, mockTokens)
+      setUser(mockUser)
     } catch (error) {
+      throw error
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const loginWithGoogle = async () => {
+    setIsLoading(true)
+    try {
+      const redirectUri = AuthSession.makeRedirectUri({
+        scheme: "com.legalassist.app",
+        path: "auth",
+      })
+
+      const request = new AuthSession.AuthRequest({
+        clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "",
+        scopes: ["openid", "profile", "email"],
+        redirectUri,
+        responseType: AuthSession.ResponseType.Code,
+        state: await Crypto.digestStringAsync(
+          Crypto.CryptoDigestAlgorithm.SHA256,
+          redirectUri + Date.now(),
+          { encoding: Crypto.CryptoEncoding.HEX }
+        ),
+        codeChallenge: await Crypto.digestStringAsync(
+          Crypto.CryptoDigestAlgorithm.SHA256,
+          redirectUri,
+          { encoding: Crypto.CryptoEncoding.BASE64 }
+        ),
+        codeChallengeMethod: AuthSession.CodeChallengeMethod.S256,
+      })
+
+      const result = await request.promptAsync({
+        authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
+      })
+
+      if (result.type === "success") {
+        // Exchange authorization code for tokens
+        const tokenResponse = await AuthSession.exchangeCodeAsync(
+          {
+            clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "",
+            code: result.params.code,
+            redirectUri,
+            extraParams: {},
+          },
+          {
+            tokenEndpoint: "https://oauth2.googleapis.com/token",
+          }
+        )
+
+        // Get user info from Google
+        const userInfoResponse = await fetch(
+          `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokenResponse.accessToken}`
+        )
+        const googleUser = await userInfoResponse.json()
+
+        // Create user object
+        const user: User = {
+          id: googleUser.id,
+          email: googleUser.email,
+          firstName: googleUser.given_name || "",
+          lastName: googleUser.family_name || "",
+          avatar: googleUser.picture,
+          subscriptionTier: "free",
+          preferences: {
+            language: "en",
+            theme: "system",
+            fontSize: "medium",
+            dyslexiaFriendly: false,
+            textToSpeech: false,
+            hapticFeedback: true,
+            notifications: true,
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+
+        const tokens: AuthTokens = {
+          accessToken: tokenResponse.accessToken || "",
+          refreshToken: tokenResponse.refreshToken || "",
+          expiresAt: Date.now() + (tokenResponse.expiresIn || 3600) * 1000,
+        }
+
+        await storeAuthData(user, tokens)
+        setUser(user)
+      } else {
+        throw new Error("Google login was cancelled or failed")
+      }
+    } catch (error) {
+      console.error("Google login error:", error)
       throw error
     } finally {
       setIsLoading(false)
@@ -101,24 +207,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const register = async (email: string, password: string, firstName: string, lastName: string) => {
     setIsLoading(true)
     try {
-      // Simulate API call
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password, firstName, lastName }),
-      })
+      // Simulate API call - replace with your actual API endpoint
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
-      if (!response.ok) {
-        throw new Error("Registration failed")
+      // Mock successful registration
+      const mockUser: User = {
+        id: Date.now().toString(),
+        email,
+        firstName,
+        lastName,
+        subscriptionTier: "free",
+        preferences: {
+          language: "en",
+          theme: "system",
+          fontSize: "medium",
+          dyslexiaFriendly: false,
+          textToSpeech: false,
+          hapticFeedback: true,
+          notifications: true,
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       }
 
-      const data = await response.json()
-      const { user, tokens } = data
+      const mockTokens: AuthTokens = {
+        accessToken: "mock_access_token",
+        refreshToken: "mock_refresh_token",
+        expiresAt: Date.now() + 3600000, // 1 hour
+      }
 
-      await storeAuthData(user, tokens)
-      setUser(user)
+      await storeAuthData(mockUser, mockTokens)
+      setUser(mockUser)
     } catch (error) {
       throw error
     } finally {
@@ -143,24 +262,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       const { refreshToken } = JSON.parse(tokens) as AuthTokens
 
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refreshToken }),
-      })
+      // Simulate refresh token API call
+      await new Promise(resolve => setTimeout(resolve, 500))
 
-      if (!response.ok) {
-        await logout()
-        return
+      // Mock new tokens
+      const newTokens: AuthTokens = {
+        accessToken: "new_mock_access_token",
+        refreshToken: "new_mock_refresh_token",
+        expiresAt: Date.now() + 3600000,
       }
 
-      const data = await response.json()
-      const { user, tokens: newTokens } = data
-
-      await storeAuthData(user, newTokens)
-      setUser(user)
+      const userData = await AsyncStorage.getItem("user_data")
+      if (userData) {
+        const user = JSON.parse(userData)
+        await storeAuthData(user, newTokens)
+        setUser(user)
+      }
     } catch (error) {
       console.error("Failed to refresh token:", error)
       await logout()
@@ -192,6 +309,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isLoading,
         isAuthenticated: !!user,
         login,
+        loginWithGoogle,
         register,
         logout,
         refreshToken,

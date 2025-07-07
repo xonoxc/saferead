@@ -99,7 +99,7 @@ export default function DocumentsScreen() {
         </View>
       )}
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {filteredDocuments.length > 0 ? (
           filteredDocuments.map(document => (
             <DocumentCard

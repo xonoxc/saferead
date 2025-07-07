@@ -1,0 +1,305 @@
+import React from "react"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
+import { Link } from "expo-router"
+import {
+  Camera,
+  Upload,
+  FileText,
+  TrendingUp,
+  CircleAlert as AlertCircle,
+  Clock,
+} from "lucide-react-native"
+import { useTheme } from "@/hooks/useTheme"
+import { useAuth } from "@/hooks/useAuth"
+import { useDocuments } from "@/hooks/useDocuments"
+import { Fonts, FontSizes } from "@/constants/Fonts"
+
+export default function HomeScreen() {
+  const { colors } = useTheme()
+  const { user } = useAuth()
+  const { documents } = useDocuments()
+
+  const quickActions = [
+    {
+      icon: Camera,
+      title: "Scan Document",
+      description: "Use camera to scan legal documents",
+      href: "/(tabs)/documents?action=scan",
+      color: colors.primary,
+    },
+    {
+      icon: Upload,
+      title: "Upload File",
+      description: "Import PDF or image files",
+      href: "/(tabs)/documents?action=upload",
+      color: colors.secondary,
+    },
+    {
+      icon: FileText,
+      title: "Text Analysis",
+      description: "Analyze text-based documents",
+      href: "/(tabs)/documents?action=text",
+      color: colors.accent,
+    },
+  ]
+
+  const stats = [
+    {
+      icon: FileText,
+      title: "Documents",
+      value: documents.length,
+      color: colors.primary,
+    },
+    {
+      icon: TrendingUp,
+      title: "Analyzed",
+      value: documents.filter(d => d.analysis).length,
+      color: colors.success,
+    },
+    {
+      icon: AlertCircle,
+      title: "High Risk",
+      value: documents.filter(d => d.analysis?.riskAssessment?.overallRisk === "high").length,
+      color: colors.error,
+    },
+    {
+      icon: Clock,
+      title: "Pending",
+      value: documents.filter(d => !d.analysis).length,
+      color: colors.warning,
+    },
+  ]
+
+  return (
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.header}>
+        <Text style={[styles.greeting, { color: colors.textSecondary }]}>Welcome back,</Text>
+        <Text style={[styles.userName, { color: colors.text }]}>
+          {user?.firstName} {user?.lastName}
+        </Text>
+      </View>
+
+      <View style={styles.statsContainer}>
+        {stats.map((stat, index) => (
+          <View key={index} style={[styles.statCard, { backgroundColor: colors.card }]}>
+            <View style={[styles.statIcon, { backgroundColor: `${stat.color}20` }]}>
+              <stat.icon size={24} color={stat.color} />
+            </View>
+            <Text style={[styles.statValue, { color: colors.text }]}>{stat.value}</Text>
+            <Text style={[styles.statTitle, { color: colors.textSecondary }]}>{stat.title}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
+        <View style={styles.actionsContainer}>
+          {quickActions.map((action, index) => (
+            <Link key={index} href={action.href} asChild>
+              <TouchableOpacity
+                style={[styles.actionCard, { backgroundColor: colors.card }]}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.actionIcon, { backgroundColor: `${action.color}20` }]}>
+                  <action.icon size={28} color={action.color} />
+                </View>
+                <Text style={[styles.actionTitle, { color: colors.text }]}>{action.title}</Text>
+                <Text style={[styles.actionDescription, { color: colors.textSecondary }]}>
+                  {action.description}
+                </Text>
+              </TouchableOpacity>
+            </Link>
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Activity</Text>
+        {documents.length > 0 ? (
+          <View style={styles.activityContainer}>
+            {documents.slice(0, 3).map((doc, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[styles.activityItem, { backgroundColor: colors.card }]}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.activityIcon, { backgroundColor: colors.surface }]}>
+                  <FileText size={20} color={colors.primary} />
+                </View>
+                <View style={styles.activityContent}>
+                  <Text style={[styles.activityTitle, { color: colors.text }]} numberOfLines={1}>
+                    {doc.title}
+                  </Text>
+                  <Text style={[styles.activityDate, { color: colors.textSecondary }]}>
+                    {new Date(doc.createdAt).toLocaleDateString()}
+                  </Text>
+                </View>
+                {doc.analysis && (
+                  <View style={[styles.analysisStatus, { backgroundColor: colors.success }]}>
+                    <Text style={[styles.analysisStatusText, { color: colors.surface }]}>✓</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : (
+          <View style={[styles.emptyState, { backgroundColor: colors.card }]}>
+            <FileText size={48} color={colors.textMuted} />
+            <Text style={[styles.emptyStateTitle, { color: colors.text }]}>No Documents Yet</Text>
+            <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
+              Start by scanning or uploading your first legal document
+            </Text>
+          </View>
+        )}
+      </View>
+    </ScrollView>
+  )
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 60,
+  },
+  header: {
+    padding: 20,
+    paddingBottom: 0,
+  },
+  greeting: {
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.regular,
+  },
+  userName: {
+    fontSize: FontSizes.xxl,
+    fontFamily: Fonts.bold,
+  },
+  statsContainer: {
+    flexDirection: "row",
+    padding: 20,
+    gap: 12,
+  },
+  statCard: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  statIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  statValue: {
+    fontSize: FontSizes.xl,
+    fontFamily: Fonts.bold,
+  },
+  statTitle: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.regular,
+  },
+  section: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: FontSizes.lg,
+    fontFamily: Fonts.semiBold,
+    marginBottom: 16,
+  },
+  actionsContainer: {
+    gap: 12,
+  },
+  actionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  actionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  actionTitle: {
+    fontSize: FontSizes.lg,
+    fontFamily: Fonts.semiBold,
+    flex: 1,
+  },
+  actionDescription: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.regular,
+    flex: 2,
+  },
+  activityContainer: {
+    gap: 8,
+  },
+  activityItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 8,
+  },
+  activityIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  activityContent: {
+    flex: 1,
+  },
+  activityTitle: {
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.medium,
+  },
+  activityDate: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.regular,
+  },
+  analysisStatus: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  analysisStatusText: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.bold,
+  },
+  emptyState: {
+    alignItems: "center",
+    padding: 32,
+    borderRadius: 12,
+  },
+  emptyStateTitle: {
+    fontSize: FontSizes.lg,
+    fontFamily: Fonts.semiBold,
+    marginTop: 16,
+  },
+  emptyStateDescription: {
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.regular,
+    textAlign: "center",
+    marginTop: 8,
+    lineHeight: 20,
+  },
+})
+

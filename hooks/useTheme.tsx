@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, use } from "react"
 import { useColorScheme } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import Colors from "@/constants/Colors"
+import { attempt } from "@/utils/attempt"
 
 type ThemeMode = "light" | "dark" | "system"
 
@@ -23,22 +24,20 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
 
   const loadTheme = async () => {
-    try {
-      const savedTheme = await AsyncStorage.getItem("theme_mode")
-      if (savedTheme) {
-        setMode(savedTheme as ThemeMode)
-      }
-    } catch (error) {
-      console.error("Failed to load theme:", error)
+    const res = await attempt(() => AsyncStorage.getItem("theme_mode"))
+    if (res.ok && res.data) {
+      setMode(res.data as ThemeMode)
+    } else if (!res.ok) {
+      console.error("Failed to load theme:", res.error)
     }
   }
 
   const setTheme = async (newMode: ThemeMode) => {
-    try {
-      await AsyncStorage.setItem("theme_mode", newMode)
+    const res = await attempt(() => AsyncStorage.setItem("theme_mode", newMode))
+    if (res.ok) {
       setMode(newMode)
-    } catch (error) {
-      console.error("Failed to save theme:", error)
+    } else {
+      console.error("Failed to save theme:", res.error)
     }
   }
 

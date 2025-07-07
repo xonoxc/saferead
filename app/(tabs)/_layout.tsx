@@ -1,34 +1,46 @@
 import { Tabs } from "expo-router"
-import { Chrome as Home, FileText, Settings, CreditCard } from "lucide-react-native"
+import { Home, FileText, Settings, CreditCard } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { useAuth } from "@/hooks/useAuth"
-import { Redirect } from "expo-router"
+import { Platform } from "react-native"
+import Colors from "@/constants/Colors"
+//import { useAuth } from "@/hooks/useAuth"
+//import { Redirect } from "expo-router"
 
 export default function TabLayout() {
   const { colors } = useTheme()
-  const { isAuthenticated } = useAuth()
+  // const { isAuthenticated } = useAuth()
 
   /* if (!isAuthenticated) {
-    return <Redirect href="/(auth)/welcome" />;
+    return <Redirect href="/(auth)/welcome" />
   } */
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: Colors.dark.primary,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: {
-          backgroundColor: colors.card,
-          borderTopColor: colors.border,
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 80,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "500",
-        },
+        tabBarShowLabel: false,
+        tabBarStyle: Platform.select({
+          ios: {
+            position: "absolute",
+          },
+          default: {
+            position: "absolute",
+            flex: 1,
+            bottom: 5,
+            paddingTop: 16,
+            alignItems: "center",
+            height: 70,
+            marginHorizontal: 10,
+            left: 0,
+            right: 0,
+            backgroundColor: "#161717",
+            borderRadius: 22,
+            borderTopWidth: 0,
+            elevation: 6,
+          },
+        }),
       }}
     >
       <Tabs.Screen

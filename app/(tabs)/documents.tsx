@@ -61,7 +61,7 @@ export default function DocumentsScreen() {
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Documents</Text>
         <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: colors.primary }]}
+          style={[styles.addButton, { backgroundColor: "#161717" }]}
           onPress={handleAddDocument}
         >
           <Plus size={24} color="#FFFFFF" />
@@ -138,7 +138,7 @@ export default function DocumentsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 20,
   },
   header: {
     flexDirection: "row",
@@ -148,25 +148,27 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   title: {
-    fontSize: FontSizes.xxl,
+    fontSize: 38,
     fontFamily: Fonts.bold,
   },
   addButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
   },
   searchContainer: {
     flexDirection: "row",
+    alignItems: "center",
     padding: 20,
-    gap: 12,
+    gap: 13,
   },
   searchInputContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
+    gap: 10,
     paddingLeft: 12,
   },
   filterButton: {
@@ -202,19 +204,22 @@ const styles = StyleSheet.create({
     padding: 48,
     borderRadius: 12,
     margin: 20,
+    marginHorizontal: 10,
   },
   emptyStateTitle: {
-    fontSize: FontSizes.xl,
+    fontSize: FontSizes.md,
     fontFamily: Fonts.semiBold,
     marginTop: 16,
     marginBottom: 8,
   },
   emptyStateDescription: {
-    fontSize: FontSizes.md,
+    fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
     textAlign: "center",
     lineHeight: 20,
     marginBottom: 24,
   },
+  addDocumentButton: {
+    borderRadius: 30,
+  },
 })
-

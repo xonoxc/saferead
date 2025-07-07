@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
-import { Link } from "expo-router"
+import { Link, type RelativePathString } from "expo-router"
 import {
   Camera,
   Upload,
@@ -71,7 +71,10 @@ export default function HomeScreen() {
   ]
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={{ paddingBottom: 120 }}
+    >
       <View style={styles.header}>
         <Text style={[styles.greeting, { color: colors.textSecondary }]}>Welcome back,</Text>
         <Text style={[styles.userName, { color: colors.text }]}>
@@ -79,7 +82,7 @@ export default function HomeScreen() {
         </Text>
       </View>
 
-      <View style={styles.statsContainer}>
+      <View style={styles.statsGrid}>
         {stats.map((stat, index) => (
           <View key={index} style={[styles.statCard, { backgroundColor: colors.card }]}>
             <View style={[styles.statIcon, { backgroundColor: `${stat.color}20` }]}>
@@ -93,24 +96,32 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
-        <View style={styles.actionsContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.actionsScrollContainer}
+        >
           {quickActions.map((action, index) => (
-            <Link key={index} href={action.href} asChild>
+            <Link
+              key={index}
+              href={action.href as RelativePathString}
+              asChild
+              style={styles.actionLink}
+            >
               <TouchableOpacity
-                style={[styles.actionCard, { backgroundColor: colors.card }]}
+                style={[styles.actionCardTab, { backgroundColor: colors.card }]}
                 activeOpacity={0.7}
               >
                 <View style={[styles.actionIcon, { backgroundColor: `${action.color}20` }]}>
                   <action.icon size={28} color={action.color} />
                 </View>
-                <Text style={[styles.actionTitle, { color: colors.text }]}>{action.title}</Text>
-                <Text style={[styles.actionDescription, { color: colors.textSecondary }]}>
-                  {action.description}
-                </Text>
+                <View>
+                  <Text style={[styles.actionTitle, { color: colors.text }]}>{action.title}</Text>
+                </View>
               </TouchableOpacity>
             </Link>
           ))}
-        </View>
+        </ScrollView>
       </View>
 
       <View style={styles.section}>
@@ -174,20 +185,11 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bold,
   },
   statsContainer: {
-    flexDirection: "row",
-    padding: 20,
-    gap: 12,
-  },
-  statCard: {
     flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    borderRadius: 30,
   },
   statIcon: {
     width: 48,
@@ -202,7 +204,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bold,
   },
   statTitle: {
-    fontSize: FontSizes.sm,
+    fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
   },
   section: {
@@ -215,12 +217,15 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     gap: 12,
+    flex: 1,
+    flexDirection: "row",
   },
   actionCard: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
     borderRadius: 12,
+    fontSize: FontSizes.xs,
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -230,14 +235,17 @@ const styles = StyleSheet.create({
   actionIcon: {
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
   },
   actionTitle: {
-    fontSize: FontSizes.lg,
+    fontSize: FontSizes.xs,
     fontFamily: Fonts.semiBold,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 15,
+    marginLeft: 10,
     flex: 1,
   },
   actionDescription: {
@@ -247,6 +255,7 @@ const styles = StyleSheet.create({
   },
   activityContainer: {
     gap: 8,
+    borderRadius: 12,
   },
   activityItem: {
     flexDirection: "row",
@@ -287,12 +296,32 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: "center",
     padding: 32,
+    paddingHorizontal: 20,
     borderRadius: 12,
   },
   emptyStateTitle: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.semiBold,
     marginTop: 16,
+  },
+  statsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    paddingHorizontal: 8,
+    marginBottom: 16,
+  },
+  statCard: {
+    width: "48%",
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 30,
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   emptyStateDescription: {
     fontSize: FontSizes.md,
@@ -301,5 +330,32 @@ const styles = StyleSheet.create({
     marginTop: 8,
     lineHeight: 20,
   },
+  actionsScrollContainer: {
+    flexDirection: "row",
+    gap: 15,
+    paddingRight: 20,
+    alignItems: "center",
+  },
+  actionCardTab: {
+    flexDirection: "row",
+    borderWidth: 1,
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 12,
+    marginRight: 12,
+    minWidth: 600,
+    elevation: 2,
+    gap: 12,
+  },
+  actionLink: {
+    flex: 1,
+    borderWidth: 2,
+    padding: 4,
+    borderColor: "gray",
+    borderStyle: "dashed",
+    borderRadius: 18,
+    width: 200,
+    flexDirection: "row",
+    alignItems: "center",
+  },
 })
-

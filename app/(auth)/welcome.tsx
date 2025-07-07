@@ -21,10 +21,10 @@ export default function WelcomeScreen() {
         </View>
 
         <View style={styles.textContainer}>
-          <Text style={[styles.title, { color: colors.text }]}>LegalAssist</Text>
+          <Text style={[styles.title, { color: colors.text }]}>SafeRead</Text>
 
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            Your AI-powered legal document assistant
+            Your AI-powered legal document
           </Text>
 
           <Text style={[styles.description, { color: colors.textMuted }]}>
@@ -41,6 +41,10 @@ export default function WelcomeScreen() {
 
         <Link href="/(auth)/login" asChild>
           <Button title="Sign In" variant="outline" size="large" fullWidth onPress={() => {}} />
+        </Link>
+
+        <Link href="/(tabs)/premium" asChild>
+          <Button title="Premium" variant="outline" size="large" fullWidth onPress={() => {}} />
         </Link>
       </View>
     </View>
@@ -94,4 +98,3 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
 })
-

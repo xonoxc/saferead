@@ -1,50 +1,37 @@
-import React, { useState } from "react"
+import React from "react"
 import { View, Text, StyleSheet, ScrollView, Alert } from "react-native"
 import { Link, router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/Button"
 import { TextInput } from "@/components/TextInput"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { type LoginFormSchema, loginFormSchema } from "@/utils/validation/login"
 
 export default function LoginScreen() {
   const { colors } = useTheme()
   const { login } = useAuth()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormSchema>({
+    mode: "onChange",
+    resolver: zodResolver(loginFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  })
 
-  const validateForm = () => {
-    const newErrors: { email?: string; password?: string } = {}
-
-    if (!email) {
-      newErrors.email = "Email is required"
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Please enter a valid email"
-    }
-
-    if (!password) {
-      newErrors.password = "Password is required"
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleLogin = async () => {
-    if (!validateForm()) return
-
-    setIsLoading(true)
+  const onSubmit = async (data: LoginFormSchema) => {
     try {
-      await login(email, password)
+      await login(data.email, data.password)
       router.replace("/(tabs)")
     } catch (error) {
       Alert.alert("Login Failed", "Invalid email or password")
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -53,7 +40,6 @@ export default function LoginScreen() {
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>Welcome Back</Text>
-
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Sign in to your account
           </Text>
@@ -61,8 +47,7 @@ export default function LoginScreen() {
 
         <View style={styles.form}>
           {/* 
-		  <GoogleSignInButton onPress={handleGoogleLogin} loading={isGoogleLoading} fullWidth />
-
+          <GoogleSignInButton onPress={handleGoogleLogin} loading={isGoogleLoading} fullWidth />
           <View style={styles.divider}>
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
             <Text style={[styles.dividerText, { color: colors.textMuted }]}>
@@ -70,33 +55,45 @@ export default function LoginScreen() {
             </Text>
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
           </View> 
-		  */}
+          */}
 
-          <TextInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            error={errors.email}
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                label="Email"
+                value={value}
+                onChangeText={onChange}
+                placeholder="Enter your email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                error={errors.email?.message}
+              />
+            )}
           />
 
-          <TextInput
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Enter your password"
-            secureTextEntry
-            error={errors.password}
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                label="Password"
+                value={value}
+                onChangeText={onChange}
+                placeholder="Enter your password"
+                secureTextEntry
+                error={errors.password?.message}
+              />
+            )}
           />
 
           <View style={styles.buttonContainer}>
             <Button
               title="Sign In"
-              onPress={handleLogin}
-              loading={isLoading}
+              onPress={handleSubmit(onSubmit)}
+              loading={isSubmitting}
               fullWidth
               size="large"
             />

@@ -1,74 +1,41 @@
-import React, { useState } from "react"
+import React from "react"
 import { View, Text, StyleSheet, ScrollView, Alert } from "react-native"
 import { Link, router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/Button"
+import { useForm, Controller } from "react-hook-form"
 import { TextInput } from "@/components/TextInput"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { type RegisterFormData, registerSchema } from "@/utils/validation/register"
 
 export default function RegisterScreen() {
   const { colors } = useTheme()
-  const { register } = useAuth()
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const { register: registerUser } = useAuth()
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    mode: "onChange",
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
   })
-  const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formData.firstName) {
-      newErrors.firstName = "First name is required"
-    }
-
-    if (!formData.lastName) {
-      newErrors.lastName = "Last name is required"
-    }
-
-    if (!formData.email) {
-      newErrors.email = "Email is required"
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email"
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required"
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters"
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password"
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleRegister = async () => {
-    if (!validateForm()) return
-
-    setIsLoading(true)
+  const onSubmit = async (data: RegisterFormData) => {
     try {
-      await register(formData.email, formData.password, formData.firstName, formData.lastName)
+      await registerUser(data.email, data.password, data.firstName, data.lastName)
       router.replace("/(tabs)")
     } catch (error) {
       Alert.alert("Registration Failed", "Please try again")
-    } finally {
-      setIsLoading(false)
     }
-  }
-
-  const updateFormData = (key: string, value: string) => {
-    setFormData(prev => ({ ...prev, [key]: value }))
   }
 
   return (
@@ -79,78 +46,97 @@ export default function RegisterScreen() {
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
-
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Join LegalAssist today
           </Text>
         </View>
 
         <View style={styles.form}>
-          {/* <GoogleSignInButton onPress={handleGoogleSignUp} loading={isGoogleLoading} fullWidth />
-
-          <View style={styles.divider}>
-            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-            <Text style={[styles.dividerText, { color: colors.textMuted }]}>
-              or sign up with email
-            </Text>
-            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-          </View> */}
-
           <View style={styles.nameRow}>
             <View style={styles.nameField}>
-              <TextInput
-                label="First Name"
-                value={formData.firstName}
-                onChangeText={value => updateFormData("firstName", value)}
-                placeholder="Enter your first name"
-                error={errors.firstName}
+              <Controller
+                control={control}
+                name="firstName"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    label="First Name"
+                    value={value}
+                    onChangeText={onChange}
+                    placeholder="Enter your first name"
+                    error={errors.firstName?.message}
+                  />
+                )}
               />
             </View>
             <View style={styles.nameField}>
-              <TextInput
-                label="Last Name"
-                value={formData.lastName}
-                onChangeText={value => updateFormData("lastName", value)}
-                placeholder="Enter your last name"
-                error={errors.lastName}
+              <Controller
+                control={control}
+                name="lastName"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    label="Last Name"
+                    value={value}
+                    onChangeText={onChange}
+                    placeholder="Enter your last name"
+                    error={errors.lastName?.message}
+                  />
+                )}
               />
             </View>
           </View>
 
-          <TextInput
-            label="Email"
-            value={formData.email}
-            onChangeText={value => updateFormData("email", value)}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            error={errors.email}
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                label="Email"
+                value={value}
+                onChangeText={onChange}
+                placeholder="Enter your email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                error={errors.email?.message}
+              />
+            )}
           />
 
-          <TextInput
-            label="Password"
-            value={formData.password}
-            onChangeText={value => updateFormData("password", value)}
-            placeholder="Enter your password"
-            secureTextEntry
-            error={errors.password}
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                label="Password"
+                value={value}
+                onChangeText={onChange}
+                placeholder="Enter your password"
+                secureTextEntry
+                error={errors.password?.message}
+              />
+            )}
           />
 
-          <TextInput
-            label="Confirm Password"
-            value={formData.confirmPassword}
-            onChangeText={value => updateFormData("confirmPassword", value)}
-            placeholder="Confirm your password"
-            secureTextEntry
-            error={errors.confirmPassword}
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                label="Confirm Password"
+                value={value}
+                onChangeText={onChange}
+                placeholder="Confirm your password"
+                secureTextEntry
+                error={errors.confirmPassword?.message}
+              />
+            )}
           />
 
           <View style={styles.buttonContainer}>
             <Button
               title="Create Account"
-              onPress={handleRegister}
-              loading={isLoading}
+              onPress={handleSubmit(onSubmit)}
+              loading={isSubmitting}
               fullWidth
               size="large"
             />
@@ -169,7 +155,6 @@ export default function RegisterScreen() {
     </ScrollView>
   )
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

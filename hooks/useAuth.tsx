@@ -2,41 +2,56 @@ import { useState, useEffect, createContext, use } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
 import { Platform } from "react-native"
-import * as AuthSession from "expo-auth-session"
-import * as Crypto from "expo-crypto"
+import { useAuthRequest } from "expo-auth-session"
+import { makeRedirectUri } from "expo-auth-session"
 import { User, AuthTokens } from "@/types"
+//import * as WebBrowser from "expo-web-browser"
 import { attempt } from "@/utils/attempt"
+
+//import { discovery } from "expo-auth-session/build/providers/Google"
 
 interface AuthContextType {
   user: User | null
   isLoading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
-  loginWithGoogle: () => Promise<void>
+  /* promptGoogleAuth: (options?: AuthRequestPromptOptions) => Promise<AuthSessionResult> */
   register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>
   logout: () => Promise<void>
   refreshToken: () => Promise<void>
   updateUser: (user: Partial<User>) => Promise<void>
 }
 
-const getPlatformGoogleClientID = () => {
-  if (Platform.OS === "android") {
-    return process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || ""
-  } else {
-    return process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || ""
-  }
+/* WebBrowser.maybeCompleteAuthSession() */
+/*
+const authConfig = {
+  androidClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID!,
+  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS!,
 }
-
+*/
 const AuthContext = createContext<AuthContextType | null>(null)
+
+const redirectURI = makeRedirectUri({
+  path: "auth",
+})
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  /* 
+   * const [_, response, promptAsync] = useAuthRequest({
+    ...authConfig,
+  })
+  */
   useEffect(() => {
     loadStoredAuth()
   }, [])
-
+  /*
+  useEffect(() => {
+    loginWithGoogle()
+  }, [response])
+*/
   const getSecureItem = async (key: string): Promise<string | null> => {
     if (Platform.OS === "web") {
       return await AsyncStorage.getItem(key)
@@ -116,6 +131,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const loadStoredAuth = async () => {
+    console.log("redirect uri", redirectURI)
     const result = await attempt(() => getSecureItem("auth_tokens"))
     if (!result.ok) {
       console.log("Failed to load auth tokens:", result.error)
@@ -160,85 +176,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     setUser(null)
   }
-
+  /*
   const loginWithGoogle = async () => {
-    setIsLoading(true)
-
-    const redirectUri = AuthSession.makeRedirectUri({
-      scheme: "com.saferead.app",
-      path: "auth",
-    })
-
-    const request = new AuthSession.AuthRequest({
-      clientId: getPlatformGoogleClientID(),
-      redirectUri,
-      responseType: AuthSession.ResponseType.Code,
-      state: await Crypto.digestStringAsync(
-        Crypto.CryptoDigestAlgorithm.SHA256,
-        redirectUri + Date.now(),
-        { encoding: Crypto.CryptoEncoding.HEX }
-      ),
-      codeChallenge: await Crypto.digestStringAsync(
-        Crypto.CryptoDigestAlgorithm.SHA256,
-        redirectUri,
-        { encoding: Crypto.CryptoEncoding.BASE64 }
-      ),
-      codeChallengeMethod: AuthSession.CodeChallengeMethod.S256,
-    })
-
-    const authResp = await attempt(() =>
-      request.promptAsync({
-        authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
-      })
-    )
-
-    if (!authResp.ok) {
-      console.error("Google login failed:", authResp.error)
-      setIsLoading(false)
-      return
-    }
-
-    const result = authResp.data
-
-    if (result.type === "success") {
-      const tokenAttemptResponse = await attempt(() =>
-        AuthSession.exchangeCodeAsync(
-          {
-            clientId: getPlatformGoogleClientID(),
-            code: result.params.code,
-            redirectUri,
-            extraParams: {},
-          },
-          {
-            tokenEndpoint: "https://oauth2.googleapis.com/token",
-          }
-        )
-      )
-      if (!tokenAttemptResponse.ok) {
-        console.error("Failed to exchange code for tokens:", tokenAttemptResponse.error)
-        setIsLoading(false)
+    if (response?.type === "success") {
+      const userInfo = getUserInfo(response.authentication?.accessToken as string)
+      if (!userInfo) {
+        console.error("Failed to fetch user info")
         return
       }
 
-      const tokenResponse = tokenAttemptResponse.data
-
-      console.log(
-        "Token Response:",
-        JSON.stringify(
-          {
-            accessToken: tokenResponse.accessToken,
-            idToken: tokenResponse.idToken,
-            code: result.params.code,
-          },
-          null,
-          2
-        )
-      )
-
-      setIsLoading(false)
+      console.log(userInfo)
     }
   }
 
+  const getUserInfo = async (token: string) => {
+    if (!token) return
+
+    const resp = await attempt(() =>
+      fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    )
+
+    if (!resp.ok) {
+      console.error("Failed to fetch user info:", resp.error)
+      return
+    }
+
+    const userInfo = await resp.data.json()
+
+    return userInfo
+  }
+*/
   const register = async (email: string, password: string, firstName: string, lastName: string) => {
     // TODO: implement registration functionality
   }
@@ -263,7 +234,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isLoading,
         isAuthenticated: !!user,
         login,
-        loginWithGoogle,
+        /*  promptGoogleAuth: promptAsync, */
         register,
         logout,
         refreshToken,

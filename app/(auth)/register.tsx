@@ -4,13 +4,12 @@ import { Link, router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/Button"
-import { GoogleSignInButton } from "@/components/GoogleSignInButton"
 import { TextInput } from "@/components/TextInput"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 
 export default function RegisterScreen() {
   const { colors } = useTheme()
-  const { register, loginWithGoogle } = useAuth()
+  const { register } = useAuth()
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -19,7 +18,6 @@ export default function RegisterScreen() {
     confirmPassword: "",
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const validateForm = () => {
@@ -69,18 +67,6 @@ export default function RegisterScreen() {
     }
   }
 
-  const handleGoogleSignUp = async () => {
-    setIsGoogleLoading(true)
-    try {
-      await loginWithGoogle()
-      router.replace("/(tabs)")
-    } catch (error) {
-      Alert.alert("Google Sign Up Failed", "Please try again")
-    } finally {
-      setIsGoogleLoading(false)
-    }
-  }
-
   const updateFormData = (key: string, value: string) => {
     setFormData(prev => ({ ...prev, [key]: value }))
   }
@@ -100,7 +86,7 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.form}>
-          <GoogleSignInButton onPress={handleGoogleSignUp} loading={isGoogleLoading} fullWidth />
+          {/* <GoogleSignInButton onPress={handleGoogleSignUp} loading={isGoogleLoading} fullWidth />
 
           <View style={styles.divider}>
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
@@ -108,7 +94,7 @@ export default function RegisterScreen() {
               or sign up with email
             </Text>
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-          </View>
+          </View> */}
 
           <View style={styles.nameRow}>
             <View style={styles.nameField}>

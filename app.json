@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.saferead.andro",
+      "bundleIdentifier": "com.saferead.ios",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -31,7 +31,7 @@
       }
     },
     "android": {
-      "package": "com.saferead.andro"
+      "package": "com.saferead.android"
     }
   }
 }

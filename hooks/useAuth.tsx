@@ -19,6 +19,14 @@ interface AuthContextType {
   updateUser: (user: Partial<User>) => Promise<void>
 }
 
+const getPlatformGoogleClientID = () => {
+  if (Platform.OS === "android") {
+    return process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || ""
+  } else {
+    return process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || ""
+  }
+}
+
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -155,14 +163,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const loginWithGoogle = async () => {
     setIsLoading(true)
+
     const redirectUri = AuthSession.makeRedirectUri({
-      scheme: "com.legalassist.app",
+      scheme: "com.saferead.app",
       path: "auth",
     })
 
     const request = new AuthSession.AuthRequest({
-      clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "",
-      scopes: ["openid", "profile", "email"],
+      clientId: getPlatformGoogleClientID(),
       redirectUri,
       responseType: AuthSession.ResponseType.Code,
       state: await Crypto.digestStringAsync(
@@ -196,7 +204,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const tokenAttemptResponse = await attempt(() =>
         AuthSession.exchangeCodeAsync(
           {
-            clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "",
+            clientId: getPlatformGoogleClientID(),
             code: result.params.code,
             redirectUri,
             extraParams: {},
@@ -214,54 +222,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       const tokenResponse = tokenAttemptResponse.data
 
-      const userInfoFetchResponse = await attempt(() =>
-        fetch(
-          `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokenResponse.accessToken}`
+      console.log(
+        "Token Response:",
+        JSON.stringify(
+          {
+            accessToken: tokenResponse.accessToken,
+            idToken: tokenResponse.idToken,
+            code: result.params.code,
+          },
+          null,
+          2
         )
       )
-
-      if (!userInfoFetchResponse.ok) {
-        console.error("Failed to fetch user info:", userInfoFetchResponse.error)
-        setIsLoading(false)
-        return
-      }
-      const userInfoResponse = userInfoFetchResponse.data
-
-      const googleUserAttempt = await attempt(() => userInfoResponse.json())
-      if (!googleUserAttempt.ok) {
-        console.error("Failed to parse user info:", googleUserAttempt.error)
-        return
-      }
-      const googleUser = googleUserAttempt.data
-
-      const user: User = {
-        id: googleUser.id,
-        email: googleUser.email,
-        firstName: googleUser.given_name || "",
-        lastName: googleUser.family_name || "",
-        avatar: googleUser.picture,
-        subscriptionTier: "free",
-        preferences: {
-          language: "en",
-          theme: "system",
-          fontSize: "medium",
-          dyslexiaFriendly: false,
-          textToSpeech: false,
-          hapticFeedback: true,
-          notifications: true,
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-
-      const tokens: AuthTokens = {
-        accessToken: tokenResponse.accessToken || "",
-        refreshToken: tokenResponse.refreshToken || "",
-        expiresAt: Date.now() + (tokenResponse.expiresIn || 3600) * 1000,
-      }
-
-      await storeAuthData(user, tokens)
-      setUser(user)
 
       setIsLoading(false)
     }

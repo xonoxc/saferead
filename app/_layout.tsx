@@ -13,7 +13,7 @@ import { ThemeProvider } from "@/hooks/useTheme"
 import { useFrameworkReady } from "@/hooks/useFrameworkReady"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 
-function AppContent() {
+const AppContent = () => {
   const [fontsLoaded] = useFonts({
     "Inter-Regular": Inter_400Regular,
     "Inter-Medium": Inter_500Medium,
@@ -23,7 +23,7 @@ function AppContent() {
   })
 
   if (!fontsLoaded) {
-    return <LoadingSpinner />
+    return <LoadingSpinner message="Loading app..." />
   }
 
   return (

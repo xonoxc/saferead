@@ -1,12 +1,12 @@
 import { useState, useEffect, createContext, use } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
-import { Platform } from "react-native"
 //import { useAuthRequest } from "expo-auth-session"
 import { makeRedirectUri } from "expo-auth-session"
 import { User, AuthTokens } from "@/types"
 //import * as WebBrowser from "expo-web-browser"
 import { attempt } from "@/utils/attempt"
+import { isWeb } from "@/utils/helpers/platform"
 
 //import { discovery } from "expo-auth-session/build/providers/Google"
 
@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [response])
 */
   const getSecureItem = async (key: string): Promise<string | null> => {
-    if (Platform.OS === "web") {
+    if (isWeb()) {
       return await AsyncStorage.getItem(key)
     } else {
       return await SecureStore.getItemAsync(key)
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const setSecureItem = async (key: string, value: string): Promise<void> => {
-    if (Platform.OS === "web") {
+    if (isWeb()) {
       await AsyncStorage.setItem(key, value)
     } else {
       await SecureStore.setItemAsync(key, value)
@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const deleteSecureItem = async (key: string) => {
-    if (Platform.OS === "web") {
+    if (isWeb()) {
       await AsyncStorage.removeItem(key)
     } else {
       await SecureStore.deleteItemAsync(key)

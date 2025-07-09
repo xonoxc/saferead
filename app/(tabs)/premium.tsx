@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, ScrollView } from "react-native"
 import { Crown, Check, Star, Users, Shield, Zap } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
@@ -332,4 +332,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 })
-

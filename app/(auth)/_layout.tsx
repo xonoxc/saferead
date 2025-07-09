@@ -1,6 +1,5 @@
-import { Stack } from "expo-router"
+import { Stack , Redirect } from "expo-router"
 import { useAuth } from "@/hooks/useAuth"
-import { Redirect } from "expo-router"
 
 export default function AuthLayout() {
   const { isAuthenticated } = useAuth()

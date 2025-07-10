@@ -21,14 +21,18 @@ export default function LoginScreen() {
     mode: "onChange",
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   })
 
   const onSubmit = async (data: LoginFormSchema) => {
     try {
-      await login(data.email, data.password)
+      const result = await login(data)
+      if (!result.success) {
+        Alert.alert("Login Failed", result.message)
+        return
+      }
       router.replace("/(tabs)")
     } catch (error) {
       Alert.alert("Login Failed", "Invalid email or password")
@@ -59,17 +63,17 @@ export default function LoginScreen() {
 
           <Controller
             control={control}
-            name="email"
+            name="username"
             render={({ field: { onChange, value } }) => (
               <TextInput
-                label="Email"
+                label="Username"
                 value={value}
                 onChangeText={onChange}
-                placeholder="Enter your email"
-                keyboardType="email-address"
+                placeholder="Enter your username"
+                keyboardType="default"
                 autoCapitalize="none"
                 autoCorrect={false}
-                error={errors.email?.message}
+                error={errors.username?.message}
               />
             )}
           />

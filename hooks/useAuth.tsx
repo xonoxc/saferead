@@ -1,12 +1,14 @@
+//import { useAuthRequest } from "expo-auth-session"
+//import { makeRedirectUri } from "expo-auth-session"
 import { useState, useEffect, createContext, use } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
-//import { useAuthRequest } from "expo-auth-session"
-import { makeRedirectUri } from "expo-auth-session"
 import { User, AuthTokens } from "@/types"
 //import * as WebBrowser from "expo-web-browser"
-import { attempt } from "@/utils/attempt"
+import { attempt, attemptSync } from "@/utils/attempt"
 import { isWeb } from "@/utils/helpers/platform"
+import { getErrorMessage } from "@/utils/helpers/respErrors"
+import { apiClient } from "@/utils/apiclient"
 
 //import { discovery } from "expo-auth-session/build/providers/Google"
 
@@ -14,9 +16,20 @@ interface AuthContextType {
   user: User | null
   isLoading: boolean
   isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (data: { username: string; password: string }) => Promise<{
+    success: boolean
+    message: string
+  }>
   /* promptGoogleAuth: (options?: AuthRequestPromptOptions) => Promise<AuthSessionResult> */
-  register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>
+  registerUser: (data: {
+    email: string
+    password1: string
+    password2: string
+    username: string
+  }) => Promise<{
+    success: boolean
+    message: string
+  }>
   logout: () => Promise<void>
   refreshToken: () => Promise<void>
   updateUser: (user: Partial<User>) => Promise<void>
@@ -30,18 +43,18 @@ const authConfig = {
 }
 */
 const AuthContext = createContext<AuthContextType | null>(null)
-
+/*
 const redirectURI = makeRedirectUri({
   path: "auth",
 })
-
+*/
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   /* 
    * const [_, response, promptAsync] = useAuthRequest({
-    ...authConfig,
+	...authConfig,
   })
   */
   useEffect(() => {
@@ -49,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
   /*
   useEffect(() => {
-    loginWithGoogle()
+	loginWithGoogle()
   }, [response])
 */
   const getSecureItem = async (key: string): Promise<string | null> => {
@@ -68,7 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  const storeAuthData = async (user: User, tokens: AuthTokens) => {
+  /* const storeAuthData = async (user: User, tokens: AuthTokens) => {
     const result = await attempt(() =>
       Promise.all([
         setSecureItem("auth_tokens", JSON.stringify(tokens)),
@@ -79,7 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Failed to store auth data:", result.error)
       return
     }
-  }
+  } */
 
   const deleteSecureItem = async (key: string) => {
     if (isWeb()) {
@@ -89,78 +102,95 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  const refreshToken = async () => {
-    const tokenRes = await attempt(() => getSecureItem("auth_tokens"))
-    if (!tokenRes.ok) {
-      console.error("Failed to get auth tokens:", tokenRes.error)
-      return
-    }
-
-    const tokens = tokenRes.data
-    if (!tokens) return
-
-    const { refreshToken } = JSON.parse(tokens) as AuthTokens
-    if (!refreshToken) {
-      console.error("No refresh token available")
-      return
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 500))
-
-    const newTokens: AuthTokens = {
-      accessToken: "new_mock_access_token",
-      refreshToken: "new_mock_refresh_token",
-      expiresAt: Date.now() + 3600000,
-    }
-
-    const userdataRes = await attempt(() => AsyncStorage.getItem("user_data"))
-    if (!userdataRes.ok) {
-      console.error("Failed to get user data:", userdataRes.error)
-      return
-    }
-
-    const userData = userdataRes.data
-
-    if (userData) {
-      const user = JSON.parse(userData)
-      await storeAuthData(user, newTokens)
-
-      setUser(user)
-    }
-    await logout()
-  }
-
   const loadStoredAuth = async () => {
-    console.log("redirect uri", redirectURI)
-    const result = await attempt(() => getSecureItem("auth_tokens"))
+    const result = await attempt(() => getSecureItem("access_token"))
     if (!result.ok) {
-      console.log("Failed to load auth tokens:", result.error)
+      await logout()
       return
     }
 
-    const tokens = result.data
+    const rawToken = result.data
+    if (!rawToken) {
+      await logout()
+      return
+    }
 
-    if (!tokens) {
-      const result = await attempt(refreshToken)
-      if (!result.ok) {
-        console.error("Failed to refresh token:", result.error)
+    const storedUserData = await attempt(() => getSecureItem("user_data"))
+    if (storedUserData.ok) {
+      const parsedUserData = attemptSync(() => JSON.parse(storedUserData.data as string) as User)
+      if (!parsedUserData.ok) {
+        await logout()
         return
       }
-    }
 
-    const { expiresAt } = JSON.parse(tokens as string) as AuthTokens
-    if (Date.now() < expiresAt) {
-      const userData = await AsyncStorage.getItem("user_data")
-      if (userData) {
-        setUser(JSON.parse(userData))
+      const userData = parsedUserData.data
+
+      if (!userData) {
+        await logout()
+        return
       }
+
+      setUser(userData)
+      return
     }
 
+    const resp = await attempt(() => apiClient.get("/auth/user/"))
+    if (!resp.ok) {
+      await logout()
+      return
+    }
+
+    const userData = resp.data.data as User
+
+    const storeUserDataAttempt = await attempt(() =>
+      setSecureItem("user_data", JSON.stringify(userData))
+    )
+    if (!storeUserDataAttempt.ok) {
+      await logout()
+      return
+    }
+
+    setUser(userData)
     setIsLoading(false)
   }
 
-  const login = async (email: string, password: string) => {
-    // TODO: implement login functionality
+  const login = async (data: {
+    username: string
+    password: string
+  }): Promise<{
+    success: boolean
+    message: string
+  }> => {
+    const result = await attempt(() => apiClient.post("/auth/login/", data))
+    if (!result.ok) {
+      return {
+        success: false,
+        message: getErrorMessage(result.error),
+      }
+    }
+
+    const token = result.data.data as { key: string }
+
+    const storeAccessTokenAttempt = await attempt(() =>
+      setSecureItem(
+        "access_token",
+        JSON.stringify({
+          token: token.key,
+        })
+      )
+    )
+
+    if (!storeAccessTokenAttempt.ok) {
+      return {
+        success: false,
+        message: "Something went wrong!",
+      }
+    }
+
+    return {
+      success: true,
+      message: "Login successful",
+    }
   }
 
   const logout = async () => {
@@ -178,40 +208,56 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
   /*
   const loginWithGoogle = async () => {
-    if (response?.type === "success") {
-      const userInfo = getUserInfo(response.authentication?.accessToken as string)
-      if (!userInfo) {
-        console.error("Failed to fetch user info")
-        return
-      }
+	if (response?.type === "success") {
+	  const userInfo = getUserInfo(response.authentication?.accessToken as string)
+	  if (!userInfo) {
+		console.error("Failed to fetch user info")
+		return
+	  }
 
-      console.log(userInfo)
-    }
+	  console.log(userInfo)
+	}
   }
 
   const getUserInfo = async (token: string) => {
-    if (!token) return
+	if (!token) return
 
-    const resp = await attempt(() =>
-      fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-    )
+	const resp = await attempt(() =>
+	  fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`, {
+		headers: {
+		  Authorization: `Bearer ${token}`,
+		},
+	  })
+	)
 
-    if (!resp.ok) {
-      console.error("Failed to fetch user info:", resp.error)
-      return
-    }
+	if (!resp.ok) {
+	  console.error("Failed to fetch user info:", resp.error)
+	  return
+	}
 
-    const userInfo = await resp.data.json()
+	const userInfo = await resp.data.json()
 
-    return userInfo
+	return userInfo
   }
 */
-  const register = async (email: string, password: string, firstName: string, lastName: string) => {
-    // TODO: implement registration functionality
+  const registerUser = async (data: {
+    email: string
+    password1: string
+    password2: string
+    username: string
+  }) => {
+    const result = await attempt(() => apiClient.post("/auth/registration/", data))
+    if (!result.ok) {
+      return {
+        success: false,
+        message: getErrorMessage(result.error),
+      }
+    }
+
+    return {
+      success: true,
+      message: "Registration successful",
+    }
   }
 
   const updateUser = async (userData: Partial<User>) => {
@@ -235,7 +281,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isAuthenticated: !!user,
         login,
         /*  promptGoogleAuth: promptAsync, */
-        register,
+        registerUser,
         logout,
         refreshToken,
         updateUser,

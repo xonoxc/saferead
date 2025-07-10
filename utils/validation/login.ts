@@ -1,8 +1,8 @@
 import { z } from "zod"
-import { emailValidation, passwordValidation } from "./user"
+import { passwordValidation, usernameValidation } from "./user"
 
 export const loginFormSchema = z.object({
-  email: emailValidation,
+  username: usernameValidation,
   password: passwordValidation,
 })
 

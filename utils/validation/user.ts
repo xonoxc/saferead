@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+export const usernameValidation = z.string().min(1, "First name is required")
+
 export const emailValidation = z
   .string()
   .email({ message: "Please enter a valid email" })

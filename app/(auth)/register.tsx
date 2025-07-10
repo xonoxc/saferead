@@ -12,7 +12,7 @@ import { type RegisterFormData, registerSchema } from "@/utils/validation/regist
 
 export default function RegisterScreen() {
   const { colors } = useTheme()
-  const { register: registerUser } = useAuth()
+  const { registerUser } = useAuth()
   const {
     control,
     handleSubmit,
@@ -21,21 +21,20 @@ export default function RegisterScreen() {
     resolver: zodResolver(registerSchema),
     mode: "onChange",
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      username: "",
       email: "",
-      password: "",
-      confirmPassword: "",
+      password1: "",
+      password2: "",
     },
   })
 
   const onSubmit = async (data: RegisterFormData) => {
-    try {
-      await registerUser(data.email, data.password, data.firstName, data.lastName)
-      router.replace("/(tabs)")
-    } catch (error) {
-      Alert.alert("Registration Failed", "Please try again")
+    const response = await registerUser(data)
+    if (!response.success) {
+      Alert.alert("Registration failed:", response.message)
+      return
     }
+    router.replace("/(tabs)")
   }
 
   return (
@@ -56,29 +55,14 @@ export default function RegisterScreen() {
             <View style={styles.nameField}>
               <Controller
                 control={control}
-                name="firstName"
+                name="username"
                 render={({ field: { onChange, value } }) => (
                   <TextInput
-                    label="First Name"
+                    label="username"
                     value={value}
                     onChangeText={onChange}
-                    placeholder="Enter your first name"
-                    error={errors.firstName?.message}
-                  />
-                )}
-              />
-            </View>
-            <View style={styles.nameField}>
-              <Controller
-                control={control}
-                name="lastName"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    label="Last Name"
-                    value={value}
-                    onChangeText={onChange}
-                    placeholder="Enter your last name"
-                    error={errors.lastName?.message}
+                    placeholder="Enter your username"
+                    error={errors.username?.message}
                   />
                 )}
               />
@@ -104,7 +88,7 @@ export default function RegisterScreen() {
 
           <Controller
             control={control}
-            name="password"
+            name="password1"
             render={({ field: { onChange, value } }) => (
               <TextInput
                 label="Password"
@@ -112,14 +96,14 @@ export default function RegisterScreen() {
                 onChangeText={onChange}
                 placeholder="Enter your password"
                 secureTextEntry
-                error={errors.password?.message}
+                error={errors.password1?.message}
               />
             )}
           />
 
           <Controller
             control={control}
-            name="confirmPassword"
+            name="password2"
             render={({ field: { onChange, value } }) => (
               <TextInput
                 label="Confirm Password"
@@ -127,7 +111,7 @@ export default function RegisterScreen() {
                 onChangeText={onChange}
                 placeholder="Confirm your password"
                 secureTextEntry
-                error={errors.confirmPassword?.message}
+                error={errors.password2?.message}
               />
             )}
           />
@@ -171,18 +155,18 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: FontSizes.xxxl,
+    fontSize: FontSizes.xl,
     fontFamily: Fonts.bold,
     textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: FontSizes.lg,
+    fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
     textAlign: "center",
   },
   form: {
-    gap: 24,
+    gap: 23,
   },
   divider: {
     flexDirection: "row",
@@ -204,6 +188,7 @@ const styles = StyleSheet.create({
   },
   nameField: {
     flex: 1,
+    textAlign: "center",
   },
   buttonContainer: {
     marginTop: 8,
@@ -213,7 +198,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerText: {
-    fontSize: FontSizes.md,
+    fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
     textAlign: "center",
   },

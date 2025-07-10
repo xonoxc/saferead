@@ -10,10 +10,12 @@ import {
   Bell,
   CircleHelp as HelpCircle,
   LogOut,
+  KeyRound,
 } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { router } from "expo-router"
 
 export default function SettingsScreen() {
   const { colors, mode, setTheme } = useTheme()
@@ -35,6 +37,11 @@ export default function SettingsScreen() {
           title: "Profile",
           value: `${user?.firstName} ${user?.lastName}`,
           onPress: () => {},
+        },
+        {
+          icon: KeyRound,
+          title: "Change Password",
+          onPress: () => router.push("/(application)/change-password"),
         },
         {
           icon: Shield,
@@ -126,16 +133,10 @@ export default function SettingsScreen() {
                 >
                   <View style={styles.itemLeft}>
                     <View style={[styles.itemIcon, { backgroundColor: colors.surface }]}>
-                      <item.icon
-                        size={20}
-                        color={item.danger ? colors.error : colors.textSecondary}
-                      />
+                      <item.icon size={20} color={!!item ? colors.error : colors.textSecondary} />
                     </View>
                     <Text
-                      style={[
-                        styles.itemTitle,
-                        { color: item.danger ? colors.error : colors.text },
-                      ]}
+                      style={[styles.itemTitle, { color: !!item ? colors.error : colors.text }]}
                     >
                       {item.title}
                     </Text>
@@ -241,4 +242,3 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
   },
 })
-

@@ -1,8 +1,9 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native"
 import { Plus, Search, Filter, Camera, Upload, FileText } from "lucide-react-native"
+
 import { useTheme } from "@/hooks/useTheme"
-import { useDocuments } from "@/hooks/useDocuments"
+import { useDocumentStore } from "@/store/useDocumentStore"
 import { DocumentCard } from "@/components/DocumentCard"
 import { Button } from "@/components/Button"
 import { TextInput } from "@/components/TextInput"
@@ -11,9 +12,27 @@ import { Fonts, FontSizes } from "@/constants/Fonts"
 
 export default function DocumentsScreen() {
   const { colors } = useTheme()
-  const { documents, isLoading, pickDocument, scanDocument, analyzeDocument } = useDocuments()
+  const {
+    documents,
+    isLoading,
+    error,
+    fetchDocuments,
+    pickDocument,
+    scanDocument,
+    analyzeDocument,
+  } = useDocumentStore()
   const [searchQuery, setSearchQuery] = useState("")
   const [showActions, setShowActions] = useState(false)
+
+  useEffect(() => {
+    fetchDocuments()
+  }, [fetchDocuments])
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert("Error", error)
+    }
+  }, [error])
 
   const filteredDocuments = documents.filter(
     doc =>
@@ -27,29 +46,16 @@ export default function DocumentsScreen() {
 
   const handlePickDocument = async () => {
     setShowActions(false)
-    try {
-      await pickDocument()
-    } catch (error) {
-      Alert.alert("Error", "Failed to pick document")
-    }
+    await pickDocument()
   }
 
   const handleScanDocument = async () => {
     setShowActions(false)
-    try {
-      await scanDocument()
-    } catch (error) {
-      Alert.alert("Error", "Failed to scan document")
-    }
+    await scanDocument()
   }
 
   const handleAnalyzeDocument = async (docId: string) => {
-    try {
-      await analyzeDocument(docId)
-      Alert.alert("Success", "Document analyzed successfully")
-    } catch (error) {
-      Alert.alert("Error", "Failed to analyze document")
-    }
+    await analyzeDocument(docId)
   }
 
   if (isLoading) {

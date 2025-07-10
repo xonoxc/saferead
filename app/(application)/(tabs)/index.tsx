@@ -8,37 +8,45 @@ import {
   TrendingUp,
   CircleAlert as AlertCircle,
   Clock,
+  LucideIcon,
 } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
-import { useDocuments } from "@/hooks/useDocuments"
+import { useDocumentStore } from "@/store/useDocumentStore"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+
+type Stat = {
+  icon: LucideIcon
+  title: string
+  value: number
+  color: string
+}
 
 export default function HomeScreen() {
   const { colors } = useTheme()
   const { user } = useAuth()
-  const { documents } = useDocuments()
+  const { documents } = useDocumentStore()
 
   const quickActions = [
     {
       icon: Camera,
       title: "Scan Document",
       description: "Use camera to scan legal documents",
-      href: "/(tabs)/documents?action=scan",
+      href: "(application)/(tabs)/documents?action=scan",
       color: colors.primary,
     },
     {
       icon: Upload,
       title: "Upload File",
       description: "Import PDF or image files",
-      href: "/(tabs)/documents?action=upload",
+      href: "(application)/(tabs)/documents?action=upload",
       color: colors.secondary,
     },
     {
       icon: FileText,
       title: "Text Analysis",
       description: "Analyze text-based documents",
-      href: "/(tabs)/documents?action=text",
+      href: "(application)/(tabs)/documents?action=text",
       color: colors.accent,
     },
   ]
@@ -74,6 +82,7 @@ export default function HomeScreen() {
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={{ paddingBottom: 120 }}
+      bounces
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.header}>
@@ -84,15 +93,23 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.statsGrid}>
-        {stats.map((stat, index) => (
-          <View key={index} style={[styles.statCard, { backgroundColor: colors.card }]}>
-            <View style={[styles.statIcon, { backgroundColor: `${stat.color}20` }]}>
-              <stat.icon size={24} color={stat.color} />
-            </View>
-            <Text style={[styles.statValue, { color: colors.text }]}>{stat.value}</Text>
-            <Text style={[styles.statTitle, { color: colors.textSecondary }]}>{stat.title}</Text>
+        <StatCard
+          stat={stats[0]}
+          style={{
+            width: "100%",
+            height: 130,
+            marginBottom: 12,
+            flex: 1,
+            marginRight: 12,
+          }}
+        />
+        <View style={styles.row}>
+          <View style={styles.leftColumn}>
+            <StatCard stat={stats[1]} style={{ width: "100%", height: 130, marginBottom: 12 }} />
+            <StatCard stat={stats[2]} style={{ width: "100%", height: 120 }} />
           </View>
-        ))}
+          <StatCard stat={stats[3]} style={{ width: "48%", height: 264 }} />
+        </View>
       </View>
 
       <View style={styles.section}>
@@ -113,8 +130,10 @@ export default function HomeScreen() {
                 style={[styles.actionCardTab, { backgroundColor: colors.card }]}
                 activeOpacity={0.7}
               >
-                <View style={[styles.actionIcon, { backgroundColor: `${action.color}20` }]}>
-                  <action.icon size={28} color={action.color} />
+                <View
+                  style={[styles.actionIcon, { backgroundColor: `${action.color}20`, padding: 10 }]}
+                >
+                  <action.icon size={20} color={action.color} />
                 </View>
                 <View>
                   <Text style={[styles.actionTitle, { color: colors.text }]}>{action.title}</Text>
@@ -168,6 +187,25 @@ export default function HomeScreen() {
   )
 }
 
+interface StatCardProps {
+  stat: Stat
+  style?: object
+}
+
+const StatCard = ({ stat, style }: StatCardProps) => {
+  const { colors } = useTheme()
+
+  return (
+    <View style={[styles.statCard, { backgroundColor: colors.card }, style]}>
+      <View style={[styles.statIcon, { backgroundColor: `${stat.color}20` }]}>
+        <stat.icon size={24} color={stat.color} />
+      </View>
+      <Text style={[styles.statValue, { color: colors.text }]}>{stat.value}</Text>
+      <Text style={[styles.statTitle, { color: colors.textSecondary }]}>{stat.title}</Text>
+    </View>
+  )
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -185,28 +223,14 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.xxl,
     fontFamily: Fonts.bold,
   },
-  statsContainer: {
-    flex: 1,
+  statsGrid: {
+    paddingBottom: 10,
+    paddingHorizontal: 20,
+  },
+  row: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    borderRadius: 30,
-  },
-  statIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  statValue: {
-    fontSize: FontSizes.xl,
-    fontFamily: Fonts.bold,
-  },
-  statTitle: {
-    fontSize: FontSizes.xs,
-    fontFamily: Fonts.regular,
+    justifyContent: "space-between",
+    width: "100%",
   },
   section: {
     padding: 20,
@@ -216,22 +240,32 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.semiBold,
     marginBottom: 16,
   },
-  actionsContainer: {
-    gap: 12,
-    flex: 1,
+  actionsScrollContainer: {
     flexDirection: "row",
+    gap: 15,
+    paddingRight: 20,
+    alignItems: "center",
   },
-  actionCard: {
+  actionCardTab: {
     flexDirection: "row",
+    borderWidth: 1,
     alignItems: "center",
     padding: 16,
     borderRadius: 12,
-    fontSize: FontSizes.xs,
+    marginRight: 12,
+    minWidth: 600,
     elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    gap: 12,
+  },
+  actionLink: {
+    flex: 1,
+    borderWidth: 2,
+    borderColor: "gray",
+    borderStyle: "dashed",
+    borderRadius: 18,
+    width: 200,
+    flexDirection: "row",
+    alignItems: "center",
   },
   actionIcon: {
     width: 56,
@@ -248,11 +282,6 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     marginLeft: 10,
     flex: 1,
-  },
-  actionDescription: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.regular,
-    flex: 2,
   },
   activityContainer: {
     gap: 8,
@@ -274,6 +303,33 @@ const styles = StyleSheet.create({
   },
   activityContent: {
     flex: 1,
+  },
+  statCard: {
+    padding: 20,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  statIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  statValue: {
+    fontSize: FontSizes.xl,
+    fontFamily: Fonts.bold,
+  },
+  statTitle: {
+    fontSize: FontSizes.xs,
+    fontFamily: Fonts.regular,
   },
   activityTitle: {
     fontSize: FontSizes.md,
@@ -305,25 +361,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.semiBold,
     marginTop: 16,
   },
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingHorizontal: 8,
-    marginBottom: 16,
-  },
-  statCard: {
-    width: "48%",
-    marginBottom: 12,
-    padding: 16,
-    borderRadius: 30,
-    alignItems: "center",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
   emptyStateDescription: {
     fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
@@ -331,32 +368,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     lineHeight: 20,
   },
-  actionsScrollContainer: {
-    flexDirection: "row",
-    gap: 15,
-    paddingRight: 20,
-    alignItems: "center",
-  },
-  actionCardTab: {
-    flexDirection: "row",
-    borderWidth: 1,
-    alignItems: "center",
-    padding: 16,
-    borderRadius: 12,
-    marginRight: 12,
-    minWidth: 600,
-    elevation: 2,
-    gap: 12,
-  },
-  actionLink: {
-    flex: 1,
-    borderWidth: 2,
-    padding: 4,
-    borderColor: "gray",
-    borderStyle: "dashed",
-    borderRadius: 18,
-    width: 200,
-    flexDirection: "row",
-    alignItems: "center",
+  leftColumn: {
+    width: "48%",
   },
 })

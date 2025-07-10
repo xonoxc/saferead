@@ -1,38 +1,67 @@
-import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import { FileText, Calendar, TriangleAlert as AlertTriangle, Shield } from "lucide-react-native"
-import { useTheme } from "@/hooks/useTheme"
-import { Document } from "@/types"
-import { Fonts, FontSizes } from "@/constants/Fonts"
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+  FileText,
+  Calendar,
+  TriangleAlert as AlertTriangle,
+  Shield,
+  MoreVertical,
+} from "lucide-react-native";
+import { useTheme } from "@/hooks/useTheme";
+import { Document } from "@/types";
+import { Fonts, FontSizes } from "@/constants/Fonts";
+import { useDocumentStore } from "@/store/useDocumentStore";
 
 interface DocumentCardProps {
-  document: Document
-  onPress: () => void
-  onAnalyze?: () => void
+  document: Document;
+  onPress: () => void;
+  onAnalyze?: () => void;
 }
 
-export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, onAnalyze }) => {
-  const { colors } = useTheme()
+export const DocumentCard: React.FC<DocumentCardProps> = ({
+  document,
+  onPress,
+  onAnalyze,
+}) => {
+  const { colors } = useTheme();
+  const { deleteDocument } = useDocumentStore();
+  const [showMenu, setShowMenu] = useState(false);
 
   const getRiskColor = (risk: string | undefined) => {
     switch (risk) {
       case "high":
-        return colors.error
+        return colors.error;
       case "medium":
-        return colors.warning
+        return colors.warning;
       case "low":
-        return colors.success
+        return colors.success;
       default:
-        return colors.textMuted
+        return colors.textMuted;
     }
-  }
+  };
 
   const formatFileSize = (bytes: number) => {
-    const sizes = ["B", "KB", "MB", "GB"]
-    if (bytes === 0) return "0 B"
-    const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + " " + sizes[i]
-  }
+    const sizes = ["B", "KB", "MB", "GB"];
+    if (bytes === 0) return "0 B";
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + " " + sizes[i];
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Document",
+      "Are you sure you want to delete this document?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteDocument(document.id),
+        },
+      ]
+    );
+    setShowMenu(false);
+  };
 
   return (
     <TouchableOpacity
@@ -52,8 +81,18 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, o
             {document.type} • {formatFileSize(document.fileSize)}
           </Text>
         </View>
-        {document.isEncrypted && <Shield size={16} color={colors.success} />}
+        <TouchableOpacity onPress={() => setShowMenu(!showMenu)}>
+          <MoreVertical size={20} color={colors.textSecondary} />
+        </TouchableOpacity>
       </View>
+
+      {showMenu && (
+        <View style={styles.menu}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleDelete}>
+            <Text style={[styles.menuItemText, { color: colors.error }]}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <View style={styles.content}>
         <View style={styles.dateContainer}>
@@ -89,9 +128,9 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, o
         {!document.analysis && onAnalyze && (
           <TouchableOpacity
             style={[styles.analyzeButton, { backgroundColor: colors.primary }]}
-            onPress={e => {
-              e.stopPropagation()
-              onAnalyze()
+            onPress={(e) => {
+              e.stopPropagation();
+              onAnalyze();
             }}
           >
             <Text style={[styles.analyzeButtonText, { color: "#FFFFFF" }]}>Analyze Document</Text>
@@ -114,8 +153,8 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, o
         </View>
       )}
     </TouchableOpacity>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   card: {
@@ -217,5 +256,20 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
   },
-})
-
+  menu: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    backgroundColor: "#2F2F2F",
+    borderRadius: 8,
+    padding: 8,
+    zIndex: 1,
+  },
+  menuItem: {
+    padding: 8,
+  },
+  menuItemText: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.medium,
+  },
+});

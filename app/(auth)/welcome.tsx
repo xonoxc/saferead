@@ -43,7 +43,7 @@ export default function WelcomeScreen() {
           <Button title="Sign In" variant="outline" size="large" fullWidth onPress={() => {}} />
         </Link>
 
-        <Link href="/(tabs)/premium" asChild>
+        <Link href="/(application)/(tabs)/premium" asChild>
           <Button title="Premium" variant="outline" size="large" fullWidth onPress={() => {}} />
         </Link>
       </View>

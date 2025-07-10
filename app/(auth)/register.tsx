@@ -1,18 +1,22 @@
-import React from "react"
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native"
+import React, { useState } from "react"
+import { View, Text, StyleSheet, ScrollView } from "react-native"
 import { Link, router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/Button"
 import { useForm, Controller } from "react-hook-form"
 import { TextInput } from "@/components/TextInput"
+import { ErrorMessage } from "@/components/ErrorMessage"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { type RegisterFormData, registerSchema } from "@/utils/validation/register"
+//import { isIOS } from "@/utils/helpers/platform"
 
 export default function RegisterScreen() {
   const { colors } = useTheme()
   const { registerUser } = useAuth()
+  const [errorMessage, setErrorMessage] = useState<string | undefined>()
+
   const {
     control,
     handleSubmit,
@@ -31,16 +35,19 @@ export default function RegisterScreen() {
   const onSubmit = async (data: RegisterFormData) => {
     const response = await registerUser(data)
     if (!response.success) {
-      Alert.alert("Registration failed:", response.message)
+      setErrorMessage(response.message)
       return
     }
-    router.replace("/(tabs)")
+    router.replace("/(application)/(tabs)")
   }
 
   return (
+    /*     <KeyboardAvoidingView style={styles.keyboardAvoidingView}> */
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
     >
       <View style={styles.content}>
         <View style={styles.header}>
@@ -51,6 +58,7 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.form}>
+          <ErrorMessage message={errorMessage} />
           <View style={styles.nameRow}>
             <View style={styles.nameField}>
               <Controller
@@ -137,18 +145,22 @@ export default function RegisterScreen() {
         </View>
       </View>
     </ScrollView>
+    /*     </KeyboardAvoidingView> */
   )
 }
 const styles = StyleSheet.create({
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   container: {
     flex: 1,
   },
-  content: {
-    flex: 1,
-    padding: 24,
-    paddingTop: 80,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
-    minHeight: "100%",
+  },
+  content: {
+    padding: 24,
   },
   header: {
     alignItems: "center",

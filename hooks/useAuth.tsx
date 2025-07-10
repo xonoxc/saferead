@@ -3,7 +3,7 @@
 import { useState, useEffect, createContext, use } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
-import { User, AuthTokens } from "@/types"
+import { User } from "@/types"
 //import * as WebBrowser from "expo-web-browser"
 import { attempt, attemptSync } from "@/utils/attempt"
 import { isWeb } from "@/utils/helpers/platform"
@@ -31,7 +31,7 @@ interface AuthContextType {
     message: string
   }>
   logout: () => Promise<void>
-  refreshToken: () => Promise<void>
+  // refreshToken: () => Promise<void>
   updateUser: (user: Partial<User>) => Promise<void>
 }
 
@@ -103,54 +103,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const loadStoredAuth = async () => {
-    const result = await attempt(() => getSecureItem("access_token"))
-    if (!result.ok) {
-      await logout()
-      return
-    }
+    setIsLoading(true)
+    const token = await getSecureItem("access_token")
 
-    const rawToken = result.data
-    if (!rawToken) {
-      await logout()
-      return
-    }
-
-    const storedUserData = await attempt(() => getSecureItem("user_data"))
-    if (storedUserData.ok) {
-      const parsedUserData = attemptSync(() => JSON.parse(storedUserData.data as string) as User)
-      if (!parsedUserData.ok) {
-        await logout()
-        return
+    if (token) {
+      const storedUserData = await getSecureItem("user_data")
+      if (storedUserData) {
+        const parsedUserData = attemptSync(() => JSON.parse(storedUserData) as User)
+        if (parsedUserData.ok) {
+          setUser(parsedUserData.data)
+        }
+      } else {
+        const resp = await attempt(() => apiClient.get("/auth/user/"))
+        if (resp.ok) {
+          const userData = resp.data.data as User
+          await setSecureItem("user_data", JSON.stringify(userData))
+          setUser(userData)
+        } else {
+          await logout()
+        }
       }
-
-      const userData = parsedUserData.data
-
-      if (!userData) {
-        await logout()
-        return
-      }
-
-      setUser(userData)
-      return
     }
-
-    const resp = await attempt(() => apiClient.get("/auth/user/"))
-    if (!resp.ok) {
-      await logout()
-      return
-    }
-
-    const userData = resp.data.data as User
-
-    const storeUserDataAttempt = await attempt(() =>
-      setSecureItem("user_data", JSON.stringify(userData))
-    )
-    if (!storeUserDataAttempt.ok) {
-      await logout()
-      return
-    }
-
-    setUser(userData)
     setIsLoading(false)
   }
 
@@ -171,21 +144,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const token = result.data.data as { key: string }
 
-    const storeAccessTokenAttempt = await attempt(() =>
-      setSecureItem(
-        "access_token",
-        JSON.stringify({
-          token: token.key,
-        })
-      )
-    )
+    await setSecureItem("access_token", token.key)
 
-    if (!storeAccessTokenAttempt.ok) {
+    const resp = await attempt(() => apiClient.get("/auth/user/"))
+    if (!resp.ok) {
+      await logout()
       return {
         success: false,
-        message: "Something went wrong!",
+        message: "Failed to fetch user data",
       }
     }
+
+    const userData = resp.data.data as User
+    await setSecureItem("user_data", JSON.stringify(userData))
+    setUser(userData)
 
     return {
       success: true,
@@ -194,16 +166,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const logout = async () => {
-    const result = await attempt(() => deleteSecureItem("auth_tokens"))
-    if (!result.ok) {
-      console.error("Failed to delete auth tokens:", result.error)
-      return
-    }
-    const removeResult = await attempt(() => AsyncStorage.removeItem("user_data"))
-    if (!removeResult.ok) {
-      console.error("Failed to remove user data:", removeResult.error)
-      return
-    }
+    await deleteSecureItem("access_token")
+    await deleteSecureItem("user_data")
     setUser(null)
   }
   /*
@@ -283,7 +247,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         /*  promptGoogleAuth: promptAsync, */
         registerUser,
         logout,
-        refreshToken,
+        /* refreshToken, */
         updateUser,
       }}
     >

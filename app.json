@@ -7,6 +7,9 @@
     "icon": "./assets/images/icon.png",
     "scheme": "com.saferead.app",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#000000"
+    },
     "experiments": {
       "reactCompiler": true,
       "typedRoutes": true

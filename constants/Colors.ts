@@ -6,6 +6,7 @@ const Colors = {
     success: "#22C55E",
     warning: "#F59E0B",
     error: "#EF4444",
+    errorBackground: "#FEE2E2",
     background: "#FFFFFF",
     surface: "#F8F9FA",
     card: "#FFFFFF",
@@ -15,6 +16,7 @@ const Colors = {
     border: "#E5E7EB",
     borderLight: "#F3F4F6",
     shadow: "#000000",
+    forgotPassword: "#2563EB",
   },
   dark: {
     primary: "#FFFFFF",
@@ -23,6 +25,7 @@ const Colors = {
     success: "#22C55E",
     warning: "#F59E0B",
     error: "#EF4444",
+    errorBackground: "#2F1517",
     background: "#000000",
     surface: "#111111",
     card: "#1A1A1A",
@@ -32,8 +35,8 @@ const Colors = {
     border: "#333333",
     borderLight: "#1A1A1A",
     shadow: "#000000",
+    forgotPassword: "#38BDF8",
   },
 }
 
 export default Colors
-

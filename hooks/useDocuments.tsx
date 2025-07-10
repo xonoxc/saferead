@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, createContext, use } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as DocumentPicker from "expo-document-picker"
 import * as ImagePicker from "expo-image-picker"
@@ -65,7 +65,20 @@ const analysis: DocumentAnalysis = {
   ],
 }
 
-export const useDocuments = () => {
+interface DocumentsContextType {
+  documents: Document[]
+  isLoading: boolean
+  error: string | null
+  pickDocument: () => Promise<Document | undefined>
+  scanDocument: () => Promise<Document | undefined>
+  analyzeDocument: (docId: string) => Promise<DocumentAnalysis>
+  deleteDocument: (docId: string) => Promise<void>
+  clearError: () => void
+}
+
+const DocumentsContext = createContext<DocumentsContextType | null>(null)
+
+export const DocumentsProvider = ({ children }: { children: React.ReactNode }) => {
   const [documents, setDocuments] = useState<Document[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -162,7 +175,7 @@ export const useDocuments = () => {
     }
 
     if (!result.data.canceled) {
-      const image = result.data.assets[0]
+      //const image = result.data.assets[0]
       const newDoc: Document = {
         id: Date.now().toString(),
         title: `Scanned Document ${new Date().toLocaleDateString()}`,
@@ -206,14 +219,28 @@ export const useDocuments = () => {
     }
   }
 
-  return {
-    documents,
-    isLoading,
-    error,
-    pickDocument,
-    scanDocument,
-    analyzeDocument,
-    deleteDocument,
-    clearError: () => setError(null),
+  return (
+    <DocumentsContext.Provider
+      value={{
+        documents,
+        isLoading,
+        error,
+        pickDocument,
+        scanDocument,
+        analyzeDocument,
+        deleteDocument,
+        clearError: () => setError(null),
+      }}
+    >
+      {children}
+    </DocumentsContext.Provider>
+  )
+}
+
+export const useDocuments = () => {
+  const context = use(DocumentsContext)
+  if (!context) {
+    throw new Error("useDocuments must be used within a DocumentsProvider")
   }
+  return context
 }

@@ -9,9 +9,15 @@ import {
 } from "@expo-google-fonts/inter"
 import { RobotoMono_400Regular } from "@expo-google-fonts/roboto-mono"
 import { AuthProvider } from "@/hooks/useAuth"
-import { ThemeProvider } from "@/hooks/useTheme"
+import { ThemeProvider, useTheme } from "@/hooks/useTheme"
 import { useFrameworkReady } from "@/hooks/useFrameworkReady"
-import { LoadingSpinner } from "@/components/LoadingSpinner"
+import * as SplashScreen from "expo-splash-screen"
+import * as SystemUI from "expo-system-ui"
+import React, { useEffect, useState } from "react"
+import { View } from "react-native"
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
+
+SplashScreen.preventAutoHideAsync()
 
 const AppContent = () => {
   const [fontsLoaded] = useFonts({
@@ -22,19 +28,47 @@ const AppContent = () => {
     "RobotoMono-Regular": RobotoMono_400Regular,
   })
 
-  if (!fontsLoaded) {
-    return <LoadingSpinner message="Loading app..." />
+  const { colors, isDark } = useTheme()
+  const [appReady, setAppReady] = useState(false)
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      setAppReady(true)
+    }
+  }, [fontsLoaded])
+
+  useEffect(() => {
+    if (appReady) {
+      SystemUI.setBackgroundColorAsync(colors.background)
+    }
+  }, [appReady, colors.background])
+
+  const onLayout = async () => {
+    if (appReady) {
+      await SplashScreen.hideAsync()
+    }
+  }
+
+  if (!appReady) {
+    return null
   }
 
   return (
-    <AuthProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </AuthProvider>
+    <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={onLayout}>
+      <AuthProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.background },
+          }}
+        >
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(application)/(tabs)" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style={isDark ? "light" : "dark"} />
+      </AuthProvider>
+    </View>
   )
 }
 
@@ -42,8 +76,10 @@ export default function RootLayout() {
   useFrameworkReady()
 
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </SafeAreaProvider>
   )
 }

@@ -3,14 +3,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
 import { isWeb } from "./helpers/platform"
 import { serverURL } from "@/constants/server"
-import { AuthTokens } from "@/types"
-import { attempt, attemptSync } from "./attempt"
+import { attempt } from "./attempt"
 
 const AUTH_HEADER = "Authorization"
 
 export async function getAccessToken(): Promise<string | null> {
   const result = await attempt(() =>
-    isWeb() ? AsyncStorage.getItem("access_token") : SecureStore.getItemAsync("auth_tokens")
+    isWeb() ? AsyncStorage.getItem("access_token") : SecureStore.getItemAsync("access_token")
   )
 
   if (!result.ok) {
@@ -18,19 +17,7 @@ export async function getAccessToken(): Promise<string | null> {
     return null
   }
 
-  const raw = result.data
-  if (!raw) return null
-
-  const parsed = attemptSync(
-    () =>
-      JSON.parse(raw) as {
-        access_token: string
-      }
-  )
-  if (!parsed.ok) {
-    return null
-  }
-  return parsed.data.access_token
+  return result.data
 }
 
 export const apiClient = axios.create({

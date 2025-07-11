@@ -10,7 +10,6 @@ import { TextInput } from "@/components/TextInput"
 import { ErrorMessage } from "@/components/ErrorMessage"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { type LoginFormSchema, loginFormSchema } from "@/utils/validation/login"
-import { isIOS } from "@/utils/helpers/platform"
 
 export default function LoginScreen() {
   const { colors } = useTheme()
@@ -44,24 +43,20 @@ export default function LoginScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={isIOS() ? "padding" : "height"}
-      style={styles.keyboardAvoidingView}
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
     >
-      <ScrollView
-        style={[styles.container, { backgroundColor: colors.background }]}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign In</Text>
-          </View>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign In</Text>
+        </View>
 
-          <View style={styles.form}>
-            <ErrorMessage message={errorMessage} />
-            {/* 
+        <View style={styles.form}>
+          <ErrorMessage message={errorMessage} />
+          {/* 
           <GoogleSignInButton onPress={handleGoogleLogin} loading={isGoogleLoading} fullWidth />
           <View style={styles.divider}>
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
@@ -72,74 +67,71 @@ export default function LoginScreen() {
           </View> 
           */}
 
-            <View style={styles.footer}>
-              <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-                Don&apos;t have an account?{" "}
-                <Link href="/(auth)/register" asChild>
-                  <Text style={[styles.link, { color: colors.primary }]}>Sign up</Text>
-                </Link>
-              </Text>
-            </View>
-
-            <View style={styles.divider}>
-              <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-              <Text style={[styles.dividerText, { color: colors.textMuted }]}>
-                or continue with
-              </Text>
-              <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-            </View>
-
-            <Controller
-              control={control}
-              name="username"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  label="Username"
-                  value={value}
-                  onChangeText={onChange}
-                  placeholder="Enter your username"
-                  keyboardType="default"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  error={errors.username?.message}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="password"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  label="Password"
-                  value={value}
-                  onChangeText={onChange}
-                  placeholder="Enter your password"
-                  secureTextEntry
-                  error={errors.password?.message}
-                />
-              )}
-            />
-
-            <View style={styles.forgotPasswordContainer}>
-              <Link href={"/(auth)/forgot-password" as RelativePathString} asChild>
-                <Text style={{ color: "skyblue" }}>Forgot Password?</Text>
+          <View style={styles.footer}>
+            <Text style={[styles.footerText, { color: colors.textSecondary }]}>
+              Don&apos;t have an account?{" "}
+              <Link href="/(auth)/register" asChild>
+                <Text style={[styles.link, { color: colors.primary }]}>Sign up</Text>
               </Link>
-            </View>
+            </Text>
+          </View>
 
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Sign In"
-                onPress={handleSubmit(onSubmit)}
-                loading={isSubmitting}
-                fullWidth
-                size="large"
+          <View style={styles.divider}>
+            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+            <Text style={[styles.dividerText, { color: colors.textMuted }]}>or continue with</Text>
+            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+          </View>
+
+          <Controller
+            control={control}
+            name="username"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                label="Username"
+                value={value}
+                onChangeText={onChange}
+                placeholder="Enter your username"
+                keyboardType="default"
+                autoCapitalize="none"
+                autoCorrect={false}
+                error={errors.username?.message}
               />
-            </View>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                label="Password"
+                value={value}
+                onChangeText={onChange}
+                placeholder="Enter your password"
+                secureTextEntry
+                error={errors.password?.message}
+              />
+            )}
+          />
+
+          <View style={styles.forgotPasswordContainer}>
+            <Link href={"/(auth)/forgot-password" as RelativePathString} asChild>
+              <Text style={{ color: "skyblue" }}>Forgot Password?</Text>
+            </Link>
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Sign In"
+              onPress={handleSubmit(onSubmit)}
+              loading={isSubmitting}
+              fullWidth
+              size="large"
+            />
           </View>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </ScrollView>
   )
 }
 

@@ -10,7 +10,6 @@ import { ErrorMessage } from "@/components/ErrorMessage"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { type RegisterFormData, registerSchema } from "@/utils/validation/register"
-//import { isIOS } from "@/utils/helpers/platform"
 
 export default function RegisterScreen() {
   const { colors } = useTheme()
@@ -42,7 +41,6 @@ export default function RegisterScreen() {
   }
 
   return (
-    /*     <KeyboardAvoidingView style={styles.keyboardAvoidingView}> */
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.scrollContent}
@@ -145,7 +143,6 @@ export default function RegisterScreen() {
         </View>
       </View>
     </ScrollView>
-    /*     </KeyboardAvoidingView> */
   )
 }
 const styles = StyleSheet.create({

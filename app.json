@@ -38,6 +38,7 @@
       }
     },
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "package": "com.saferead.andro"
     }
   }

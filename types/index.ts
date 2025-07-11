@@ -1,8 +1,9 @@
 export interface User {
   id: string
   email: string
-  firstName: string
-  lastName: string
+  username: string
+  first_name?: string
+  last_name?: string
   avatar?: string
   subscriptionTier: "free" | "pro" | "enterprise"
   preferences: UserPreferences
@@ -102,4 +103,3 @@ export interface SubscriptionPlan {
   aiAnalysisLimit: number
   collaborators: number
 }
-

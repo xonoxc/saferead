@@ -32,6 +32,13 @@ const AppContent = () => {
   const [appReady, setAppReady] = useState(false)
 
   useEffect(() => {
+    ;(async () => {
+      const bgColor = await SystemUI.getBackgroundColorAsync()
+      if (!bgColor) {
+        await SystemUI.setBackgroundColorAsync(colors.background)
+      }
+    })()
+
     if (fontsLoaded) {
       setAppReady(true)
     }
@@ -54,12 +61,11 @@ const AppContent = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={onLayout}>
+    <View style={{ flex: 1 }} onLayout={onLayout}>
       <AuthProvider>
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: colors.background },
           }}
         >
           <Stack.Screen name="(auth)" />

@@ -14,69 +14,13 @@ import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { useDocumentStore } from "@/store/useDocumentStore"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-
-type Stat = {
-  icon: LucideIcon
-  title: string
-  value: number
-  color: string
-}
+import { Document } from "@/types"
 
 export default function HomeScreen() {
   const { colors } = useTheme()
   const { user } = useAuth()
   const { documents } = useDocumentStore()
-
-  const quickActions = [
-    {
-      icon: Camera,
-      title: "Scan Document",
-      description: "Use camera to scan legal documents",
-      href: "(application)/(tabs)/documents?action=scan",
-      color: colors.primary,
-    },
-    {
-      icon: Upload,
-      title: "Upload File",
-      description: "Import PDF or image files",
-      href: "(application)/(tabs)/documents?action=upload",
-      color: colors.secondary,
-    },
-    {
-      icon: FileText,
-      title: "Text Analysis",
-      description: "Analyze text-based documents",
-      href: "(application)/(tabs)/documents?action=text",
-      color: colors.accent,
-    },
-  ]
-
-  const stats = [
-    {
-      icon: FileText,
-      title: "Documents",
-      value: documents.length,
-      color: colors.primary,
-    },
-    {
-      icon: TrendingUp,
-      title: "Analyzed",
-      value: documents.filter(d => d.analysis).length,
-      color: colors.success,
-    },
-    {
-      icon: AlertCircle,
-      title: "High Risk",
-      value: documents.filter(d => d.analysis?.riskAssessment?.overallRisk === "high").length,
-      color: colors.error,
-    },
-    {
-      icon: Clock,
-      title: "Pending",
-      value: documents.filter(d => !d.analysis).length,
-      color: colors.warning,
-    },
-  ]
+  const [quickActions, stats] = getStatsAndActions({ colors, documents })
 
   return (
     <ScrollView
@@ -87,9 +31,7 @@ export default function HomeScreen() {
     >
       <View style={styles.header}>
         <Text style={[styles.greeting, { color: colors.textSecondary }]}>Welcome back,</Text>
-        <Text style={[styles.userName, { color: colors.text }]}>
-          {user?.firstName} {user?.lastName}
-        </Text>
+        <Text style={[styles.userName, { color: colors.text }]}>{user?.username}</Text>
       </View>
 
       <View style={styles.statsGrid}>
@@ -187,11 +129,17 @@ export default function HomeScreen() {
   )
 }
 
+/*
+ * StatCardProps defines the properties for the StatCard component.
+ * **/
 interface StatCardProps {
   stat: Stat
   style?: object
 }
 
+/*
+ *StatCard component displays a single statistic card with an icon, value, and title.
+ * **/
 const StatCard = ({ stat, style }: StatCardProps) => {
   const { colors } = useTheme()
 
@@ -206,14 +154,100 @@ const StatCard = ({ stat, style }: StatCardProps) => {
   )
 }
 
+/**
+ *
+ * QuickAction and Stat types are used to define the structure of quick actions and statistics displayed on the home screen.
+ * **/
+type QuickAction = {
+  icon: LucideIcon
+  title: string
+  description: string
+  href: unknown
+  color: string
+}
+
+type Stat = {
+  icon: LucideIcon
+  title: string
+  value: number
+  color: string
+}
+
+/*
+ * getStatsAndActions function generates quick actions and statistics
+ * based on
+ * the provided colors and documents.
+ * **/
+function getStatsAndActions({
+  colors,
+  documents,
+}: {
+  colors: any
+  documents: Document[]
+}): [QuickAction[], Stat[]] {
+  const quickActions = [
+    {
+      icon: Camera,
+      title: "Scan Document",
+      description: "Use camera to scan legal documents",
+      href: "(application)/(tabs)/documents?action=scan",
+      color: colors.primary,
+    },
+    {
+      icon: Upload,
+      title: "Upload File",
+      description: "Import PDF or image files",
+      href: "(application)/(tabs)/documents?action=upload",
+      color: colors.secondary,
+    },
+    {
+      icon: FileText,
+      title: "Text Analysis",
+      description: "Analyze text-based documents",
+      href: "(application)/(tabs)/documents?action=text",
+      color: colors.accent,
+    },
+  ]
+
+  const stats = [
+    {
+      icon: FileText,
+      title: "Documents",
+      value: documents.length,
+      color: colors.primary,
+    },
+    {
+      icon: TrendingUp,
+      title: "Analyzed",
+      value: documents.filter(d => d.analysis).length,
+      color: colors.success,
+    },
+    {
+      icon: AlertCircle,
+      title: "High Risk",
+      value: documents.filter(d => d.analysis?.riskAssessment?.overallRisk === "high").length,
+      color: colors.error,
+    },
+    {
+      icon: Clock,
+      title: "Pending",
+      value: documents.filter(d => !d.analysis).length,
+      color: colors.warning,
+    },
+  ]
+
+  return [quickActions, stats]
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 60,
   },
   header: {
-    padding: 20,
-    paddingBottom: 0,
+    paddingTop: 8,
+    paddingHorizontal: 20,
+    paddingBottom: 8,
   },
   greeting: {
     fontSize: FontSizes.md,
@@ -222,6 +256,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: FontSizes.xxl,
     fontFamily: Fonts.bold,
+    marginBottom: 4,
   },
   statsGrid: {
     paddingBottom: 10,

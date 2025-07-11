@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native"
+import { View, StyleSheet, ScrollView, Alert } from "react-native"
 import { router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useForm, Controller } from "react-hook-form"
@@ -20,7 +20,6 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function ChangePasswordScreen() {
   const { colors } = useTheme()
-  const { user } = useAuth()
   const { logout } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -39,7 +38,7 @@ export default function ChangePasswordScreen() {
 
   const onSubmit = async (data: ChangePasswordFormSchema) => {
     setIsSubmitting(true)
-    const result = await attempt(() => apiClient.post("/auth/password/change/", data))
+    const result = await attempt(apiClient.post("/auth/password/change/", data))
     setIsSubmitting(false)
 
     if (!result.ok) {

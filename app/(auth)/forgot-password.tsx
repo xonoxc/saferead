@@ -30,7 +30,7 @@ export default function ForgotPasswordScreen() {
 
   const onSubmit = async (data: EmailFormSchema) => {
     setIsSubmitting(true)
-    const result = await attempt(() => apiClient.post("/auth/password/reset/", data))
+    const result = await attempt(apiClient.post("/auth/password/reset/", data))
     setIsSubmitting(false)
 
     if (!result.ok) {

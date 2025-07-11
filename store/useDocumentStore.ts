@@ -33,7 +33,7 @@ export const useDocumentStore = create(
     ...initialState,
     fetchDocuments: async () => {
       set({ isLoading: true, error: null })
-      const result = await attempt(() => apiClient.get<Document[]>("/documents"))
+      const result = await attempt(apiClient.get<Document[]>("/documents"))
 
       if (!result.ok) {
         set({ error: result.error.message, isLoading: false })
@@ -50,7 +50,7 @@ export const useDocumentStore = create(
       })
     },
     deleteDocument: async documentId => {
-      const result = await attempt(() => apiClient.delete(`/documents/${documentId}`))
+      const result = await attempt(apiClient.delete(`/documents/${documentId}`))
 
       if (!result.ok) {
         set({ error: result.error.message })
@@ -62,7 +62,7 @@ export const useDocumentStore = create(
       })
     },
     pickDocument: async () => {
-      const result = await attempt(() =>
+      const result = await attempt(
         DocumentPicker.getDocumentAsync({
           type: [
             "application/pdf",
@@ -88,7 +88,7 @@ export const useDocumentStore = create(
           type: asset.mimeType,
         } as any)
 
-        const result = await attempt(() =>
+        const result = await attempt(
           apiClient.post<Document>("/documents/upload", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
@@ -105,7 +105,7 @@ export const useDocumentStore = create(
       }
     },
     scanDocument: async () => {
-      const permissionRes = await attempt(() => ImagePicker.requestCameraPermissionsAsync())
+      const permissionRes = await attempt(ImagePicker.requestCameraPermissionsAsync())
 
       if (!permissionRes.ok) {
         set({ error: permissionRes.error.message })
@@ -118,7 +118,7 @@ export const useDocumentStore = create(
         return
       }
 
-      const result = await attempt(() =>
+      const result = await attempt(
         ImagePicker.launchCameraAsync({
           mediaTypes: "images",
           allowsEditing: true,
@@ -141,7 +141,7 @@ export const useDocumentStore = create(
           type: "image/jpeg",
         } as any)
 
-        const result = await attempt(() =>
+        const result = await attempt(
           apiClient.post<Document>("/documents/upload", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
@@ -158,7 +158,7 @@ export const useDocumentStore = create(
       }
     },
     analyzeDocument: async documentId => {
-      const result = await attempt(() => apiClient.post(`/documents/${documentId}/analyze`))
+      const result = await attempt(apiClient.post(`/documents/${documentId}/analyze`))
 
       if (!result.ok) {
         set({ error: result.error.message })
@@ -166,4 +166,3 @@ export const useDocumentStore = create(
     },
   }))
 )
-

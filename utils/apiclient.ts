@@ -8,7 +8,7 @@ import { attempt } from "./attempt"
 const AUTH_HEADER = "Authorization"
 
 export async function getAccessToken(): Promise<string | null> {
-  const result = await attempt(() =>
+  const result = await attempt(
     isWeb() ? AsyncStorage.getItem("access_token") : SecureStore.getItemAsync("access_token")
   )
 

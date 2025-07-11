@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   /* const storeAuthData = async (user: User, tokens: AuthTokens) => {
-    const result = await attempt(() =>
+    const result = await attempt(
       Promise.all([
         setSecureItem("auth_tokens", JSON.stringify(tokens)),
         AsyncStorage.setItem("user_data", JSON.stringify(user)),
@@ -109,12 +109,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (token) {
       const storedUserData = await getSecureItem("user_data")
       if (storedUserData) {
-        const parsedUserData = attemptSync(() => JSON.parse(storedUserData) as User)
+        const parsedUserData = attemptSync(JSON.parse(storedUserData) as User)
         if (parsedUserData.ok) {
           setUser(parsedUserData.data)
         }
       } else {
-        const resp = await attempt(() => apiClient.get("/auth/user/"))
+        const resp = await attempt(apiClient.get("/auth/user/"))
         if (resp.ok) {
           const userData = resp.data.data as User
           await setSecureItem("user_data", JSON.stringify(userData))
@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     success: boolean
     message: string
   }> => {
-    const result = await attempt(() => apiClient.post("/auth/login/", data))
+    const result = await attempt(apiClient.post("/auth/login/", data))
     if (!result.ok) {
       return {
         success: false,
@@ -146,7 +146,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     await setSecureItem("access_token", token.key)
 
-    const resp = await attempt(() => apiClient.get("/auth/user/"))
+    const resp = await attempt(apiClient.get("/auth/user/"))
     if (!resp.ok) {
       await logout()
       return {
@@ -186,7 +186,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const getUserInfo = async (token: string) => {
 	if (!token) return
 
-	const resp = await attempt(() =>
+	const resp = await attempt(
 	  fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`, {
 		headers: {
 		  Authorization: `Bearer ${token}`,
@@ -210,7 +210,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     password2: string
     username: string
   }) => {
-    const result = await attempt(() => apiClient.post("/auth/registration/", data))
+    const result = await attempt(apiClient.post("/auth/registration/", data))
     if (!result.ok) {
       return {
         success: false,
@@ -227,9 +227,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const updateUser = async (userData: Partial<User>) => {
     const updatedUser = { ...user, ...userData } as User
 
-    const result = await attempt(() =>
-      AsyncStorage.setItem("user_data", JSON.stringify(updatedUser))
-    )
+    const result = await attempt(AsyncStorage.setItem("user_data", JSON.stringify(updatedUser)))
     if (!result.ok) {
       console.error("Failed to update user data:", result.error)
       return

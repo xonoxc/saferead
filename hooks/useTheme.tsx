@@ -24,7 +24,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
 
   const loadTheme = async () => {
-    const res = await attempt(() => AsyncStorage.getItem("theme_mode"))
+    const res = await attempt(AsyncStorage.getItem("theme_mode"))
     if (res.ok && res.data) {
       setMode(res.data as ThemeMode)
     } else if (!res.ok) {
@@ -33,7 +33,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const setTheme = async (newMode: ThemeMode) => {
-    const res = await attempt(() => AsyncStorage.setItem("theme_mode", newMode))
+    const res = await attempt(AsyncStorage.setItem("theme_mode", newMode))
     if (res.ok) {
       setMode(newMode)
     } else {

@@ -33,9 +33,9 @@ function err<E>(error: E): Err<E> {
  *
  * actual attempt function
  * **/
-export async function attempt<T, E = ErrorType>(fn: () => Promise<T>): Promise<Result<T, E>> {
+export async function attempt<T, E = ErrorType>(fn: Promise<T>): Promise<Result<T, E>> {
   try {
-    const data = await fn()
+    const data = await fn
     return ok(data)
   } catch (error: any) {
     //Axios specific error handling
@@ -53,9 +53,9 @@ export async function attempt<T, E = ErrorType>(fn: () => Promise<T>): Promise<R
 /*
  * A Synchronous version of attempt function
  * **/
-export function attemptSync<T, E = Error>(fn: () => T): Result<T, E> {
+export function attemptSync<T, E = Error>(fn: T): Result<T, E> {
   try {
-    const data = fn()
+    const data = fn
     return ok(data)
   } catch (error: any) {
     return err(error as E)

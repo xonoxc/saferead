@@ -42,7 +42,7 @@ export default function ResetPasswordScreen() {
 
     setIsSubmitting(true)
     const payload = { ...data, uid, token }
-    const result = await attempt(() => apiClient.post("/auth/password/reset/confirm/", payload))
+    const result = await attempt(apiClient.post("/auth/password/reset/confirm/", payload))
     setIsSubmitting(false)
 
     if (!result.ok) {

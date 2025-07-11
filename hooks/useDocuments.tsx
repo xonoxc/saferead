@@ -89,7 +89,7 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
 
   const loadDocuments = async () => {
     setIsLoading(true)
-    const storeExtractRes = await attempt(() => AsyncStorage.getItem("documents"))
+    const storeExtractRes = await attempt(AsyncStorage.getItem("documents"))
     if (!storeExtractRes.ok) {
       setError("Failed to load documents from storage")
       setIsLoading(false)
@@ -104,7 +104,7 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
   }
 
   const saveDocuments = async (docs: Document[]) => {
-    const response = await attempt(() => AsyncStorage.setItem("documents", JSON.stringify(docs)))
+    const response = await attempt(AsyncStorage.setItem("documents", JSON.stringify(docs)))
     if (!response.ok) {
       setError("Failed to save documents")
       console.error("Save documents error:", response.error)
@@ -112,7 +112,7 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
   }
 
   const pickDocument = async () => {
-    const result = await attempt(() =>
+    const result = await attempt(
       DocumentPicker.getDocumentAsync({
         type: ["application/pdf", "image/*", "text/*"],
         copyToCacheDirectory: true,
@@ -153,13 +153,13 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
   }
 
   const scanDocument = async () => {
-    const perm = await attempt(() => ImagePicker.requestCameraPermissionsAsync())
+    const perm = await attempt(ImagePicker.requestCameraPermissionsAsync())
     if (!perm.ok || perm.data.status !== "granted") {
       setError("Camera permission required")
       return
     }
 
-    const result = await attempt(() =>
+    const result = await attempt(
       ImagePicker.launchCameraAsync({
         mediaTypes: "images",
         allowsEditing: true,
@@ -207,16 +207,10 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
     return analysis
   }
 
-  const deleteDocument = async (docId: string) => {
-    const response = await attempt(() => {
-      const updatedDocs = documents.filter(doc => doc.id !== docId)
-      setDocuments(updatedDocs)
-      return saveDocuments(updatedDocs)
-    })
-    if (!response.ok) {
-      setError("Failed to delete document")
-      console.error("Delete document error:", response.error)
-    }
+  const deleteDocument = (docId: string) => {
+    const updatedDocs = documents.filter(doc => doc.id !== docId)
+    setDocuments(updatedDocs)
+    return saveDocuments(updatedDocs)
   }
 
   return (

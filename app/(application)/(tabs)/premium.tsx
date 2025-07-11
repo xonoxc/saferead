@@ -1,92 +1,16 @@
 import React from "react"
 import { View, Text, StyleSheet, ScrollView } from "react-native"
-import { Crown, Check, Star, Users, Shield, Zap } from "lucide-react-native"
+import { Crown, Check, Star, Users, Shield, Zap, LucideIcon } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { User } from "@/types"
 
 export default function PremiumScreen() {
   const { colors } = useTheme()
   const { user } = useAuth()
-
-  const plans = [
-    {
-      id: "free",
-      name: "Free",
-      price: "$0",
-      interval: "forever",
-      features: [
-        "5 documents per month",
-        "Basic AI analysis",
-        "Text-to-speech",
-        "Standard support",
-      ],
-      limitations: [
-        "Limited document formats",
-        "Basic risk assessment",
-        "No collaboration features",
-      ],
-      current: user?.subscriptionTier === "free",
-    },
-    {
-      id: "pro",
-      name: "Pro",
-      price: "$19.99",
-      interval: "per month",
-      features: [
-        "Unlimited documents",
-        "Advanced AI analysis",
-        "All document formats",
-        "Priority support",
-        "Collaboration tools",
-        "Advanced security",
-        "Custom templates",
-      ],
-      popular: true,
-      current: user?.subscriptionTier === "pro",
-    },
-    {
-      id: "enterprise",
-      name: "Enterprise",
-      price: "$49.99",
-      interval: "per month",
-      features: [
-        "Everything in Pro",
-        "Team management",
-        "Advanced analytics",
-        "Custom integrations",
-        "Dedicated support",
-        "GDPR compliance",
-        "Bulk processing",
-        "API access",
-      ],
-      current: user?.subscriptionTier === "enterprise",
-    },
-  ]
-
-  const features = [
-    {
-      icon: Zap,
-      title: "Advanced AI Analysis",
-      description: "Get deeper insights with our enhanced AI models",
-    },
-    {
-      icon: Shield,
-      title: "Enhanced Security",
-      description: "Bank-level encryption and secure document storage",
-    },
-    {
-      icon: Users,
-      title: "Team Collaboration",
-      description: "Share and collaborate on documents with your team",
-    },
-    {
-      icon: Star,
-      title: "Priority Support",
-      description: "24/7 premium support from our legal tech experts",
-    },
-  ]
+  const [features, plans] = getPlansAndFeatures(user)
 
   return (
     <ScrollView
@@ -189,6 +113,111 @@ export default function PremiumScreen() {
       </View>
     </ScrollView>
   )
+}
+
+/*
+ * feature and plan types
+ * ***/
+type Feature = {
+  icon: LucideIcon
+  title: string
+  description: string
+}
+
+type Plan = {
+  id: string
+  name: string
+  price: string
+  interval: string
+  features: string[]
+  limitations?: string[]
+  popular?: boolean
+  current?: boolean
+}
+
+/*
+ * getPlansAndFeatures retrieves the available plans and features for the premium subscription.
+ * **/
+function getPlansAndFeatures(user: User | null): [Feature[], Plan[]] {
+  const features: Feature[] = [
+    {
+      icon: Zap,
+      title: "Advanced AI Analysis",
+      description: "Get deeper insights with our enhanced AI models",
+    },
+    {
+      icon: Shield,
+      title: "Enhanced Security",
+      description: "Bank-level encryption and secure document storage",
+    },
+    {
+      icon: Users,
+      title: "Team Collaboration",
+      description: "Share and collaborate on documents with your team",
+    },
+    {
+      icon: Star,
+      title: "Priority Support",
+      description: "24/7 premium support from our legal tech experts",
+    },
+  ]
+
+  const plans: Plan[] = [
+    {
+      id: "free",
+      name: "Free",
+      price: "$0",
+      interval: "forever",
+      features: [
+        "5 documents per month",
+        "Basic AI analysis",
+        "Text-to-speech",
+        "Standard support",
+      ],
+      limitations: [
+        "Limited document formats",
+        "Basic risk assessment",
+        "No collaboration features",
+      ],
+      current: user?.subscriptionTier === "free",
+    },
+    {
+      id: "pro",
+      name: "Pro",
+      price: "$19.99",
+      interval: "per month",
+      features: [
+        "Unlimited documents",
+        "Advanced AI analysis",
+        "All document formats",
+        "Priority support",
+        "Collaboration tools",
+        "Advanced security",
+        "Custom templates",
+      ],
+      popular: true,
+      current: user?.subscriptionTier === "pro",
+    },
+    {
+      id: "enterprise",
+      name: "Enterprise",
+      price: "$49.99",
+      interval: "per month",
+      features: [
+        "Everything in Pro",
+        "Team management",
+        "Advanced analytics",
+        "Custom integrations",
+        "Dedicated support",
+        "GDPR compliance",
+        "Bulk processing",
+        "API access",
+      ],
+      current: user?.subscriptionTier === "enterprise",
+    },
+  ]
+
+  return [features, plans]
 }
 
 const styles = StyleSheet.create({

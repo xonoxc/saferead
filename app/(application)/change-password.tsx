@@ -16,11 +16,14 @@ import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
 import { useAuth } from "@/hooks/useAuth"
 import { ModalLoadingSpinner } from "@/components/ModalLoadingSpinner"
+import { Stack } from "expo-router"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function ChangePasswordScreen() {
   const { colors } = useTheme()
   const { logout } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
+
   const {
     control,
     handleSubmit,
@@ -58,70 +61,78 @@ export default function ChangePasswordScreen() {
 
   return (
     <>
-      <ModalLoadingSpinner visible={isSubmitting} message="Changing password..." />
-      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.text }]}>Change Password</Text>
-          </View>
+      <Stack.Screen
+        options={{
+          headerTitle: "Change Password",
+          headerStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+        <ModalLoadingSpinner visible={isSubmitting} message="Changing password..." />
+        <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+          <View style={styles.content}>
+            <View style={styles.header}>
+              <Text style={[styles.title, { color: colors.text }]}>Change Password</Text>
+            </View>
 
-          <View style={styles.form}>
-            <Controller
-              control={control}
-              name="old_password"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  label="Old Password"
-                  value={value}
-                  onChangeText={onChange}
-                  placeholder="Enter your old password"
-                  secureTextEntry
-                  error={errors.old_password?.message}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="new_password1"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  label="New Password"
-                  value={value}
-                  onChangeText={onChange}
-                  placeholder="Enter your new password"
-                  secureTextEntry
-                  error={errors.new_password1?.message}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="new_password2"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  label="Confirm New Password"
-                  value={value}
-                  onChangeText={onChange}
-                  placeholder="Confirm your new password"
-                  secureTextEntry
-                  error={errors.new_password2?.message}
-                />
-              )}
-            />
-
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Change Password"
-                onPress={handleSubmit(onSubmit)}
-                loading={isSubmitting}
-                fullWidth
-                size="large"
+            <View style={styles.form}>
+              <Controller
+                control={control}
+                name="old_password"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    label="Old Password"
+                    value={value}
+                    onChangeText={onChange}
+                    placeholder="Enter your old password"
+                    secureTextEntry
+                    error={errors.old_password?.message}
+                  />
+                )}
               />
+              <Controller
+                control={control}
+                name="new_password1"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    label="New Password"
+                    value={value}
+                    onChangeText={onChange}
+                    placeholder="Enter your new password"
+                    secureTextEntry
+                    error={errors.new_password1?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="new_password2"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    label="Confirm New Password"
+                    value={value}
+                    onChangeText={onChange}
+                    placeholder="Confirm your new password"
+                    secureTextEntry
+                    error={errors.new_password2?.message}
+                  />
+                )}
+              />
+
+              <View style={styles.buttonContainer}>
+                <Button
+                  title="Change Password"
+                  onPress={handleSubmit(onSubmit)}
+                  loading={isSubmitting}
+                  fullWidth
+                  size="large"
+                />
+              </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
     </>
   )
 }
@@ -133,7 +144,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 24,
-    paddingTop: 40,
     justifyContent: "center",
   },
   header: {

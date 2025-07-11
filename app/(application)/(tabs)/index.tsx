@@ -2,28 +2,32 @@ import React from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
 import { Link, type RelativePathString } from "expo-router"
 import {
-  Camera,
   Upload,
   FileText,
   TrendingUp,
   CircleAlert as AlertCircle,
   Clock,
   LucideIcon,
+  ScanText,
 } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { useDocumentStore } from "@/store/useDocumentStore"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { Document } from "@/types"
+import { useTabHideScroll } from "@/hooks/useTabHideScroll"
 
 export default function HomeScreen() {
   const { colors } = useTheme()
   const { user } = useAuth()
   const { documents } = useDocumentStore()
   const [quickActions, stats] = getStatsAndActions({ colors, documents })
+  const { handleScroll } = useTabHideScroll()
 
   return (
     <ScrollView
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={{ paddingBottom: 120 }}
       bounces
@@ -187,7 +191,7 @@ function getStatsAndActions({
 }): [QuickAction[], Stat[]] {
   const quickActions = [
     {
-      icon: Camera,
+      icon: ScanText,
       title: "Scan Document",
       description: "Use camera to scan legal documents",
       href: "(application)/(tabs)/documents?action=scan",

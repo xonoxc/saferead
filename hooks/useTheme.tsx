@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import Colors from "@/constants/Colors"
 import { attempt } from "@/utils/attempt"
 
-type ThemeMode = "light" | "dark" | "system"
+export type ThemeMode = "light" | "dark" | "system"
 
 interface ThemeContextType {
   mode: ThemeMode

@@ -19,6 +19,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: "pink",
         tabBarInactiveTintColor: colors.textMuted,
         tabBarShowLabel: false,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: Platform.select({
           ios: {
             position: "absolute",
@@ -34,7 +35,8 @@ export default function TabLayout() {
             right: 0,
             backgroundColor: colors.background,
             borderTopWidth: 0,
-            elevation: 6,
+            shadowColor: colors.textMuted,
+            zIndex: 1000,
           },
         }),
       }}
@@ -53,6 +55,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => <FileText size={size} color={color} />,
         }}
       />
+
       <Tabs.Screen
         name="premium"
         options={{

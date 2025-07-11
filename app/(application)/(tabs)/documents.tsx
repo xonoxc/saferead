@@ -63,6 +63,12 @@ export default function DocumentsScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="Search documents..."
+            inputStyle={{
+              width: 220,
+              paddingVertical: 8,
+              fontSize: FontSizes.sm,
+              fontFamily: Fonts.regular,
+            }}
           />
         </View>
         <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.card }]}>
@@ -150,14 +156,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 20,
-    gap: 13,
+    gap: 12,
   },
   searchInputContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    paddingLeft: 12,
   },
   filterButton: {
     width: 44,

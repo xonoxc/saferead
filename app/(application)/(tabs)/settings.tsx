@@ -1,7 +1,6 @@
 import React from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from "react-native"
 import {
-  User,
   Moon,
   Sun,
   Globe,
@@ -11,15 +10,19 @@ import {
   CircleHelp as HelpCircle,
   LogOut,
   KeyRound,
+  User as UserIcon,
 } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { router } from "expo-router"
+import type { User } from "@/types"
+import type { ThemeMode } from "@/hooks/useTheme"
+import { type Router, useRouter } from "expo-router"
 
 export default function SettingsScreen() {
   const { colors, mode, setTheme } = useTheme()
   const { user, logout } = useAuth()
+  const router = useRouter()
 
   const handleLogout = () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
@@ -28,14 +31,129 @@ export default function SettingsScreen() {
     ])
   }
 
-  const settingsGroups = [
+  const settingsGroups = getSettingsGroups({
+    user,
+    mode,
+    setTheme,
+    router,
+    handleLogout,
+  })
+
+  return (
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 120 }}
+    >
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
+      </View>
+
+      <View style={styles.content}>
+        {settingsGroups.map((group, groupIndex) => (
+          <View key={groupIndex} style={styles.group}>
+            <Text style={[styles.groupTitle, { color: colors.textSecondary }]}>{group.title}</Text>
+            <View style={[styles.groupItems, { backgroundColor: colors.card }]}>
+              {group.items.map((item, itemIndex) => (
+                <TouchableOpacity
+                  key={itemIndex}
+                  style={[
+                    styles.item,
+                    itemIndex < group.items.length - 1 && {
+                      borderBottomWidth: 1,
+                      borderBottomColor: colors.border,
+                    },
+                  ]}
+                  onPress={item.onPress}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.itemLeft}>
+                    <View style={[styles.itemIcon, { backgroundColor: colors.surface }]}>
+                      <item.icon
+                        size={20}
+                        color={item.danger ? colors.error : colors.textSecondary}
+                      />
+                    </View>
+                    <Text
+                      style={[
+                        styles.itemTitle,
+                        { color: item.danger ? colors.error : colors.text },
+                      ]}
+                    >
+                      {item.title}
+                    </Text>
+                  </View>
+                  <View style={styles.itemRight}>
+                    {item.type === "toggle" ? (
+                      <Switch
+                        value={item.value as boolean}
+                        onValueChange={item.onPress}
+                        trackColor={{ false: colors.border, true: colors.primary }}
+                        thumbColor={colors.background}
+                      />
+                    ) : (
+                      item.value && (
+                        <Text style={[styles.itemValue, { color: colors.textSecondary }]}>
+                          {item.value}
+                        </Text>
+                      )
+                    )}
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.footer}>
+        <Text style={[styles.footerText, { color: colors.textMuted }]}>SafeRead v1.0.0</Text>
+      </View>
+    </ScrollView>
+  )
+}
+
+type GETSettingsGroupsParams = {
+  user: User | null
+  mode: string
+  setTheme: (theme: ThemeMode) => Promise<void>
+  router: Router
+  handleLogout: () => void
+}
+
+type SettingsItem = {
+  icon: React.ComponentType<any>
+  title: string
+  value?: boolean | string
+  type?: "toggle"
+  onPress: () => void
+  danger?: boolean
+}
+
+type SettingsGroup = {
+  title: string
+  items: SettingsItem[]
+}
+
+/*
+ *
+ *function to generate settings groups
+ * ***/
+function getSettingsGroups({
+  user,
+  mode,
+  setTheme,
+  router,
+  handleLogout,
+}: GETSettingsGroupsParams): SettingsGroup[] {
+  return [
     {
       title: "Account",
       items: [
         {
-          icon: User,
+          icon: UserIcon,
           title: "Profile",
-          value: `${user?.firstName} ${user?.lastName}`,
+          value: `${user?.username}`,
           onPress: () => {},
         },
         {
@@ -56,7 +174,8 @@ export default function SettingsScreen() {
         {
           icon: mode === "dark" ? Moon : Sun,
           title: "Theme",
-          value: mode === "dark" ? "Dark" : "Light",
+          value: mode === "dark",
+          type: "toggle",
           onPress: () => setTheme(mode === "dark" ? "light" : "dark"),
         },
         {
@@ -103,72 +222,6 @@ export default function SettingsScreen() {
       ],
     },
   ]
-
-  return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
-      </View>
-
-      <View style={styles.content}>
-        {settingsGroups.map((group, groupIndex) => (
-          <View key={groupIndex} style={styles.group}>
-            <Text style={[styles.groupTitle, { color: colors.textSecondary }]}>{group.title}</Text>
-            <View style={[styles.groupItems, { backgroundColor: colors.card }]}>
-              {group.items.map((item, itemIndex) => (
-                <TouchableOpacity
-                  key={itemIndex}
-                  style={[
-                    styles.item,
-                    itemIndex < group.items.length - 1 && {
-                      borderBottomWidth: 1,
-                      borderBottomColor: colors.border,
-                    },
-                  ]}
-                  onPress={item.onPress}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.itemLeft}>
-                    <View style={[styles.itemIcon, { backgroundColor: colors.surface }]}>
-                      <item.icon size={20} color={!!item ? colors.error : colors.textSecondary} />
-                    </View>
-                    <Text
-                      style={[styles.itemTitle, { color: !!item ? colors.error : colors.text }]}
-                    >
-                      {item.title}
-                    </Text>
-                  </View>
-                  <View style={styles.itemRight}>
-                    {item.type === "toggle" ? (
-                      <Switch
-                        value={item.value}
-                        onValueChange={() => {}}
-                        trackColor={{ false: colors.border, true: colors.primary }}
-                        thumbColor={colors.background}
-                      />
-                    ) : (
-                      item.value && (
-                        <Text style={[styles.itemValue, { color: colors.textSecondary }]}>
-                          {item.value}
-                        </Text>
-                      )
-                    )}
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: colors.textMuted }]}>LegalAssist v1.0.0</Text>
-      </View>
-    </ScrollView>
-  )
 }
 
 const styles = StyleSheet.create({

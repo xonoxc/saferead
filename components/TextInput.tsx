@@ -6,6 +6,7 @@ import {
   StyleSheet,
   StyleProp,
   TextStyle,
+  ViewStyle,
 } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
@@ -23,6 +24,11 @@ interface TextInputProps {
   autoCapitalize?: "none" | "sentences" | "words" | "characters"
   autoCorrect?: boolean
   editable?: boolean
+
+  containerStyle?: StyleProp<ViewStyle>
+  labelStyle?: StyleProp<TextStyle>
+  inputStyle?: StyleProp<TextStyle>
+  errorStyle?: StyleProp<TextStyle>
 }
 
 export const TextInput: React.FC<TextInputProps> = ({
@@ -38,11 +44,15 @@ export const TextInput: React.FC<TextInputProps> = ({
   autoCapitalize = "sentences",
   autoCorrect = true,
   editable = true,
+  containerStyle,
+  labelStyle,
+  inputStyle,
+  errorStyle,
 }) => {
   const { colors } = useTheme()
   const [isFocused, setIsFocused] = useState(false)
 
-  const inputStyle: StyleProp<TextStyle> = [
+  const combinedInputStyle: StyleProp<TextStyle> = [
     styles.input,
     {
       backgroundColor: colors.surface,
@@ -51,13 +61,14 @@ export const TextInput: React.FC<TextInputProps> = ({
     },
     multiline && { textAlignVertical: "top" },
     !editable && { opacity: 0.5 },
+    inputStyle, // ⬅️ custom style gets merged
   ]
 
   return (
-    <View style={styles.container}>
-      {label && <Text style={[styles.label, { color: colors.text }]}>{label}</Text>}
+    <View style={[styles.container, containerStyle]}>
+      {label && <Text style={[styles.label, { color: colors.text }, labelStyle]}>{label}</Text>}
       <RNTextInput
-        style={inputStyle}
+        style={combinedInputStyle}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
@@ -72,7 +83,7 @@ export const TextInput: React.FC<TextInputProps> = ({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />
-      {error && <Text style={[styles.error, { color: colors.error }]}>{error}</Text>}
+      {error && <Text style={[styles.error, { color: colors.error }, errorStyle]}>{error}</Text>}
     </View>
   )
 }

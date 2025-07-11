@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native"
+import React, { useState } from "react"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
 import { Plus, Search, Filter, Camera, Upload, FileText } from "lucide-react-native"
 
 import { useTheme } from "@/hooks/useTheme"
@@ -12,27 +12,9 @@ import { Fonts, FontSizes } from "@/constants/Fonts"
 
 export default function DocumentsScreen() {
   const { colors } = useTheme()
-  const {
-    documents,
-    isLoading,
-    error,
-    fetchDocuments,
-    pickDocument,
-    scanDocument,
-    analyzeDocument,
-  } = useDocumentStore()
+  const { documents, isLoading, pickDocument, scanDocument, analyzeDocument } = useDocumentStore()
   const [searchQuery, setSearchQuery] = useState("")
   const [showActions, setShowActions] = useState(false)
-
-  useEffect(() => {
-    fetchDocuments()
-  }, [fetchDocuments])
-
-  useEffect(() => {
-    if (error) {
-      Alert.alert("Error", error)
-    }
-  }, [error])
 
   const filteredDocuments = documents.filter(
     doc =>
@@ -118,7 +100,7 @@ export default function DocumentsScreen() {
             />
           ))
         ) : (
-          <View style={[styles.emptyState, { backgroundColor: colors.card }]}>
+          <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
             <FileText size={64} color={colors.textMuted} />
             <Text style={[styles.emptyStateTitle, { color: colors.text }]}>No Documents Found</Text>
             <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>

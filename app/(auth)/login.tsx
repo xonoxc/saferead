@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView } from "react-native"
+import { View, Text, StyleSheet, ScrollView } from "react-native"
 import { Link, RelativePathString, router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useForm, Controller } from "react-hook-form"

@@ -159,7 +159,6 @@ export const useDocumentStore = create(
     },
     analyzeDocument: async documentId => {
       const result = await attempt(apiClient.post(`/documents/${documentId}/analyze`))
-
       if (!result.ok) {
         set({ error: result.error.message })
       }

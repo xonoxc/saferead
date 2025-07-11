@@ -223,7 +223,7 @@ function getPlansAndFeatures(user: User | null): [Feature[], Plan[]] {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
+    paddingVertical: 20,
   },
   header: {
     alignItems: "center",

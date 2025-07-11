@@ -4,10 +4,9 @@ import { NativeScrollEvent, NativeSyntheticEvent } from "react-native"
 
 export function useTabHideScroll() {
   const navigation = useNavigation()
-  const lastOffset = React.useRef(0)
+  const lastOffset = React.useRef<number>(0)
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    console.log("handleScroll called")
     const currentOffset = event.nativeEvent.contentOffset.y
     const diff = currentOffset - lastOffset.current
 

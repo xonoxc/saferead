@@ -69,7 +69,7 @@ const AppContent = () => {
           }}
         >
           <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(application)/(tabs)" />
+          <Stack.Screen name="(application)" />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style={isDark ? "light" : "dark"} />

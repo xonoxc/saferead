@@ -16,7 +16,6 @@ import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
 import { useAuth } from "@/hooks/useAuth"
 import { ModalLoadingSpinner } from "@/components/ModalLoadingSpinner"
-import { Stack } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function ChangePasswordScreen() {
@@ -61,20 +60,15 @@ export default function ChangePasswordScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          headerTitle: "Change Password",
-          headerStyle: { backgroundColor: colors.background },
-        }}
-      />
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
         <ModalLoadingSpinner visible={isSubmitting} message="Changing password..." />
         <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
           <View style={styles.content}>
+            {/*
             <View style={styles.header}>
               <Text style={[styles.title, { color: colors.text }]}>Change Password</Text>
             </View>
-
+            */}
             <View style={styles.form}>
               <Controller
                 control={control}

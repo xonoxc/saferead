@@ -20,6 +20,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function ChangePasswordScreen() {
   const { colors } = useTheme()
+  const { user } = useAuth()
   const { logout } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -31,7 +32,6 @@ export default function ChangePasswordScreen() {
     mode: "onChange",
     resolver: zodResolver(changePasswordFormSchema),
     defaultValues: {
-      old_password: "",
       new_password1: "",
       new_password2: "",
     },
@@ -70,20 +70,6 @@ export default function ChangePasswordScreen() {
             </View>
             */}
             <View style={styles.form}>
-              <Controller
-                control={control}
-                name="old_password"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    label="Old Password"
-                    value={value}
-                    onChangeText={onChange}
-                    placeholder="Enter your old password"
-                    secureTextEntry
-                    error={errors.old_password?.message}
-                  />
-                )}
-              />
               <Controller
                 control={control}
                 name="new_password1"

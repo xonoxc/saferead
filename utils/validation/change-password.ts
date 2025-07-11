@@ -3,7 +3,6 @@ import { passwordValidation } from "./user"
 
 export const changePasswordFormSchema = z
   .object({
-    old_password: passwordValidation,
     new_password1: passwordValidation,
     new_password2: passwordValidation,
   })
@@ -13,3 +12,7 @@ export const changePasswordFormSchema = z
   })
 
 export type ChangePasswordFormSchema = z.infer<typeof changePasswordFormSchema>
+
+export const forgetPasswordFormSchema = changePasswordFormSchema
+
+export type ForgetPasswordFormSchema = ChangePasswordFormSchema

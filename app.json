@@ -8,6 +8,7 @@
     "scheme": "com.saferead.app",
     "userInterfaceStyle": "automatic",
     "splash": {
+      "image": "./assets/images/splash.png",
       "backgroundColor": "#000000"
     },
     "experiments": {

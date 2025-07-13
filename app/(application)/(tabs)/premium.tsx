@@ -1,270 +1,232 @@
 import React from "react"
-import { View, Text, StyleSheet, ScrollView } from "react-native"
-import { Crown, Check, Star, Users, Shield, Zap, LucideIcon } from "lucide-react-native"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
+import { Check, Sparkles, Shield, Users, Zap, Brain } from "lucide-react-native"
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
-import { useAuth } from "@/hooks/useAuth"
-import { Button } from "@/components/Button"
-import { Fonts, FontSizes } from "@/constants/Fonts"
-import { User } from "@/types"
+import { Fonts } from "@/constants/Fonts"
+import CustomBackBtn from "@/components/CustomBackBtn"
 
 export default function PremiumScreen() {
   const { colors } = useTheme()
-  const { user } = useAuth()
-  const [features, plans] = getPlansAndFeatures(user)
+  const premiumFeatures = getPremiumFeatures()
 
-  return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.header}>
-        <View style={[styles.crownContainer, { backgroundColor: colors.accent }]}>
-          <Crown size={32} color="#FFFFFF" />
-        </View>
-        <Text style={[styles.title, { color: colors.text }]}>Upgrade to Premium</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Unlock the full potential of legal document analysis
-        </Text>
-      </View>
-
-      <View style={styles.featuresContainer}>
-        {features.map((feature, index) => (
-          <View key={index} style={[styles.featureItem, { backgroundColor: colors.card }]}>
-            <View style={[styles.featureIcon, { backgroundColor: `${colors.primary}20` }]}>
-              <feature.icon size={24} color={colors.primary} />
-            </View>
-            <View style={styles.featureContent}>
-              <Text style={[styles.featureTitle, { color: colors.text }]}>{feature.title}</Text>
-              <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>
-                {feature.description}
-              </Text>
-            </View>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.plansContainer}>
-        <Text style={[styles.plansTitle, { color: colors.text }]}>Choose Your Plan</Text>
-        {plans.map(plan => (
-          <View
-            key={plan.id}
-            style={[
-              styles.planCard,
-              { backgroundColor: colors.card, borderColor: colors.border },
-              plan.popular && { borderColor: colors.primary, borderWidth: 2 },
-              plan.current && { backgroundColor: `${colors.primary}10` },
-            ]}
-          >
-            {plan.popular && (
-              <View style={[styles.popularBadge, { backgroundColor: colors.primary }]}>
-                <Text style={[styles.popularText, { color: "#FFFFFF" }]}>Most Popular</Text>
-              </View>
-            )}
-
-            <View style={styles.planHeader}>
-              <Text style={[styles.planName, { color: colors.text }]}>{plan.name}</Text>
-              <View style={styles.planPricing}>
-                <Text style={[styles.planPrice, { color: colors.text }]}>{plan.price}</Text>
-                <Text style={[styles.planInterval, { color: colors.textSecondary }]}>
-                  {plan.interval}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.planFeatures}>
-              {plan.features.map((feature, index) => (
-                <View key={index} style={styles.featureRow}>
-                  <Check size={16} color={colors.success} />
-                  <Text style={[styles.featureText, { color: colors.textSecondary }]}>
-                    {feature}
-                  </Text>
-                </View>
-              ))}
-            </View>
-
-            <View style={styles.planAction}>
-              {plan.current ? (
-                <Button
-                  title="Current Plan"
-                  variant="outline"
-                  fullWidth
-                  disabled
-                  onPress={() => {}}
-                />
-              ) : (
-                <Button
-                  title={`Upgrade to ${plan.name}`}
-                  variant={plan.popular ? "primary" : "outline"}
-                  fullWidth
-                  onPress={() => {
-                    // Handle subscription upgrade
-                  }}
-                />
-              )}
-            </View>
-          </View>
-        ))}
-      </View>
-
-      <View style={[styles.footer, { backgroundColor: colors.card }]}>
-        <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-          Cancel anytime • 30-day money-back guarantee
-        </Text>
-      </View>
-    </ScrollView>
-  )
-}
-
-/*
- * feature and plan types
- * ***/
-type Feature = {
-  icon: LucideIcon
-  title: string
-  description: string
-}
-
-type Plan = {
-  id: string
-  name: string
-  price: string
-  interval: string
-  features: string[]
-  limitations?: string[]
-  popular?: boolean
-  current?: boolean
-}
-
-/*
- * getPlansAndFeatures retrieves the available plans and features for the premium subscription.
- * **/
-function getPlansAndFeatures(user: User | null): [Feature[], Plan[]] {
-  const features: Feature[] = [
+  const proFeatures = [
+    {
+      icon: Brain,
+      title: "Advanced AI Analysis",
+      description: "Access to our most powerful legal AI models",
+    },
     {
       icon: Zap,
-      title: "Advanced AI Analysis",
-      description: "Get deeper insights with our enhanced AI models",
+      title: "Lightning Fast Processing",
+      description: "Priority queue for instant document analysis",
     },
     {
       icon: Shield,
-      title: "Enhanced Security",
-      description: "Bank-level encryption and secure document storage",
+      title: "Enterprise Security",
+      description: "Bank-level encryption and compliance",
     },
     {
       icon: Users,
       title: "Team Collaboration",
-      description: "Share and collaborate on documents with your team",
-    },
-    {
-      icon: Star,
-      title: "Priority Support",
-      description: "24/7 premium support from our legal tech experts",
+      description: "Share and collaborate with unlimited team members",
     },
   ]
 
-  const plans: Plan[] = [
-    {
-      id: "free",
-      name: "Free",
-      price: "$0",
-      interval: "forever",
-      features: [
-        "5 documents per month",
-        "Basic AI analysis",
-        "Text-to-speech",
-        "Standard support",
-      ],
-      limitations: [
-        "Limited document formats",
-        "Basic risk assessment",
-        "No collaboration features",
-      ],
-      current: user?.subscriptionTier === "free",
-    },
-    {
-      id: "pro",
-      name: "Pro",
-      price: "$19.99",
-      interval: "per month",
-      features: [
-        "Unlimited documents",
-        "Advanced AI analysis",
-        "All document formats",
-        "Priority support",
-        "Collaboration tools",
-        "Advanced security",
-        "Custom templates",
-      ],
-      popular: true,
-      current: user?.subscriptionTier === "pro",
-    },
-    {
-      id: "enterprise",
-      name: "Enterprise",
-      price: "$49.99",
-      interval: "per month",
-      features: [
-        "Everything in Pro",
-        "Team management",
-        "Advanced analytics",
-        "Custom integrations",
-        "Dedicated support",
-        "GDPR compliance",
-        "Bulk processing",
-        "API access",
-      ],
-      current: user?.subscriptionTier === "enterprise",
-    },
-  ]
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.header}>
+        <CustomBackBtn containerWidth={45} />
+      </Animated.View>
 
-  return [features, plans]
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.heroSection}>
+          <View style={styles.iconContainer}>
+            <Sparkles size={32} color="#FFD700" />
+          </View>
+
+          <Text style={styles.title}>SafeRead Pro</Text>
+
+          <Text style={styles.subtitle}>
+            Access our most powerful AI models and advanced legal analysis features
+          </Text>
+        </Animated.View>
+
+        {/* Key Features */}
+        <Animated.View
+          entering={FadeInDown.delay(300).springify()}
+          style={styles.keyFeaturesSection}
+        >
+          {proFeatures.map((feature, index) => (
+            <Animated.View
+              key={index}
+              entering={FadeInDown.delay(400 + index * 100).springify()}
+              style={styles.keyFeatureItem}
+            >
+              <View style={styles.featureIconContainer}>
+                <feature.icon size={20} color="#FFD700" />
+              </View>
+              <View style={styles.featureContent}>
+                <Text style={styles.featureTitle}>{feature.title}</Text>
+                <Text style={styles.featureDescription}>{feature.description}</Text>
+              </View>
+            </Animated.View>
+          ))}
+        </Animated.View>
+
+        {/* Features List */}
+        <Animated.View entering={FadeInDown.delay(600).springify()} style={styles.featuresSection}>
+          {premiumFeatures.map((feature, index) => (
+            <Animated.View
+              key={index}
+              entering={FadeInDown.delay(700 + index * 50).springify()}
+              style={styles.featureItem}
+            >
+              <View style={styles.checkContainer}>
+                <Check size={20} color="#00D4AA" />
+              </View>
+              <Text style={styles.featureText}>{feature}</Text>
+            </Animated.View>
+          ))}
+        </Animated.View>
+
+        {/* Pricing Cards */}
+        <Animated.View entering={FadeInDown.delay(1000).springify()} style={styles.pricingSection}>
+          <View style={styles.pricingCards}>
+            {/* Pro Plan */}
+            <View style={[styles.pricingCard, styles.selectedCard]}>
+              <Text style={styles.planName}>Pro</Text>
+              <View style={styles.priceContainer}>
+                <Text style={styles.currency}>$</Text>
+                <Text style={styles.price}>19.99</Text>
+                <Text style={styles.period}>/mo</Text>
+              </View>
+            </View>
+
+            {/* Enterprise Plan */}
+            <View style={styles.pricingCard}>
+              <Text style={styles.planName}>Enterprise</Text>
+              <View style={styles.priceContainer}>
+                <Text style={styles.currency}>$</Text>
+                <Text style={styles.price}>49.99</Text>
+                <Text style={styles.period}>/mo</Text>
+              </View>
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* CTA Button */}
+        <Animated.View entering={FadeInDown.delay(1200).springify()} style={styles.ctaSection}>
+          <TouchableOpacity style={styles.upgradeButton}>
+            <Text style={styles.upgradeButtonText}>Upgrade to Pro</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.billingInfo}>Auto-renews for $19.99/month until cancelled</Text>
+
+          <TouchableOpacity style={styles.restoreButton}>
+            <Text style={styles.restoreText}>Restore subscription</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Footer */}
+        <Animated.View entering={FadeInDown.delay(1400).springify()} style={styles.footer}>
+          <View style={styles.footerLinks}>
+            <TouchableOpacity>
+              <Text style={styles.footerLink}>Terms</Text>
+            </TouchableOpacity>
+            <Text style={styles.footerSeparator}>|</Text>
+            <TouchableOpacity>
+              <Text style={styles.footerLink}>Privacy Policy</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </ScrollView>
+    </View>
+  )
+}
+
+function getPremiumFeatures() {
+  return [
+    "Everything in Free",
+    "Unlimited document analysis with advanced AI models",
+    "Priority processing and faster analysis",
+    "Advanced risk assessment with detailed insights",
+    "Collaboration tools and team sharing",
+    "Premium templates and custom document types",
+    "Priority customer support",
+    "Advanced security and encryption",
+    "Export capabilities and integrations",
+    "Early access to new features",
+  ]
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 20,
   },
   header: {
-    alignItems: "center",
-    padding: 20,
-    paddingBottom: 32,
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
-  crownContainer: {
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  heroSection: {
+    alignItems: "center",
+    marginBottom: 40,
+  },
+  iconContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
+    backgroundColor: "rgba(255, 215, 0, 0.1)",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 24,
   },
   title: {
-    fontSize: FontSizes.xxl,
+    fontSize: 36,
     fontFamily: Fonts.bold,
+    color: "#FFFFFF",
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: 16,
   },
   subtitle: {
-    fontSize: FontSizes.md,
+    fontSize: 18,
     fontFamily: Fonts.regular,
+    color: "#CCCCCC",
     textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 24,
+    paddingHorizontal: 20,
   },
-  featuresContainer: {
-    padding: 20,
-    paddingTop: 0,
+  keyFeaturesSection: {
+    marginBottom: 40,
   },
-  featureItem: {
+  keyFeatureItem: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: 20,
   },
-  featureIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  featureIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 215, 0, 0.1)",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
@@ -273,91 +235,137 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   featureTitle: {
-    fontSize: FontSizes.md,
+    fontSize: 16,
     fontFamily: Fonts.semiBold,
+    color: "#FFFFFF",
     marginBottom: 4,
   },
   featureDescription: {
-    fontSize: FontSizes.sm,
+    fontSize: 14,
     fontFamily: Fonts.regular,
-    lineHeight: 18,
+    color: "#CCCCCC",
+    lineHeight: 20,
   },
-  plansContainer: {
-    padding: 20,
+  featuresSection: {
+    marginBottom: 40,
   },
-  plansTitle: {
-    fontSize: FontSizes.xl,
-    fontFamily: Fonts.bold,
-    textAlign: "center",
-    marginBottom: 24,
-  },
-  planCard: {
-    borderRadius: 16,
-    padding: 20,
+  featureItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 16,
-    borderWidth: 1,
-    position: "relative",
   },
-  popularBadge: {
-    position: "absolute",
-    top: -12,
-    left: 20,
-    right: 20,
-    borderRadius: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
+  checkContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(0, 212, 170, 0.1)",
+    justifyContent: "center",
     alignItems: "center",
-  },
-  popularText: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.semiBold,
-  },
-  planHeader: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  planName: {
-    fontSize: FontSizes.xl,
-    fontFamily: Fonts.bold,
-    marginBottom: 8,
-  },
-  planPricing: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: 4,
-  },
-  planPrice: {
-    fontSize: FontSizes.xxxl,
-    fontFamily: Fonts.bold,
-  },
-  planInterval: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
-  },
-  planFeatures: {
-    marginBottom: 24,
-  },
-  featureRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
+    marginRight: 16,
+    marginTop: 2,
   },
   featureText: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
-    marginLeft: 8,
     flex: 1,
+    fontSize: 16,
+    fontFamily: Fonts.regular,
+    color: "#FFFFFF",
+    lineHeight: 24,
   },
-  planAction: {
-    marginTop: "auto",
+  pricingSection: {
+    marginBottom: 40,
   },
-  footer: {
+  pricingCards: {
+    flexDirection: "row",
+    gap: 16,
+  },
+  pricingCard: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 16,
     padding: 20,
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
-  footerText: {
-    fontSize: FontSizes.sm,
+  selectedCard: {
+    borderColor: "#FFD700",
+    backgroundColor: "rgba(255, 215, 0, 0.05)",
+  },
+  planName: {
+    fontSize: 16,
+    fontFamily: Fonts.semiBold,
+    color: "#FFFFFF",
+    marginBottom: 12,
+  },
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "baseline",
+  },
+  currency: {
+    fontSize: 20,
+    fontFamily: Fonts.semiBold,
+    color: "#FFFFFF",
+  },
+  price: {
+    fontSize: 32,
+    fontFamily: Fonts.bold,
+    color: "#FFFFFF",
+  },
+  period: {
+    fontSize: 16,
     fontFamily: Fonts.regular,
+    color: "#CCCCCC",
+  },
+  ctaSection: {
+    alignItems: "center",
+    marginBottom: 40,
+  },
+  upgradeButton: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 25,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  upgradeButtonText: {
+    fontSize: 18,
+    fontFamily: Fonts.semiBold,
+    color: "#000000",
+  },
+  billingInfo: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: "#CCCCCC",
     textAlign: "center",
+    marginBottom: 20,
+  },
+  restoreButton: {
+    paddingVertical: 8,
+  },
+  restoreText: {
+    fontSize: 16,
+    fontFamily: Fonts.regular,
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+  footer: {
+    alignItems: "center",
+  },
+  footerLinks: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  footerLink: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: "#CCCCCC",
+  },
+  footerSeparator: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: "#CCCCCC",
+    marginHorizontal: 12,
   },
 })

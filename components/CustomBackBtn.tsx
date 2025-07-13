@@ -3,13 +3,15 @@ import { useRouter } from "expo-router"
 import { ChevronLeft } from "lucide-react-native"
 import { TouchableOpacity, StyleSheet } from "react-native"
 
-export default function CustomBackBtn() {
+export default function CustomBackBtn({ containerWidth }: { containerWidth?: number }) {
   const { colors } = useTheme()
   const router = useRouter()
 
+  const width = containerWidth ?? 50
+
   return (
     <TouchableOpacity
-      style={[styles.container, { borderColor: colors.border }]}
+      style={[styles.container, { borderColor: colors.border, width }]}
       onPress={() => router.back()}
     >
       <ChevronLeft color={colors.text} />

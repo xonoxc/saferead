@@ -103,3 +103,23 @@ export interface SubscriptionPlan {
   aiAnalysisLimit: number
   collaborators: number
 }
+
+export interface Space {
+  id: string
+  name: string
+  description: string
+  documentCount: number
+  color: string
+  icon: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface VoiceNote {
+  id: string
+  documentId: string
+  audioUri: string
+  transcription: string
+  timestamp: number
+  duration: number
+}

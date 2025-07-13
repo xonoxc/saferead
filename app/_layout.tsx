@@ -32,36 +32,24 @@ const AppContent = () => {
   const [appReady, setAppReady] = useState(false)
 
   useEffect(() => {
-    ;(async () => {
-      const bgColor = await SystemUI.getBackgroundColorAsync()
-      if (!bgColor) {
-        await SystemUI.setBackgroundColorAsync(colors.background)
-      }
-    })()
+    if (!fontsLoaded) return
 
     if (fontsLoaded) {
       setAppReady(true)
     }
   }, [fontsLoaded])
 
-  useEffect(() => {
-    if (appReady) {
-      SystemUI.setBackgroundColorAsync(colors.background)
-    }
-  }, [appReady, colors.background])
-
   const onLayout = async () => {
     if (appReady) {
+      await SystemUI.setBackgroundColorAsync("#000000")
       await SplashScreen.hideAsync()
     }
   }
 
-  if (!appReady) {
-    return null
-  }
+  if (!appReady) return null
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayout}>
+    <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={onLayout}>
       <AuthProvider>
         <Stack
           screenOptions={{

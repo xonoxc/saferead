@@ -1,18 +1,17 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native"
 import { Plus, Search, Filter, Camera, Upload, FileText } from "lucide-react-native"
-
 import { useTheme } from "@/hooks/useTheme"
-import { useDocumentStore } from "@/store/useDocumentStore"
+import { DocumentsProvider, useDocuments } from "@/hooks/useDocuments"
 import { DocumentCard } from "@/components/DocumentCard"
 import { Button } from "@/components/Button"
 import { TextInput } from "@/components/TextInput"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 
-export default function DocumentsScreen() {
+export default function AnalyzeScreen() {
   const { colors } = useTheme()
-  const { documents, isLoading, pickDocument, scanDocument, analyzeDocument } = useDocumentStore()
+  const { documents, isLoading, pickDocument, scanDocument, analyzeDocument } = useDocuments()
   const [searchQuery, setSearchQuery] = useState("")
   const [showActions, setShowActions] = useState(false)
 
@@ -28,16 +27,29 @@ export default function DocumentsScreen() {
 
   const handlePickDocument = async () => {
     setShowActions(false)
-    await pickDocument()
+    try {
+      await pickDocument()
+    } catch (error) {
+      Alert.alert("Error", "Failed to pick document")
+    }
   }
 
   const handleScanDocument = async () => {
     setShowActions(false)
-    await scanDocument()
+    try {
+      await scanDocument()
+    } catch (error) {
+      Alert.alert("Error", "Failed to scan document")
+    }
   }
 
   const handleAnalyzeDocument = async (docId: string) => {
-    await analyzeDocument(docId)
+    try {
+      await analyzeDocument(docId)
+      Alert.alert("Success", "Document analyzed successfully")
+    } catch (error) {
+      Alert.alert("Error", "Failed to analyze document")
+    }
   }
 
   if (isLoading) {
@@ -47,9 +59,9 @@ export default function DocumentsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Documents</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Analyze</Text>
         <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: "#161717" }]}
+          style={[styles.addButton, { backgroundColor: colors.primary }]}
           onPress={handleAddDocument}
         >
           <Plus size={24} color="#FFFFFF" />
@@ -63,12 +75,6 @@ export default function DocumentsScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="Search documents..."
-            inputStyle={{
-              width: 220,
-              paddingVertical: 8,
-              fontSize: FontSizes.sm,
-              fontFamily: Fonts.regular,
-            }}
           />
         </View>
         <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.card }]}>
@@ -93,7 +99,7 @@ export default function DocumentsScreen() {
         </View>
       )}
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.content}>
         {filteredDocuments.length > 0 ? (
           filteredDocuments.map(document => (
             <DocumentCard
@@ -106,7 +112,7 @@ export default function DocumentsScreen() {
             />
           ))
         ) : (
-          <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
+          <View style={[styles.emptyState, { backgroundColor: colors.card }]}>
             <FileText size={64} color={colors.textMuted} />
             <Text style={[styles.emptyStateTitle, { color: colors.text }]}>No Documents Found</Text>
             <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
@@ -132,7 +138,7 @@ export default function DocumentsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 60,
   },
   header: {
     flexDirection: "row",
@@ -142,19 +148,18 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   title: {
-    fontSize: 38,
+    fontSize: FontSizes.xxl,
     fontFamily: Fonts.bold,
   },
   addButton: {
     width: 44,
     height: 44,
-    borderRadius: 25,
+    borderRadius: 22,
     justifyContent: "center",
     alignItems: "center",
   },
   searchContainer: {
     flexDirection: "row",
-    alignItems: "center",
     padding: 20,
     gap: 12,
   },
@@ -162,7 +167,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    paddingLeft: 12,
   },
   filterButton: {
     width: 44,
@@ -197,22 +202,18 @@ const styles = StyleSheet.create({
     padding: 48,
     borderRadius: 12,
     margin: 20,
-    marginHorizontal: 10,
   },
   emptyStateTitle: {
-    fontSize: FontSizes.md,
+    fontSize: FontSizes.xl,
     fontFamily: Fonts.semiBold,
     marginTop: 16,
     marginBottom: 8,
   },
   emptyStateDescription: {
-    fontSize: FontSizes.xs,
+    fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
     textAlign: "center",
     lineHeight: 20,
     marginBottom: 24,
-  },
-  addDocumentButton: {
-    borderRadius: 30,
   },
 })

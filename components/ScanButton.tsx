@@ -1,5 +1,5 @@
 import React from "react"
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native"
+import { TouchableOpacity, View, StyleSheet } from "react-native"
 import { Plus } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { router } from "expo-router"

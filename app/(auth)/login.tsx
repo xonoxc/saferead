@@ -30,16 +30,12 @@ export default function LoginScreen() {
   })
 
   const onSubmit = async (data: LoginFormSchema) => {
-    try {
-      const result = await login(data)
-      if (!result.success) {
-        setErrorMessage(result.message)
-        return
-      }
-      router.replace("/(application)/(tabs)")
-    } catch (error) {
-      setErrorMessage("Invalid email or password")
+    const result = await login(data)
+    if (!result.success) {
+      setErrorMessage(result.message)
+      return
     }
+    router.replace("/(application)/(tabs)")
   }
 
   return (

@@ -16,14 +16,15 @@ import { useVoice } from "@/hooks/useVoice"
 import { DocumentAnalysisView } from "@/components/DocumentAnalysisView"
 import { VoiceRecorder } from "@/components/VoiceRecorder"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { Document } from "@/types"
+import { Document, DocumentAnalysis } from "@/types"
+import { attempt } from "@/utils/attempt"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
   const { documents, pickDocument, scanDocument, analyzeDocument } = useDocuments()
   const { isRecording, startRecording, stopRecording, transcribeAudio } = useVoice()
-  const [selectedDocument, setSelectedDocument] = useState(null)
-  const [analysisResult, setAnalysisResult] = useState(null)
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
+  const [analysisResult, setAnalysisResult] = useState<DocumentAnalysis | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false)
   const [pastedText, setPastedText] = useState("")
@@ -31,7 +32,7 @@ export default function AnalyzeScreen() {
   const pulseAnim = useRef(new RNAnimated.Value(1)).current
   const scale = useSharedValue(1)
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const _animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }))
 
@@ -57,43 +58,32 @@ export default function AnalyzeScreen() {
   }, [isRecording])
 
   const handleDocumentUpload = async () => {
-    try {
-      const doc = await pickDocument()
-      if (doc) {
-        setSelectedDocument(doc)
-        handleAnalyze(doc)
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to upload document")
+    const doc = await pickDocument()
+    if (doc) {
+      setSelectedDocument(doc)
+      handleAnalyze(doc)
     }
   }
 
   const handleDocumentScan = async () => {
-    try {
-      const doc = await scanDocument()
-      if (doc) {
-        setSelectedDocument(doc)
-        handleAnalyze(doc)
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to scan document")
+    const doc = await scanDocument()
+    if (doc) {
+      setSelectedDocument(doc)
+      handleAnalyze(doc)
     }
   }
 
   const handleAnalyze = async (document: Document) => {
     setIsAnalyzing(true)
-    try {
-      const analysis = await analyzeDocument(document.id)
-      setAnalysisResult({
-        ...analysis,
-        riskyPoints: 3,
-        favorablePoints: 2,
-      })
-    } catch (error) {
-      Alert.alert("Error", "Failed to analyze document")
-    } finally {
-      setIsAnalyzing(false)
-    }
+
+    const analysis = await analyzeDocument(document.id)
+    setAnalysisResult({
+      ...analysis,
+      riskyPoints: 3,
+      favorablePoints: 2,
+    })
+
+    setIsAnalyzing(false)
   }
 
   const handleVoiceRecording = async () => {

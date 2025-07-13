@@ -1,4 +1,4 @@
-import { ExpectedError } from "../attempt"
+import { attemptSync, ExpectedError } from "../attempt"
 
 /*
  *
@@ -24,9 +24,8 @@ export function extractValidationErrorMessage(message: string | object): string 
   let data = message
 
   if (typeof message === "string") {
-    try {
-      data = JSON.parse(message)
-    } catch {
+    const res = attemptSync(JSON.parse(message))
+    if (!res.ok) {
       return message
     }
   }

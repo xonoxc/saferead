@@ -9,29 +9,7 @@ import CustomBackBtn from "@/components/CustomBackBtn"
 export default function PremiumScreen() {
   const { colors } = useTheme()
   const premiumFeatures = getPremiumFeatures()
-
-  const proFeatures = [
-    {
-      icon: Brain,
-      title: "Advanced AI Analysis",
-      description: "Access to our most powerful legal AI models",
-    },
-    {
-      icon: Zap,
-      title: "Lightning Fast Processing",
-      description: "Priority queue for instant document analysis",
-    },
-    {
-      icon: Shield,
-      title: "Enterprise Security",
-      description: "Bank-level encryption and compliance",
-    },
-    {
-      icon: Users,
-      title: "Team Collaboration",
-      description: "Share and collaborate with unlimited team members",
-    },
-  ]
+  const proFeatures = getProfeatures()
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -161,6 +139,31 @@ function getPremiumFeatures() {
     "Advanced security and encryption",
     "Export capabilities and integrations",
     "Early access to new features",
+  ]
+}
+
+function getProfeatures() {
+  return [
+    {
+      icon: Brain,
+      title: "Advanced AI Analysis",
+      description: "Access to our most powerful legal AI models",
+    },
+    {
+      icon: Zap,
+      title: "Lightning Fast Processing",
+      description: "Priority queue for instant document analysis",
+    },
+    {
+      icon: Shield,
+      title: "Enterprise Security",
+      description: "Bank-level encryption and compliance",
+    },
+    {
+      icon: Users,
+      title: "Team Collaboration",
+      description: "Share and collaborate with unlimited team members",
+    },
   ]
 }
 

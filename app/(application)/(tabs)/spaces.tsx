@@ -34,16 +34,13 @@ export default function SpacesScreen() {
       return
     }
 
-    try {
-      await createSpace(newSpaceName, newSpaceDescription, selectedColor, selectedIcon)
-      setShowCreateModal(false)
-      setNewSpaceName("")
-      setNewSpaceDescription("")
-      setSelectedColor("#4ECDC4")
-      setSelectedIcon("📁")
-    } catch (error) {
-      Alert.alert("Error", "Failed to create space")
-    }
+    await createSpace(newSpaceName, newSpaceDescription, selectedColor, selectedIcon)
+
+    setShowCreateModal(false)
+    setNewSpaceName("")
+    setNewSpaceDescription("")
+    setSelectedColor("#4ECDC4")
+    setSelectedIcon("📁")
   }
 
   const handleDeleteSpace = (spaceId: string, spaceName: string) => {

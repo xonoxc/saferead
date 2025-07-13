@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native"
 import { Plus, Search, Filter, Camera, Upload, FileText } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { DocumentsProvider, useDocuments } from "@/hooks/useDocuments"
+import { useDocuments } from "@/hooks/useDocuments"
 import { DocumentCard } from "@/components/DocumentCard"
 import { Button } from "@/components/Button"
 import { TextInput } from "@/components/TextInput"
@@ -27,29 +27,17 @@ export default function AnalyzeScreen() {
 
   const handlePickDocument = async () => {
     setShowActions(false)
-    try {
-      await pickDocument()
-    } catch (error) {
-      Alert.alert("Error", "Failed to pick document")
-    }
+    await pickDocument()
   }
 
   const handleScanDocument = async () => {
     setShowActions(false)
-    try {
-      await scanDocument()
-    } catch (error) {
-      Alert.alert("Error", "Failed to scan document")
-    }
+    await scanDocument()
   }
 
   const handleAnalyzeDocument = async (docId: string) => {
-    try {
-      await analyzeDocument(docId)
-      Alert.alert("Success", "Document analyzed successfully")
-    } catch (error) {
-      Alert.alert("Error", "Failed to analyze document")
-    }
+    await analyzeDocument(docId)
+    Alert.alert("Success", "Document analyzed successfully")
   }
 
   if (isLoading) {

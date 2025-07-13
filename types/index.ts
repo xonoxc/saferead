@@ -41,6 +41,8 @@ export interface DocumentAnalysis {
   summary: string
   keyTerms: KeyTerm[]
   riskAssessment: RiskAssessment
+  riskyPoints?: number
+  favorablePoints?: number
   deadlines: Deadline[]
   recommendations: string[]
   sensitiveInfo: SensitiveInfo[]

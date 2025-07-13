@@ -71,7 +71,7 @@ interface DocumentsContextType {
   error: string | null
   pickDocument: () => Promise<Document | undefined>
   scanDocument: () => Promise<Document | undefined>
-  analyzeDocument: (docId: string) => Promise<DocumentAnalysis>
+  analyzeDocument: (docId: string) => Promise<DocumentAnalysis | null>
   deleteDocument: (docId: string) => Promise<void>
   clearError: () => void
 }
@@ -147,7 +147,14 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
 
       const updatedDocs = [...documents, newDoc]
       setDocuments(updatedDocs)
-      await saveDocuments(updatedDocs)
+
+      const saveattempt = await attempt(saveDocuments(updatedDocs))
+      if (!saveattempt.ok) {
+        setError("Failed to save document")
+        console.error("Save document error:", saveattempt.error)
+        return
+      }
+
       return newDoc
     }
   }
@@ -198,12 +205,18 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
     }
   }
 
-  const analyzeDocument = async (docId: string): Promise<DocumentAnalysis> => {
+  const analyzeDocument = async (docId: string): Promise<DocumentAnalysis | null> => {
     setIsLoading(true)
     const updatedDocs = documents.map(doc => (doc.id === docId ? { ...doc, analysis } : doc))
     setDocuments(updatedDocs)
-    await saveDocuments(updatedDocs)
-    setIsLoading(false)
+
+    const saveRes = await attempt(saveDocuments(updatedDocs))
+    if (saveRes.ok) {
+      setError("Failed to save document")
+      setIsLoading(false)
+      return null
+    }
+
     return analysis
   }
 

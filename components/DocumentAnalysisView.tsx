@@ -15,6 +15,7 @@ import { useTheme } from "@/hooks/useTheme"
 import { useVoice } from "@/hooks/useVoice"
 import { Document, DocumentAnalysis } from "@/types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { attempt } from "@/utils/attempt"
 
 interface DocumentAnalysisViewProps {
   document: Document
@@ -58,13 +59,15 @@ export const DocumentAnalysisView: React.FC<DocumentAnalysisViewProps> = ({
   }
 
   const handleShare = async () => {
-    try {
-      await Share.share({
+    const resp = await attempt(
+      Share.share({
         message: `Document Analysis: ${document.title}\n\nSummary: ${analysis.summary}`,
         title: "Document Analysis Report",
       })
-    } catch (error) {
-      console.error("Error sharing:", error)
+    )
+    if (!resp.ok) {
+      console.error("Error sharing:", resp.error)
+      return
     }
   }
 

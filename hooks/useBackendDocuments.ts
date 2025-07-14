@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getDocuments, getDocumentById, deleteDocument as deleteDocumentApi, AnalysisResponse, DocumentsListResponse } from '@/services/api'
 import { attempt } from '@/utils/attempt'
+import { FilterOptions } from '@/components/DocumentFilter'
 
 export const useBackendDocuments = () => {
   const [documents, setDocuments] = useState<AnalysisResponse[]>([])
@@ -8,12 +9,16 @@ export const useBackendDocuments = () => {
   const [error, setError] = useState<string | null>(null)
   const [hasMore, setHasMore] = useState(true)
   const [nextPage, setNextPage] = useState<string | null>(null)
+  const [currentFilters, setCurrentFilters] = useState<FilterOptions>({
+    ordering: '-created_at',
+  })
 
-  const loadDocuments = async (refresh = false) => {
+  const loadDocuments = async (refresh = false, filters?: FilterOptions) => {
     setIsLoading(true)
     setError(null)
 
-    const result = await attempt(getDocuments())
+    const filtersToUse = filters || currentFilters
+    const result = await attempt(getDocuments(1, filtersToUse))
     
     if (!result.ok) {
       setError(result.error.message || 'Failed to load documents')
@@ -43,7 +48,7 @@ export const useBackendDocuments = () => {
     const pageMatch = nextPage?.match(/page=(\d+)/)
     const page = pageMatch ? parseInt(pageMatch[1]) : 2
 
-    const result = await attempt(getDocuments(page))
+    const result = await attempt(getDocuments(page, currentFilters))
     
     if (!result.ok) {
       setError(result.error.message || 'Failed to load more documents')
@@ -56,6 +61,14 @@ export const useBackendDocuments = () => {
     setHasMore(!!response.next)
     setNextPage(response.next)
     setIsLoading(false)
+  }
+
+  const applyFilters = (filters: FilterOptions) => {
+    setCurrentFilters(filters)
+    setDocuments([])
+    setHasMore(true)
+    setNextPage(null)
+    loadDocuments(true, filters)
   }
 
   const getDocument = async (documentId: string): Promise<AnalysisResponse | null> => {
@@ -95,7 +108,9 @@ export const useBackendDocuments = () => {
     isLoading,
     error,
     hasMore,
+    currentFilters,
     loadMoreDocuments,
+    applyFilters,
     getDocument,
     deleteDocument,
     refreshDocuments,

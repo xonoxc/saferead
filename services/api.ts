@@ -1,4 +1,5 @@
 import { apiClient } from "@/utils/apiclient"
+import { FilterOptions } from "@/components/DocumentFilter"
 
 export interface UploadDocumentRequest {
   document_file: any
@@ -63,8 +64,23 @@ export const uploadDocument = async (data: UploadDocumentRequest): Promise<Analy
   return response.data
 }
 
-export const getDocuments = async (page?: number): Promise<DocumentsListResponse> => {
-  const params = page ? { page } : {}
+export const getDocuments = async (page?: number, filters?: FilterOptions): Promise<DocumentsListResponse> => {
+  const params: any = {}
+  
+  if (page) params.page = page
+  
+  if (filters) {
+    // Add filtering parameters
+    if (filters.status) params.status = filters.status
+    if (filters.document_type) params.document_type = filters.document_type
+    if (filters.confidence_score_gte) params.confidence_score__gte = filters.confidence_score_gte
+    if (filters.confidence_score_lte) params.confidence_score__lte = filters.confidence_score_lte
+    if (filters.created_at_gte) params.created_at__gte = filters.created_at_gte
+    if (filters.created_at_lte) params.created_at__lte = filters.created_at_lte
+    if (filters.ordering) params.ordering = filters.ordering
+    if (filters.search) params.search = filters.search
+  }
+
   const response = await apiClient.get('/scanner/documents/', { params })
   return response.data
 }

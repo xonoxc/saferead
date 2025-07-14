@@ -4,6 +4,8 @@ import { Plus, Search, Filter, Camera, Upload, FileText, Trash2, TrendingUp } fr
 import { useTheme } from "@/hooks/useTheme"
 import { useDocuments } from "@/hooks/useDocuments"
 import { useBackendDocuments } from "@/hooks/useBackendDocuments"
+import { BackendAnalysisView } from "@/components/BackendAnalysisView"
+import { DocumentFilter, FilterOptions } from "@/components/DocumentFilter"
 import { Button } from "@/components/Button"
 import { TextInput } from "@/components/TextInput"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
@@ -80,7 +82,10 @@ const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({ document, onP
         <View style={styles.cardActions}>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: colors.error + '20' }]}
-            onPress={handleDelete}
+            onPress={(e) => {
+              e.stopPropagation()
+              handleDelete()
+            }}
           >
             <Trash2 size={16} color={colors.error} />
           </TouchableOpacity>
@@ -130,21 +135,18 @@ export default function DocumentsScreen() {
     isLoading, 
     error, 
     hasMore, 
+    currentFilters,
     loadMoreDocuments, 
+    applyFilters,
     deleteDocument: deleteBackendDocument,
     refreshDocuments 
   } = useBackendDocuments()
   
   const [searchQuery, setSearchQuery] = useState("")
   const [showActions, setShowActions] = useState(false)
+  const [showFilter, setShowFilter] = useState(false)
+  const [selectedDocument, setSelectedDocument] = useState<AnalysisResponse | null>(null)
   const [refreshing, setRefreshing] = useState(false)
-
-  const filteredDocuments = documents.filter(
-    doc =>
-      doc.original_filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.document_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.summary_text.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   const handleAddDocument = () => {
     setShowActions(true)
@@ -173,12 +175,23 @@ export default function DocumentsScreen() {
     setRefreshing(false)
   }
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    const newFilters = {
+      ...currentFilters,
+      search: query || undefined,
+    }
+    applyFilters(newFilters)
+  }
+
+  const handleDocumentPress = (document: AnalysisResponse) => {
+    setSelectedDocument(document)
+  }
+
   const renderDocument = ({ item }: { item: AnalysisResponse }) => (
     <BackendDocumentCard
       document={item}
-      onPress={() => {
-        // Navigate to document detail or show analysis
-      }}
+      onPress={() => handleDocumentPress(item)}
       onDelete={handleDeleteDocument}
     />
   )
@@ -200,7 +213,7 @@ export default function DocumentsScreen() {
       </Text>
       <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
         {searchQuery
-          ? "Try adjusting your search terms"
+          ? "Try adjusting your search terms or filters"
           : "Start by analyzing your first legal document"}
       </Text>
       {!searchQuery && (
@@ -213,6 +226,15 @@ export default function DocumentsScreen() {
       )}
     </View>
   )
+
+  if (selectedDocument) {
+    return (
+      <BackendAnalysisView
+        analysis={selectedDocument}
+        onBack={() => setSelectedDocument(null)}
+      />
+    )
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -231,13 +253,16 @@ export default function DocumentsScreen() {
           <Search size={20} color={colors.textMuted} />
           <TextInput
             value={searchQuery}
-            onChangeText={setSearchQuery}
+            onChangeText={handleSearch}
             placeholder="Search documents..."
-            placeholderTextColor={colors.textMuted}
-            style={[styles.searchInput, { color: colors.text }]}
+            containerStyle={styles.searchInputWrapper}
+            inputStyle={[styles.searchInput, { color: colors.text }]}
           />
         </View>
-        <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.card }]}>
+        <TouchableOpacity 
+          style={[styles.filterButton, { backgroundColor: colors.card }]}
+          onPress={() => setShowFilter(true)}
+        >
           <Filter size={20} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
@@ -266,7 +291,7 @@ export default function DocumentsScreen() {
       )}
 
       <FlatList
-        data={filteredDocuments}
+        data={documents}
         renderItem={renderDocument}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
@@ -282,6 +307,13 @@ export default function DocumentsScreen() {
         ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
         showsVerticalScrollIndicator={false}
+      />
+
+      <DocumentFilter
+        visible={showFilter}
+        onClose={() => setShowFilter(false)}
+        onApply={applyFilters}
+        currentFilters={currentFilters}
       />
     </View>
   )
@@ -320,18 +352,25 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
     borderRadius: 12,
     gap: 8,
   },
-  searchInput: {
+  searchInputWrapper: {
     flex: 1,
+    margin: 0,
+  },
+  searchInput: {
     fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+    minHeight: 0,
   },
   filterButton: {
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",

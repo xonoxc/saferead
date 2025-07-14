@@ -1,4 +1,4 @@
-package com.saferead.andro
+package com.saferead.android
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

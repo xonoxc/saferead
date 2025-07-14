@@ -1,4 +1,4 @@
-package com.saferead.andro
+package com.saferead.android
 
 import android.app.Application
 import android.content.res.Configuration

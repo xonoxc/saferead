@@ -1,24 +1,149 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native"
-import { Plus, Search, Filter, Camera, Upload, FileText } from "lucide-react-native"
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, RefreshControl } from "react-native"
+import { Plus, Search, Filter, Camera, Upload, FileText, Trash2, TrendingUp } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useDocuments } from "@/hooks/useDocuments"
-import { DocumentCard } from "@/components/DocumentCard"
+import { useBackendDocuments } from "@/hooks/useBackendDocuments"
 import { Button } from "@/components/Button"
 import { TextInput } from "@/components/TextInput"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { AnalysisResponse } from "@/services/api"
 
-export default function AnalyzeScreen() {
+interface BackendDocumentCardProps {
+  document: AnalysisResponse
+  onPress: () => void
+  onDelete: (id: string) => void
+}
+
+const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({ document, onPress, onDelete }) => {
   const { colors } = useTheme()
-  const { documents, isLoading, pickDocument, scanDocument, analyzeDocument } = useDocuments()
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return colors.success
+      case 'processing':
+        return colors.warning
+      case 'failed':
+        return colors.error
+      default:
+        return colors.textSecondary
+    }
+  }
+
+  const getDocumentTypeLabel = (type: string) => {
+    const types = {
+      'terms': 'Terms & Conditions',
+      'privacy': 'Privacy Policy',
+      'legal': 'Legal Agreement',
+      'other': 'Other Document',
+    }
+    return types[type] || type
+  }
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Document",
+      "Are you sure you want to delete this document? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => onDelete(document.id),
+        },
+      ]
+    )
+  }
+
+  return (
+    <TouchableOpacity
+      style={[styles.documentCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+      onPress={onPress}
+    >
+      <View style={styles.cardHeader}>
+        <View style={[styles.documentIcon, { backgroundColor: colors.primary + '20' }]}>
+          <FileText size={24} color={colors.primary} />
+        </View>
+        <View style={styles.documentInfo}>
+          <Text style={[styles.documentTitle, { color: colors.text }]} numberOfLines={1}>
+            {document.original_filename}
+          </Text>
+          <Text style={[styles.documentType, { color: colors.textSecondary }]}>
+            {getDocumentTypeLabel(document.document_type)}
+          </Text>
+          <Text style={[styles.documentDate, { color: colors.textSecondary }]}>
+            {new Date(document.created_at).toLocaleDateString()}
+          </Text>
+        </View>
+        <View style={styles.cardActions}>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: colors.error + '20' }]}
+            onPress={handleDelete}
+          >
+            <Trash2 size={16} color={colors.error} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.statusContainer}>
+        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(document.status) + '20' }]}>
+          <Text style={[styles.statusText, { color: getStatusColor(document.status) }]}>
+            {document.status.toUpperCase()}
+          </Text>
+        </View>
+        {document.status === 'completed' && (
+          <View style={styles.confidenceContainer}>
+            <TrendingUp size={12} color={colors.primary} />
+            <Text style={[styles.confidenceText, { color: colors.textSecondary }]}>
+              {(document.confidence_score * 100).toFixed(0)}%
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {document.status === 'completed' && (
+        <View style={styles.analysisPreview}>
+          <Text style={[styles.summaryText, { color: colors.textSecondary }]} numberOfLines={2}>
+            {document.summary_text}
+          </Text>
+          <View style={styles.analysisStats}>
+            <Text style={[styles.statText, { color: colors.error }]}>
+              {document.risky_points.length} risks
+            </Text>
+            <Text style={[styles.statText, { color: colors.success }]}>
+              {document.favourable_points.length} favorable
+            </Text>
+          </View>
+        </View>
+      )}
+    </TouchableOpacity>
+  )
+}
+
+export default function DocumentsScreen() {
+  const { colors } = useTheme()
+  const { pickDocument, scanDocument } = useDocuments()
+  const { 
+    documents, 
+    isLoading, 
+    error, 
+    hasMore, 
+    loadMoreDocuments, 
+    deleteDocument: deleteBackendDocument,
+    refreshDocuments 
+  } = useBackendDocuments()
+  
   const [searchQuery, setSearchQuery] = useState("")
   const [showActions, setShowActions] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   const filteredDocuments = documents.filter(
     doc =>
-      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.type.toLowerCase().includes(searchQuery.toLowerCase())
+      doc.original_filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.document_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.summary_text.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const handleAddDocument = () => {
@@ -35,14 +160,59 @@ export default function AnalyzeScreen() {
     await scanDocument()
   }
 
-  const handleAnalyzeDocument = async (docId: string) => {
-    await analyzeDocument(docId)
-    Alert.alert("Success", "Document analyzed successfully")
+  const handleDeleteDocument = async (documentId: string) => {
+    const success = await deleteBackendDocument(documentId)
+    if (success) {
+      Alert.alert("Success", "Document deleted successfully")
+    }
   }
 
-  if (isLoading) {
-    return <LoadingSpinner />
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    refreshDocuments()
+    setRefreshing(false)
   }
+
+  const renderDocument = ({ item }: { item: AnalysisResponse }) => (
+    <BackendDocumentCard
+      document={item}
+      onPress={() => {
+        // Navigate to document detail or show analysis
+      }}
+      onDelete={handleDeleteDocument}
+    />
+  )
+
+  const renderFooter = () => {
+    if (!hasMore) return null
+    return (
+      <View style={styles.footerLoader}>
+        <LoadingSpinner size="small" />
+      </View>
+    )
+  }
+
+  const renderEmpty = () => (
+    <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
+      <FileText size={64} color={colors.textMuted} />
+      <Text style={[styles.emptyStateTitle, { color: colors.text }]}>
+        {searchQuery ? "No Documents Found" : "No Documents Yet"}
+      </Text>
+      <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
+        {searchQuery
+          ? "Try adjusting your search terms"
+          : "Start by analyzing your first legal document"}
+      </Text>
+      {!searchQuery && (
+        <Button
+          title="Add Document"
+          onPress={handleAddDocument}
+          variant="primary"
+          size="large"
+        />
+      )}
+    </View>
+  )
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -57,18 +227,26 @@ export default function AnalyzeScreen() {
       </View>
 
       <View style={styles.searchContainer}>
-        <View style={styles.searchInputContainer}>
+        <View style={[styles.searchInputContainer, { backgroundColor: colors.card }]}>
           <Search size={20} color={colors.textMuted} />
           <TextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="Search documents..."
+            placeholderTextColor={colors.textMuted}
+            style={[styles.searchInput, { color: colors.text }]}
           />
         </View>
         <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.card }]}>
           <Filter size={20} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
+
+      {error && (
+        <View style={[styles.errorContainer, { backgroundColor: colors.error + '20' }]}>
+          <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
+        </View>
+      )}
 
       {showActions && (
         <View style={[styles.actionsContainer, { backgroundColor: colors.card }]}>
@@ -82,43 +260,29 @@ export default function AnalyzeScreen() {
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionItem} onPress={() => setShowActions(false)}>
             <FileText size={24} color={colors.accent} />
-            <Text style={[styles.actionText, { color: colors.text }]}>Text Input</Text>
+            <Text style={[styles.actionText, { color: colors.text }]}>Cancel</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      <ScrollView style={styles.content}>
-        {filteredDocuments.length > 0 ? (
-          filteredDocuments.map(document => (
-            <DocumentCard
-              key={document.id}
-              document={document}
-              onPress={() => {
-                // Navigate to document detail
-              }}
-              onAnalyze={() => handleAnalyzeDocument(document.id)}
-            />
-          ))
-        ) : (
-          <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
-            <FileText size={64} color={colors.textMuted} />
-            <Text style={[styles.emptyStateTitle, { color: colors.text }]}>No Documents Found</Text>
-            <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
-              {searchQuery
-                ? "Try adjusting your search terms"
-                : "Start by adding your first legal document"}
-            </Text>
-            {!searchQuery && (
-              <Button
-                title="Add Document"
-                onPress={handleAddDocument}
-                variant="primary"
-                size="large"
-              />
-            )}
-          </View>
-        )}
-      </ScrollView>
+      <FlatList
+        data={filteredDocuments}
+        renderItem={renderDocument}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[colors.primary]}
+          />
+        }
+        onEndReached={loadMoreDocuments}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        ListEmptyComponent={renderEmpty}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   )
 }
@@ -133,7 +297,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
-    paddingBottom: 0,
+    paddingBottom: 10,
   },
   title: {
     fontSize: FontSizes.xxl,
@@ -148,50 +312,159 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: "row",
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
     gap: 12,
   },
   searchInputContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    paddingLeft: 12,
+    padding: 12,
+    borderRadius: 12,
+    gap: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.regular,
   },
   filterButton: {
     width: 44,
     height: 44,
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
   },
-  actionsContainer: {
+  errorContainer: {
     margin: 20,
-    marginTop: 0,
+    padding: 12,
+    borderRadius: 8,
+  },
+  errorText: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.medium,
+    textAlign: 'center',
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 20,
+    marginHorizontal: 20,
+    marginBottom: 20,
     borderRadius: 12,
-    padding: 16,
-    gap: 12,
   },
   actionItem: {
-    flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    gap: 12,
+    gap: 8,
   },
   actionText: {
-    fontSize: FontSizes.md,
+    fontSize: FontSizes.sm,
     fontFamily: Fonts.medium,
   },
-  content: {
-    flex: 1,
+  listContent: {
     paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  documentCard: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  documentIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  documentInfo: {
+    flex: 1,
+  },
+  documentTitle: {
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.semiBold,
+    marginBottom: 4,
+  },
+  documentType: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.regular,
+    marginBottom: 2,
+  },
+  documentDate: {
+    fontSize: FontSizes.xs,
+    fontFamily: Fonts.regular,
+  },
+  cardActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusText: {
+    fontSize: FontSizes.xs,
+    fontFamily: Fonts.bold,
+  },
+  confidenceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  confidenceText: {
+    fontSize: FontSizes.xs,
+    fontFamily: Fonts.medium,
+  },
+  analysisPreview: {
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+  },
+  summaryText: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.regular,
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  analysisStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  statText: {
+    fontSize: FontSizes.xs,
+    fontFamily: Fonts.medium,
+  },
+  footerLoader: {
+    paddingVertical: 20,
+    alignItems: 'center',
   },
   emptyState: {
-    alignItems: "center",
-    /* borderWidth: 1,
-    borderColor: "#E0E0E0", */
-    padding: 30,
-    borderRadius: 12,
-    margin: 5,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
   },
   emptyStateTitle: {
     fontSize: FontSizes.xl,
@@ -202,8 +475,8 @@ const styles = StyleSheet.create({
   emptyStateDescription: {
     fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
-    textAlign: "center",
-    lineHeight: 20,
+    textAlign: 'center',
     marginBottom: 24,
+    paddingHorizontal: 40,
   },
 })

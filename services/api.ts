@@ -1,14 +1,13 @@
 import { apiClient } from "@/utils/apiclient"
 
 export interface UploadDocumentRequest {
-  document_file: any // Can be File, Blob, or React Native file object
+  document_file: any
   original_filename: string
   document_type: 'terms' | 'privacy' | 'legal' | 'other'
 }
 
 export interface AnalysisResponse {
   id: string
-  user: number
   document_file: string
   original_filename: string
   document_type: string
@@ -21,9 +20,13 @@ export interface AnalysisResponse {
   processed_at: string
   error_message: string
   confidence_score: number
-  has_analysis_results: boolean
-  analysis_complete: boolean
-  is_ready_for_analysis: boolean
+}
+
+export interface DocumentsListResponse {
+  count: number
+  next: string | null
+  previous: string | null
+  results: AnalysisResponse[]
 }
 
 export const uploadDocument = async (data: UploadDocumentRequest): Promise<AnalysisResponse> => {
@@ -60,7 +63,17 @@ export const uploadDocument = async (data: UploadDocumentRequest): Promise<Analy
   return response.data
 }
 
-export const getDocumentAnalysis = async (documentId: string): Promise<AnalysisResponse> => {
+export const getDocuments = async (page?: number): Promise<DocumentsListResponse> => {
+  const params = page ? { page } : {}
+  const response = await apiClient.get('/scanner/documents/', { params })
+  return response.data
+}
+
+export const getDocumentById = async (documentId: string): Promise<AnalysisResponse> => {
   const response = await apiClient.get(`/scanner/documents/${documentId}/`)
   return response.data
+}
+
+export const deleteDocument = async (documentId: string): Promise<void> => {
+  await apiClient.delete(`/scanner/documents/${documentId}/`)
 }

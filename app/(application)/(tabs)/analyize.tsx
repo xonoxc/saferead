@@ -8,7 +8,19 @@ import {
   Alert,
   Animated as RNAnimated,
 } from "react-native"
-import { Plus, Mic, MicOff, Upload, Camera, FileText } from "lucide-react-native"
+import {
+  Plus,
+  Mic,
+  MicOff,
+  Upload,
+  Camera,
+  FileText,
+  Menu,
+  ListTree,
+  Box,
+  ArrowRight,
+  ChevronRight,
+} from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { defaultAnalysis, useDocuments } from "@/hooks/useDocuments"
@@ -18,6 +30,9 @@ import { VoiceRecorder } from "@/components/VoiceRecorder"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { Document, DocumentAnalysis } from "@/types"
 import UpgradeButton from "@/components/UpgradeButton"
+import { SideBar } from "@/components/Sidebar/Sidebar"
+import { useNavigation } from "expo-router"
+import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
@@ -29,12 +44,28 @@ export default function AnalyzeScreen() {
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false)
   const [pastedText, _] = useState("")
 
+  const [isSideBarOpen, setIsSideBarOpen] = useState(false)
+
   const pulseAnim = useRef(new RNAnimated.Value(1)).current
+
+  useTabBarVisibility(!isSideBarOpen, colors)
+
   /*   const scale = useSharedValue(1) */
 
   /* const _animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   })) */
+
+  const handleItemPress = (item: string) => {
+    setIsSideBarOpen(false)
+    if (item === "logout") {
+      console.log("Logging out...")
+    } else if (item === "settings") {
+      console.log("Go to settings")
+    } else {
+      console.log(`You tapped on ${item}`)
+    }
+  }
 
   React.useEffect(() => {
     if (isRecording) {
@@ -139,11 +170,43 @@ export default function AnalyzeScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <SideBar
+        isOpen={isSideBarOpen}
+        onClose={() => setIsSideBarOpen(false)}
+        onItemPress={handleItemPress}
+      />
+
       {/* Header */}
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
-        <UpgradeButton />
-      </Animated.View>
+        <View style={styles.innerHeader}>
+          <TouchableOpacity
+            onPress={() => setIsSideBarOpen(true)}
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              justifyContent: "center",
+              paddingHorizontal: 16,
+            }}
+          >
+            <Menu
+              color={colors.text}
+              style={{
+                width: 24,
+                height: 24,
+                padding: 4,
+                borderRadius: 12,
+                backgroundColor: colors.card + "20",
+              }}
+            />
+          </TouchableOpacity>
 
+          <View style={{ alignItems: "center" }}>
+            <UpgradeButton />
+          </View>
+        </View>
+      </Animated.View>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Upload Options */}
         <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.uploadSection}>
@@ -276,8 +339,17 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    paddingHorizontal: 120,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    paddingHorizontal: 10,
     paddingBottom: 0,
+  },
+  innerHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 12,
+    width: "100%",
+    justifyContent: "center",
   },
   title: {
     fontSize: FontSizes.xxl,

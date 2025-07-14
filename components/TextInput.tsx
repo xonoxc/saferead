@@ -91,6 +91,7 @@ export const TextInput: React.FC<TextInputProps> = ({
 const styles = StyleSheet.create({
   container: {
     marginVertical: 4,
+    flex: 1,
   },
   label: {
     fontSize: FontSizes.xs,

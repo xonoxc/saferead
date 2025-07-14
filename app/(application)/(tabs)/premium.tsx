@@ -159,11 +159,6 @@ function getProfeatures() {
       title: "Enterprise Security",
       description: "Bank-level encryption and compliance",
     },
-    {
-      icon: Users,
-      title: "Team Collaboration",
-      description: "Share and collaborate with unlimited team members",
-    },
   ]
 }
 
@@ -325,7 +320,7 @@ const styles = StyleSheet.create({
   },
   upgradeButton: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 25,
+    borderRadius: 17,
     paddingVertical: 16,
     paddingHorizontal: 32,
     width: "100%",

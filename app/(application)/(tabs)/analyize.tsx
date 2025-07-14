@@ -18,6 +18,7 @@ import { VoiceRecorder } from "@/components/VoiceRecorder"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { Document, DocumentAnalysis } from "@/types"
 import { attempt } from "@/utils/attempt"
+import UpgradeButton from "@/components/UpgradeButton"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
@@ -136,7 +137,7 @@ export default function AnalyzeScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Analyze</Text>
+        <UpgradeButton />
       </Animated.View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -300,6 +301,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
+    paddingHorizontal: 120,
     paddingBottom: 0,
   },
   title: {

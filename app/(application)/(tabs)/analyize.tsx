@@ -11,13 +11,12 @@ import {
 import { Plus, Mic, MicOff, Upload, Camera, FileText } from "lucide-react-native"
 import Animated, { FadeInDown, useSharedValue, useAnimatedStyle } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
-import { useDocuments } from "@/hooks/useDocuments"
+import { defaultAnalysis, useDocuments } from "@/hooks/useDocuments"
 import { useVoice } from "@/hooks/useVoice"
 import { DocumentAnalysisView } from "@/components/DocumentAnalysisView"
 import { VoiceRecorder } from "@/components/VoiceRecorder"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { Document, DocumentAnalysis } from "@/types"
-import { attempt } from "@/utils/attempt"
 import UpgradeButton from "@/components/UpgradeButton"
 
 export default function AnalyzeScreen() {
@@ -78,10 +77,10 @@ export default function AnalyzeScreen() {
     setIsAnalyzing(true)
 
     const analysis = await analyzeDocument(document.id)
+    console.log("Analyzing document:", document.title, analysis)
+
     setAnalysisResult({
-      ...analysis,
-      riskyPoints: 3,
-      favorablePoints: 2,
+      ...defaultAnalysis,
     })
 
     setIsAnalyzing(false)
@@ -141,31 +140,6 @@ export default function AnalyzeScreen() {
       </Animated.View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* AI Assistant Card */}
-        <Animated.View
-          entering={FadeInDown.delay(200).springify()}
-          style={[styles.assistantCard, { backgroundColor: colors.surface }]}
-        >
-          <View style={styles.assistantHeader}>
-            <View style={styles.avatarContainer}>
-              <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
-                <Text style={styles.avatarText}>AI</Text>
-              </View>
-            </View>
-            <View style={styles.assistantInfo}>
-              <Text style={[styles.assistantName, { color: colors.text }]}>System</Text>
-            </View>
-          </View>
-
-          <View style={[styles.messageContainer, { backgroundColor: colors.card }]}>
-            <Text style={[styles.messageText, { color: colors.text }]}>
-              Risky Points: 3 Favorable Points: 2{"\n"}
-              Summary: The document has a moderate risk level with some favorable terms. Review the
-              risky points carefully.
-            </Text>
-          </View>
-        </Animated.View>
-
         {/* Upload Options */}
         <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.uploadSection}>
           <View style={styles.uploadGrid}>
@@ -224,11 +198,7 @@ export default function AnalyzeScreen() {
             onPress={handleVoiceRecording}
           >
             <RNAnimated.View style={{ transform: [{ scale: pulseAnim }] }}>
-              {isRecording ? (
-                <MicOff size={32} color="#FFFFFF" />
-              ) : (
-                <Mic size={32} color="#FFFFFF" />
-              )}
+              {isRecording ? <MicOff size={32} color="black" /> : <Mic size={32} color="black" />}
             </RNAnimated.View>
           </TouchableOpacity>
           <Text style={[styles.voiceText, { color: colors.textSecondary }]}>

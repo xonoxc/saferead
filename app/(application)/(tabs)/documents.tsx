@@ -47,7 +47,7 @@ export default function AnalyzeScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Analyze</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Your Documents</Text>
         <TouchableOpacity
           style={[styles.addButton, { backgroundColor: colors.primary }]}
           onPress={handleAddDocument}
@@ -100,7 +100,7 @@ export default function AnalyzeScreen() {
             />
           ))
         ) : (
-          <View style={[styles.emptyState, { backgroundColor: colors.card }]}>
+          <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
             <FileText size={64} color={colors.textMuted} />
             <Text style={[styles.emptyStateTitle, { color: colors.text }]}>No Documents Found</Text>
             <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
@@ -126,7 +126,7 @@ export default function AnalyzeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 5,
   },
   header: {
     flexDirection: "row",
@@ -187,9 +187,11 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     alignItems: "center",
-    padding: 48,
+    /* borderWidth: 1,
+    borderColor: "#E0E0E0", */
+    padding: 30,
     borderRadius: 12,
-    margin: 20,
+    margin: 5,
   },
   emptyStateTitle: {
     fontSize: FontSizes.xl,

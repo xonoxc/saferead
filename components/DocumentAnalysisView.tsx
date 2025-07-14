@@ -11,7 +11,7 @@ import {
   EyeOff,
 } from "lucide-react-native"
 import Animated, { FadeInDown, FadeInRight } from "react-native-reanimated"
-import { useTheme } from "@/hooks/useTheme"
+import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { useVoice } from "@/hooks/useVoice"
 import { Document, DocumentAnalysis } from "@/types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
@@ -32,31 +32,7 @@ export const DocumentAnalysisView: React.FC<DocumentAnalysisViewProps> = ({
   const { speakText } = useVoice()
   const [showSensitiveInfo, setShowSensitiveInfo] = useState(false)
 
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case "high":
-        return colors.error
-      case "medium":
-        return colors.warning
-      case "low":
-        return colors.success
-      default:
-        return colors.textMuted
-    }
-  }
-
-  const getImportanceColor = (importance: string) => {
-    switch (importance) {
-      case "high":
-        return colors.error
-      case "medium":
-        return colors.warning
-      case "low":
-        return colors.success
-      default:
-        return colors.textMuted
-    }
-  }
+  console.log("analysis", analysis, null, 2)
 
   const handleShare = async () => {
     const resp = await attempt(
@@ -110,13 +86,15 @@ export const DocumentAnalysisView: React.FC<DocumentAnalysisViewProps> = ({
             <View
               style={[
                 styles.riskBadge,
-                { backgroundColor: getRiskColor(analysis.riskAssessment.overallRisk) + "20" },
+                {
+                  backgroundColor: getRiskColor(analysis.riskAssessment.overallRisk, colors) + "20",
+                },
               ]}
             >
               <Text
                 style={[
                   styles.riskBadgeText,
-                  { color: getRiskColor(analysis.riskAssessment.overallRisk) },
+                  { color: getRiskColor(analysis.riskAssessment.overallRisk, colors) },
                 ]}
               >
                 {analysis.riskAssessment.overallRisk.toUpperCase()}
@@ -177,11 +155,14 @@ export const DocumentAnalysisView: React.FC<DocumentAnalysisViewProps> = ({
                 <View
                   style={[
                     styles.importanceBadge,
-                    { backgroundColor: getImportanceColor(term.importance) + "20" },
+                    { backgroundColor: getImportanceColor(term.importance, colors) + "20" },
                   ]}
                 >
                   <Text
-                    style={[styles.importanceText, { color: getImportanceColor(term.importance) }]}
+                    style={[
+                      styles.importanceText,
+                      { color: getImportanceColor(term.importance, colors) },
+                    ]}
                   >
                     {term.importance}
                   </Text>
@@ -296,13 +277,13 @@ export const DocumentAnalysisView: React.FC<DocumentAnalysisViewProps> = ({
                 <View
                   style={[
                     styles.importanceBadge,
-                    { backgroundColor: getImportanceColor(section.importance) + "20" },
+                    { backgroundColor: getImportanceColor(section.importance, colors) + "20" },
                   ]}
                 >
                   <Text
                     style={[
                       styles.importanceText,
-                      { color: getImportanceColor(section.importance) },
+                      { color: getImportanceColor(section.importance, colors) },
                     ]}
                   >
                     {section.importance}
@@ -318,6 +299,32 @@ export const DocumentAnalysisView: React.FC<DocumentAnalysisViewProps> = ({
       </ScrollView>
     </View>
   )
+}
+
+function getRiskColor(risk: string, colors: ColorsType) {
+  switch (risk) {
+    case "high":
+      return colors.error
+    case "medium":
+      return colors.warning
+    case "low":
+      return colors.success
+    default:
+      return colors.textMuted
+  }
+}
+
+function getImportanceColor(importance: string, colors: ColorsType) {
+  switch (importance) {
+    case "high":
+      return colors.error
+    case "medium":
+      return colors.warning
+    case "low":
+      return colors.success
+    default:
+      return colors.textMuted
+  }
 }
 
 const styles = StyleSheet.create({

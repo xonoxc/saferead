@@ -6,7 +6,7 @@ import { Document, DocumentAnalysis } from "@/types"
 
 import { attempt } from "@/utils/attempt"
 
-const analysis: DocumentAnalysis = {
+export const defaultAnalysis: DocumentAnalysis = {
   summary:
     "This is a comprehensive legal document that outlines the terms and conditions for a service agreement.",
   keyTerms: [
@@ -217,7 +217,7 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
       return null
     }
 
-    return analysis
+    return defaultAnalysis
   }
 
   const deleteDocument = (docId: string) => {

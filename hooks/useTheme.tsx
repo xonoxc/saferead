@@ -6,9 +6,11 @@ import { attempt } from "@/utils/attempt"
 
 export type ThemeMode = "light" | "dark" | "system"
 
+export type ColorsType = typeof Colors.light
+
 interface ThemeContextType {
   mode: ThemeMode
-  colors: typeof Colors.light
+  colors: ColorsType
   isDark: boolean
   setTheme: (mode: ThemeMode) => Promise<void>
 }

@@ -7,27 +7,37 @@ import {
   TouchableOpacity,
   Alert,
   Animated as RNAnimated,
+  TextInput,
 } from "react-native"
 import { Plus, Mic, MicOff, Upload, Camera, FileText } from "lucide-react-native"
 import Animated, { FadeInDown, useSharedValue, useAnimatedStyle } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
-import { defaultAnalysis, useDocuments } from "@/hooks/useDocuments"
+import { useDocuments } from "@/hooks/useDocuments"
 import { useVoice } from "@/hooks/useVoice"
+import { useAuth } from "@/hooks/useAuth"
 import { DocumentAnalysisView } from "@/components/DocumentAnalysisView"
+import { EnhancedAnalysisView } from "@/components/EnhancedAnalysisView"
+import { DocumentTypeSelector, DocumentType } from "@/components/DocumentTypeSelector"
 import { VoiceRecorder } from "@/components/VoiceRecorder"
+import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { Document, DocumentAnalysis } from "@/types"
+import { uploadDocument, AnalysisResponse } from "@/services/api"
+import { attempt } from "@/utils/attempt"
 import UpgradeButton from "@/components/UpgradeButton"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
-  const { documents, pickDocument, scanDocument, analyzeDocument } = useDocuments()
+  const { user } = useAuth()
+  const { documents, pickDocument, scanDocument } = useDocuments()
   const { isRecording, startRecording, stopRecording, transcribeAudio } = useVoice()
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
-  const [analysisResult, setAnalysisResult] = useState<DocumentAnalysis | null>(null)
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false)
   const [pastedText, setPastedText] = useState("")
+  const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType>('other')
+  const [showTextInput, setShowTextInput] = useState(false)
 
   const pulseAnim = useRef(new RNAnimated.Value(1)).current
   const scale = useSharedValue(1)
@@ -58,32 +68,114 @@ export default function AnalyzeScreen() {
   }, [isRecording])
 
   const handleDocumentUpload = async () => {
-    const doc = await pickDocument()
-    if (doc) {
-      setSelectedDocument(doc)
-      handleAnalyze(doc)
+    if (!user) {
+      Alert.alert("Error", "Please log in to upload documents")
+      return
+    }
+
+    try {
+      const result = await pickDocument()
+      if (result) {
+        await handleAnalyzeDocument(result, selectedDocumentType)
+      }
+    } catch (error) {
+      console.error("Upload error:", error)
+      Alert.alert("Error", "Failed to upload document")
     }
   }
 
   const handleDocumentScan = async () => {
-    const doc = await scanDocument()
-    if (doc) {
-      setSelectedDocument(doc)
-      handleAnalyze(doc)
+    if (!user) {
+      Alert.alert("Error", "Please log in to scan documents")
+      return
+    }
+
+    try {
+      const result = await scanDocument()
+      if (result) {
+        await handleAnalyzeDocument(result, selectedDocumentType)
+      }
+    } catch (error) {
+      console.error("Scan error:", error)
+      Alert.alert("Error", "Failed to scan document")
     }
   }
 
-  const handleAnalyze = async (document: Document) => {
+  const handleAnalyzeDocument = async (document: any, docType: DocumentType) => {
+    if (!user) {
+      Alert.alert("Error", "Please log in to analyze documents")
+      return
+    }
+
+    console.log("Document structure:", document) // Debug log
+
     setIsAnalyzing(true)
+    setSelectedDocument(document)
 
-    const analysis = await analyzeDocument(document.id)
-    console.log("Analyzing document:", document.title, analysis)
+    try {
+      let documentFile: any
+      let filename: string
 
-    setAnalysisResult({
-      ...defaultAnalysis,
-    })
+      // Handle different document types
+      if (document.uri) {
+        // For documents with URI (from picker/scanner)
+        documentFile = {
+          uri: document.uri,
+          type: document.type || document.mimeType || 'image/jpeg',
+          name: document.name || document.title || 'document',
+        }
+        filename = document.title || document.name || 'document'
+      } else if (document.assets && document.assets.length > 0) {
+        // Handle expo-image-picker format
+        const asset = document.assets[0]
+        documentFile = {
+          uri: asset.uri,
+          type: asset.mimeType || 'image/jpeg',
+          name: asset.fileName || document.title || 'document',
+        }
+        filename = asset.fileName || document.title || 'document'
+      } else if (document.content) {
+        // For text content
+        const textBlob = new Blob([document.content], { type: 'text/plain' })
+        documentFile = new File([textBlob], `${document.title || 'document'}.txt`, { type: 'text/plain' })
+        filename = document.title || 'document.txt'
+      } else if (document.originalFormat === 'image' && !document.uri) {
+        // Handle stored image documents without URI - need to re-scan
+        Alert.alert(
+          "Document Not Available", 
+          "This document needs to be re-scanned or uploaded again for analysis.",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Re-scan", onPress: () => handleDocumentScan() }
+          ]
+        )
+        return
+      } else {
+        console.error("Unsupported document structure:", document)
+        throw new Error("Unsupported document format. Please try again.")
+      }
 
-    setIsAnalyzing(false)
+      console.log("Document file prepared:", documentFile) // Debug log
+
+      const uploadResult = await attempt(
+        uploadDocument({
+          document_file: documentFile,
+          original_filename: filename,
+          document_type: docType,
+        })
+      )
+
+      if (!uploadResult.ok) {
+        throw new Error(uploadResult.error.message || "Failed to analyze document")
+      }
+
+      setAnalysisResult(uploadResult.data)
+    } catch (error) {
+      console.error("Analysis error:", error)
+      Alert.alert("Error", error.message || "Failed to analyze document. Please try again.")
+    } finally {
+      setIsAnalyzing(false)
+    }
   }
 
   const handleVoiceRecording = async () => {
@@ -91,7 +183,6 @@ export default function AnalyzeScreen() {
       const audioUri = await stopRecording()
       if (audioUri) {
         setShowVoiceRecorder(false)
-        // Process voice command or transcribe
         const transcription = await transcribeAudio(audioUri)
         Alert.alert("Voice Note", `Transcription: ${transcription}`)
       }
@@ -101,28 +192,33 @@ export default function AnalyzeScreen() {
     }
   }
 
-  const handleTextAnalysis = () => {
+  const handleTextAnalysis = async () => {
     if (!pastedText.trim()) {
-      Alert.alert("Error", "Please paste some text to analyze")
+      Alert.alert("Error", "Please enter some text to analyze")
       return
     }
 
-    // Create a mock document from pasted text
-    const mockDoc = {
-      id: Date.now().toString(),
-      title: "Pasted Text Analysis",
-      content: pastedText,
-      type: "text",
+    if (!user) {
+      Alert.alert("Error", "Please log in to analyze text")
+      return
     }
 
-    setSelectedDocument(mockDoc)
-    handleAnalyze(mockDoc)
+    const textBlob = new Blob([pastedText], { type: 'text/plain' })
+    const textFile = new File([textBlob], 'pasted-text.txt', { type: 'text/plain' })
+
+    await handleAnalyzeDocument(
+      {
+        title: "Pasted Text Analysis",
+        content: pastedText,
+        uri: textFile,
+      },
+      selectedDocumentType
+    )
   }
 
-  if (analysisResult && selectedDocument) {
+  if (analysisResult) {
     return (
-      <DocumentAnalysisView
-        document={selectedDocument}
+      <EnhancedAnalysisView
         analysis={analysisResult}
         onBack={() => {
           setAnalysisResult(null)
@@ -140,6 +236,14 @@ export default function AnalyzeScreen() {
       </Animated.View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Document Type Selector */}
+        <Animated.View entering={FadeInDown.delay(200).springify()}>
+          <DocumentTypeSelector
+            selectedType={selectedDocumentType}
+            onSelect={setSelectedDocumentType}
+          />
+        </Animated.View>
+
         {/* Upload Options */}
         <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.uploadSection}>
           <View style={styles.uploadGrid}>
@@ -165,7 +269,7 @@ export default function AnalyzeScreen() {
 
             <TouchableOpacity
               style={[styles.uploadOption, { backgroundColor: colors.card }]}
-              onPress={handleTextAnalysis}
+              onPress={() => setShowTextInput(!showTextInput)}
             >
               <View style={[styles.uploadIcon, { backgroundColor: colors.accent + "20" }]}>
                 <FileText size={24} color={colors.accent} />
@@ -176,17 +280,33 @@ export default function AnalyzeScreen() {
         </Animated.View>
 
         {/* Text Input Area */}
-        <Animated.View
-          entering={FadeInDown.delay(400).springify()}
-          style={[styles.textInputCard, { backgroundColor: colors.card }]}
-        >
-          <Text style={[styles.textInputLabel, { color: colors.textSecondary }]}>
-            Paste your document here
-          </Text>
-          <TouchableOpacity style={styles.addButton}>
-            <Plus size={24} color={colors.primary} />
-          </TouchableOpacity>
-        </Animated.View>
+        {showTextInput && (
+          <Animated.View
+            entering={FadeInDown.delay(400).springify()}
+            style={[styles.textInputCard, { backgroundColor: colors.card }]}
+          >
+            <Text style={[styles.textInputLabel, { color: colors.text }]}>
+              Enter or paste your document text
+            </Text>
+            <TextInput
+              style={[styles.textInput, { color: colors.text, borderColor: colors.border }]}
+              value={pastedText}
+              onChangeText={setPastedText}
+              placeholder="Paste your document text here..."
+              placeholderTextColor={colors.textMuted}
+              multiline
+              numberOfLines={6}
+              textAlignVertical="top"
+            />
+            <Button
+              title="Analyze Text"
+              onPress={handleTextAnalysis}
+              variant="primary"
+              disabled={!pastedText.trim()}
+              style={styles.analyzeButton}
+            />
+          </Animated.View>
+        )}
 
         {/* Voice Recorder */}
         <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.voiceSection}>
@@ -198,7 +318,7 @@ export default function AnalyzeScreen() {
             onPress={handleVoiceRecording}
           >
             <RNAnimated.View style={{ transform: [{ scale: pulseAnim }] }}>
-              {isRecording ? <MicOff size={32} color="black" /> : <Mic size={32} color="black" />}
+              {isRecording ? <MicOff size={32} color="white" /> : <Mic size={32} color="white" />}
             </RNAnimated.View>
           </TouchableOpacity>
           <Text style={[styles.voiceText, { color: colors.textSecondary }]}>
@@ -214,14 +334,7 @@ export default function AnalyzeScreen() {
               <TouchableOpacity
                 key={doc.id}
                 style={[styles.recentItem, { backgroundColor: colors.card }]}
-                onPress={() => {
-                  setSelectedDocument(doc)
-                  if (doc.analysis) {
-                    setAnalysisResult(doc.analysis)
-                  } else {
-                    handleAnalyze(doc)
-                  }
-                }}
+                onPress={() => handleAnalyzeDocument(doc, selectedDocumentType)}
               >
                 <View style={[styles.recentIcon, { backgroundColor: colors.surface }]}>
                   <FileText size={20} color={colors.primary} />
@@ -257,7 +370,12 @@ export default function AnalyzeScreen() {
       {isAnalyzing && (
         <View style={styles.loadingOverlay}>
           <View style={[styles.loadingCard, { backgroundColor: colors.card }]}>
-            <Text style={[styles.loadingText, { color: colors.text }]}>Analyzing Document...</Text>
+            <Text style={[styles.loadingText, { color: colors.text }]}>
+              Analyzing Document...
+            </Text>
+            <Text style={[styles.loadingSubtext, { color: colors.textSecondary }]}>
+              This may take a few moments
+            </Text>
           </View>
         </View>
       )}
@@ -274,55 +392,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 120,
     paddingBottom: 0,
   },
-  title: {
-    fontSize: FontSizes.xxl,
-    fontFamily: Fonts.bold,
-    textAlign: "center",
-  },
   content: {
     flex: 1,
     padding: 20,
-  },
-  assistantCard: {
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
-  },
-  assistantHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  avatarContainer: {
-    marginRight: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarText: {
-    color: "#FFFFFF",
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.bold,
-  },
-  assistantInfo: {
-    flex: 1,
-  },
-  assistantName: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.semiBold,
-  },
-  messageContainer: {
-    borderRadius: 12,
-    padding: 16,
-  },
-  messageText: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
-    lineHeight: 22,
   },
   uploadSection: {
     marginBottom: 24,
@@ -354,24 +426,24 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
-    minHeight: 120,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
-    borderStyle: "dashed",
-    borderColor: "#E0E0E0",
   },
   textInputLabel: {
-    fontSize: FontSizes.lg,
-    fontFamily: Fonts.regular,
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.medium,
     marginBottom: 12,
   },
-  addButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
+  textInput: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.regular,
+    minHeight: 120,
+    marginBottom: 16,
+  },
+  analyzeButton: {
+    alignSelf: 'flex-end',
+    paddingHorizontal: 24,
   },
   voiceSection: {
     alignItems: "center",
@@ -449,10 +521,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 24,
     margin: 20,
+    alignItems: 'center',
   },
   loadingText: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.medium,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  loadingSubtext: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.regular,
     textAlign: "center",
   },
 })

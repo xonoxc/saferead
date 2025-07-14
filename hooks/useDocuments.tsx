@@ -207,7 +207,7 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
 
   const analyzeDocument = async (docId: string): Promise<DocumentAnalysis | null> => {
     setIsLoading(true)
-    const updatedDocs = documents.map(doc => (doc.id === docId ? { ...doc, analysis } : doc))
+    const updatedDocs = documents.map(doc => (doc.id === docId ? { ...doc, defaultAnalysis } : doc))
     setDocuments(updatedDocs)
 
     const saveRes = await attempt(saveDocuments(updatedDocs))

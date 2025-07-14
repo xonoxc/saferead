@@ -1,5 +1,5 @@
 import { useTheme } from "@/hooks/useTheme"
-import { Route, useRouter } from "expo-router"
+import { useRouter } from "expo-router"
 import { ChevronLeft } from "lucide-react-native"
 import { TouchableOpacity, StyleSheet } from "react-native"
 

@@ -37,7 +37,7 @@ export default function RegisterScreen() {
       setErrorMessage(response.message)
       return
     }
-    router.replace("/(application)/(tabs)")
+    router.replace("/(auth)/login")
   }
 
   return (

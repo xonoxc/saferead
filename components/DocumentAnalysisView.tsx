@@ -56,7 +56,7 @@ export const DocumentAnalysisView: React.FC<DocumentAnalysisViewProps> = ({
       {/* Header */}
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
         <View>
-          <CustomBackBtn containerWidth={44} />
+          <CustomBackBtn containerWidth={44} onBack={onBack} />
         </View>
         <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
           {document.title}

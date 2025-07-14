@@ -1,18 +1,33 @@
 import { useTheme } from "@/hooks/useTheme"
-import { useRouter } from "expo-router"
+import { Route, useRouter } from "expo-router"
 import { ChevronLeft } from "lucide-react-native"
 import { TouchableOpacity, StyleSheet } from "react-native"
 
-export default function CustomBackBtn({ containerWidth }: { containerWidth?: number }) {
+export default function CustomBackBtn({
+  containerWidth,
+  onBack,
+}: {
+  containerWidth?: number
+
+  onBack?: () => void
+}) {
   const { colors } = useTheme()
   const router = useRouter()
 
   const width = containerWidth ?? 50
 
+  const handleBackPress = () => {
+    if (onBack) {
+      onBack()
+      return
+    }
+    router.back()
+  }
+
   return (
     <TouchableOpacity
       style={[styles.container, { borderColor: colors.border, width }]}
-      onPress={() => router.back()}
+      onPress={handleBackPress}
     >
       <ChevronLeft color={colors.text} />
     </TouchableOpacity>

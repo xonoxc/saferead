@@ -1,13 +1,12 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, RefreshControl } from "react-native"
-import { Plus, Search, Filter, Camera, Upload, FileText, Trash2, TrendingUp } from "lucide-react-native"
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, RefreshControl, TextInput } from "react-native"
+import { Plus, Search, Filter, FileText, Trash2, TrendingUp } from "lucide-react-native"
+import { router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
-import { useDocuments } from "@/hooks/useDocuments"
 import { useBackendDocuments } from "@/hooks/useBackendDocuments"
 import { BackendAnalysisView } from "@/components/BackendAnalysisView"
 import { DocumentFilter, FilterOptions } from "@/components/DocumentFilter"
 import { Button } from "@/components/Button"
-import { TextInput } from "@/components/TextInput"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { AnalysisResponse } from "@/services/api"
@@ -129,7 +128,6 @@ const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({ document, onP
 
 export default function DocumentsScreen() {
   const { colors } = useTheme()
-  const { pickDocument, scanDocument } = useDocuments()
   const { 
     documents, 
     isLoading, 
@@ -143,23 +141,12 @@ export default function DocumentsScreen() {
   } = useBackendDocuments()
   
   const [searchQuery, setSearchQuery] = useState("")
-  const [showActions, setShowActions] = useState(false)
   const [showFilter, setShowFilter] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<AnalysisResponse | null>(null)
   const [refreshing, setRefreshing] = useState(false)
 
   const handleAddDocument = () => {
-    setShowActions(true)
-  }
-
-  const handlePickDocument = async () => {
-    setShowActions(false)
-    await pickDocument()
-  }
-
-  const handleScanDocument = async () => {
-    setShowActions(false)
-    await scanDocument()
+    router.push("/(application)/(tabs)/analyize")
   }
 
   const handleDeleteDocument = async (documentId: string) => {
@@ -244,49 +231,34 @@ export default function DocumentsScreen() {
           style={[styles.addButton, { backgroundColor: colors.primary }]}
           onPress={handleAddDocument}
         >
-          <Plus size={24} color="#FFFFFF" />
+          <Plus size={24} color={colors.background} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.searchContainer}>
-        <View style={[styles.searchInputContainer, { backgroundColor: colors.card }]}>
-          <Search size={20} color={colors.textMuted} />
+        <View style={[styles.searchInputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Search size={18} color={colors.textMuted} />
           <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
             value={searchQuery}
             onChangeText={handleSearch}
             placeholder="Search documents..."
-            containerStyle={styles.searchInputWrapper}
-            inputStyle={[styles.searchInput, { color: colors.text }]}
+            placeholderTextColor={colors.textMuted}
+            returnKeyType="search"
+            clearButtonMode="while-editing"
           />
         </View>
         <TouchableOpacity 
-          style={[styles.filterButton, { backgroundColor: colors.card }]}
+          style={[styles.filterButton, { backgroundColor: colors.card, borderColor: colors.border }]}
           onPress={() => setShowFilter(true)}
         >
-          <Filter size={20} color={colors.textSecondary} />
+          <Filter size={18} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
       {error && (
         <View style={[styles.errorContainer, { backgroundColor: colors.error + '20' }]}>
           <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
-        </View>
-      )}
-
-      {showActions && (
-        <View style={[styles.actionsContainer, { backgroundColor: colors.card }]}>
-          <TouchableOpacity style={styles.actionItem} onPress={handleScanDocument}>
-            <Camera size={24} color={colors.primary} />
-            <Text style={[styles.actionText, { color: colors.text }]}>Scan Document</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionItem} onPress={handlePickDocument}>
-            <Upload size={24} color={colors.secondary} />
-            <Text style={[styles.actionText, { color: colors.text }]}>Upload File</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionItem} onPress={() => setShowActions(false)}>
-            <FileText size={24} color={colors.accent} />
-            <Text style={[styles.actionText, { color: colors.text }]}>Cancel</Text>
-          </TouchableOpacity>
         </View>
       )}
 
@@ -341,6 +313,11 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   searchContainer: {
     flexDirection: "row",
@@ -353,20 +330,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 4,
+    paddingVertical: 8,
     borderRadius: 12,
+    borderWidth: 1,
     gap: 8,
   },
-  searchInputWrapper: {
-    flex: 1,
-    margin: 0,
-  },
   searchInput: {
+    flex: 1,
     fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
-    paddingVertical: 8,
+    paddingVertical: 4,
     paddingHorizontal: 0,
-    minHeight: 0,
   },
   filterButton: {
     width: 48,
@@ -374,6 +348,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
   },
   errorContainer: {
     margin: 20,
@@ -384,22 +359,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.sm,
     fontFamily: Fonts.medium,
     textAlign: 'center',
-  },
-  actionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 20,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 12,
-  },
-  actionItem: {
-    alignItems: "center",
-    gap: 8,
-  },
-  actionText: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.medium,
   },
   listContent: {
     paddingHorizontal: 20,

@@ -81,6 +81,8 @@ export default function AnalyzeScreen() {
 
     setAnalysisResult({
       ...defaultAnalysis,
+      riskyPoints: 1,
+      favorablePoints: 4,
     })
 
     setIsAnalyzing(false)

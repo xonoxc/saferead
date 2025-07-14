@@ -1,13 +1,13 @@
 import React, { useState } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native"
-import { Plus, Search, Filter, Camera, Upload, FileText } from "lucide-react-native"
+import { Plus, Filter, Camera, Upload, FileText } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useDocuments } from "@/hooks/useDocuments"
 import { DocumentCard } from "@/components/DocumentCard"
 import { Button } from "@/components/Button"
-import { TextInput } from "@/components/TextInput"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { SearchBar } from "@/components/SearchBar"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
@@ -56,15 +56,8 @@ export default function AnalyzeScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputContainer}>
-          <Search size={20} color={colors.textMuted} />
-          <TextInput
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="Search documents..."
-          />
-        </View>
+      <View style={styles.searchWrapper}>
+        <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
         <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.card }]}>
           <Filter size={20} color={colors.textSecondary} />
         </TouchableOpacity>
@@ -94,13 +87,13 @@ export default function AnalyzeScreen() {
               key={document.id}
               document={document}
               onPress={() => {
-                // Navigate to document detail
+                // Navigation here
               }}
               onAnalyze={() => handleAnalyzeDocument(document.id)}
             />
           ))
         ) : (
-          <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
+          <View style={[styles.emptyState]}>
             <FileText size={64} color={colors.textMuted} />
             <Text style={[styles.emptyStateTitle, { color: colors.text }]}>No Documents Found</Text>
             <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
@@ -126,14 +119,13 @@ export default function AnalyzeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 5,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
-    paddingBottom: 0,
+    paddingBottom: 10,
   },
   title: {
     fontSize: FontSizes.xxl,
@@ -146,27 +138,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  searchContainer: {
-    flexDirection: "row",
-    padding: 20,
-    gap: 12,
-  },
-  searchInputContainer: {
-    flex: 1,
+  searchWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    paddingLeft: 12,
+    paddingHorizontal: 20,
+    gap: 12,
   },
   filterButton: {
     width: 44,
     height: 44,
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
   },
   actionsContainer: {
     margin: 20,
-    marginTop: 0,
     borderRadius: 12,
     padding: 16,
     gap: 12,
@@ -184,14 +170,12 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingBottom: 60,
   },
   emptyState: {
     alignItems: "center",
-    /* borderWidth: 1,
-    borderColor: "#E0E0E0", */
     padding: 30,
     borderRadius: 12,
-    margin: 5,
   },
   emptyStateTitle: {
     fontSize: FontSizes.xl,

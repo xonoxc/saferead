@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 16,
     paddingVertical: 14,
+    flex: 1,
     fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
     minHeight: 52,

@@ -8,10 +8,9 @@ import {
   Alert,
   Animated as RNAnimated,
   TextInput,
-  FlatList,
 } from "react-native"
-import { Plus, Mic, MicOff, Upload, Camera, FileText, Calendar, TrendingUp } from "lucide-react-native"
-import Animated, { FadeInDown, useSharedValue, useAnimatedStyle } from "react-native-reanimated"
+import { Mic, MicOff, Upload, Camera, FileText, TrendingUp, Menu } from "lucide-react-native"
+import Animated, { FadeInDown } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { useDocuments } from "@/hooks/useDocuments"
 import { useBackendDocuments } from "@/hooks/useBackendDocuments"
@@ -25,6 +24,8 @@ import { Fonts, FontSizes } from "@/constants/Fonts"
 import { uploadDocument, AnalysisResponse } from "@/services/api"
 import { attempt } from "@/utils/attempt"
 import UpgradeButton from "@/components/UpgradeButton"
+import { SideBar } from "@/components/Sidebar/Sidebar"
+import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 
 interface RecentDocumentItemProps {
   document: AnalysisResponse
@@ -36,11 +37,11 @@ const RecentDocumentItem: React.FC<RecentDocumentItemProps> = ({ document, onPre
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return colors.success
-      case 'processing':
+      case "processing":
         return colors.warning
-      case 'failed':
+      case "failed":
         return colors.error
       default:
         return colors.textSecondary
@@ -48,11 +49,11 @@ const RecentDocumentItem: React.FC<RecentDocumentItemProps> = ({ document, onPre
   }
 
   const getDocumentTypeLabel = (type: string) => {
-    const types = {
-      'terms': 'Terms & Conditions',
-      'privacy': 'Privacy Policy',
-      'legal': 'Legal Agreement',
-      'other': 'Other Document',
+    const types: Record<string, string> = {
+      terms: "Terms & Conditions",
+      privacy: "Privacy Policy",
+      legal: "Legal Agreement",
+      other: "Other Document",
     }
     return types[type] || type
   }
@@ -63,7 +64,7 @@ const RecentDocumentItem: React.FC<RecentDocumentItemProps> = ({ document, onPre
       onPress={onPress}
     >
       <View style={styles.documentHeader}>
-        <View style={[styles.documentIcon, { backgroundColor: colors.primary + '20' }]}>
+        <View style={[styles.documentIcon, { backgroundColor: colors.primary + "20" }]}>
           <FileText size={20} color={colors.primary} />
         </View>
         <View style={styles.documentInfo}>
@@ -75,7 +76,12 @@ const RecentDocumentItem: React.FC<RecentDocumentItemProps> = ({ document, onPre
           </Text>
         </View>
         <View style={styles.documentMeta}>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(document.status) + '20' }]}>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: getStatusColor(document.status) + "20" },
+            ]}
+          >
             <Text style={[styles.statusText, { color: getStatusColor(document.status) }]}>
               {document.status}
             </Text>
@@ -85,8 +91,8 @@ const RecentDocumentItem: React.FC<RecentDocumentItemProps> = ({ document, onPre
           </Text>
         </View>
       </View>
-      
-      {document.status === 'completed' && (
+
+      {document.status === "completed" && (
         <View style={styles.documentStats}>
           <View style={styles.statItem}>
             <TrendingUp size={14} color={colors.primary} />
@@ -109,16 +115,37 @@ export default function AnalyzeScreen() {
   const { colors } = useTheme()
   const { user } = useAuth()
   const { pickDocument, scanDocument } = useDocuments()
-  const { documents: recentDocuments, isLoading: isLoadingRecent } = useBackendDocuments()
+  const { documents: recentDocuments } = useBackendDocuments()
   const { isRecording, startRecording, stopRecording, transcribeAudio } = useVoice()
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false)
   const [pastedText, setPastedText] = useState("")
-  const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType>('other')
+  const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType>("other")
   const [showTextInput, setShowTextInput] = useState(false)
 
   const pulseAnim = useRef(new RNAnimated.Value(1)).current
+
+  const [isSideBarOpen, setIsSideBarOpen] = useState(false)
+
+  useTabBarVisibility(!isSideBarOpen, colors)
+
+  /*   const scale = useSharedValue(1) */
+
+  /* const _animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  })) */
+
+  const handleItemPress = (item: string) => {
+    setIsSideBarOpen(false)
+    if (item === "logout") {
+      console.log("Logging out...")
+    } else if (item === "settings") {
+      console.log("Go to settings")
+    } else {
+      console.log(`You tapped on ${item}`)
+    }
+  }
 
   React.useEffect(() => {
     if (isRecording) {
@@ -190,14 +217,16 @@ export default function AnalyzeScreen() {
       if (document.uri) {
         documentFile = {
           uri: document.uri,
-          type: document.type || document.mimeType || 'image/jpeg',
-          name: document.name || document.title || 'document',
+          type: document.type || document.mimeType || "image/jpeg",
+          name: document.name || document.title || "document",
         }
-        filename = document.title || document.name || 'document'
+        filename = document.title || document.name || "document"
       } else if (document.content) {
-        const textBlob = new Blob([document.content], { type: 'text/plain' })
-        documentFile = new File([textBlob], `${document.title || 'document'}.txt`, { type: 'text/plain' })
-        filename = document.title || 'document.txt'
+        const textBlob = new Blob([document.content], { type: "text/plain" })
+        documentFile = new File([textBlob], `${document.title || "document"}.txt`, {
+          type: "text/plain",
+        })
+        filename = document.title || "document.txt"
       } else {
         throw new Error("Unsupported document format. Please try again.")
       }
@@ -216,8 +245,10 @@ export default function AnalyzeScreen() {
 
       setAnalysisResult(uploadResult.data)
     } catch (error) {
-      console.error("Analysis error:", error)
-      Alert.alert("Error", error.message || "Failed to analyze document. Please try again.")
+      if (error instanceof Error) {
+        console.error("Analysis error:", error)
+        Alert.alert("Error", error.message || "Failed to analyze document. Please try again.")
+      }
     } finally {
       setIsAnalyzing(false)
     }
@@ -248,8 +279,8 @@ export default function AnalyzeScreen() {
       return
     }
 
-    const textBlob = new Blob([pastedText], { type: 'text/plain' })
-    const textFile = new File([textBlob], 'pasted-text.txt', { type: 'text/plain' })
+    const textBlob = new Blob([pastedText], { type: "text/plain" })
+    const textFile = new File([textBlob], "pasted-text.txt", { type: "text/plain" })
 
     await handleAnalyzeDocument(
       {
@@ -266,21 +297,48 @@ export default function AnalyzeScreen() {
   }
 
   if (analysisResult) {
-    return (
-      <EnhancedAnalysisView
-        analysis={analysisResult}
-        onBack={() => setAnalysisResult(null)}
-      />
-    )
+    return <EnhancedAnalysisView analysis={analysisResult} onBack={() => setAnalysisResult(null)} />
   }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <SideBar
+        isOpen={isSideBarOpen}
+        onClose={() => setIsSideBarOpen(false)}
+        onItemPress={handleItemPress}
+      />
+
       {/* Header */}
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
-        <UpgradeButton />
-      </Animated.View>
+        <View style={styles.innerHeader}>
+          <TouchableOpacity
+            onPress={() => setIsSideBarOpen(true)}
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              justifyContent: "center",
+              paddingHorizontal: 16,
+            }}
+          >
+            <Menu
+              color={colors.text}
+              style={{
+                width: 24,
+                height: 24,
+                padding: 4,
+                borderRadius: 12,
+                backgroundColor: colors.card + "20",
+              }}
+            />
+          </TouchableOpacity>
 
+          <View style={{ alignItems: "center" }}>
+            <UpgradeButton />
+          </View>
+        </View>
+      </Animated.View>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Document Type Selector */}
         <Animated.View entering={FadeInDown.delay(200).springify()}>
@@ -349,7 +407,6 @@ export default function AnalyzeScreen() {
               onPress={handleTextAnalysis}
               variant="primary"
               disabled={!pastedText.trim()}
-              style={styles.analyzeButton}
             />
           </Animated.View>
         )}
@@ -376,7 +433,7 @@ export default function AnalyzeScreen() {
         {recentDocuments.length > 0 && (
           <Animated.View entering={FadeInDown.delay(600).springify()} style={styles.recentSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Analysis</Text>
-            {recentDocuments.slice(0, 5).map((doc) => (
+            {recentDocuments.slice(0, 5).map(doc => (
               <RecentDocumentItem
                 key={doc.id}
                 document={doc}
@@ -401,9 +458,7 @@ export default function AnalyzeScreen() {
       {isAnalyzing && (
         <View style={styles.loadingOverlay}>
           <View style={[styles.loadingCard, { backgroundColor: colors.card }]}>
-            <Text style={[styles.loadingText, { color: colors.text }]}>
-              Analyzing Document...
-            </Text>
+            <Text style={[styles.loadingText, { color: colors.text }]}>Analyzing Document...</Text>
             <Text style={[styles.loadingSubtext, { color: colors.textSecondary }]}>
               This may take a few moments
             </Text>
@@ -420,8 +475,22 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    paddingHorizontal: 120,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    paddingHorizontal: 10,
     paddingBottom: 0,
+  },
+  innerHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 12,
+    width: "100%",
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: FontSizes.xxl,
+    fontFamily: Fonts.bold,
+    textAlign: "center",
   },
   content: {
     flex: 1,
@@ -473,7 +542,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   analyzeButton: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     paddingHorizontal: 24,
   },
   voiceSection: {
@@ -512,16 +581,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   documentHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   documentIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   documentInfo: {
@@ -537,7 +606,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
   },
   documentMeta: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -548,21 +617,21 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: FontSizes.xs,
     fontFamily: Fonts.medium,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
   documentDate: {
     fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
   },
   documentStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: 8,
   },
   statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   statText: {
@@ -583,7 +652,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 24,
     margin: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   loadingText: {
     fontSize: FontSizes.lg,

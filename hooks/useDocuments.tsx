@@ -69,8 +69,8 @@ interface DocumentsContextType {
   documents: Document[]
   isLoading: boolean
   error: string | null
-  pickDocument: () => Promise<Document | undefined>
-  scanDocument: () => Promise<Document | undefined>
+  pickDocument: () => Promise<any>
+  scanDocument: () => Promise<any>
   analyzeDocument: (docId: string) => Promise<DocumentAnalysis | null>
   deleteDocument: (docId: string) => Promise<void>
   clearError: () => void
@@ -159,7 +159,7 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
       return {
         ...newDoc,
         uri: file.uri,
-        type: file.mimeType || 'application/octet-stream',
+        type: file.mimeType || "application/octet-stream",
         name: file.name,
         mimeType: file.mimeType,
       }
@@ -208,21 +208,23 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
       const updatedDocs = [...documents, newDoc]
       setDocuments(updatedDocs)
       await saveDocuments(updatedDocs)
-      
+
       // Return the document with image data for immediate analysis
       return {
         ...newDoc,
         uri: image.uri,
-        type: image.mimeType || 'image/jpeg',
+        type: image.mimeType || "image/jpeg",
         name: newDoc.title,
-        mimeType: image.mimeType || 'image/jpeg',
+        mimeType: image.mimeType || "image/jpeg",
       }
     }
   }
 
   const analyzeDocument = async (docId: string): Promise<DocumentAnalysis | null> => {
     setIsLoading(true)
-    const updatedDocs = documents.map(doc => (doc.id === docId ? { ...doc, analysis: defaultAnalysis } : doc))
+    const updatedDocs = documents.map(doc =>
+      doc.id === docId ? { ...doc, analysis: defaultAnalysis } : doc
+    )
     setDocuments(updatedDocs)
 
     const saveRes = await attempt(saveDocuments(updatedDocs))

@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share } from "react-native"
 import {
-  ArrowLeft,
   Share2,
   Download,
   TriangleAlert as AlertTriangle,
@@ -16,6 +15,7 @@ import { useVoice } from "@/hooks/useVoice"
 import { Document, DocumentAnalysis } from "@/types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { attempt } from "@/utils/attempt"
+import CustomBackBtn from "./CustomBackBtn"
 
 interface DocumentAnalysisViewProps {
   document: Document
@@ -55,9 +55,9 @@ export const DocumentAnalysisView: React.FC<DocumentAnalysisViewProps> = ({
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <ArrowLeft size={24} color={colors.text} />
-        </TouchableOpacity>
+        <View>
+          <CustomBackBtn containerWidth={44} onBack={onBack} />
+        </View>
         <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
           {document.title}
         </Text>
@@ -74,7 +74,7 @@ export const DocumentAnalysisView: React.FC<DocumentAnalysisViewProps> = ({
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
         {/* Risk Overview */}
         <Animated.View
@@ -335,11 +335,10 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 10,
     padding: 20,
+    paddingHorizontal: 11,
     paddingBottom: 10,
-  },
-  backButton: {
-    marginRight: 12,
   },
   headerTitle: {
     flex: 1,

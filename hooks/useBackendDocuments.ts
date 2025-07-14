@@ -1,7 +1,12 @@
-import { useState, useEffect } from 'react'
-import { getDocuments, getDocumentById, deleteDocument as deleteDocumentApi, AnalysisResponse, DocumentsListResponse } from '@/services/api'
-import { attempt } from '@/utils/attempt'
-import { FilterOptions } from '@/components/DocumentFilter'
+import { useState, useEffect } from "react"
+import {
+  getDocuments,
+  getDocumentById,
+  deleteDocument as deleteDocumentApi,
+  AnalysisResponse,
+} from "@/services/api"
+import { attempt } from "@/utils/attempt"
+import { FilterOptions } from "@/components/DocumentFilter"
 
 export const useBackendDocuments = () => {
   const [documents, setDocuments] = useState<AnalysisResponse[]>([])
@@ -10,7 +15,7 @@ export const useBackendDocuments = () => {
   const [hasMore, setHasMore] = useState(true)
   const [nextPage, setNextPage] = useState<string | null>(null)
   const [currentFilters, setCurrentFilters] = useState<FilterOptions>({
-    ordering: '-created_at',
+    ordering: "-created_at",
   })
 
   const loadDocuments = async (refresh = false, filters?: FilterOptions) => {
@@ -19,9 +24,9 @@ export const useBackendDocuments = () => {
 
     const filtersToUse = filters || currentFilters
     const result = await attempt(getDocuments(1, filtersToUse))
-    
+
     if (!result.ok) {
-      setError(result.error.message || 'Failed to load documents')
+      setError(result.error.message || "Failed to load documents")
       setIsLoading(false)
       return
     }
@@ -32,7 +37,7 @@ export const useBackendDocuments = () => {
     } else {
       setDocuments(prev => [...prev, ...response.results])
     }
-    
+
     setHasMore(!!response.next)
     setNextPage(response.next)
     setIsLoading(false)
@@ -49,9 +54,9 @@ export const useBackendDocuments = () => {
     const page = pageMatch ? parseInt(pageMatch[1]) : 2
 
     const result = await attempt(getDocuments(page, currentFilters))
-    
+
     if (!result.ok) {
-      setError(result.error.message || 'Failed to load more documents')
+      setError(result.error.message || "Failed to load more documents")
       setIsLoading(false)
       return
     }
@@ -73,9 +78,9 @@ export const useBackendDocuments = () => {
 
   const getDocument = async (documentId: string): Promise<AnalysisResponse | null> => {
     const result = await attempt(getDocumentById(documentId))
-    
+
     if (!result.ok) {
-      setError(result.error.message || 'Failed to load document')
+      setError(result.error.message || "Failed to load document")
       return null
     }
 
@@ -84,9 +89,9 @@ export const useBackendDocuments = () => {
 
   const deleteDocument = async (documentId: string): Promise<boolean> => {
     const result = await attempt(deleteDocumentApi(documentId))
-    
+
     if (!result.ok) {
-      setError(result.error.message || 'Failed to delete document')
+      setError(result.error.message || "Failed to delete document")
       return false
     }
 
@@ -117,3 +122,4 @@ export const useBackendDocuments = () => {
     clearError: () => setError(null),
   }
 }
+

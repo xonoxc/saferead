@@ -1,11 +1,20 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, RefreshControl, TextInput } from "react-native"
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  RefreshControl,
+  TextInput,
+} from "react-native"
 import { Plus, Search, Filter, FileText, Trash2, TrendingUp } from "lucide-react-native"
 import { router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useBackendDocuments } from "@/hooks/useBackendDocuments"
 import { BackendAnalysisView } from "@/components/BackendAnalysisView"
-import { DocumentFilter, FilterOptions } from "@/components/DocumentFilter"
+import { DocumentFilter } from "@/components/DocumentFilter"
 import { Button } from "@/components/Button"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants/Fonts"
@@ -17,16 +26,20 @@ interface BackendDocumentCardProps {
   onDelete: (id: string) => void
 }
 
-const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({ document, onPress, onDelete }) => {
+const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({
+  document,
+  onPress,
+  onDelete,
+}) => {
   const { colors } = useTheme()
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return colors.success
-      case 'processing':
+      case "processing":
         return colors.warning
-      case 'failed':
+      case "failed":
         return colors.error
       default:
         return colors.textSecondary
@@ -34,11 +47,11 @@ const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({ document, onP
   }
 
   const getDocumentTypeLabel = (type: string) => {
-    const types = {
-      'terms': 'Terms & Conditions',
-      'privacy': 'Privacy Policy',
-      'legal': 'Legal Agreement',
-      'other': 'Other Document',
+    const types: Record<string, string> = {
+      terms: "Terms & Conditions",
+      privacy: "Privacy Policy",
+      legal: "Legal Agreement",
+      other: "Other Document",
     }
     return types[type] || type
   }
@@ -64,7 +77,7 @@ const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({ document, onP
       onPress={onPress}
     >
       <View style={styles.cardHeader}>
-        <View style={[styles.documentIcon, { backgroundColor: colors.primary + '20' }]}>
+        <View style={[styles.documentIcon, { backgroundColor: colors.primary + "20" }]}>
           <FileText size={24} color={colors.primary} />
         </View>
         <View style={styles.documentInfo}>
@@ -80,8 +93,8 @@ const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({ document, onP
         </View>
         <View style={styles.cardActions}>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: colors.error + '20' }]}
-            onPress={(e) => {
+            style={[styles.actionButton, { backgroundColor: colors.error + "20" }]}
+            onPress={e => {
               e.stopPropagation()
               handleDelete()
             }}
@@ -92,12 +105,14 @@ const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({ document, onP
       </View>
 
       <View style={styles.statusContainer}>
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(document.status) + '20' }]}>
+        <View
+          style={[styles.statusBadge, { backgroundColor: getStatusColor(document.status) + "20" }]}
+        >
           <Text style={[styles.statusText, { color: getStatusColor(document.status) }]}>
             {document.status.toUpperCase()}
           </Text>
         </View>
-        {document.status === 'completed' && (
+        {document.status === "completed" && (
           <View style={styles.confidenceContainer}>
             <TrendingUp size={12} color={colors.primary} />
             <Text style={[styles.confidenceText, { color: colors.textSecondary }]}>
@@ -107,7 +122,7 @@ const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({ document, onP
         )}
       </View>
 
-      {document.status === 'completed' && (
+      {document.status === "completed" && (
         <View style={styles.analysisPreview}>
           <Text style={[styles.summaryText, { color: colors.textSecondary }]} numberOfLines={2}>
             {document.summary_text}
@@ -128,18 +143,17 @@ const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({ document, onP
 
 export default function DocumentsScreen() {
   const { colors } = useTheme()
-  const { 
-    documents, 
-    isLoading, 
-    error, 
-    hasMore, 
+  const {
+    documents,
+    error,
+    hasMore,
     currentFilters,
-    loadMoreDocuments, 
+    loadMoreDocuments,
     applyFilters,
     deleteDocument: deleteBackendDocument,
-    refreshDocuments 
+    refreshDocuments,
   } = useBackendDocuments()
-  
+
   const [searchQuery, setSearchQuery] = useState("")
   const [showFilter, setShowFilter] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<AnalysisResponse | null>(null)
@@ -204,22 +218,14 @@ export default function DocumentsScreen() {
           : "Start by analyzing your first legal document"}
       </Text>
       {!searchQuery && (
-        <Button
-          title="Add Document"
-          onPress={handleAddDocument}
-          variant="primary"
-          size="large"
-        />
+        <Button title="Add Document" onPress={handleAddDocument} variant="primary" size="large" />
       )}
     </View>
   )
 
   if (selectedDocument) {
     return (
-      <BackendAnalysisView
-        analysis={selectedDocument}
-        onBack={() => setSelectedDocument(null)}
-      />
+      <BackendAnalysisView analysis={selectedDocument} onBack={() => setSelectedDocument(null)} />
     )
   }
 
@@ -236,7 +242,12 @@ export default function DocumentsScreen() {
       </View>
 
       <View style={styles.searchContainer}>
-        <View style={[styles.searchInputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View
+          style={[
+            styles.searchInputContainer,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
           <Search size={18} color={colors.textMuted} />
           <TextInput
             style={[styles.searchInput, { color: colors.text }]}
@@ -248,8 +259,11 @@ export default function DocumentsScreen() {
             clearButtonMode="while-editing"
           />
         </View>
-        <TouchableOpacity 
-          style={[styles.filterButton, { backgroundColor: colors.card, borderColor: colors.border }]}
+        <TouchableOpacity
+          style={[
+            styles.filterButton,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
           onPress={() => setShowFilter(true)}
         >
           <Filter size={18} color={colors.textSecondary} />
@@ -257,7 +271,7 @@ export default function DocumentsScreen() {
       </View>
 
       {error && (
-        <View style={[styles.errorContainer, { backgroundColor: colors.error + '20' }]}>
+        <View style={[styles.errorContainer, { backgroundColor: colors.error + "20" }]}>
           <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
         </View>
       )}
@@ -265,7 +279,7 @@ export default function DocumentsScreen() {
       <FlatList
         data={documents}
         renderItem={renderDocument}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl
@@ -294,7 +308,6 @@ export default function DocumentsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 5,
   },
   header: {
     flexDirection: "row",
@@ -358,7 +371,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: FontSizes.sm,
     fontFamily: Fonts.medium,
-    textAlign: 'center',
+    textAlign: "center",
   },
   listContent: {
     paddingHorizontal: 20,
@@ -371,16 +384,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
   },
   documentIcon: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   documentInfo: {
@@ -401,20 +414,20 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
   },
   cardActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   actionButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   statusContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   statusBadge: {
@@ -427,8 +440,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bold,
   },
   confidenceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   confidenceText: {
@@ -438,7 +451,7 @@ const styles = StyleSheet.create({
   analysisPreview: {
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
+    borderTopColor: "rgba(0,0,0,0.1)",
   },
   summaryText: {
     fontSize: FontSizes.sm,
@@ -447,8 +460,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   analysisStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   statText: {
     fontSize: FontSizes.xs,
@@ -456,12 +469,12 @@ const styles = StyleSheet.create({
   },
   footerLoader: {
     paddingVertical: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 60,
   },
   emptyStateTitle: {
@@ -473,7 +486,7 @@ const styles = StyleSheet.create({
   emptyStateDescription: {
     fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 24,
     paddingHorizontal: 40,
   },

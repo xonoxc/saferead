@@ -1,6 +1,6 @@
 import { useNavigation } from "expo-router"
 import { useEffect } from "react"
-import { useTheme, type ColorsType } from "./useTheme"
+import { useTheme } from "@/hooks/useTheme"
 import { getTabBarStyles } from "@/utils/helpers/tabs"
 
 /*

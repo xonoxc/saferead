@@ -1,6 +1,7 @@
 import React from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
 import { Link, type RelativePathString } from "expo-router"
+import Animated, { FadeInDown } from "react-native-reanimated"
 import {
   Upload,
   FileText,
@@ -33,12 +34,12 @@ export default function HomeScreen() {
       bounces
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.header}>
+      <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
         <Text style={[styles.greeting, { color: colors.textSecondary }]}>Welcome back,</Text>
         <Text style={[styles.userName, { color: colors.text }]}>{user?.username}</Text>
-      </View>
+      </Animated.View>
 
-      <View style={styles.statsGrid}>
+      <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.statsGrid}>
         <StatCard
           stat={stats[0]}
           style={{
@@ -56,9 +57,9 @@ export default function HomeScreen() {
           </View>
           <StatCard stat={stats[3]} style={{ width: "48%", height: 264 }} />
         </View>
-      </View>
+      </Animated.View>
 
-      <View style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
         <ScrollView
           horizontal
@@ -88,9 +89,9 @@ export default function HomeScreen() {
             </Link>
           ))}
         </ScrollView>
-      </View>
+      </Animated.View>
 
-      <View style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Activity</Text>
         {documents.length > 0 ? (
           <View style={styles.activityContainer}>
@@ -128,7 +129,7 @@ export default function HomeScreen() {
             </Text>
           </View>
         )}
-      </View>
+      </Animated.View>
     </ScrollView>
   )
 }

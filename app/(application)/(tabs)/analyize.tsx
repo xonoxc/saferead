@@ -1,195 +1,59 @@
-import React, { useState, useRef } from "react"
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  Animated as RNAnimated,
-} from "react-native"
-import {
-  Plus,
-  Mic,
-  MicOff,
-  Upload,
-  Camera,
-  FileText,
-  Menu,
-  ListTree,
-  Box,
-  ArrowRight,
-  ChevronRight,
-} from "lucide-react-native"
-import Animated, { FadeInDown } from "react-native-reanimated"
+import React from "react"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native"
+import { Upload, Camera, FileText, Menu, LogOut } from "lucide-react-native"
+import Animated, { FadeInDown, FadeIn, FadeOut } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
-import { defaultAnalysis, useDocuments } from "@/hooks/useDocuments"
-import { useVoice } from "@/hooks/useVoice"
-import { DocumentAnalysisView } from "@/components/DocumentAnalysisView"
-import { VoiceRecorder } from "@/components/VoiceRecorder"
+import { DocumentTypeSelector } from "@/components/DocumentTypeSelector"
+import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { Document, DocumentAnalysis } from "@/types"
 import UpgradeButton from "@/components/UpgradeButton"
-import { SideBar } from "@/components/Sidebar/Sidebar"
-import { useNavigation } from "expo-router"
-import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
+import { SideBar } from "@/components/sidebar/Sidebar"
+import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisView"
+import { RecentDocumentItem } from "@/components/documents/RecentDocumentCard"
+import { useAnalysis } from "@/hooks/useAnalysis"
+import { ChatView } from "@/components/chat/ChatView"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
-  const { documents, pickDocument, scanDocument, analyzeDocument } = useDocuments()
-  const { isRecording, startRecording, stopRecording, transcribeAudio } = useVoice()
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
-  const [analysisResult, setAnalysisResult] = useState<DocumentAnalysis | null>(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false)
-  const [pastedText, _] = useState("")
 
-  const [isSideBarOpen, setIsSideBarOpen] = useState(false)
+  const {
+    isSideBarOpen,
+    setIsSideBarOpen,
+    isAnalyzing,
+    analysisResult,
+    handleDocumentUpload,
+    handleDocumentScan,
+    pastedText,
+    setPastedText,
+    selectedDocumentType,
+    setSelectedDocumentType,
+    showTextInput,
+    setShowTextInput,
+    handleTextAnalysis,
+    recentDocuments,
+    setAnalysisResult,
+    handleRecentDocumentPress,
+    selectedSpace,
+    setSelectedSpace,
+  } = useAnalysis()
 
-  const pulseAnim = useRef(new RNAnimated.Value(1)).current
-
-  useTabBarVisibility(!isSideBarOpen, colors)
-
-  /*   const scale = useSharedValue(1) */
-
-  /* const _animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  })) */
-
-  const handleItemPress = (item: string) => {
-    setIsSideBarOpen(false)
-    if (item === "logout") {
-      console.log("Logging out...")
-    } else if (item === "settings") {
-      console.log("Go to settings")
-    } else {
-      console.log(`You tapped on ${item}`)
-    }
+  if (analysisResult) {
+    return <DocumentAnalysisView analysis={analysisResult} onBack={() => setAnalysisResult(null)} />
   }
 
-  React.useEffect(() => {
-    if (isRecording) {
-      const pulse = RNAnimated.loop(
-        RNAnimated.sequence([
-          RNAnimated.timing(pulseAnim, {
-            toValue: 1.2,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-          RNAnimated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-        ])
-      )
-      pulse.start()
-      return () => pulse.stop()
-    }
-  }, [isRecording])
-
-  const handleDocumentUpload = async () => {
-    const doc = await pickDocument()
-    if (doc) {
-      setSelectedDocument(doc)
-      handleAnalyze(doc)
-    }
-  }
-
-  const handleDocumentScan = async () => {
-    const doc = await scanDocument()
-    if (doc) {
-      setSelectedDocument(doc)
-      handleAnalyze(doc)
-    }
-  }
-
-  const handleAnalyze = async (document: Document) => {
-    setIsAnalyzing(true)
-
-    const analysis = await analyzeDocument(document.id)
-    console.log("Analyzing document:", document.title, analysis)
-
-    setAnalysisResult({
-      ...defaultAnalysis,
-      riskyPoints: 1,
-      favorablePoints: 4,
-    })
-
-    setIsAnalyzing(false)
-  }
-
-  const handleVoiceRecording = async () => {
-    if (isRecording) {
-      const audioUri = await stopRecording()
-      if (audioUri) {
-        setShowVoiceRecorder(false)
-        // Process voice command or transcribe
-        const transcription = await transcribeAudio(audioUri)
-        Alert.alert("Voice Note", `Transcription: ${transcription}`)
-      }
-    } else {
-      await startRecording()
-      setShowVoiceRecorder(true)
-    }
-  }
-
-  const handleTextAnalysis = () => {
-    if (!pastedText.trim()) {
-      Alert.alert("Error", "Please paste some text to analyze")
-      return
-    }
-
-    // Create a mock document from pasted text
-    const mockDoc = {
-      id: Date.now().toString(),
-      title: "Pasted Text Analysis",
-      content: pastedText,
-      type: "text",
-    }
-
-    //@ts-ignore
-    setSelectedDocument(mockDoc)
-
-    //@ts-ignore
-    handleAnalyze(mockDoc)
-  }
-
-  if (analysisResult && selectedDocument) {
-    return (
-      <DocumentAnalysisView
-        document={selectedDocument}
-        analysis={analysisResult}
-        onBack={() => {
-          setAnalysisResult(null)
-          setSelectedDocument(null)
-        }}
-      />
-    )
+  const handleSpaceClose = () => {
+    setSelectedSpace(null)
   }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <SideBar
-        isOpen={isSideBarOpen}
-        onClose={() => setIsSideBarOpen(false)}
-        onItemPress={handleItemPress}
-      />
+      <SideBar isOpen={isSideBarOpen} onClose={() => setIsSideBarOpen(false)} />
 
       {/* Header */}
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
         <View style={styles.innerHeader}>
-          <TouchableOpacity
-            onPress={() => setIsSideBarOpen(true)}
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              bottom: 0,
-              justifyContent: "center",
-              paddingHorizontal: 16,
-            }}
-          >
+          {/* Left: Menu */}
+          <TouchableOpacity onPress={() => setIsSideBarOpen(true)}>
             <Menu
               color={colors.text}
               style={{
@@ -202,130 +66,126 @@ export default function AnalyzeScreen() {
             />
           </TouchableOpacity>
 
-          <View style={{ alignItems: "center" }}>
+          {/* Center: Upgrade */}
+          <View style={{ flex: 1, alignItems: "center" }}>
             <UpgradeButton />
           </View>
+
+          {/* Right: Exit only if inside Chat */}
+          {selectedSpace ? (
+            <TouchableOpacity onPress={handleSpaceClose}>
+              <LogOut size={18} color={colors.text} />
+            </TouchableOpacity>
+          ) : (
+            <View style={{ width: 24 }} />
+          )}
         </View>
       </Animated.View>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Upload Options */}
-        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.uploadSection}>
-          <View style={styles.uploadGrid}>
-            <TouchableOpacity
-              style={[styles.uploadOption, { backgroundColor: colors.card }]}
-              onPress={handleDocumentScan}
-            >
-              <View style={[styles.uploadIcon, { backgroundColor: colors.primary + "20" }]}>
-                <Camera size={24} color={colors.primary} />
-              </View>
-              <Text style={[styles.uploadText, { color: colors.text }]}>Scan Document</Text>
-            </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.uploadOption, { backgroundColor: colors.card }]}
-              onPress={handleDocumentUpload}
-            >
-              <View style={[styles.uploadIcon, { backgroundColor: colors.secondary + "20" }]}>
-                <Upload size={24} color={colors.secondary} />
-              </View>
-              <Text style={[styles.uploadText, { color: colors.text }]}>Upload File</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.uploadOption, { backgroundColor: colors.card }]}
-              onPress={handleTextAnalysis}
-            >
-              <View style={[styles.uploadIcon, { backgroundColor: colors.accent + "20" }]}>
-                <FileText size={24} color={colors.accent} />
-              </View>
-              <Text style={[styles.uploadText, { color: colors.text }]}>Analyze Text</Text>
-            </TouchableOpacity>
-          </View>
+      {selectedSpace ? (
+        <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>
+          <ChatView space={selectedSpace} />
         </Animated.View>
-
-        {/* Text Input Area */}
-        <Animated.View
-          entering={FadeInDown.delay(400).springify()}
-          style={[styles.textInputCard, { backgroundColor: colors.card }]}
-        >
-          <Text style={[styles.textInputLabel, { color: colors.textSecondary }]}>
-            Paste your document here
-          </Text>
-          <TouchableOpacity style={styles.addButton}>
-            <Plus size={24} color={colors.primary} />
-          </TouchableOpacity>
-        </Animated.View>
-
-        {/* Voice Recorder */}
-        <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.voiceSection}>
-          <TouchableOpacity
-            style={[
-              styles.voiceButton,
-              { backgroundColor: isRecording ? colors.error : colors.primary },
-            ]}
-            onPress={handleVoiceRecording}
-          >
-            <RNAnimated.View style={{ transform: [{ scale: pulseAnim }] }}>
-              {isRecording ? <MicOff size={32} color="black" /> : <Mic size={32} color="black" />}
-            </RNAnimated.View>
-          </TouchableOpacity>
-          <Text style={[styles.voiceText, { color: colors.textSecondary }]}>
-            {isRecording ? "Recording... Tap to stop" : "Tap to record voice note"}
-          </Text>
-        </Animated.View>
-
-        {/* Recent Documents */}
-        {documents.length > 0 && (
-          <Animated.View entering={FadeInDown.delay(600).springify()} style={styles.recentSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Documents</Text>
-            {documents.slice(0, 3).map(doc => (
-              <TouchableOpacity
-                key={doc.id}
-                style={[styles.recentItem, { backgroundColor: colors.card }]}
-                onPress={() => {
-                  setSelectedDocument(doc)
-                  if (doc.analysis) {
-                    setAnalysisResult(doc.analysis)
-                  } else {
-                    handleAnalyze(doc)
-                  }
-                }}
-              >
-                <View style={[styles.recentIcon, { backgroundColor: colors.surface }]}>
-                  <FileText size={20} color={colors.primary} />
-                </View>
-                <View style={styles.recentContent}>
-                  <Text style={[styles.recentTitle, { color: colors.text }]} numberOfLines={1}>
-                    {doc.title}
-                  </Text>
-                  <Text style={[styles.recentDate, { color: colors.textSecondary }]}>
-                    {new Date(doc.createdAt).toLocaleDateString()}
-                  </Text>
-                </View>
-                {doc.analysis && (
-                  <View style={[styles.analysisIndicator, { backgroundColor: colors.success }]} />
-                )}
-              </TouchableOpacity>
-            ))}
+      ) : (
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Document Type Selector */}
+          <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <DocumentTypeSelector
+              selectedType={selectedDocumentType}
+              onSelect={setSelectedDocumentType}
+            />
           </Animated.View>
-        )}
-      </ScrollView>
 
-      {/* Voice Recorder Modal */}
-      {showVoiceRecorder && (
-        <VoiceRecorder
-          isVisible={showVoiceRecorder}
-          isRecording={isRecording}
-          onClose={() => setShowVoiceRecorder(false)}
-          onStopRecording={handleVoiceRecording}
-        />
+          {/* Upload Options */}
+          <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.uploadSection}>
+            <View style={styles.uploadGrid}>
+              <TouchableOpacity
+                style={[styles.uploadOption, { backgroundColor: colors.card }]}
+                onPress={handleDocumentScan}
+              >
+                <View style={[styles.uploadIcon, { backgroundColor: colors.primary + "20" }]}>
+                  <Camera size={24} color={colors.primary} />
+                </View>
+                <Text style={[styles.uploadText, { color: colors.text }]}>Scan Document</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.uploadOption, { backgroundColor: colors.card }]}
+                onPress={handleDocumentUpload}
+              >
+                <View style={[styles.uploadIcon, { backgroundColor: colors.secondary + "20" }]}>
+                  <Upload size={24} color={colors.secondary} />
+                </View>
+                <Text style={[styles.uploadText, { color: colors.text }]}>Upload File</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.uploadOption, { backgroundColor: colors.card }]}
+                onPress={() => setShowTextInput(!showTextInput)}
+              >
+                <View style={[styles.uploadIcon, { backgroundColor: colors.accent + "20" }]}>
+                  <FileText size={24} color={colors.accent} />
+                </View>
+                <Text style={[styles.uploadText, { color: colors.text }]}>Analyze Text</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+
+          {/* Text Input Area */}
+          {showTextInput && (
+            <Animated.View
+              entering={FadeInDown.delay(400).springify()}
+              style={[styles.textInputCard, { backgroundColor: colors.card }]}
+            >
+              <Text style={[styles.textInputLabel, { color: colors.text }]}>
+                Enter or paste your document text
+              </Text>
+              <TextInput
+                style={[styles.textInput, { color: colors.text, borderColor: colors.border }]}
+                value={pastedText}
+                onChangeText={setPastedText}
+                placeholder="Paste your document text here..."
+                placeholderTextColor={colors.textMuted}
+                multiline
+                numberOfLines={6}
+                textAlignVertical="top"
+              />
+              <Button
+                title="Analyze Text"
+                onPress={handleTextAnalysis}
+                variant="primary"
+                disabled={!pastedText.trim()}
+              />
+            </Animated.View>
+          )}
+
+          {/* Recent Documents */}
+          {recentDocuments.length > 0 && (
+            <Animated.View
+              entering={FadeInDown.delay(600).springify()}
+              style={styles.recentSection}
+            >
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Analysis</Text>
+              {/* TODO: Replace with actual recent documents */}
+              {recentDocuments.slice(0, 5).map(doc => (
+                <RecentDocumentItem
+                  key={doc.id}
+                  document={doc}
+                  onPress={() => handleRecentDocumentPress(doc)}
+                />
+              ))}
+            </Animated.View>
+          )}
+        </ScrollView>
       )}
 
-      {/* Loading Overlay */}
       {isAnalyzing && (
         <View style={styles.loadingOverlay}>
           <View style={[styles.loadingCard, { backgroundColor: colors.card }]}>
             <Text style={[styles.loadingText, { color: colors.text }]}>Analyzing Document...</Text>
+            <Text style={[styles.loadingSubtext, { color: colors.textSecondary }]}>
+              This may take a few moments
+            </Text>
           </View>
         </View>
       )}
@@ -345,11 +205,11 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   innerHeader: {
-    alignItems: "center",
     flexDirection: "row",
-    gap: 12,
+    alignItems: "center",
+    justifyContent: "space-between",
     width: "100%",
-    justifyContent: "center",
+    paddingHorizontal: 10,
   },
   title: {
     fontSize: FontSizes.xxl,
@@ -359,47 +219,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
-  },
-  assistantCard: {
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
-  },
-  assistantHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  avatarContainer: {
-    marginRight: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarText: {
-    color: "#FFFFFF",
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.bold,
-  },
-  assistantInfo: {
-    flex: 1,
-  },
-  assistantName: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.semiBold,
-  },
-  messageContainer: {
-    borderRadius: 12,
-    padding: 16,
-  },
-  messageText: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
-    lineHeight: 22,
   },
   uploadSection: {
     marginBottom: 24,
@@ -431,46 +250,23 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
-    minHeight: 120,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
-    borderStyle: "dashed",
-    borderColor: "#E0E0E0",
   },
   textInputLabel: {
-    fontSize: FontSizes.lg,
-    fontFamily: Fonts.regular,
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.medium,
     marginBottom: 12,
   },
-  addButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
+  textInput: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.regular,
+    minHeight: 120,
+    marginBottom: 16,
   },
-  voiceSection: {
-    alignItems: "center",
+  chatSection: {
     marginBottom: 32,
-  },
-  voiceButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  voiceText: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.regular,
-    textAlign: "center",
   },
   recentSection: {
     marginBottom: 32,
@@ -479,38 +275,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.lg,
     fontFamily: Fonts.semiBold,
     marginBottom: 16,
-  },
-  recentItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 8,
-  },
-  recentIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  recentContent: {
-    flex: 1,
-  },
-  recentTitle: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.medium,
-    marginBottom: 2,
-  },
-  recentDate: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.regular,
-  },
-  analysisIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
   },
   loadingOverlay: {
     position: "absolute",
@@ -526,10 +290,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 24,
     margin: 20,
+    alignItems: "center",
   },
   loadingText: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.medium,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  loadingSubtext: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.regular,
     textAlign: "center",
   },
 })

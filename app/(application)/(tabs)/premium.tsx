@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
-import { Check, Sparkles, Shield, Users, Zap, Brain } from "lucide-react-native"
+import { Check, Sparkles, Shield, Zap, Brain } from "lucide-react-native"
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts } from "@/constants/Fonts"

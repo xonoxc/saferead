@@ -7,22 +7,25 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
-import { Text, TouchableOpacity, View, StyleSheet } from "react-native"
-import { PackagePlus, X } from "lucide-react-native"
+import { TouchableOpacity, View, StyleSheet } from "react-native"
+import { PackagePlus } from "lucide-react-native"
 import { SpacesSidebarContent } from "./SidebarSpacesContent"
 import CustomBackBtn from "../CustomBackBtn"
+
+import { useSpaceStore } from "@/store/useSpaceStore"
+import { Space } from "@/types"
 
 const SCREEN_WIDTH = getScreenWidth()
 
 interface SidebarProps {
   isOpen: boolean
   onClose: () => void
-  onItemPress: (item: string) => void
 }
 
 export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
   const { colors } = useTheme()
   const [createFormVisible, setCreateFormVisible] = React.useState(false)
+  const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
 
   const translateX = useSharedValue(SCREEN_WIDTH)
 
@@ -32,6 +35,12 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
       easing: Easing.out(Easing.exp),
     })
   }, [isOpen])
+
+  const handleSpaceSelect = (space: Space) => {
+    // TODO: Replace with actual data fetching or navigation
+    setSelectedSpace(space)
+    onClose()
+  }
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
@@ -53,6 +62,7 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
         <SpacesSidebarContent
           showCreateModal={createFormVisible}
           onCreateFormClose={() => setCreateFormVisible(false)}
+          onSpaceSelect={handleSpaceSelect}
         />
       </View>
     </Animated.View>

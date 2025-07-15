@@ -69,8 +69,8 @@ interface DocumentsContextType {
   documents: Document[]
   isLoading: boolean
   error: string | null
-  pickDocument: () => Promise<Document | undefined>
-  scanDocument: () => Promise<Document | undefined>
+  pickDocument: () => Promise<any>
+  scanDocument: () => Promise<any>
   analyzeDocument: (docId: string) => Promise<DocumentAnalysis | null>
   deleteDocument: (docId: string) => Promise<void>
   clearError: () => void
@@ -124,7 +124,7 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
       return
     }
 
-    if (!result.data.canceled) {
+    if (!result.data.canceled && result.data.assets && result.data.assets.length > 0) {
       const file = result.data.assets[0]
       const newDoc: Document = {
         id: Date.now().toString(),
@@ -155,7 +155,14 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
         return
       }
 
-      return newDoc
+      // Return the document with file data for immediate analysis
+      return {
+        ...newDoc,
+        uri: file.uri,
+        type: file.mimeType || "application/octet-stream",
+        name: file.name,
+        mimeType: file.mimeType,
+      }
     }
   }
 
@@ -181,15 +188,15 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
       return
     }
 
-    if (!result.data.canceled) {
-      //const image = result.data.assets[0]
+    if (!result.data.canceled && result.data.assets && result.data.assets.length > 0) {
+      const image = result.data.assets[0]
       const newDoc: Document = {
         id: Date.now().toString(),
         title: `Scanned Document ${new Date().toLocaleDateString()}`,
         type: "other",
         content: "",
         originalFormat: "image",
-        fileSize: 0,
+        fileSize: image.fileSize || 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         isEncrypted: false,
@@ -201,22 +208,33 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
       const updatedDocs = [...documents, newDoc]
       setDocuments(updatedDocs)
       await saveDocuments(updatedDocs)
-      return newDoc
+
+      // Return the document with image data for immediate analysis
+      return {
+        ...newDoc,
+        uri: image.uri,
+        type: image.mimeType || "image/jpeg",
+        name: newDoc.title,
+        mimeType: image.mimeType || "image/jpeg",
+      }
     }
   }
 
   const analyzeDocument = async (docId: string): Promise<DocumentAnalysis | null> => {
     setIsLoading(true)
-    const updatedDocs = documents.map(doc => (doc.id === docId ? { ...doc, defaultAnalysis } : doc))
+    const updatedDocs = documents.map(doc =>
+      doc.id === docId ? { ...doc, analysis: defaultAnalysis } : doc
+    )
     setDocuments(updatedDocs)
 
     const saveRes = await attempt(saveDocuments(updatedDocs))
-    if (saveRes.ok) {
+    if (!saveRes.ok) {
       setError("Failed to save document")
       setIsLoading(false)
       return null
     }
 
+    setIsLoading(false)
     return defaultAnalysis
   }
 
@@ -244,7 +262,7 @@ export const DocumentsProvider = ({ children }: { children: React.ReactNode }) =
   )
 }
 
-export const useDocuments = () => {
+export function useDocuments() {
   const context = use(DocumentsContext)
   if (!context) {
     throw new Error("useDocuments must be used within a DocumentsProvider")

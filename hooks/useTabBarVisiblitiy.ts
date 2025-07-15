@@ -1,13 +1,14 @@
 import { useNavigation } from "expo-router"
 import { useEffect } from "react"
-import type { ColorsType } from "./useTheme"
+import { useTheme } from "@/hooks/useTheme"
 import { getTabBarStyles } from "@/utils/helpers/tabs"
 
 /*
  * @params visible - visible is when you want to show the tab bar
  * **/
-export function useTabBarVisibility(visible: boolean, colors: ColorsType) {
+export function useTabBarVisibility(visible: boolean) {
   const navigation = useNavigation()
+  const { colors } = useTheme()
 
   useEffect(() => {
     navigation.setOptions({
@@ -16,5 +17,5 @@ export function useTabBarVisibility(visible: boolean, colors: ColorsType) {
         display: visible ? "flex" : "none",
       },
     })
-  }, [visible])
+  }, [visible, colors])
 }

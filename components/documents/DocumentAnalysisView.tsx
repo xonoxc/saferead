@@ -1,31 +1,26 @@
 import React, { useState } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share } from "react-native"
 import {
-  ArrowLeft,
   Share2,
   Download,
   TriangleAlert as AlertTriangle,
   CheckCircle,
   TrendingUp,
-  Calendar,
-  FileText,
 } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
-import { useTheme } from "@/hooks/useTheme"
+import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { useVoice } from "@/hooks/useVoice"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { AnalysisResponse } from "@/services/api"
 import { attempt } from "@/utils/attempt"
+import CustomBackBtn from "@/components/CustomBackBtn"
 
-interface BackendAnalysisViewProps {
+interface DocumentAnalysisViewProps {
   analysis: AnalysisResponse
   onBack: () => void
 }
 
-export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
-  analysis,
-  onBack,
-}) => {
+export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewProps) => {
   const { colors } = useTheme()
   const { speakText } = useVoice()
   const [showAllRisks, setShowAllRisks] = useState(false)
@@ -33,14 +28,14 @@ export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
 
   const handleShare = async () => {
     const shareContent = `Document Analysis: ${analysis.original_filename}\n\nSummary: ${analysis.summary_text}\n\nRisks: ${analysis.risky_points.length}\nFavorable Points: ${analysis.favourable_points.length}\nConfidence: ${(analysis.confidence_score * 100).toFixed(0)}%`
-    
+
     const result = await attempt(
       Share.share({
         message: shareContent,
         title: "Document Analysis Report",
       })
     )
-    
+
     if (!result.ok) {
       console.error("Error sharing:", result.error)
     }
@@ -50,27 +45,15 @@ export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
     speakText(text)
   }
 
-  const getRiskColor = () => {
-    if (analysis.risky_points.length > analysis.favourable_points.length) return colors.error
-    if (analysis.risky_points.length < analysis.favourable_points.length) return colors.success
-    return colors.warning
-  }
-
-  const getOverallRisk = () => {
-    if (analysis.risky_points.length > analysis.favourable_points.length) return "HIGH"
-    if (analysis.risky_points.length < analysis.favourable_points.length) return "LOW"
-    return "MEDIUM"
-  }
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <ArrowLeft size={24} color={colors.text} />
-        </TouchableOpacity>
+        <View>
+          <CustomBackBtn containerWidth={44} onBack={onBack} />
+        </View>
         <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
-          {analysis.original_filename}
+          {analysis.original_filename || "Document Analysis"}
         </Text>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
@@ -82,15 +65,24 @@ export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
         </View>
       </Animated.View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={{ paddingBottom: 110 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Status & Confidence */}
         <Animated.View
           entering={FadeInDown.delay(200).springify()}
           style={[styles.statusCard, { backgroundColor: colors.card }]}
         >
           <View style={styles.statusHeader}>
-            <View style={[styles.statusBadge, { backgroundColor: getRiskColor() + '20' }]}>
-              <Text style={[styles.statusText, { color: getRiskColor() }]}>
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: getRiskColor(analysis, colors) + "20" },
+              ]}
+            >
+              <Text style={[styles.statusText, { color: getRiskColor(analysis, colors) }]}>
                 {analysis.status.toUpperCase()}
               </Text>
             </View>
@@ -101,11 +93,13 @@ export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
               </Text>
             </View>
           </View>
-          
+
           <View style={styles.riskOverview}>
-            <View style={[styles.riskBadge, { backgroundColor: getRiskColor() + '20' }]}>
-              <Text style={[styles.riskBadgeText, { color: getRiskColor() }]}>
-                {getOverallRisk()} RISK
+            <View
+              style={[styles.riskBadge, { backgroundColor: getRiskColor(analysis, colors) + "20" }]}
+            >
+              <Text style={[styles.riskBadgeText, { color: getRiskColor(analysis, colors) }]}>
+                {getOverallRisk(analysis)} RISK
               </Text>
             </View>
           </View>
@@ -149,7 +143,7 @@ export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
         >
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Risky Points</Text>
-            <View style={[styles.countBadge, { backgroundColor: colors.error + '20' }]}>
+            <View style={[styles.countBadge, { backgroundColor: colors.error + "20" }]}>
               <Text style={[styles.countText, { color: colors.error }]}>
                 {analysis.risky_points.length}
               </Text>
@@ -169,7 +163,7 @@ export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
               onPress={() => setShowAllRisks(!showAllRisks)}
             >
               <Text style={[styles.showMoreText, { color: colors.primary }]}>
-                {showAllRisks ? 'Show Less' : `Show ${analysis.risky_points.length - 3} More`}
+                {showAllRisks ? "Show Less" : `Show ${analysis.risky_points.length - 3} More`}
               </Text>
             </TouchableOpacity>
           )}
@@ -182,7 +176,7 @@ export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
         >
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Favorable Points</Text>
-            <View style={[styles.countBadge, { backgroundColor: colors.success + '20' }]}>
+            <View style={[styles.countBadge, { backgroundColor: colors.success + "20" }]}>
               <Text style={[styles.countText, { color: colors.success }]}>
                 {analysis.favourable_points.length}
               </Text>
@@ -202,7 +196,9 @@ export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
               onPress={() => setShowAllFavorable(!showAllFavorable)}
             >
               <Text style={[styles.showMoreText, { color: colors.primary }]}>
-                {showAllFavorable ? 'Show Less' : `Show ${analysis.favourable_points.length - 3} More`}
+                {showAllFavorable
+                  ? "Show Less"
+                  : `Show ${analysis.favourable_points.length - 3} More`}
               </Text>
             </TouchableOpacity>
           )}
@@ -235,9 +231,7 @@ export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
             </View>
             <View style={styles.infoItem}>
               <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Status</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>
-                {analysis.status}
-              </Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>{analysis.status}</Text>
             </View>
           </View>
         </Animated.View>
@@ -246,15 +240,47 @@ export const BackendAnalysisView: React.FC<BackendAnalysisViewProps> = ({
   )
 }
 
+/*
+ * Helper Functions
+ * **/
+
+/*
+ * Get the color based on the overall risk level
+ * ***/
+const getRiskColor = (analysis: AnalysisResponse, colors: ColorsType) => {
+  switch (getOverallRisk(analysis)) {
+    case "HIGH":
+      return colors.error
+    case "LOW":
+      return colors.success
+    default:
+      return colors.warning
+  }
+}
+
+/*
+ * Get the overall risk level based on the number of risky and favorable points
+ * **/
+const getOverallRisk = (analysis: AnalysisResponse) => {
+  if (analysis.risky_points.length > analysis.favourable_points.length) {
+    return "HIGH"
+  } else if (analysis.risky_points.length < analysis.favourable_points.length) {
+    return "LOW"
+  } else {
+    return "MEDIUM"
+  }
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    gap: 12,
+    alignItems: "center",
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 10,
   },
   backButton: {
     padding: 8,
@@ -266,7 +292,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.semiBold,
   },
   headerActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   actionButton: {
@@ -282,9 +308,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statusHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   statusBadge: {
@@ -297,8 +323,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bold,
   },
   confidenceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   confidenceText: {
@@ -306,7 +332,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
   },
   riskOverview: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 16,
   },
   riskBadge: {
@@ -319,11 +345,11 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bold,
   },
   statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     fontSize: FontSizes.xxxl,
@@ -340,9 +366,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   sectionTitle: {
@@ -368,8 +394,8 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   pointItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 12,
     gap: 8,
   },
@@ -380,7 +406,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   showMoreButton: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 8,
   },
   showMoreText: {
@@ -391,9 +417,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   infoItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 8,
   },
   infoLabel: {

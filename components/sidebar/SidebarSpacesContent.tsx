@@ -5,8 +5,8 @@ import { useTheme } from "@/hooks/useTheme"
 import { useSpaces } from "@/hooks/useSpaces"
 import { TextInput } from "@/components/TextInput"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
-import { SpaceList } from "@/components/SpaceList"
-import { CreateSpaceForm } from "@/components/CreateSpaceForm"
+import { SpaceList } from "@/components/spaces/SpaceList"
+import { CreateSpaceForm } from "@/components/spaces/CreateSpaceForm"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 
 export function SpacesSidebarContent({

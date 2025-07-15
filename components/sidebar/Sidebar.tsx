@@ -7,8 +7,8 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
-import { Text, TouchableOpacity, View, StyleSheet } from "react-native"
-import { PackagePlus, X } from "lucide-react-native"
+import { TouchableOpacity, View, StyleSheet } from "react-native"
+import { PackagePlus } from "lucide-react-native"
 import { SpacesSidebarContent } from "./SidebarSpacesContent"
 import CustomBackBtn from "../CustomBackBtn"
 

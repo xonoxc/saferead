@@ -45,7 +45,7 @@ export default function AnalyzeScreen() {
 
   const [isSideBarOpen, setIsSideBarOpen] = useState(false)
 
-  useTabBarVisibility(!isSideBarOpen, colors)
+  useTabBarVisibility(!isSideBarOpen)
 
   /*   const scale = useSharedValue(1) */
 

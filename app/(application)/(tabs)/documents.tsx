@@ -76,6 +76,10 @@ export default function DocumentsScreen() {
     />
   )
 
+  const isDocumentsDataAvailable = () => {
+    return documents.length > 0 && !error
+  }
+
   const renderFooter = () => {
     if (!hasMore) return null
     return (
@@ -138,24 +142,26 @@ export default function DocumentsScreen() {
         </View>
       )}
 
-      <FlatList
-        data={documents}
-        renderItem={renderDocument}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            colors={[colors.primary]}
-          />
-        }
-        onEndReached={loadMoreDocuments}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={renderFooter}
-        ListEmptyComponent={FallBackState}
-        showsVerticalScrollIndicator={false}
-      />
+      {isDocumentsDataAvailable() && (
+        <FlatList
+          data={documents}
+          renderItem={renderDocument}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={[colors.primary]}
+            />
+          }
+          onEndReached={loadMoreDocuments}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
+          ListEmptyComponent={FallBackState}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
 
       <DocumentFilter
         visible={showFilter}
@@ -368,7 +374,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 12,
-    borderWidth: 1,
+    borderWidth: 0,
     gap: 8,
   },
   searchInput: {
@@ -384,7 +390,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
+    borderWidth: 0,
   },
   errorContainer: {
     margin: 20,
@@ -404,7 +410,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    borderWidth: 1,
+    borderWidth: 0,
   },
   cardHeader: {
     flexDirection: "row",

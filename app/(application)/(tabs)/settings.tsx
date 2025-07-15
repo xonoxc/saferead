@@ -1,8 +1,6 @@
 import React from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from "react-native"
 import {
-  Moon,
-  Sun,
   Globe,
   Volume2,
   Shield,
@@ -11,6 +9,9 @@ import {
   LogOut,
   KeyRound,
   User as UserIcon,
+  Sun,
+  Moon,
+  Smartphone,
 } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
@@ -18,6 +19,7 @@ import { Fonts, FontSizes } from "@/constants/Fonts"
 import type { User } from "@/types"
 import type { ThemeMode } from "@/hooks/useTheme"
 import { type Router, useRouter } from "expo-router"
+import { DropdownSelector } from "@/components/DropDownSelector"
 
 export default function SettingsScreen() {
   const { colors, mode, setTheme } = useTheme()
@@ -50,10 +52,29 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.content}>
+        <DropdownSelector
+          label="THEME"
+          selected={mode}
+          options={[
+            {
+              value: "light",
+              label: "Light",
+              icon: <Sun size={20} color={colors.textSecondary} />,
+            },
+            { value: "dark", label: "Dark", icon: <Moon size={20} color={colors.textSecondary} /> },
+            {
+              value: "system",
+              label: "System",
+              icon: <Smartphone size={20} color={colors.textSecondary} />,
+            },
+          ]}
+          onSelect={val => setTheme(val as ThemeMode)}
+        />
+
         {settingsGroups.map((group, groupIndex) => (
           <View key={groupIndex} style={styles.group}>
-            <Text style={[styles.groupTitle, { color: colors.textSecondary }]}>{group.title}</Text>
-            <View style={[styles.groupItems, { backgroundColor: colors.card }]}>
+            <Text style={[styles.groupTitle, { color: colors.textMuted }]}>{group.title}</Text>
+            <View style={[styles.groupItems, { backgroundColor: colors.background }]}>
               {group.items.map((item, itemIndex) => (
                 <TouchableOpacity
                   key={itemIndex}
@@ -113,26 +134,16 @@ export default function SettingsScreen() {
   )
 }
 
-type GETSettingsGroupsParams = {
-  user: User | null
-  mode: string
-  setTheme: (theme: ThemeMode) => Promise<void>
-  router: Router
-  handleLogout: () => void
-}
-
-type SettingsItem = {
-  icon: React.ComponentType<any>
-  title: string
-  value?: boolean | string
-  type?: "toggle"
-  onPress: () => void
-  danger?: boolean
-}
-
 type SettingsGroup = {
   title: string
-  items: SettingsItem[]
+  items: {
+    icon: React.ComponentType<any>
+    title: string
+    value?: boolean | string
+    type?: "toggle"
+    onPress: () => void
+    danger?: boolean
+  }[]
 }
 
 /*
@@ -141,11 +152,15 @@ type SettingsGroup = {
  * ***/
 function getSettingsGroups({
   user,
-  mode,
-  setTheme,
   router,
   handleLogout,
-}: GETSettingsGroupsParams): SettingsGroup[] {
+}: {
+  user: User | null
+  mode: string
+  setTheme: (theme: ThemeMode) => Promise<void>
+  router: Router
+  handleLogout: () => void
+}): SettingsGroup[] {
   return [
     {
       title: "Account",
@@ -171,13 +186,13 @@ function getSettingsGroups({
     {
       title: "Preferences",
       items: [
-        {
+        /* {
           icon: mode === "dark" ? Moon : Sun,
           title: "Theme",
           value: mode === "dark",
           type: "toggle",
           onPress: () => setTheme(mode === "dark" ? "light" : "dark"),
-        },
+        }, */
         {
           icon: Globe,
           title: "Language",
@@ -227,14 +242,14 @@ function getSettingsGroups({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 20,
+    paddingVertical: 1,
   },
   header: {
     padding: 20,
     paddingBottom: 0,
   },
   title: {
-    fontSize: FontSizes.xxl,
+    fontSize: FontSizes.xxxl,
     fontFamily: Fonts.bold,
   },
   content: {

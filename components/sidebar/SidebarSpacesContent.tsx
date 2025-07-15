@@ -63,7 +63,7 @@ export function SpacesSidebarContent({
         <SpaceList spaces={filteredSpaces} onDelete={handleDeleteSpace} />
       </ScrollView>
 
-      <Modal visible={showCreateModal} animationType="slide" presentationStyle="pageSheet">
+      <Modal visible={showCreateModal} animationType="fade" presentationStyle="pageSheet">
         <CreateSpaceForm onCreate={handleCreateSpace} onCancel={onCreateFormClose} />
       </Modal>
     </View>

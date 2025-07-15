@@ -1,38 +1,25 @@
-import React, { useState, useEffect, useRef } from "react"
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
-} from "react-native"
-import { X, Send } from "lucide-react-native"
+import React, { useState, useEffect } from "react"
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native"
+import { Send, Box } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Space } from "@/types"
+
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated"
-import { useHeaderHeight } from "@react-navigation/elements"
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
-import { isIOS } from "@/utils/helpers/platform"
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 interface ChatViewProps {
   space: Space
-  onExit: () => void
 }
 
-export function ChatView({ space, onExit }: ChatViewProps) {
+export function ChatView({ space }: ChatViewProps) {
   const { colors } = useTheme()
   const [message, setMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [chatHistory, setChatHistory] = useState<Array<{ text: string; sender: "user" | "bot" }>>(
     []
   )
-  const scrollViewRef = useRef<ScrollView>(null)
-  const headerHeight = useHeaderHeight()
-  const tabBarHeight = useBottomTabBarHeight()
 
   useEffect(() => {
     setChatHistory([{ text: `Welcome to ${space.name}! How can I help you?`, sender: "bot" }])
@@ -56,94 +43,88 @@ export function ChatView({ space, onExit }: ChatViewProps) {
     }
   }
 
-  useEffect(() => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: true })
-    }
-  }, [chatHistory])
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <KeyboardAvoidingView
-        behavior={isIOS() ? "padding" : undefined}
-        style={[styles.container, { backgroundColor: colors.background }]}
-        keyboardVerticalOffset={
-          useBottomTabBarHeight() + useHeaderHeight() + useSafeAreaInsets().top
-        }
-      >
-        <View style={[styles.header, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <View style={styles.headerContent}>
-            <Text style={[styles.spaceBadge, { backgroundColor: space.color }]}>{space.name}</Text>
-            <TouchableOpacity onPress={onExit}>
-              <X size={24} color={colors.text} />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <ScrollView
-          ref={scrollViewRef}
-          style={styles.chatContainer}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        >
-          {chatHistory.map((chat, index) => (
-            <Animated.View
-              key={index}
-              entering={FadeInDown.delay(100 * index).springify()}
-              style={[
-                styles.chatBubble,
-                chat.sender === "user" ? styles.userBubble : styles.botBubble,
-                {
-                  backgroundColor: chat.sender === "user" ? colors.primary : colors.card,
-                },
-              ]}
-            >
-              <Text
-                style={{
-                  color: chat.sender === "user" ? colors.background : colors.text,
-                  fontFamily: Fonts.regular,
-                }}
-              >
-                {chat.text}
-              </Text>
-            </Animated.View>
-          ))}
-          {isTyping && (
-            <Animated.View
-              entering={FadeIn}
-              style={[styles.chatBubble, styles.botBubble, { backgroundColor: colors.card }]}
-            >
-              <Text style={{ color: colors.text, fontFamily: Fonts.regular }}>Typing...</Text>
-            </Animated.View>
-          )}
-        </ScrollView>
-        <View
-          style={[
-            styles.inputContainer,
-            { backgroundColor: colors.card, borderTopColor: colors.border },
-          ]}
-        >
-          <TextInput
+      <View style={[styles.header, { backgroundColor: colors.background }]}>
+        <View style={styles.headerContent}>
+          <View
             style={[
-              styles.input,
+              styles.badgeContainer,
               {
-                color: colors.text,
+                backgroundColor: colors.card,
                 borderColor: colors.border,
-                backgroundColor: colors.background,
+                borderStyle: "dashed",
+                paddingHorizontal: 10,
               },
             ]}
-            value={message}
-            onChangeText={setMessage}
-            placeholder="Ask a question..."
-            placeholderTextColor={colors.textMuted}
-          />
-          <TouchableOpacity
-            style={[styles.sendButton, { backgroundColor: colors.primary }]}
-            onPress={handleSend}
-            disabled={!message.trim()}
           >
-            <Send size={24} color={colors.background} />
-          </TouchableOpacity>
+            <Box color={colors.text} size={18} />
+            <Text style={[styles.spaceBadge, { color: colors.text }]}>{space.name}</Text>
+          </View>
         </View>
-      </KeyboardAvoidingView>
+      </View>
+
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 100 }}
+        keyboardShouldPersistTaps="handled"
+        extraScrollHeight={80}
+        enableOnAndroid
+      >
+        {chatHistory.map((chat, index) => (
+          <Animated.View
+            key={index}
+            entering={FadeInDown.delay(100 * index).springify()}
+            style={[
+              styles.chatBubble,
+              chat.sender === "user" ? styles.userBubble : styles.botBubble,
+              {
+                backgroundColor: chat.sender === "user" ? colors.primary : colors.card,
+              },
+            ]}
+          >
+            <Text
+              style={{
+                color: chat.sender === "user" ? colors.background : colors.text,
+                fontFamily: Fonts.regular,
+              }}
+            >
+              {chat.text}
+            </Text>
+          </Animated.View>
+        ))}
+        {isTyping && (
+          <Animated.View
+            entering={FadeIn}
+            style={[styles.chatBubble, styles.botBubble, { backgroundColor: colors.card }]}
+          >
+            <Text style={{ color: colors.text, fontFamily: Fonts.regular }}>Typing...</Text>
+          </Animated.View>
+        )}
+      </KeyboardAwareScrollView>
+
+      <View style={[styles.inputContainer, { backgroundColor: colors.background }]}>
+        <TextInput
+          style={[
+            styles.input,
+            {
+              color: colors.text,
+              borderColor: colors.border,
+              backgroundColor: colors.surface,
+            },
+          ]}
+          value={message}
+          onChangeText={setMessage}
+          placeholder="Ask a question..."
+          placeholderTextColor={colors.textMuted}
+        />
+        <TouchableOpacity
+          style={[styles.sendButton, { backgroundColor: colors.primary }]}
+          onPress={handleSend}
+          disabled={!message.trim()}
+        >
+          <Send size={24} color={colors.background} />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   )
 }
@@ -153,22 +134,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
     borderBottomWidth: 1,
   },
   headerContent: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
   },
   spaceBadge: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.semiBold,
-    color: "white",
-    paddingHorizontal: 12,
+    fontSize: FontSizes.xs,
+    fontFamily: Fonts.medium,
+    paddingHorizontal: 14,
+    flexDirection: "row",
     paddingVertical: 6,
-    borderRadius: 16,
-    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+  },
+  badgeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 10,
+    marginHorizontal: 8,
   },
   chatContainer: {
     flex: 1,
@@ -198,7 +188,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     borderWidth: 1,
-    borderRadius: 24,
+    borderRadius: 15,
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginRight: 12,

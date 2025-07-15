@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react"
+import { useState } from "react"
 
-import { Alert, Animated as RNAnimated } from "react-native"
+import { Alert } from "react-native"
 import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 import { uploadDocument, AnalysisResponse } from "@/services/api"
 import { attempt } from "@/utils/attempt"

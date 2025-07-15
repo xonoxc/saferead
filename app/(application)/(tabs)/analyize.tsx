@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native"
-import { Upload, Camera, FileText, Menu, X } from "lucide-react-native"
+import { Upload, Camera, FileText, Menu, LogOut } from "lucide-react-native"
 import Animated, { FadeInDown, FadeIn, FadeOut } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { DocumentTypeSelector } from "@/components/DocumentTypeSelector"
@@ -12,7 +12,6 @@ import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisVie
 import { RecentDocumentItem } from "@/components/documents/RecentDocumentCard"
 import { useAnalysis } from "@/hooks/useAnalysis"
 import { ChatView } from "@/components/chat/ChatView"
-import { useSpaceStore } from "@/store/useSpaceStore"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
@@ -42,6 +41,10 @@ export default function AnalyzeScreen() {
     return <DocumentAnalysisView analysis={analysisResult} onBack={() => setAnalysisResult(null)} />
   }
 
+  const handleSpaceClose = () => {
+    setSelectedSpace(null)
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SideBar isOpen={isSideBarOpen} onClose={() => setIsSideBarOpen(false)} />
@@ -49,17 +52,8 @@ export default function AnalyzeScreen() {
       {/* Header */}
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
         <View style={styles.innerHeader}>
-          <TouchableOpacity
-            onPress={() => setIsSideBarOpen(true)}
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              bottom: 0,
-              justifyContent: "center",
-              paddingHorizontal: 16,
-            }}
-          >
+          {/* Left: Menu */}
+          <TouchableOpacity onPress={() => setIsSideBarOpen(true)}>
             <Menu
               color={colors.text}
               style={{
@@ -72,15 +66,25 @@ export default function AnalyzeScreen() {
             />
           </TouchableOpacity>
 
-          <View style={{ alignItems: "center" }}>
+          {/* Center: Upgrade */}
+          <View style={{ flex: 1, alignItems: "center" }}>
             <UpgradeButton />
           </View>
+
+          {/* Right: Exit only if inside Chat */}
+          {selectedSpace ? (
+            <TouchableOpacity onPress={handleSpaceClose}>
+              <LogOut size={18} color={colors.text} />
+            </TouchableOpacity>
+          ) : (
+            <View style={{ width: 24 }} />
+          )}
         </View>
       </Animated.View>
 
       {selectedSpace ? (
         <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>
-          <ChatView space={selectedSpace} onExit={() => setSelectedSpace(null)} />
+          <ChatView space={selectedSpace} />
         </Animated.View>
       ) : (
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -201,11 +205,11 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   innerHeader: {
-    alignItems: "center",
     flexDirection: "row",
-    gap: 12,
+    alignItems: "center",
+    justifyContent: "space-between",
     width: "100%",
-    justifyContent: "center",
+    paddingHorizontal: 10,
   },
   title: {
     fontSize: FontSizes.xxl,

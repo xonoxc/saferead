@@ -7,7 +7,6 @@ import {
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
-  Platform,
 } from "react-native"
 import { X, Send } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
@@ -15,7 +14,9 @@ import { Space } from "@/types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated"
 import { useHeaderHeight } from "@react-navigation/elements"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
+import { isIOS } from "@/utils/helpers/platform"
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 
 interface ChatViewProps {
   space: Space
@@ -31,7 +32,7 @@ export function ChatView({ space, onExit }: ChatViewProps) {
   )
   const scrollViewRef = useRef<ScrollView>(null)
   const headerHeight = useHeaderHeight()
-  const { bottom } = useSafeAreaInsets()
+  const tabBarHeight = useBottomTabBarHeight()
 
   useEffect(() => {
     setChatHistory([{ text: `Welcome to ${space.name}! How can I help you?`, sender: "bot" }])
@@ -62,84 +63,88 @@ export function ChatView({ space, onExit }: ChatViewProps) {
   }, [chatHistory])
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={headerHeight - bottom}
-    >
-      <View style={[styles.header, { backgroundColor: colors.card, borderColor: colors.border }]}>
-        <View style={styles.headerContent}>
-          <Text style={[styles.spaceBadge, { backgroundColor: space.color }]}>{space.name}</Text>
-          <TouchableOpacity onPress={onExit}>
-            <X size={24} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <ScrollView
-        ref={scrollViewRef}
-        style={styles.chatContainer}
-        contentContainerStyle={{ paddingBottom: 20 }}
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <KeyboardAvoidingView
+        behavior={isIOS() ? "padding" : undefined}
+        style={[styles.container, { backgroundColor: colors.background }]}
+        keyboardVerticalOffset={
+          useBottomTabBarHeight() + useHeaderHeight() + useSafeAreaInsets().top
+        }
       >
-        {chatHistory.map((chat, index) => (
-          <Animated.View
-            key={index}
-            entering={FadeInDown.delay(100 * index).springify()}
+        <View style={[styles.header, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.headerContent}>
+            <Text style={[styles.spaceBadge, { backgroundColor: space.color }]}>{space.name}</Text>
+            <TouchableOpacity onPress={onExit}>
+              <X size={24} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.chatContainer}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          {chatHistory.map((chat, index) => (
+            <Animated.View
+              key={index}
+              entering={FadeInDown.delay(100 * index).springify()}
+              style={[
+                styles.chatBubble,
+                chat.sender === "user" ? styles.userBubble : styles.botBubble,
+                {
+                  backgroundColor: chat.sender === "user" ? colors.primary : colors.card,
+                },
+              ]}
+            >
+              <Text
+                style={{
+                  color: chat.sender === "user" ? colors.background : colors.text,
+                  fontFamily: Fonts.regular,
+                }}
+              >
+                {chat.text}
+              </Text>
+            </Animated.View>
+          ))}
+          {isTyping && (
+            <Animated.View
+              entering={FadeIn}
+              style={[styles.chatBubble, styles.botBubble, { backgroundColor: colors.card }]}
+            >
+              <Text style={{ color: colors.text, fontFamily: Fonts.regular }}>Typing...</Text>
+            </Animated.View>
+          )}
+        </ScrollView>
+        <View
+          style={[
+            styles.inputContainer,
+            { backgroundColor: colors.card, borderTopColor: colors.border },
+          ]}
+        >
+          <TextInput
             style={[
-              styles.chatBubble,
-              chat.sender === "user" ? styles.userBubble : styles.botBubble,
+              styles.input,
               {
-                backgroundColor: chat.sender === "user" ? colors.primary : colors.card,
+                color: colors.text,
+                borderColor: colors.border,
+                backgroundColor: colors.background,
               },
             ]}
+            value={message}
+            onChangeText={setMessage}
+            placeholder="Ask a question..."
+            placeholderTextColor={colors.textMuted}
+          />
+          <TouchableOpacity
+            style={[styles.sendButton, { backgroundColor: colors.primary }]}
+            onPress={handleSend}
+            disabled={!message.trim()}
           >
-            <Text
-              style={{
-                color: chat.sender === "user" ? colors.background : colors.text,
-                fontFamily: Fonts.regular,
-              }}
-            >
-              {chat.text}
-            </Text>
-          </Animated.View>
-        ))}
-        {isTyping && (
-          <Animated.View
-            entering={FadeIn}
-            style={[styles.chatBubble, styles.botBubble, { backgroundColor: colors.card }]}
-          >
-            <Text style={{ color: colors.text, fontFamily: Fonts.regular }}>Typing...</Text>
-          </Animated.View>
-        )}
-      </ScrollView>
-      <View
-        style={[
-          styles.inputContainer,
-          { backgroundColor: colors.card, borderTopColor: colors.border },
-        ]}
-      >
-        <TextInput
-          style={[
-            styles.input,
-            {
-              color: colors.text,
-              borderColor: colors.border,
-              backgroundColor: colors.background,
-            },
-          ]}
-          value={message}
-          onChangeText={setMessage}
-          placeholder="Ask a question..."
-          placeholderTextColor={colors.textMuted}
-        />
-        <TouchableOpacity
-          style={[styles.sendButton, { backgroundColor: colors.primary }]}
-          onPress={handleSend}
-          disabled={!message.trim()}
-        >
-          <Send size={24} color={colors.background} />
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+            <Send size={24} color={colors.background} />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   )
 }
 

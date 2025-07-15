@@ -6,9 +6,9 @@ import {
   AnalysisResponse,
 } from "@/services/api"
 import { attempt } from "@/utils/attempt"
-import { FilterOptions } from "@/components/DocumentFilter"
+import { FilterOptions } from "@/types/docs"
 
-export const useBackendDocuments = () => {
+export const useBackendDocuments = (spaceId?: string) => {
   const [documents, setDocuments] = useState<AnalysisResponse[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -25,7 +25,11 @@ export const useBackendDocuments = () => {
     setIsLoading(true)
     setError(null)
 
-    const filtersToUse = filters || currentFilters
+    const filtersToUse = { ...filters, ...currentFilters }
+    if (spaceId) {
+      filtersToUse.space_id = spaceId
+    }
+
     const result = await attempt(getDocuments(1, filtersToUse))
 
     if (!result.ok) {
@@ -57,7 +61,12 @@ export const useBackendDocuments = () => {
     const pageMatch = nextPage?.match(/page=(\d+)/)
     const page = pageMatch ? parseInt(pageMatch[1]) : 2
 
-    const result = await attempt(getDocuments(page, currentFilters))
+    const filtersToUse = { ...currentFilters }
+    if (spaceId) {
+      filtersToUse.space_id = spaceId
+    }
+
+    const result = await attempt(getDocuments(page, filtersToUse))
 
     if (!result.ok) {
       setError(result.error.message || "Failed to load more documents")
@@ -112,7 +121,7 @@ export const useBackendDocuments = () => {
       hasFetchedOnce.current = true
       loadDocuments(true)
     }
-  }, [])
+  }, [spaceId])
 
   return {
     documents,

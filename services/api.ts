@@ -79,6 +79,7 @@ export const getDocuments = async (page?: number, filters?: FilterOptions): Prom
     if (filters.created_at_lte) params.created_at__lte = filters.created_at_lte
     if (filters.ordering) params.ordering = filters.ordering
     if (filters.search) params.search = filters.search
+    if (filters.space_id) params.space_id = filters.space_id
   }
 
   const response = await apiClient.get('/scanner/documents/', { params })

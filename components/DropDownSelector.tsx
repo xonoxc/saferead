@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList } from "react-native"
 import { ChevronDown, Check } from "lucide-react-native"
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
+import Animated from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { FontSizes, Fonts } from "@/constants/Fonts"
 
@@ -46,13 +46,9 @@ export function DropdownSelector<T>({
         <ChevronDown size={20} color={colors.textSecondary} />
       </TouchableOpacity>
 
-      <Modal transparent visible={open} animationType="none" onRequestClose={() => setOpen(false)}>
+      <Modal transparent visible={open} animationType="fade" onRequestClose={() => setOpen(false)}>
         <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setOpen(false)}>
-          <Animated.View
-            entering={ZoomIn.duration(200)}
-            exiting={ZoomOut.duration(150)}
-            style={[styles.modal, { backgroundColor: colors.card }]}
-          >
+          <Animated.View style={[styles.modal, { backgroundColor: colors.card }]}>
             <FlatList
               data={options}
               keyExtractor={item => `${item.value}`}
@@ -111,7 +107,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modal: {
-    width: "80%",
+    width: "90%",
     borderRadius: 16,
     padding: 20,
     maxHeight: "60%",

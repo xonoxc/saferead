@@ -9,8 +9,8 @@ import {
   RefreshControl,
   TextInput,
 } from "react-native"
-import { Plus, Search, Filter, FileText, Trash2, TrendingUp } from "lucide-react-native"
-import { router } from "expo-router"
+import { Plus, Search, Filter, FileText, Trash2, TrendingUp, Folder } from "lucide-react-native"
+import { router, useLocalSearchParams } from "expo-router"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { useBackendDocuments } from "@/hooks/useBackendDocuments"
 import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisView"
@@ -22,6 +22,12 @@ import { AnalysisResponse } from "@/services/api"
 
 export default function DocumentsScreen() {
   const { colors } = useTheme()
+  const { spaceId, spaceName, spaceColor } = useLocalSearchParams<{
+    spaceId?: string
+    spaceName?: string
+    spaceColor?: string
+  }>()
+
   const {
     documents,
     error,
@@ -31,7 +37,7 @@ export default function DocumentsScreen() {
     applyFilters,
     deleteDocument: deleteBackendDocument,
     refreshDocuments,
-  } = useBackendDocuments()
+  } = useBackendDocuments(spaceId)
 
   const [searchQuery, setSearchQuery] = useState("")
   const [showFilter, setShowFilter] = useState(false)
@@ -95,10 +101,25 @@ export default function DocumentsScreen() {
     )
   }
 
+  const FallbackStateWrapper = () => (
+    <FallBackState
+      searchQuery={searchQuery}
+      handleAddDocument={handleAddDocument}
+      spaceName={spaceName}
+    />
+  )
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Your Documents</Text>
+        {spaceName ? (
+          <View style={styles.spaceHeader}>
+            <Folder size={24} color={spaceColor || colors.primary} />
+            <Text style={[styles.title, { color: spaceColor || colors.text }]}>{spaceName}</Text>
+          </View>
+        ) : (
+          <Text style={[styles.title, { color: colors.text }]}>Your Documents</Text>
+        )}
         <TouchableOpacity
           style={[styles.addButton, { backgroundColor: colors.primary }]}
           onPress={handleAddDocument}
@@ -142,7 +163,7 @@ export default function DocumentsScreen() {
         </View>
       )}
 
-      {isDocumentsDataAvailable() && (
+      {isDocumentsDataAvailable() ? (
         <FlatList
           data={documents}
           renderItem={renderDocument}
@@ -158,9 +179,11 @@ export default function DocumentsScreen() {
           onEndReached={loadMoreDocuments}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
-          ListEmptyComponent={FallBackState}
+          ListEmptyComponent={FallbackStateWrapper}
           showsVerticalScrollIndicator={false}
         />
+      ) : (
+        <FallbackStateWrapper />
       )}
 
       <DocumentFilter
@@ -310,22 +333,31 @@ function isDocumentStatusCompleted(document: AnalysisResponse): boolean {
 function FallBackState({
   searchQuery,
   handleAddDocument,
+  spaceName,
 }: {
   searchQuery?: string
   handleAddDocument: () => void
+  spaceName?: string
 }) {
   const { colors } = useTheme()
+
+  const title = spaceName
+    ? `No documents in ${spaceName}`
+    : searchQuery
+      ? "No Documents Found"
+      : "No Documents Yet"
+  const description = spaceName
+    ? "Add a document to this space to get started"
+    : searchQuery
+      ? "Try adjusting your search terms or filters"
+      : "Start by analyzing your first legal document"
 
   return (
     <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
       <FileText size={64} color={colors.textMuted} />
-      <Text style={[styles.emptyStateTitle, { color: colors.text }]}>
-        {searchQuery ? "No Documents Found" : "No Documents Yet"}
-      </Text>
+      <Text style={[styles.emptyStateTitle, { color: colors.text }]}>{title}</Text>
       <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
-        {searchQuery
-          ? "Try adjusting your search terms or filters"
-          : "Start by analyzing your first legal document"}
+        {description}
       </Text>
       {!searchQuery && (
         <Button title="Add Document" onPress={handleAddDocument} variant="primary" size="large" />
@@ -348,6 +380,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: FontSizes.xxl,
     fontFamily: Fonts.bold,
+  },
+  spaceHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   addButton: {
     width: 44,

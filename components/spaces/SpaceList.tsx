@@ -1,16 +1,20 @@
 import React from "react"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import { Trash2 } from "lucide-react-native"
+import { Trash2, ChevronRight } from "lucide-react-native"
 import Animated, { FadeInRight } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { useRouter } from "expo-router"
+import type { Space } from "@/types"
 
 export const SpaceList = ({
   spaces,
   onDelete,
+  onSpaceSelect,
 }: {
-  spaces: any[]
+  spaces: Space[]
   onDelete: (id: string, name: string) => void
+  onSpaceSelect: (space: Space) => void
 }) => {
   const { colors } = useTheme()
 
@@ -29,7 +33,11 @@ export const SpaceList = ({
             },
           ]}
         >
-          <TouchableOpacity activeOpacity={0.9} style={styles.touchWrap}>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            style={styles.touchWrap}
+            onPress={() => onSpaceSelect(space)}
+          >
             <View style={styles.content}>
               {/* Left */}
               <View style={styles.left}>
@@ -49,16 +57,13 @@ export const SpaceList = ({
 
               {/* Right */}
               <View style={styles.right}>
-                <View style={[styles.preview, { backgroundColor: space.color + "20" }]}>
-                  <View style={[styles.shape, { backgroundColor: space.color }]} />
-                </View>
-
                 <TouchableOpacity
                   onPress={() => onDelete(space.id, space.name)}
                   style={[styles.moreBtn, { backgroundColor: colors.error + "10" }]}
                 >
                   <Trash2 size={18} color={colors.error} />
                 </TouchableOpacity>
+                <ChevronRight size={24} color={colors.textSecondary} />
               </View>
             </View>
           </TouchableOpacity>
@@ -119,23 +124,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  preview: {
-    width: 56,
-    height: 40,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 6,
-  },
-  shape: {
-    width: 28,
-    height: 16,
-    borderRadius: 4,
-  },
   moreBtn: {
     padding: 6,
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    marginRight: 8,
   },
 })

@@ -6,29 +6,27 @@ import { uploadDocument, AnalysisResponse } from "@/services/api"
 import { attempt } from "@/utils/attempt"
 import { useDocuments } from "@/hooks/useDocuments"
 import { useBackendDocuments } from "@/hooks/useBackendDocuments"
-import { useVoice } from "@/hooks/useVoice"
 
 import { useAuth } from "@/hooks/useAuth"
 
 import type { DocumentType } from "@/components/DocumentTypeSelector"
+import { useSpaceStore } from "@/store/useSpaceStore"
 
 export function useAnalysis() {
   const { user } = useAuth()
   const { pickDocument, scanDocument } = useDocuments()
   const { documents: recentDocuments } = useBackendDocuments()
-  const { isRecording, startRecording, stopRecording, transcribeAudio } = useVoice()
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false)
   const [pastedText, setPastedText] = useState("")
   const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType>("other")
   const [showTextInput, setShowTextInput] = useState(false)
 
-  const pulseAnim = useRef(new RNAnimated.Value(1)).current
-
   const [isSideBarOpen, setIsSideBarOpen] = useState(false)
 
-  useTabBarVisibility(!isSideBarOpen)
+  const { selectedSpace, setSelectedSpace } = useSpaceStore()
+
+  useTabBarVisibility(!(isSideBarOpen || !!selectedSpace))
 
   const handleItemPress = (item: string) => {
     setIsSideBarOpen(false)
@@ -40,27 +38,6 @@ export function useAnalysis() {
       console.log(`You tapped on ${item}`)
     }
   }
-
-  React.useEffect(() => {
-    if (isRecording) {
-      const pulse = RNAnimated.loop(
-        RNAnimated.sequence([
-          RNAnimated.timing(pulseAnim, {
-            toValue: 1.2,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-          RNAnimated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-        ])
-      )
-      pulse.start()
-      return () => pulse.stop()
-    }
-  }, [isRecording])
 
   const handleDocumentUpload = async () => {
     if (!user) {
@@ -148,20 +125,6 @@ export function useAnalysis() {
     }
   }
 
-  const handleVoiceRecording = async () => {
-    if (isRecording) {
-      const audioUri = await stopRecording()
-      if (audioUri) {
-        setShowVoiceRecorder(false)
-        const transcription = await transcribeAudio(audioUri)
-        Alert.alert("Voice Note", `Transcription: ${transcription}`)
-      }
-    } else {
-      await startRecording()
-      setShowVoiceRecorder(true)
-    }
-  }
-
   const handleTextAnalysis = async () => {
     if (!pastedText.trim()) {
       Alert.alert("Error", "Please enter some text to analyze")
@@ -192,22 +155,14 @@ export function useAnalysis() {
 
   return {
     user,
-    isRecording,
-    startRecording,
-    stopRecording,
-    transcribeAudio,
     isAnalyzing,
     analysisResult,
-    showVoiceRecorder,
-    setShowVoiceRecorder,
-    pulseAnim,
     handleItemPress,
     handleDocumentUpload,
     isSideBarOpen,
     setIsSideBarOpen,
     handleDocumentScan,
     handleAnalyzeDocument,
-    handleVoiceRecording,
     pastedText,
     setPastedText,
     selectedDocumentType,
@@ -216,6 +171,8 @@ export function useAnalysis() {
     showTextInput,
     setShowTextInput,
     handleTextAnalysis,
+    selectedSpace,
+    setSelectedSpace,
     recentDocuments,
     handleRecentDocumentPress,
   }

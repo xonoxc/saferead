@@ -1,18 +1,9 @@
 import React from "react"
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Animated as RNAnimated,
-  TextInput,
-} from "react-native"
-import { Mic, MicOff, Upload, Camera, FileText, Menu } from "lucide-react-native"
-import Animated, { FadeInDown } from "react-native-reanimated"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native"
+import { Upload, Camera, FileText, Menu, X } from "lucide-react-native"
+import Animated, { FadeInDown, FadeIn, FadeOut } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { DocumentTypeSelector } from "@/components/DocumentTypeSelector"
-import { VoiceRecorder } from "@/components/VoiceRecorder"
 import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import UpgradeButton from "@/components/UpgradeButton"
@@ -20,23 +11,19 @@ import { SideBar } from "@/components/sidebar/Sidebar"
 import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisView"
 import { RecentDocumentItem } from "@/components/documents/RecentDocumentCard"
 import { useAnalysis } from "@/hooks/useAnalysis"
+import { ChatView } from "@/components/chat/ChatView"
+import { useSpaceStore } from "@/store/useSpaceStore"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
 
   const {
-    isRecording,
     isSideBarOpen,
     setIsSideBarOpen,
     isAnalyzing,
     analysisResult,
-    showVoiceRecorder,
-    setShowVoiceRecorder,
-    pulseAnim,
-    handleItemPress,
     handleDocumentUpload,
     handleDocumentScan,
-    handleVoiceRecording,
     pastedText,
     setPastedText,
     selectedDocumentType,
@@ -47,6 +34,8 @@ export default function AnalyzeScreen() {
     recentDocuments,
     setAnalysisResult,
     handleRecentDocumentPress,
+    selectedSpace,
+    setSelectedSpace,
   } = useAnalysis()
 
   if (analysisResult) {
@@ -55,11 +44,7 @@ export default function AnalyzeScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <SideBar
-        isOpen={isSideBarOpen}
-        onClose={() => setIsSideBarOpen(false)}
-        onItemPress={handleItemPress}
-      />
+      <SideBar isOpen={isSideBarOpen} onClose={() => setIsSideBarOpen(false)} />
 
       {/* Header */}
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
@@ -92,122 +77,104 @@ export default function AnalyzeScreen() {
           </View>
         </View>
       </Animated.View>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Document Type Selector */}
-        <Animated.View entering={FadeInDown.delay(200).springify()}>
-          <DocumentTypeSelector
-            selectedType={selectedDocumentType}
-            onSelect={setSelectedDocumentType}
-          />
+
+      {selectedSpace ? (
+        <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>
+          <ChatView space={selectedSpace} onExit={() => setSelectedSpace(null)} />
         </Animated.View>
-
-        {/* Upload Options */}
-        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.uploadSection}>
-          <View style={styles.uploadGrid}>
-            <TouchableOpacity
-              style={[styles.uploadOption, { backgroundColor: colors.card }]}
-              onPress={handleDocumentScan}
-            >
-              <View style={[styles.uploadIcon, { backgroundColor: colors.primary + "20" }]}>
-                <Camera size={24} color={colors.primary} />
-              </View>
-              <Text style={[styles.uploadText, { color: colors.text }]}>Scan Document</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.uploadOption, { backgroundColor: colors.card }]}
-              onPress={handleDocumentUpload}
-            >
-              <View style={[styles.uploadIcon, { backgroundColor: colors.secondary + "20" }]}>
-                <Upload size={24} color={colors.secondary} />
-              </View>
-              <Text style={[styles.uploadText, { color: colors.text }]}>Upload File</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.uploadOption, { backgroundColor: colors.card }]}
-              onPress={() => setShowTextInput(!showTextInput)}
-            >
-              <View style={[styles.uploadIcon, { backgroundColor: colors.accent + "20" }]}>
-                <FileText size={24} color={colors.accent} />
-              </View>
-              <Text style={[styles.uploadText, { color: colors.text }]}>Analyze Text</Text>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-
-        {/* Text Input Area */}
-        {showTextInput && (
-          <Animated.View
-            entering={FadeInDown.delay(400).springify()}
-            style={[styles.textInputCard, { backgroundColor: colors.card }]}
-          >
-            <Text style={[styles.textInputLabel, { color: colors.text }]}>
-              Enter or paste your document text
-            </Text>
-            <TextInput
-              style={[styles.textInput, { color: colors.text, borderColor: colors.border }]}
-              value={pastedText}
-              onChangeText={setPastedText}
-              placeholder="Paste your document text here..."
-              placeholderTextColor={colors.textMuted}
-              multiline
-              numberOfLines={6}
-              textAlignVertical="top"
-            />
-            <Button
-              title="Analyze Text"
-              onPress={handleTextAnalysis}
-              variant="primary"
-              disabled={!pastedText.trim()}
+      ) : (
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Document Type Selector */}
+          <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <DocumentTypeSelector
+              selectedType={selectedDocumentType}
+              onSelect={setSelectedDocumentType}
             />
           </Animated.View>
-        )}
 
-        {/* Voice Recorder */}
-        <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.voiceSection}>
-          <TouchableOpacity
-            style={[
-              styles.voiceButton,
-              { backgroundColor: isRecording ? colors.error : colors.primary },
-            ]}
-            onPress={handleVoiceRecording}
-          >
-            <RNAnimated.View style={{ transform: [{ scale: pulseAnim }] }}>
-              {isRecording ? <MicOff size={32} color="white" /> : <Mic size={32} color="white" />}
-            </RNAnimated.View>
-          </TouchableOpacity>
-          <Text style={[styles.voiceText, { color: colors.textSecondary }]}>
-            {isRecording ? "Recording... Tap to stop" : "Tap to record voice note"}
-          </Text>
-        </Animated.View>
+          {/* Upload Options */}
+          <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.uploadSection}>
+            <View style={styles.uploadGrid}>
+              <TouchableOpacity
+                style={[styles.uploadOption, { backgroundColor: colors.card }]}
+                onPress={handleDocumentScan}
+              >
+                <View style={[styles.uploadIcon, { backgroundColor: colors.primary + "20" }]}>
+                  <Camera size={24} color={colors.primary} />
+                </View>
+                <Text style={[styles.uploadText, { color: colors.text }]}>Scan Document</Text>
+              </TouchableOpacity>
 
-        {/* Recent Documents */}
-        {recentDocuments.length > 0 && (
-          <Animated.View entering={FadeInDown.delay(600).springify()} style={styles.recentSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Analysis</Text>
-            {recentDocuments.slice(0, 5).map(doc => (
-              <RecentDocumentItem
-                key={doc.id}
-                document={doc}
-                onPress={() => handleRecentDocumentPress(doc)}
+              <TouchableOpacity
+                style={[styles.uploadOption, { backgroundColor: colors.card }]}
+                onPress={handleDocumentUpload}
+              >
+                <View style={[styles.uploadIcon, { backgroundColor: colors.secondary + "20" }]}>
+                  <Upload size={24} color={colors.secondary} />
+                </View>
+                <Text style={[styles.uploadText, { color: colors.text }]}>Upload File</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.uploadOption, { backgroundColor: colors.card }]}
+                onPress={() => setShowTextInput(!showTextInput)}
+              >
+                <View style={[styles.uploadIcon, { backgroundColor: colors.accent + "20" }]}>
+                  <FileText size={24} color={colors.accent} />
+                </View>
+                <Text style={[styles.uploadText, { color: colors.text }]}>Analyze Text</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+
+          {/* Text Input Area */}
+          {showTextInput && (
+            <Animated.View
+              entering={FadeInDown.delay(400).springify()}
+              style={[styles.textInputCard, { backgroundColor: colors.card }]}
+            >
+              <Text style={[styles.textInputLabel, { color: colors.text }]}>
+                Enter or paste your document text
+              </Text>
+              <TextInput
+                style={[styles.textInput, { color: colors.text, borderColor: colors.border }]}
+                value={pastedText}
+                onChangeText={setPastedText}
+                placeholder="Paste your document text here..."
+                placeholderTextColor={colors.textMuted}
+                multiline
+                numberOfLines={6}
+                textAlignVertical="top"
               />
-            ))}
-          </Animated.View>
-        )}
-      </ScrollView>
+              <Button
+                title="Analyze Text"
+                onPress={handleTextAnalysis}
+                variant="primary"
+                disabled={!pastedText.trim()}
+              />
+            </Animated.View>
+          )}
 
-      {/* Voice Recorder Modal */}
-      {showVoiceRecorder && (
-        <VoiceRecorder
-          isVisible={showVoiceRecorder}
-          isRecording={isRecording}
-          onClose={() => setShowVoiceRecorder(false)}
-          onStopRecording={handleVoiceRecording}
-        />
+          {/* Recent Documents */}
+          {recentDocuments.length > 0 && (
+            <Animated.View
+              entering={FadeInDown.delay(600).springify()}
+              style={styles.recentSection}
+            >
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Analysis</Text>
+              {/* TODO: Replace with actual recent documents */}
+              {recentDocuments.slice(0, 5).map(doc => (
+                <RecentDocumentItem
+                  key={doc.id}
+                  document={doc}
+                  onPress={() => handleRecentDocumentPress(doc)}
+                />
+              ))}
+            </Animated.View>
+          )}
+        </ScrollView>
       )}
 
-      {/* Loading Overlay */}
       {isAnalyzing && (
         <View style={styles.loadingOverlay}>
           <View style={[styles.loadingCard, { backgroundColor: colors.card }]}>
@@ -294,31 +261,8 @@ const styles = StyleSheet.create({
     minHeight: 120,
     marginBottom: 16,
   },
-  analyzeButton: {
-    alignSelf: "flex-end",
-    paddingHorizontal: 24,
-  },
-  voiceSection: {
-    alignItems: "center",
+  chatSection: {
     marginBottom: 32,
-  },
-  voiceButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  voiceText: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.regular,
-    textAlign: "center",
   },
   recentSection: {
     marginBottom: 32,
@@ -327,10 +271,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.lg,
     fontFamily: Fonts.semiBold,
     marginBottom: 16,
-  },
-  documentDate: {
-    fontSize: FontSizes.xs,
-    fontFamily: Fonts.regular,
   },
   loadingOverlay: {
     position: "absolute",

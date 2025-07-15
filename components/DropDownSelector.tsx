@@ -15,7 +15,7 @@ interface DropdownSelectorProps<T> {
   label?: string
   selected: T
   options: DropdownOption<T>[]
-  onSelect: (value: T) => void
+  onSelect: (value: any) => void
 }
 
 export function DropdownSelector<T>({

@@ -9,12 +9,16 @@ import { SpaceList } from "@/components/spaces/SpaceList"
 import { CreateSpaceForm } from "@/components/spaces/CreateSpaceForm"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 
+import { Space } from "@/types"
+
 export function SpacesSidebarContent({
   showCreateModal,
   onCreateFormClose,
+  onSpaceSelect,
 }: {
   showCreateModal: boolean
   onCreateFormClose: () => void
+  onSpaceSelect: (space: Space) => void
 }) {
   const { colors } = useTheme()
   const { spaces, isLoading, createSpace, deleteSpace } = useSpaces()
@@ -60,7 +64,7 @@ export function SpacesSidebarContent({
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <SpaceList spaces={filteredSpaces} onDelete={handleDeleteSpace} />
+        <SpaceList spaces={filteredSpaces} onDelete={handleDeleteSpace} onSpaceSelect={onSpaceSelect} />
       </ScrollView>
 
       <Modal visible={showCreateModal} animationType="fade" presentationStyle="pageSheet">

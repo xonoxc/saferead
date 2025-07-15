@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   getDocuments,
   getDocumentById,
@@ -17,8 +17,11 @@ export const useBackendDocuments = () => {
   const [currentFilters, setCurrentFilters] = useState<FilterOptions>({
     ordering: "-created_at",
   })
+  const hasFetchedOnce = useRef<boolean>(false)
 
   const loadDocuments = async (refresh = false, filters?: FilterOptions) => {
+    if (error && !refresh) return
+
     setIsLoading(true)
     setError(null)
 
@@ -26,12 +29,14 @@ export const useBackendDocuments = () => {
     const result = await attempt(getDocuments(1, filtersToUse))
 
     if (!result.ok) {
+      console.log("Error loading documents:", result.error)
       setError(result.error.message || "Failed to load documents")
       setIsLoading(false)
       return
     }
 
     const response = result.data
+
     if (refresh) {
       setDocuments(response.results)
     } else {
@@ -49,7 +54,6 @@ export const useBackendDocuments = () => {
     setIsLoading(true)
     setError(null)
 
-    // Extract page number from next URL
     const pageMatch = nextPage?.match(/page=(\d+)/)
     const page = pageMatch ? parseInt(pageMatch[1]) : 2
 
@@ -68,12 +72,12 @@ export const useBackendDocuments = () => {
     setIsLoading(false)
   }
 
-  const applyFilters = (filters: FilterOptions) => {
+  const applyFilters = async (filters: FilterOptions) => {
     setCurrentFilters(filters)
     setDocuments([])
     setHasMore(true)
     setNextPage(null)
-    loadDocuments(true, filters)
+    await loadDocuments(true, filters)
   }
 
   const getDocument = async (documentId: string): Promise<AnalysisResponse | null> => {
@@ -95,17 +99,19 @@ export const useBackendDocuments = () => {
       return false
     }
 
-    // Remove from local state
     setDocuments(prev => prev.filter(doc => doc.id !== documentId))
     return true
   }
 
-  const refreshDocuments = () => {
-    loadDocuments(true)
+  const refreshDocuments = async () => {
+    await loadDocuments(true)
   }
 
   useEffect(() => {
-    loadDocuments(true)
+    if (!hasFetchedOnce.current) {
+      hasFetchedOnce.current = true
+      loadDocuments(true)
+    }
   }, [])
 
   return {
@@ -122,4 +128,3 @@ export const useBackendDocuments = () => {
     clearError: () => setError(null),
   }
 }
-

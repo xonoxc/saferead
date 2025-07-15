@@ -9,14 +9,13 @@ import {
   Animated as RNAnimated,
   TextInput,
 } from "react-native"
-import { Mic, MicOff, Upload, Camera, FileText, TrendingUp, Menu } from "lucide-react-native"
+import { Mic, MicOff, Upload, Camera, FileText, Menu } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { useDocuments } from "@/hooks/useDocuments"
 import { useBackendDocuments } from "@/hooks/useBackendDocuments"
 import { useVoice } from "@/hooks/useVoice"
 import { useAuth } from "@/hooks/useAuth"
-import { EnhancedAnalysisView } from "@/components/EnhancedAnalysisView"
 import { DocumentTypeSelector, DocumentType } from "@/components/DocumentTypeSelector"
 import { VoiceRecorder } from "@/components/VoiceRecorder"
 import { Button } from "@/components/Button"
@@ -24,92 +23,10 @@ import { Fonts, FontSizes } from "@/constants/Fonts"
 import { uploadDocument, AnalysisResponse } from "@/services/api"
 import { attempt } from "@/utils/attempt"
 import UpgradeButton from "@/components/UpgradeButton"
-import { SideBar } from "@/components/Sidebar/Sidebar"
+import { SideBar } from "@/components/sidebar/Sidebar"
 import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
-
-interface RecentDocumentItemProps {
-  document: AnalysisResponse
-  onPress: () => void
-}
-
-const RecentDocumentItem: React.FC<RecentDocumentItemProps> = ({ document, onPress }) => {
-  const { colors } = useTheme()
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return colors.success
-      case "processing":
-        return colors.warning
-      case "failed":
-        return colors.error
-      default:
-        return colors.textSecondary
-    }
-  }
-
-  const getDocumentTypeLabel = (type: string) => {
-    const types: Record<string, string> = {
-      terms: "Terms & Conditions",
-      privacy: "Privacy Policy",
-      legal: "Legal Agreement",
-      other: "Other Document",
-    }
-    return types[type] || type
-  }
-
-  return (
-    <TouchableOpacity
-      style={[styles.recentDocumentItem, { backgroundColor: colors.card }]}
-      onPress={onPress}
-    >
-      <View style={styles.documentHeader}>
-        <View style={[styles.documentIcon, { backgroundColor: colors.primary + "20" }]}>
-          <FileText size={20} color={colors.primary} />
-        </View>
-        <View style={styles.documentInfo}>
-          <Text style={[styles.documentTitle, { color: colors.text }]} numberOfLines={1}>
-            {document.original_filename}
-          </Text>
-          <Text style={[styles.documentType, { color: colors.textSecondary }]}>
-            {getDocumentTypeLabel(document.document_type)}
-          </Text>
-        </View>
-        <View style={styles.documentMeta}>
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: getStatusColor(document.status) + "20" },
-            ]}
-          >
-            <Text style={[styles.statusText, { color: getStatusColor(document.status) }]}>
-              {document.status}
-            </Text>
-          </View>
-          <Text style={[styles.documentDate, { color: colors.textSecondary }]}>
-            {new Date(document.created_at).toLocaleDateString()}
-          </Text>
-        </View>
-      </View>
-
-      {document.status === "completed" && (
-        <View style={styles.documentStats}>
-          <View style={styles.statItem}>
-            <TrendingUp size={14} color={colors.primary} />
-            <Text style={[styles.statText, { color: colors.textSecondary }]}>
-              {(document.confidence_score * 100).toFixed(0)}% confidence
-            </Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={[styles.statText, { color: colors.textSecondary }]}>
-              {document.risky_points.length} risks • {document.favourable_points.length} favorable
-            </Text>
-          </View>
-        </View>
-      )}
-    </TouchableOpacity>
-  )
-}
+import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisView"
+import { RecentDocumentItem } from "@/components/documents/RecentDocumentCard"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
@@ -297,7 +214,7 @@ export default function AnalyzeScreen() {
   }
 
   if (analysisResult) {
-    return <EnhancedAnalysisView analysis={analysisResult} onBack={() => setAnalysisResult(null)} />
+    return <DocumentAnalysisView analysis={analysisResult} onBack={() => setAnalysisResult(null)} />
   }
 
   return (
@@ -575,66 +492,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.semiBold,
     marginBottom: 16,
   },
-  recentDocumentItem: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  documentHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  documentIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  documentInfo: {
-    flex: 1,
-  },
-  documentTitle: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.medium,
-    marginBottom: 2,
-  },
-  documentType: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.regular,
-  },
-  documentMeta: {
-    alignItems: "flex-end",
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginBottom: 4,
-  },
-  statusText: {
-    fontSize: FontSizes.xs,
-    fontFamily: Fonts.medium,
-    textTransform: "capitalize",
-  },
   documentDate: {
-    fontSize: FontSizes.xs,
-    fontFamily: Fonts.regular,
-  },
-  documentStats: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 8,
-  },
-  statItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  statText: {
     fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
   },

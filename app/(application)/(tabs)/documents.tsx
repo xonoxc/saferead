@@ -11,135 +11,14 @@ import {
 } from "react-native"
 import { Plus, Search, Filter, FileText, Trash2, TrendingUp } from "lucide-react-native"
 import { router } from "expo-router"
-import { useTheme } from "@/hooks/useTheme"
+import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { useBackendDocuments } from "@/hooks/useBackendDocuments"
-import { BackendAnalysisView } from "@/components/BackendAnalysisView"
-import { DocumentFilter } from "@/components/DocumentFilter"
+import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisView"
+import { DocumentFilter } from "@/components/documents/DocumentFilter"
 import { Button } from "@/components/Button"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { AnalysisResponse } from "@/services/api"
-
-interface BackendDocumentCardProps {
-  document: AnalysisResponse
-  onPress: () => void
-  onDelete: (id: string) => void
-}
-
-const BackendDocumentCard: React.FC<BackendDocumentCardProps> = ({
-  document,
-  onPress,
-  onDelete,
-}) => {
-  const { colors } = useTheme()
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return colors.success
-      case "processing":
-        return colors.warning
-      case "failed":
-        return colors.error
-      default:
-        return colors.textSecondary
-    }
-  }
-
-  const getDocumentTypeLabel = (type: string) => {
-    const types: Record<string, string> = {
-      terms: "Terms & Conditions",
-      privacy: "Privacy Policy",
-      legal: "Legal Agreement",
-      other: "Other Document",
-    }
-    return types[type] || type
-  }
-
-  const handleDelete = () => {
-    Alert.alert(
-      "Delete Document",
-      "Are you sure you want to delete this document? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => onDelete(document.id),
-        },
-      ]
-    )
-  }
-
-  return (
-    <TouchableOpacity
-      style={[styles.documentCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-      onPress={onPress}
-    >
-      <View style={styles.cardHeader}>
-        <View style={[styles.documentIcon, { backgroundColor: colors.primary + "20" }]}>
-          <FileText size={24} color={colors.primary} />
-        </View>
-        <View style={styles.documentInfo}>
-          <Text style={[styles.documentTitle, { color: colors.text }]} numberOfLines={1}>
-            {document.original_filename}
-          </Text>
-          <Text style={[styles.documentType, { color: colors.textSecondary }]}>
-            {getDocumentTypeLabel(document.document_type)}
-          </Text>
-          <Text style={[styles.documentDate, { color: colors.textSecondary }]}>
-            {new Date(document.created_at).toLocaleDateString()}
-          </Text>
-        </View>
-        <View style={styles.cardActions}>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: colors.error + "20" }]}
-            onPress={e => {
-              e.stopPropagation()
-              handleDelete()
-            }}
-          >
-            <Trash2 size={16} color={colors.error} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.statusContainer}>
-        <View
-          style={[styles.statusBadge, { backgroundColor: getStatusColor(document.status) + "20" }]}
-        >
-          <Text style={[styles.statusText, { color: getStatusColor(document.status) }]}>
-            {document.status.toUpperCase()}
-          </Text>
-        </View>
-        {document.status === "completed" && (
-          <View style={styles.confidenceContainer}>
-            <TrendingUp size={12} color={colors.primary} />
-            <Text style={[styles.confidenceText, { color: colors.textSecondary }]}>
-              {(document.confidence_score * 100).toFixed(0)}%
-            </Text>
-          </View>
-        )}
-      </View>
-
-      {document.status === "completed" && (
-        <View style={styles.analysisPreview}>
-          <Text style={[styles.summaryText, { color: colors.textSecondary }]} numberOfLines={2}>
-            {document.summary_text}
-          </Text>
-          <View style={styles.analysisStats}>
-            <Text style={[styles.statText, { color: colors.error }]}>
-              {document.risky_points.length} risks
-            </Text>
-            <Text style={[styles.statText, { color: colors.success }]}>
-              {document.favourable_points.length} favorable
-            </Text>
-          </View>
-        </View>
-      )}
-    </TouchableOpacity>
-  )
-}
 
 export default function DocumentsScreen() {
   const { colors } = useTheme()
@@ -172,17 +51,17 @@ export default function DocumentsScreen() {
 
   const handleRefresh = async () => {
     setRefreshing(true)
-    refreshDocuments()
+    await refreshDocuments()
     setRefreshing(false)
   }
 
-  const handleSearch = (query: string) => {
+  const handleSearch = async (query: string) => {
     setSearchQuery(query)
     const newFilters = {
       ...currentFilters,
       search: query || undefined,
     }
-    applyFilters(newFilters)
+    await applyFilters(newFilters)
   }
 
   const handleDocumentPress = (document: AnalysisResponse) => {
@@ -190,7 +69,7 @@ export default function DocumentsScreen() {
   }
 
   const renderDocument = ({ item }: { item: AnalysisResponse }) => (
-    <BackendDocumentCard
+    <DocumentCard
       document={item}
       onPress={() => handleDocumentPress(item)}
       onDelete={handleDeleteDocument}
@@ -206,26 +85,9 @@ export default function DocumentsScreen() {
     )
   }
 
-  const renderEmpty = () => (
-    <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
-      <FileText size={64} color={colors.textMuted} />
-      <Text style={[styles.emptyStateTitle, { color: colors.text }]}>
-        {searchQuery ? "No Documents Found" : "No Documents Yet"}
-      </Text>
-      <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
-        {searchQuery
-          ? "Try adjusting your search terms or filters"
-          : "Start by analyzing your first legal document"}
-      </Text>
-      {!searchQuery && (
-        <Button title="Add Document" onPress={handleAddDocument} variant="primary" size="large" />
-      )}
-    </View>
-  )
-
   if (selectedDocument) {
     return (
-      <BackendAnalysisView analysis={selectedDocument} onBack={() => setSelectedDocument(null)} />
+      <DocumentAnalysisView analysis={selectedDocument} onBack={() => setSelectedDocument(null)} />
     )
   }
 
@@ -291,7 +153,7 @@ export default function DocumentsScreen() {
         onEndReached={loadMoreDocuments}
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
-        ListEmptyComponent={renderEmpty}
+        ListEmptyComponent={FallBackState}
         showsVerticalScrollIndicator={false}
       />
 
@@ -301,6 +163,167 @@ export default function DocumentsScreen() {
         onApply={applyFilters}
         currentFilters={currentFilters}
       />
+    </View>
+  )
+}
+
+interface DocumentCardProps {
+  document: AnalysisResponse
+  onPress: () => void
+  onDelete: (id: string) => void
+}
+
+const DocumentCard = ({ document, onPress, onDelete }: DocumentCardProps) => {
+  const { colors } = useTheme()
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Document",
+      "Are you sure you want to delete this document? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => onDelete(document.id),
+        },
+      ]
+    )
+  }
+
+  const isDocumentComplete = isDocumentStatusCompleted(document)
+
+  return (
+    <TouchableOpacity
+      style={[styles.documentCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+      onPress={onPress}
+    >
+      <View style={styles.cardHeader}>
+        <View style={[styles.documentIcon, { backgroundColor: colors.primary + "20" }]}>
+          <FileText size={24} color={colors.primary} />
+        </View>
+        <View style={styles.documentInfo}>
+          <Text style={[styles.documentTitle, { color: colors.text }]} numberOfLines={1}>
+            {document.original_filename}
+          </Text>
+          <Text style={[styles.documentType, { color: colors.textSecondary }]}>
+            {getDocumentTypeLabel(document.document_type)}
+          </Text>
+          <Text style={[styles.documentDate, { color: colors.textSecondary }]}>
+            {new Date(document.created_at).toLocaleDateString()}
+          </Text>
+        </View>
+        <View style={styles.cardActions}>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: colors.error + "20" }]}
+            onPress={e => {
+              e.stopPropagation()
+              handleDelete()
+            }}
+          >
+            <Trash2 size={16} color={colors.error} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.statusContainer}>
+        <View
+          style={[
+            styles.statusBadge,
+            { backgroundColor: getStatusColor(document.status, colors) + "20" },
+          ]}
+        >
+          <Text style={[styles.statusText, { color: getStatusColor(document.status, colors) }]}>
+            {document.status.toUpperCase()}
+          </Text>
+        </View>
+        {isDocumentComplete && (
+          <View style={styles.confidenceContainer}>
+            <TrendingUp size={12} color={colors.primary} />
+            <Text style={[styles.confidenceText, { color: colors.textSecondary }]}>
+              {(document.confidence_score * 100).toFixed(0)}%
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {isDocumentComplete && (
+        <View style={styles.analysisPreview}>
+          <Text style={[styles.summaryText, { color: colors.textSecondary }]} numberOfLines={2}>
+            {document.summary_text}
+          </Text>
+          <View style={styles.analysisStats}>
+            <Text style={[styles.statText, { color: colors.error }]}>
+              {document.risky_points.length} risks
+            </Text>
+            <Text style={[styles.statText, { color: colors.success }]}>
+              {document.favourable_points.length} favorable
+            </Text>
+          </View>
+        </View>
+      )}
+    </TouchableOpacity>
+  )
+}
+
+function getStatusColor(status: string, colors: ColorsType) {
+  switch (status) {
+    case "completed":
+      return colors.success
+    case "processing":
+      return colors.warning
+    case "failed":
+      return colors.error
+    default:
+      return colors.textSecondary
+  }
+}
+
+function getDocumentTypeLabel(type: string) {
+  const types: Record<string, string> = {
+    terms: "Terms & Conditions",
+    privacy: "Privacy Policy",
+    legal: "Legal Agreement",
+    other: "Other Document",
+  }
+  return types[type] || type
+}
+
+/*
+ * isDocumentStatusCompleted
+ * **/
+function isDocumentStatusCompleted(document: AnalysisResponse): boolean {
+  return document.status === "completed"
+}
+
+/*
+ *
+ *
+ * fallback state component
+ * **/
+function FallBackState({
+  searchQuery,
+  handleAddDocument,
+}: {
+  searchQuery?: string
+  handleAddDocument: () => void
+}) {
+  const { colors } = useTheme()
+
+  return (
+    <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
+      <FileText size={64} color={colors.textMuted} />
+      <Text style={[styles.emptyStateTitle, { color: colors.text }]}>
+        {searchQuery ? "No Documents Found" : "No Documents Yet"}
+      </Text>
+      <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
+        {searchQuery
+          ? "Try adjusting your search terms or filters"
+          : "Start by analyzing your first legal document"}
+      </Text>
+      {!searchQuery && (
+        <Button title="Add Document" onPress={handleAddDocument} variant="primary" size="large" />
+      )}
     </View>
   )
 }

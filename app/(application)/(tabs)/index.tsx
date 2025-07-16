@@ -1,29 +1,134 @@
 import React from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
-import { Link, type RelativePathString } from "expo-router"
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import {
-  Upload,
   FileText,
   TrendingUp,
   CircleAlert as AlertCircle,
   Clock,
   LucideIcon,
-  ScanText,
+  CheckCircle,
+  XCircle,
+  BarChart3,
+  Shield,
+  Scale,
+  FileCheck,
+  Loader,
 } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
-import { useDocumentStore } from "@/store/useDocumentStore"
+import { useDocumentStats } from "@/hooks/useDocumentStats"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { Document } from "@/types"
 import { useTabHideScroll } from "@/hooks/useTabHideScroll"
+import { LoadingSpinner } from "@/components/LoadingSpinner"
 
 export default function HomeScreen() {
   const { colors } = useTheme()
   const { user } = useAuth()
-  const { documents } = useDocumentStore()
-  const [quickActions, stats] = getStatsAndActions({ colors, documents })
+  const { stats, isLoading, error, refetch } = useDocumentStats()
   const { handleScroll } = useTabHideScroll()
+
+  if (!user) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.authPrompt}>
+          <Text style={[styles.authTitle, { color: colors.text }]}>Welcome to SafeRead</Text>
+          <Text style={[styles.authDescription, { color: colors.textSecondary }]}>
+            Please log in to view your document statistics
+          </Text>
+        </View>
+      </View>
+    )
+  }
+
+  const getMainStats = () => {
+    if (!stats) return []
+    
+    return [
+      {
+        icon: FileText,
+        title: "Total Documents",
+        value: stats.total_documents,
+        color: colors.primary,
+      },
+      {
+        icon: CheckCircle,
+        title: "Completed",
+        value: stats.completed,
+        color: colors.success,
+      },
+      {
+        icon: AlertCircle,
+        title: "Failed",
+        value: stats.failed,
+        color: colors.error,
+      },
+      {
+        icon: Clock,
+        title: "Pending",
+        value: stats.pending,
+        color: colors.warning,
+      },
+    ]
+  }
+
+  const getTypeStats = () => {
+    if (!stats) return []
+    
+    return [
+      {
+        icon: Scale,
+        title: "Legal Agreements",
+        value: stats.by_type.legal,
+        color: colors.primary,
+      },
+      {
+        icon: FileCheck,
+        title: "Terms & Conditions",
+        value: stats.by_type.terms,
+        color: colors.secondary,
+      },
+      {
+        icon: Shield,
+        title: "Privacy Policies",
+        value: stats.by_type.privacy,
+        color: colors.accent,
+      },
+      {
+        icon: FileText,
+        title: "Other Documents",
+        value: stats.by_type.other,
+        color: colors.textSecondary,
+      },
+    ]
+  }
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.loadingContainer}>
+          <LoadingSpinner size="large" />
+          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+            Loading your statistics...
+          </Text>
+        </View>
+      </View>
+    )
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.errorContainer}>
+          <XCircle size={48} color={colors.error} />
+          <Text style={[styles.errorTitle, { color: colors.text }]}>Unable to load statistics</Text>
+          <Text style={[styles.errorDescription, { color: colors.textSecondary }]}>
+            {error}
+          </Text>
+        </View>
+      </View>
+    )
+  }
 
   return (
     <ScrollView
@@ -33,118 +138,103 @@ export default function HomeScreen() {
       contentContainerStyle={{ paddingBottom: 120 }}
       bounces
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={isLoading}
+          onRefresh={refetch}
+          colors={[colors.primary]}
+        />
+      }
     >
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
         <Text style={[styles.greeting, { color: colors.textSecondary }]}>Welcome back,</Text>
         <Text style={[styles.userName, { color: colors.text }]}>{user?.username}</Text>
       </Animated.View>
 
+      {/* Main Statistics */}
       <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.statsGrid}>
         <StatCard
-          stat={stats[0]}
+          stat={getMainStats()[0]}
           style={{
             width: "100%",
             height: 130,
             marginBottom: 12,
-            flex: 1,
-            marginRight: 12,
           }}
         />
         <View style={styles.row}>
           <View style={styles.leftColumn}>
-            <StatCard stat={stats[1]} style={{ width: "100%", height: 130, marginBottom: 12 }} />
-            <StatCard stat={stats[2]} style={{ width: "100%", height: 120 }} />
+            <StatCard stat={getMainStats()[1]} style={{ width: "100%", height: 130, marginBottom: 12 }} />
+            <StatCard stat={getMainStats()[2]} style={{ width: "100%", height: 120 }} />
           </View>
-          <StatCard stat={stats[3]} style={{ width: "48%", height: 264 }} />
+          <StatCard stat={getMainStats()[3]} style={{ width: "48%", height: 264 }} />
         </View>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.actionsScrollContainer}
-        >
-          {quickActions.map((action, index) => (
-            <Link
-              key={index}
-              href={action.href as RelativePathString}
-              asChild
-              style={styles.actionLink}
-            >
-              <TouchableOpacity
-                style={[styles.actionCardTab, { backgroundColor: colors.card }]}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[styles.actionIcon, { backgroundColor: `${action.color}20`, padding: 10 }]}
-                >
-                  <action.icon size={20} color={action.color} />
-                </View>
-                <View>
-                  <Text style={[styles.actionTitle, { color: colors.text }]}>{action.title}</Text>
-                </View>
-              </TouchableOpacity>
-            </Link>
+      {/* Confidence Score */}
+      {stats && stats.avg_confidence > 0 && (
+        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Average Confidence</Text>
+          <View style={[styles.confidenceCard, { backgroundColor: colors.card }]}>
+            <View style={[styles.confidenceIcon, { backgroundColor: colors.primary + "20" }]}>
+              <TrendingUp size={24} color={colors.primary} />
+            </View>
+            <View style={styles.confidenceContent}>
+              <Text style={[styles.confidenceValue, { color: colors.text }]}>
+                {(stats.avg_confidence * 100).toFixed(1)}%
+              </Text>
+              <Text style={[styles.confidenceLabel, { color: colors.textSecondary }]}>
+                Analysis Confidence
+              </Text>
+            </View>
+          </View>
+        </Animated.View>
+      )}
+
+      {/* Document Types */}
+      <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Document Types</Text>
+        <View style={styles.typeGrid}>
+          {getTypeStats().map((stat, index) => (
+            <View key={index} style={styles.typeRow}>
+              <TypeCard stat={stat} />
+            </View>
           ))}
-        </ScrollView>
+        </View>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Activity</Text>
-        {documents.length > 0 ? (
-          <View style={styles.activityContainer}>
-            {documents.slice(0, 3).map((doc, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[styles.activityItem, { backgroundColor: colors.card }]}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.activityIcon, { backgroundColor: colors.surface }]}>
-                  <FileText size={20} color={colors.primary} />
-                </View>
-                <View style={styles.activityContent}>
-                  <Text style={[styles.activityTitle, { color: colors.text }]} numberOfLines={1}>
-                    {doc.title}
-                  </Text>
-                  <Text style={[styles.activityDate, { color: colors.textSecondary }]}>
-                    {new Date(doc.createdAt).toLocaleDateString()}
-                  </Text>
-                </View>
-                {doc.analysis && (
-                  <View style={[styles.analysisStatus, { backgroundColor: colors.success }]}>
-                    <Text style={[styles.analysisStatusText, { color: colors.surface }]}>✓</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            ))}
+      {/* Processing Status */}
+      {stats && stats.processing > 0 && (
+        <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Currently Processing</Text>
+          <View style={[styles.processingCard, { backgroundColor: colors.card }]}>
+            <View style={[styles.processingIcon, { backgroundColor: colors.warning + "20" }]}>
+              <Loader size={24} color={colors.warning} />
+            </View>
+            <View style={styles.processingContent}>
+              <Text style={[styles.processingValue, { color: colors.text }]}>
+                {stats.processing}
+              </Text>
+              <Text style={[styles.processingLabel, { color: colors.textSecondary }]}>
+                Documents being analyzed
+              </Text>
+            </View>
           </View>
-        ) : (
-          <View style={[styles.emptyState, { backgroundColor: colors.card }]}>
-            <FileText size={48} color={colors.textMuted} />
-            <Text style={[styles.emptyStateTitle, { color: colors.text }]}>No Documents Yet</Text>
-            <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
-              Start by scanning or uploading your first legal document
-            </Text>
-          </View>
-        )}
-      </Animated.View>
+        </Animated.View>
+      )}
     </ScrollView>
   )
 }
 
-/*
- * StatCardProps defines the properties for the StatCard component.
- * **/
 interface StatCardProps {
-  stat: Stat
+  stat: {
+    icon: LucideIcon
+    title: string
+    value: number
+    color: string
+  }
   style?: object
 }
 
-/*
- *StatCard component displays a single statistic card with an icon, value, and title.
- * **/
 const StatCard = ({ stat, style }: StatCardProps) => {
   const { colors } = useTheme()
 
@@ -159,89 +249,20 @@ const StatCard = ({ stat, style }: StatCardProps) => {
   )
 }
 
-/**
- *
- * QuickAction and Stat types are used to define the structure of quick actions and statistics displayed on the home screen.
- * **/
-type QuickAction = {
-  icon: LucideIcon
-  title: string
-  description: string
-  href: unknown
-  color: string
-}
+const TypeCard = ({ stat }: StatCardProps) => {
+  const { colors } = useTheme()
 
-type Stat = {
-  icon: LucideIcon
-  title: string
-  value: number
-  color: string
-}
-
-/*
- * getStatsAndActions function generates quick actions and statistics
- * based on
- * the provided colors and documents.
- * **/
-function getStatsAndActions({
-  colors,
-  documents,
-}: {
-  colors: any
-  documents: Document[]
-}): [QuickAction[], Stat[]] {
-  const quickActions = [
-    {
-      icon: ScanText,
-      title: "Scan Document",
-      description: "Use camera to scan legal documents",
-      href: "(application)/(tabs)/documents?action=scan",
-      color: colors.primary,
-    },
-    {
-      icon: Upload,
-      title: "Upload File",
-      description: "Import PDF or image files",
-      href: "(application)/(tabs)/documents?action=upload",
-      color: colors.secondary,
-    },
-    {
-      icon: FileText,
-      title: "Text Analysis",
-      description: "Analyze text-based documents",
-      href: "(application)/(tabs)/documents?action=text",
-      color: colors.accent,
-    },
-  ]
-
-  const stats = [
-    {
-      icon: FileText,
-      title: "Documents",
-      value: documents.length,
-      color: colors.primary,
-    },
-    {
-      icon: TrendingUp,
-      title: "Analyzed",
-      value: documents.filter(d => d.analysis).length,
-      color: colors.success,
-    },
-    {
-      icon: AlertCircle,
-      title: "High Risk",
-      value: documents.filter(d => d.analysis?.riskAssessment?.overallRisk === "high").length,
-      color: colors.error,
-    },
-    {
-      icon: Clock,
-      title: "Pending",
-      value: documents.filter(d => !d.analysis).length,
-      color: colors.warning,
-    },
-  ]
-
-  return [quickActions, stats]
+  return (
+    <View style={[styles.typeCard, { backgroundColor: colors.card }]}>
+      <View style={[styles.typeIcon, { backgroundColor: `${stat.color}20` }]}>
+        <stat.icon size={20} color={stat.color} />
+      </View>
+      <View style={styles.typeContent}>
+        <Text style={[styles.typeTitle, { color: colors.text }]}>{stat.title}</Text>
+        <Text style={[styles.typeValue, { color: stat.color }]}>{stat.value}</Text>
+      </View>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -272,6 +293,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
   },
+  leftColumn: {
+    width: "48%",
+  },
   section: {
     padding: 20,
   },
@@ -279,70 +303,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.lg,
     fontFamily: Fonts.semiBold,
     marginBottom: 16,
-  },
-  actionsScrollContainer: {
-    flexDirection: "row",
-    gap: 15,
-    paddingRight: 20,
-    alignItems: "center",
-  },
-  actionCardTab: {
-    flexDirection: "row",
-    borderWidth: 1,
-    alignItems: "center",
-    padding: 16,
-    borderRadius: 12,
-    marginRight: 12,
-    minWidth: 600,
-    elevation: 2,
-    gap: 12,
-  },
-  actionLink: {
-    flex: 1,
-    borderWidth: 2,
-    borderColor: "gray",
-    borderStyle: "dashed",
-    borderRadius: 18,
-    width: 200,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  actionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  actionTitle: {
-    fontSize: FontSizes.xs,
-    fontFamily: Fonts.semiBold,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 15,
-    marginLeft: 10,
-    flex: 1,
-  },
-  activityContainer: {
-    gap: 8,
-    borderRadius: 12,
-  },
-  activityItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 8,
-  },
-  activityIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  activityContent: {
-    flex: 1,
   },
   statCard: {
     padding: 20,
@@ -370,45 +330,148 @@ const styles = StyleSheet.create({
   statTitle: {
     fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
+    textAlign: "center",
   },
-  activityTitle: {
+  confidenceCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+    borderRadius: 16,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  confidenceIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  confidenceContent: {
+    flex: 1,
+  },
+  confidenceValue: {
+    fontSize: FontSizes.xxl,
+    fontFamily: Fonts.bold,
+  },
+  confidenceLabel: {
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.regular,
+  },
+  typeGrid: {
+    gap: 12,
+  },
+  typeRow: {
+    width: "100%",
+  },
+  typeCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  typeIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  typeContent: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  typeTitle: {
     fontSize: FontSizes.md,
     fontFamily: Fonts.medium,
   },
-  activityDate: {
-    fontSize: FontSizes.sm,
+  typeValue: {
+    fontSize: FontSizes.lg,
+    fontFamily: Fonts.bold,
+  },
+  processingCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+    borderRadius: 16,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  processingIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  processingContent: {
+    flex: 1,
+  },
+  processingValue: {
+    fontSize: FontSizes.xxl,
+    fontFamily: Fonts.bold,
+  },
+  processingLabel: {
+    fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
   },
-  analysisStatus: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  loadingContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  analysisStatusText: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.bold,
+  loadingText: {
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.regular,
+    marginTop: 16,
   },
-  emptyState: {
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    padding: 32,
-    paddingHorizontal: 20,
-    borderRadius: 12,
+    padding: 20,
   },
-  emptyStateTitle: {
+  errorTitle: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.semiBold,
     marginTop: 16,
   },
-  emptyStateDescription: {
+  errorDescription: {
     fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
     textAlign: "center",
     marginTop: 8,
-    lineHeight: 20,
   },
-  leftColumn: {
-    width: "48%",
+  authPrompt: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  authTitle: {
+    fontSize: FontSizes.xxl,
+    fontFamily: Fonts.bold,
+    marginBottom: 8,
+  },
+  authDescription: {
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.regular,
+    textAlign: "center",
   },
 })

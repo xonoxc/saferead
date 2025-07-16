@@ -30,6 +30,21 @@ export interface DocumentsListResponse {
   results: AnalysisResponse[]
 }
 
+export interface StatsResponse {
+  total_documents: number
+  completed: number
+  pending: number
+  failed: number
+  processing: number
+  by_type: {
+    terms: number
+    privacy: number
+    legal: number
+    other: number
+  }
+  avg_confidence: number
+}
+
 export const uploadDocument = async (data: UploadDocumentRequest): Promise<AnalysisResponse> => {
   const formData = new FormData()
   
@@ -93,4 +108,9 @@ export const getDocumentById = async (documentId: string): Promise<AnalysisRespo
 
 export const deleteDocument = async (documentId: string): Promise<void> => {
   await apiClient.delete(`/scanner/documents/${documentId}/`)
+}
+
+export const getDocumentStats = async (): Promise<StatsResponse> => {
+  const response = await apiClient.get('/scanner/documents/stats/')
+  return response.data
 }

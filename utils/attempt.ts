@@ -1,11 +1,10 @@
-import { AxiosError } from "axios"
+import { AxiosError, type AxiosResponse } from "axios"
 
 export type ExpectedError = {
   status: number
   message: string
 }
 
-type ErrorType = Error | ExpectedError
 /*
  *typescript utility for handling async operations with error handling
  **/
@@ -30,13 +29,25 @@ function err<E>(error: E): Err<E> {
 }
 
 /*
- *
- * actual attempt function
+ * AttemptArg : type for the argument of attempt function
  * **/
-export async function attempt<T, E = ErrorType>(fn: Promise<T>): Promise<Result<T, E>> {
+type AttemptArg<T> = Promise<T | AxiosResponse<T>>
+
+/*
+ * ErrorType : union type for Error and ExpectedError
+ * **/
+type ErrorType = Error | ExpectedError
+/*
+ *
+ * actual attempt function | axios overloaded
+ * **/
+export async function attempt<T, E = ErrorType>(fn: AttemptArg<T>): Promise<Result<T, E>> {
   try {
-    const data = await fn
-    return ok(data)
+    const result = await fn
+
+    const data = isAxiosResponse(result) ? result.data : result
+
+    return ok(data as T)
   } catch (error: any) {
     //Axios specific error handling
     if (error instanceof AxiosError) {
@@ -48,6 +59,12 @@ export async function attempt<T, E = ErrorType>(fn: Promise<T>): Promise<Result<
 
     return err(error as E)
   }
+}
+/*
+ * isAxiosResponse function : checks if the response is an AxiosResponse
+ * **/
+function isAxiosResponse<T>(res: any): res is AxiosResponse<T> {
+  return res && typeof res === "object" && "data" in res && "status" in res && "headers" in res
 }
 
 /*

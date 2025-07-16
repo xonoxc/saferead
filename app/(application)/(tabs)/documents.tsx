@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import {
   View,
   Text,
@@ -10,15 +10,13 @@ import {
   TextInput,
 } from "react-native"
 import { Plus, Search, Filter, FileText, Trash2, TrendingUp, Folder } from "lucide-react-native"
-import { router, useLocalSearchParams } from "expo-router"
+import { useLocalSearchParams } from "expo-router"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
-import { useBackendDocuments } from "@/hooks/useBackendDocuments"
-import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisView"
-import { DocumentFilter } from "@/components/documents/DocumentFilter"
-import { Button } from "@/components/Button"
+import { DocumentAnalysisView, DocumentFilter } from "@/components/documents"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
-import { Fonts, FontSizes } from "@/constants/Fonts"
-import { AnalysisResponse } from "@/services/api"
+import { Fonts, FontSizes } from "@/constants"
+import { AnalysisResponse } from "@/types/api/documents.types"
+import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
 
 export default function DocumentsScreen() {
   const { colors } = useTheme()
@@ -33,42 +31,21 @@ export default function DocumentsScreen() {
     error,
     hasMore,
     currentFilters,
-    loadMoreDocuments,
+    searchQuery,
     applyFilters,
-    deleteDocument: deleteBackendDocument,
-    refreshDocuments,
-  } = useBackendDocuments(spaceId)
-
-  const [searchQuery, setSearchQuery] = useState("")
-  const [showFilter, setShowFilter] = useState(false)
-  const [selectedDocument, setSelectedDocument] = useState<AnalysisResponse | null>(null)
-  const [refreshing, setRefreshing] = useState(false)
-
-  const handleAddDocument = () => {
-    router.push("/(application)/(tabs)/analyize")
-  }
-
-  const handleDeleteDocument = async (documentId: string) => {
-    const success = await deleteBackendDocument(documentId)
-    if (success) {
-      Alert.alert("Success", "Document deleted successfully")
-    }
-  }
-
-  const handleRefresh = async () => {
-    setRefreshing(true)
-    await refreshDocuments()
-    setRefreshing(false)
-  }
-
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query)
-    const newFilters = {
-      ...currentFilters,
-      search: query || undefined,
-    }
-    await applyFilters(newFilters)
-  }
+    showFilter,
+    isLoading,
+    selectedDocument,
+    refreshing,
+    setShowFilter,
+    setSelectedDocument,
+    handleAddDocument,
+    handleDeleteDocument,
+    handleSearch,
+    handleRefresh,
+    loadMoreDocuments,
+    FallbackStateWrapper,
+  } = useDocumentScreen(spaceId, spaceName)
 
   const handleDocumentPress = (document: AnalysisResponse) => {
     setSelectedDocument(document)
@@ -101,14 +78,6 @@ export default function DocumentsScreen() {
     )
   }
 
-  const FallbackStateWrapper = () => (
-    <FallBackState
-      searchQuery={searchQuery}
-      handleAddDocument={handleAddDocument}
-      spaceName={spaceName}
-    />
-  )
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
@@ -139,7 +108,7 @@ export default function DocumentsScreen() {
           <TextInput
             style={[styles.searchInput, { color: colors.text }]}
             value={searchQuery}
-            onChangeText={handleSearch}
+            onChangeText={text => handleSearch(text)}
             placeholder="Search documents..."
             placeholderTextColor={colors.textMuted}
             returnKeyType="search"
@@ -325,47 +294,6 @@ function isDocumentStatusCompleted(document: AnalysisResponse): boolean {
   return document.status === "completed"
 }
 
-/*
- *
- *
- * fallback state component
- * **/
-function FallBackState({
-  searchQuery,
-  handleAddDocument,
-  spaceName,
-}: {
-  searchQuery?: string
-  handleAddDocument: () => void
-  spaceName?: string
-}) {
-  const { colors } = useTheme()
-
-  const title = spaceName
-    ? `No documents in ${spaceName}`
-    : searchQuery
-      ? "No Documents Found"
-      : "No Documents Yet"
-  const description = spaceName
-    ? "Add a document to this space to get started"
-    : searchQuery
-      ? "Try adjusting your search terms or filters"
-      : "Start by analyzing your first legal document"
-
-  return (
-    <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
-      <FileText size={64} color={colors.textMuted} />
-      <Text style={[styles.emptyStateTitle, { color: colors.text }]}>{title}</Text>
-      <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
-        {description}
-      </Text>
-      {!searchQuery && (
-        <Button title="Add Document" onPress={handleAddDocument} variant="primary" size="large" />
-      )}
-    </View>
-  )
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -536,24 +464,5 @@ const styles = StyleSheet.create({
   footerLoader: {
     paddingVertical: 20,
     alignItems: "center",
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 60,
-  },
-  emptyStateTitle: {
-    fontSize: FontSizes.xl,
-    fontFamily: Fonts.semiBold,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyStateDescription: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
-    textAlign: "center",
-    marginBottom: 24,
-    paddingHorizontal: 40,
   },
 })

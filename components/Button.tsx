@@ -8,7 +8,7 @@ import {
   ViewStyle,
 } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { Fonts, FontSizes } from "@/constants/Fonts"
+import { Fonts, FontSizes } from "@/constants"
 
 interface ButtonProps {
   title: string

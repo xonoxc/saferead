@@ -2,13 +2,14 @@ import React, { useState } from "react"
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from "react-native"
 import { Filter, X, Calendar, TrendingUp, FileText, Clock } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { TextInput } from "@/components/TextInput"
-import { Fonts, FontSizes } from "@/constants/Fonts"
+import { TextInput } from "@/components"
 import {
+  Fonts,
+  FontSizes,
   DOCUMENT_TYPE_OPTIONS,
   DOCUMENT_FILTER_STATUS_OPTIONS,
   DOCUMENTS_ORDERING_OPTIONS,
-} from "@/constants/Document"
+} from "@/constants"
 import { FilterOptions } from "@/types/docs"
 
 interface DocumentFilterProps {

@@ -2,7 +2,6 @@ import { Redirect, Tabs } from "expo-router"
 import { Home, FileText, Settings, TextSearch } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
-import { DocumentsProvider } from "@/hooks/useDocuments"
 import { getTabBarStyles } from "@/utils/helpers/tabs"
 
 export default function TabLayout() {
@@ -14,57 +13,55 @@ export default function TabLayout() {
   }
 
   return (
-    <DocumentsProvider>
-      <Tabs
-        screenOptions={{
-          sceneStyle: { backgroundColor: colors.background },
-          headerShown: false,
-          tabBarActiveTintColor: "pink",
-          tabBarInactiveTintColor: colors.textMuted,
-          tabBarShowLabel: false,
-          tabBarHideOnKeyboard: true,
-          tabBarStyle: getTabBarStyles(colors),
+    <Tabs
+      screenOptions={{
+        sceneStyle: { backgroundColor: colors.background },
+        headerShown: false,
+        tabBarActiveTintColor: "pink",
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarShowLabel: false,
+        tabBarHideOnKeyboard: true,
+        tabBarStyle: getTabBarStyles(colors),
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
         }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "Home",
-            tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="analyize"
-          options={{
-            title: "Analyze",
-            tabBarIcon: ({ size, color }) => <TextSearch size={size} color={color} />,
-          }}
-        />
+      />
+      <Tabs.Screen
+        name="analyize"
+        options={{
+          title: "Analyze",
+          tabBarIcon: ({ size, color }) => <TextSearch size={size} color={color} />,
+        }}
+      />
 
-        <Tabs.Screen
-          name="documents"
-          options={{
-            title: "Documents",
-            tabBarIcon: ({ size, color }) => <FileText size={size} color={color} />,
-          }}
-        />
+      <Tabs.Screen
+        name="documents"
+        options={{
+          title: "Documents",
+          tabBarIcon: ({ size, color }) => <FileText size={size} color={color} />,
+        }}
+      />
 
-        <Tabs.Screen
-          name="premium"
-          options={{
-            href: null,
-            /* title: "Premium",
+      <Tabs.Screen
+        name="premium"
+        options={{
+          href: null,
+          /* title: "Premium",
           tabBarIcon: ({ size, color }) => <CreditCard size={size} color={color} />, */
-          }}
-        />
-        <Tabs.Screen
-          name="settings"
-          options={{
-            title: "Settings",
-            tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
-          }}
-        />
-      </Tabs>
-    </DocumentsProvider>
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
+        }}
+      />
+    </Tabs>
   )
 }

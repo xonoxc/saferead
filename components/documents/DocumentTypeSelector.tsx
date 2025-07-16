@@ -1,4 +1,4 @@
-import { DropdownSelector, DropdownOption } from "@/components/DropDownSelector"
+import { DropdownSelector, DropdownOption } from "@/components"
 
 export type DocumentType = "terms" | "privacy" | "legal" | "other"
 
@@ -27,4 +27,3 @@ export const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
     />
   )
 }
-

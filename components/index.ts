@@ -6,8 +6,6 @@ export * from "./Button"
 
 export * from "./DropDownSelector"
 
-export * from "./DocumentTypeSelector"
-
 export * from "./GoogleSignInButton"
 
 export * from "./ScanButton"
@@ -25,3 +23,7 @@ export * from "./UpgradeButton"
 export * from "./LoadingSpinner"
 
 export * from "./ErrorMessage"
+
+export * from "./CustomBackBtn"
+
+export * from "./SearchBar"

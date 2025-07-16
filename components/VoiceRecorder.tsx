@@ -2,7 +2,7 @@ import React from "react"
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated } from "react-native"
 import { Mic, MicOff, X } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { Fonts, FontSizes } from "@/constants/Fonts"
+import { Fonts, FontSizes } from "@/constants"
 
 interface VoiceRecorderProps {
   isVisible: boolean

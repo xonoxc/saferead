@@ -69,7 +69,7 @@ export const RecentDocumentItem = ({ document, onPress }: RecentDocumentItemProp
         </View>
       </View>
 
-      {document.status === "completed" && (
+      {isDocumentComplete(document) && (
         <View style={styles.documentStats}>
           <View style={styles.statItem}>
             <TrendingUp size={14} color={colors.primary} />
@@ -86,6 +86,10 @@ export const RecentDocumentItem = ({ document, onPress }: RecentDocumentItemProp
       )}
     </TouchableOpacity>
   )
+}
+
+function isDocumentComplete(document: AnalysisResponse): boolean {
+  return document.status === "completed"
 }
 
 const styles = StyleSheet.create({

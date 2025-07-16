@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList } from "react
 import { ChevronDown, Check } from "lucide-react-native"
 import Animated from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
-import { FontSizes, Fonts } from "@/constants/Fonts"
+import { FontSizes, Fonts } from "@/constants"
 
 export interface DropdownOption<T> {
   label: string

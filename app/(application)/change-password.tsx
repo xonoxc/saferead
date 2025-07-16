@@ -4,9 +4,8 @@ import { router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button } from "@/components/Button"
-import { TextInput } from "@/components/TextInput"
-import { Fonts, FontSizes } from "@/constants/Fonts"
+import { TextInput, Button, ModalLoadingSpinner } from "@/components/"
+import { Fonts, FontSizes } from "@/constants"
 import {
   type ChangePasswordFormSchema,
   changePasswordFormSchema,
@@ -15,7 +14,6 @@ import { apiClient } from "@/utils/apiclient"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
 import { useAuth } from "@/hooks/useAuth"
-import { ModalLoadingSpinner } from "@/components/ModalLoadingSpinner"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function ChangePasswordScreen() {

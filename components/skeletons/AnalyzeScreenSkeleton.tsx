@@ -1,58 +1,69 @@
 import React from "react"
-import { View, StyleSheet, ScrollView } from "react-native"
+import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native"
 import Skeleton from "./Skeleton"
 import { useTheme } from "@/hooks/useTheme"
+import { Fonts, FontSizes } from "@/constants"
 
-const AnalyzeScreenSkeleton = () => {
+const { height } = Dimensions.get("window")
+
+interface AnalyzeScreenSkeletonProps {
+  isAnalizing?: boolean
+}
+
+const AnalyzeScreenSkeleton = ({ isAnalizing = false }: AnalyzeScreenSkeletonProps) => {
   const { colors } = useTheme()
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={{ paddingBottom: 120 }}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.header}>
-        <Skeleton width={40} height={40} borderRadius={20} />
-        <Skeleton width={100} height={30} borderRadius={8} />
-        <Skeleton width={40} height={40} borderRadius={20} />
-      </View>
-
-      {/* Document Type Selector */}
-      <View style={styles.selectorContainer}>
-        <Skeleton width="100%" height={50} borderRadius={12} />
-      </View>
-
-      {/* Upload Options */}
-      <View style={styles.uploadSection}>
-        <View style={styles.uploadGrid}>
-          <Skeleton width="30%" height={100} borderRadius={12} />
-          <Skeleton width="30%" height={100} borderRadius={12} />
-          <Skeleton width="30%" height={100} borderRadius={12} />
+    <View style={{ flex: 1 }}>
+      {isAnalizing && (
+        <View style={styles.overlayContainer}>
+          <Text style={[styles.overlayText, { color: colors.text }]}>Analyzing......</Text>
         </View>
-      </View>
+      )}
 
-      {/* Text Input Area */}
-      <View style={styles.textInputCard}>
-        <Skeleton width={200} height={20} style={{ marginBottom: 12 }} />
-        <Skeleton width="100%" height={120} borderRadius={12} style={{ marginBottom: 16 }} />
-        <Skeleton width="100%" height={50} borderRadius={8} />
-      </View>
+      <ScrollView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        contentContainerStyle={{ paddingBottom: 120 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <Skeleton width={40} height={40} borderRadius={20} />
+          <Skeleton width={100} height={30} borderRadius={8} />
+          <Skeleton width={40} height={40} borderRadius={20} />
+        </View>
 
-      {/* Recent Documents */}
-      <View style={styles.recentSection}>
-        <Skeleton width={200} height={24} style={{ marginBottom: 16 }} />
-        {[...Array(3)].map((_, index) => (
-          <Skeleton
-            key={index}
-            width="100%"
-            height={70}
-            borderRadius={12}
-            style={{ marginBottom: 12 }}
-          />
-        ))}
-      </View>
-    </ScrollView>
+        <View style={styles.selectorContainer}>
+          <Skeleton width="100%" height={50} borderRadius={12} />
+        </View>
+
+        <View style={styles.uploadSection}>
+          <View style={styles.uploadGrid}>
+            <Skeleton width="30%" height={100} borderRadius={12} />
+            <Skeleton width="30%" height={100} borderRadius={12} />
+            <Skeleton width="30%" height={100} borderRadius={12} />
+          </View>
+        </View>
+
+        <View style={styles.textInputCard}>
+          <Skeleton width={200} height={20} style={{ marginBottom: 12 }} />
+          <Skeleton width="100%" height={120} borderRadius={12} style={{ marginBottom: 16 }} />
+          <Skeleton width="100%" height={50} borderRadius={8} />
+        </View>
+
+        <View style={styles.recentSection}>
+          <Skeleton width={200} height={24} style={{ marginBottom: 16 }} />
+          {[...Array(3)].map((_, index) => (
+            <Skeleton
+              key={index}
+              width="100%"
+              height={70}
+              borderRadius={12}
+              style={{ marginBottom: 12 }}
+            />
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   )
 }
 
@@ -60,6 +71,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingVertical: 20,
+  },
+  overlayContainer: {
+    position: "absolute",
+    top: height / 2.5,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    pointerEvents: "none",
+  },
+  overlayText: {
+    fontSize: FontSizes.xl,
+    fontWeight: "bold",
+    fontFamily: Fonts.bold,
   },
   header: {
     flexDirection: "row",

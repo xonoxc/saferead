@@ -109,6 +109,7 @@ export const useVoice = () => {
   }
 
   const speakText = async (text: string) => {
+    console.log("Speaking text:", text)
     const resp = attemptSync(
       Speech.speak(text, {
         language: "en-US",

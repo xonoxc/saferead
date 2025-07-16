@@ -19,13 +19,12 @@ export function useAnalysis() {
 
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [pastedText, setPastedText] = useState("")
   const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType>("other")
   const [showTextInput, setShowTextInput] = useState(false)
   const [isSideBarOpen, setIsSideBarOpen] = useState(false)
   const { selectedSpace, setSelectedSpace } = useSpaceStore()
 
-  const { data } = useDocuments()
+  const { data, isLoading: isRecentDocumentsLoading } = useDocuments()
   const recentDocuments = data?.pages.flatMap(page => page.results) ?? []
 
   useTabBarVisibility(!(isSideBarOpen || !!selectedSpace))
@@ -122,29 +121,6 @@ export function useAnalysis() {
     await handleAnalyzeDocument(result.data, selectedDocumentType)
   }
 
-  const handleTextAnalysis = async () => {
-    if (!pastedText.trim()) {
-      Alert.alert("Error", "Please enter some text to analyze")
-      return
-    }
-
-    if (!user) {
-      Alert.alert("Error", "Please log in to analyze text")
-      return
-    }
-
-    const textBlob = new Blob([pastedText], { type: "text/plain" })
-    const textFile = new File([textBlob], "pasted-text.txt", { type: "text/plain" })
-
-    await handleAnalyzeDocument(
-      {
-        title: "Pasted Text Analysis",
-        content: pastedText,
-        uri: textFile,
-      },
-      selectedDocumentType
-    )
-  }
   const handleRecentDocumentPress = (document: AnalysisResponse) => {
     setAnalysisResult(document)
   }
@@ -159,14 +135,12 @@ export function useAnalysis() {
     setIsSideBarOpen,
     handleDocumentScan,
     handleAnalyzeResult: handleAnalyzeDocument,
-    pastedText,
-    setPastedText,
     selectedDocumentType,
     setAnalysisResult,
     setSelectedDocumentType,
     showTextInput,
     setShowTextInput,
-    handleTextAnalysis,
+    isRecentDocumentsLoading,
     selectedSpace,
     setSelectedSpace,
     recentDocuments,

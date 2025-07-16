@@ -10,7 +10,7 @@ interface RecentDocumentItemProps {
 }
 
 export const RecentDocumentItem = ({ document, onPress }: RecentDocumentItemProps) => {
-  const { colors } = useTheme()
+  const { colors, isDark } = useTheme()
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -37,7 +37,15 @@ export const RecentDocumentItem = ({ document, onPress }: RecentDocumentItemProp
 
   return (
     <TouchableOpacity
-      style={[styles.recentDocumentItem, { backgroundColor: colors.card }]}
+      style={[
+        styles.recentDocumentItem,
+        {
+          backgroundColor: colors.card,
+          borderWidth: isDark ? 0 : 1,
+          borderColor: colors.border,
+          shadowOpacity: isDark ? 0 : 0.1,
+        },
+      ]}
       onPress={onPress}
     >
       <View style={styles.documentHeader}>
@@ -114,7 +122,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   recentDocumentItem: {
-    borderRadius: 12,
+    borderRadius: 21,
     padding: 16,
     marginBottom: 12,
   },

@@ -1,6 +1,6 @@
 import { useDocumentsStore } from "@/store/useDocumentStore"
 import { AnalysisResponse } from "@/types/api/documents.types"
-import { router, useFocusEffect } from "expo-router"
+import { router } from "expo-router"
 import React, { useEffect, useState } from "react"
 import { View, Text, Alert, StyleSheet } from "react-native"
 import { useDebouncedCallback } from "../useDebouncCallback"

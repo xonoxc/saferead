@@ -91,9 +91,9 @@ const styles = StyleSheet.create({
   selector: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 16,
+    padding: 17,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 20,
   },
   selectedText: {
     fontSize: FontSizes.md,

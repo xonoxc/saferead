@@ -22,7 +22,7 @@ interface DocumentAnalysisViewProps {
 }
 
 export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewProps) => {
-  const { colors } = useTheme()
+  const { colors, isDark } = useTheme()
   const { speakText } = useVoice()
   const [showAllRisks, setShowAllRisks] = useState(false)
   const [showAllFavorable, setShowAllFavorable] = useState(false)
@@ -49,7 +49,15 @@ export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewP
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
+      <Animated.View
+        entering={FadeInDown.delay(100).springify()}
+        style={[
+          styles.header,
+          {
+            shadowColor: isDark ? "transparent" : colors.shadow,
+          },
+        ]}
+      >
         <View>
           <CustomBackBtn containerWidth={44} onBack={onBack} />
         </View>
@@ -74,13 +82,26 @@ export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewP
         {/* Status & Confidence */}
         <Animated.View
           entering={FadeInDown.delay(200).springify()}
-          style={[styles.statusCard, { backgroundColor: colors.card }]}
+          style={[
+            styles.statusCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: isDark ? 0 : 1,
+              shadowOpacity: isDark ? 0 : 0.1,
+            },
+          ]}
         >
           <View style={styles.statusHeader}>
             <View
               style={[
                 styles.statusBadge,
-                { backgroundColor: getRiskColor(analysis, colors) + "20" },
+                {
+                  backgroundColor: getRiskColor(analysis, colors) + "20",
+                  borderWidth: isDark ? 0 : 1,
+                  borderColor: colors.border,
+                  shadowOpacity: isDark ? 0 : 0.1,
+                },
               ]}
             >
               <Text style={[styles.statusText, { color: getRiskColor(analysis, colors) }]}>
@@ -124,7 +145,15 @@ export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewP
         {/* Summary */}
         <Animated.View
           entering={FadeInDown.delay(300).springify()}
-          style={[styles.section, { backgroundColor: colors.card }]}
+          style={[
+            styles.section,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: isDark ? 0 : 1,
+              shadowOpacity: isDark ? 0 : 0.1,
+            },
+          ]}
         >
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Executive Summary</Text>
@@ -145,7 +174,15 @@ export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewP
         {/* Risky Points */}
         <Animated.View
           entering={FadeInDown.delay(400).springify()}
-          style={[styles.section, { backgroundColor: colors.card }]}
+          style={[
+            styles.section,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: isDark ? 0 : 1,
+              shadowOpacity: isDark ? 0 : 0.1,
+            },
+          ]}
         >
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Risky Points</Text>
@@ -178,7 +215,15 @@ export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewP
         {/* Favorable Points */}
         <Animated.View
           entering={FadeInDown.delay(500).springify()}
-          style={[styles.section, { backgroundColor: colors.card }]}
+          style={[
+            styles.section,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: isDark ? 0 : 1,
+              shadowOpacity: isDark ? 0 : 0.1,
+            },
+          ]}
         >
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Favorable Points</Text>
@@ -213,7 +258,15 @@ export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewP
         {/* Document Info */}
         <Animated.View
           entering={FadeInDown.delay(600).springify()}
-          style={[styles.section, { backgroundColor: colors.card }]}
+          style={[
+            styles.section,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: isDark ? 0 : 1,
+              shadowOpacity: isDark ? 0 : 0.1,
+            },
+          ]}
         >
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Document Information</Text>
           <View style={styles.infoGrid}>

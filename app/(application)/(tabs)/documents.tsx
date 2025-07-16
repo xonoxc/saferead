@@ -9,6 +9,7 @@ import {
   RefreshControl,
   TextInput,
 } from "react-native"
+import Animated, { FadeInDown } from "react-native-reanimated"
 import { Plus, Search, Filter, FileText, Trash2, TrendingUp, Folder } from "lucide-react-native"
 import { useLocalSearchParams } from "expo-router"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
@@ -23,7 +24,7 @@ import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 const SKELETON_COUNT = 5
 
 export default function DocumentsScreen() {
-  const { colors } = useTheme()
+  const { colors, isDark } = useTheme()
   const { spaceId, spaceName, spaceColor } = useLocalSearchParams<{
     spaceId?: string
     spaceName?: string
@@ -57,12 +58,14 @@ export default function DocumentsScreen() {
     setSelectedDocument(document)
   }
 
-  const renderDocument = ({ item }: { item: AnalysisResponse }) => (
-    <DocumentCard
-      document={item}
-      onPress={() => handleDocumentPress(item)}
-      onDelete={handleDeleteDocument}
-    />
+  const renderDocument = ({ item, index }: { item: AnalysisResponse; index: number }) => (
+    <Animated.View entering={FadeInDown.delay(index * 50 + 300).springify()}>
+      <DocumentCard
+        document={item}
+        onPress={() => handleDocumentPress(item)}
+        onDelete={handleDeleteDocument}
+      />
+    </Animated.View>
   )
 
   const isDocumentsDataAvailable = () => {
@@ -87,7 +90,7 @@ export default function DocumentsScreen() {
   if (isLoading) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.header}>
+        <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
           {spaceName ? (
             <View style={styles.spaceHeader}>
               <Folder size={24} color={spaceColor || colors.primary} />
@@ -102,12 +105,15 @@ export default function DocumentsScreen() {
           >
             <Plus size={24} color={colors.background} />
           </TouchableOpacity>
-        </View>
-        <View style={styles.searchContainer}>
+        </Animated.View>
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.searchContainer}>
           <View
             style={[
               styles.searchInputContainer,
-              { backgroundColor: colors.card, borderColor: colors.border },
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
             ]}
           >
             <Search size={18} color={colors.textMuted} />
@@ -130,7 +136,7 @@ export default function DocumentsScreen() {
           >
             <Filter size={18} color={colors.textSecondary} />
           </TouchableOpacity>
-        </View>
+        </Animated.View>
         <FlatList
           data={Array.from({ length: SKELETON_COUNT }).map((_, i) => ({ id: `skeleton-${i}` }))}
           keyExtractor={item => item.id}
@@ -144,7 +150,7 @@ export default function DocumentsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
+      <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
         {spaceName ? (
           <View style={styles.spaceHeader}>
             <Folder size={24} color={spaceColor || colors.primary} />
@@ -159,9 +165,9 @@ export default function DocumentsScreen() {
         >
           <Plus size={24} color={colors.background} />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
-      <View style={styles.searchContainer}>
+      <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.searchContainer}>
         <View
           style={[
             styles.searchInputContainer,
@@ -188,12 +194,15 @@ export default function DocumentsScreen() {
         >
           <Filter size={18} color={colors.textSecondary} />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {error?.message && (
-        <View style={[styles.errorContainer, { backgroundColor: colors.error + "20" }]}>
+        <Animated.View
+          entering={FadeInDown.delay(300).springify()}
+          style={[styles.errorContainer, { backgroundColor: colors.error + "20" }]}
+        >
           <Text style={[styles.errorText, { color: colors.error }]}>{error.message}</Text>
-        </View>
+        </Animated.View>
       )}
 
       {isDocumentsDataAvailable() ? (
@@ -216,9 +225,9 @@ export default function DocumentsScreen() {
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <View style={styles.listContent}>
+        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.listContent}>
           <FallbackStateWrapper />
-        </View>
+        </Animated.View>
       )}
 
       <DocumentFilter
@@ -238,7 +247,7 @@ interface DocumentCardProps {
 }
 
 const DocumentCard = ({ document, onPress, onDelete }: DocumentCardProps) => {
-  const { colors } = useTheme()
+  const { colors, isDark } = useTheme()
 
   const handleDelete = () => {
     Alert.alert(
@@ -259,7 +268,15 @@ const DocumentCard = ({ document, onPress, onDelete }: DocumentCardProps) => {
 
   return (
     <TouchableOpacity
-      style={[styles.documentCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+      style={[
+        styles.documentCard,
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+          borderWidth: isDark ? 0 : 1,
+          shadowOpacity: isDark ? 0 : 0.1,
+        },
+      ]}
       onPress={onPress}
     >
       <View style={styles.cardHeader}>
@@ -438,7 +455,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   documentCard: {
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 16,
     marginBottom: 12,
     borderWidth: 0,

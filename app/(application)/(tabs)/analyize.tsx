@@ -174,7 +174,6 @@ export default function AnalyzeScreen() {
               style={styles.recentSection}
             >
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Analysis</Text>
-              {/* TODO: Replace with actual recent documents */}
               {recentDocuments.slice(0, 5).map(doc => (
                 <RecentDocumentItem
                   key={doc.id}
@@ -237,7 +236,7 @@ const styles = StyleSheet.create({
   },
   uploadOption: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: 18,
     padding: 16,
     alignItems: "center",
     gap: 8,

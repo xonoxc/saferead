@@ -64,10 +64,11 @@ export default function HomeScreen() {
         color: colors.error,
       },
       {
-        icon: Clock,
-        title: "Pending",
-        value: stats.pending,
-        color: colors.warning,
+        icon: TrendingUp,
+        title: "Avg Confidence",
+        value: Math.round(stats.avg_confidence * 100),
+        color: colors.primary,
+        isPercentage: true,
       },
     ]
   }
@@ -170,28 +171,8 @@ export default function HomeScreen() {
         </View>
       </Animated.View>
 
-      {/* Confidence Score */}
-      {stats && stats.avg_confidence > 0 && (
-        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Average Confidence</Text>
-          <View style={[styles.confidenceCard, { backgroundColor: colors.card }]}>
-            <View style={[styles.confidenceIcon, { backgroundColor: colors.primary + "20" }]}>
-              <TrendingUp size={24} color={colors.primary} />
-            </View>
-            <View style={styles.confidenceContent}>
-              <Text style={[styles.confidenceValue, { color: colors.text }]}>
-                {(stats.avg_confidence * 100).toFixed(1)}%
-              </Text>
-              <Text style={[styles.confidenceLabel, { color: colors.textSecondary }]}>
-                Analysis Confidence
-              </Text>
-            </View>
-          </View>
-        </Animated.View>
-      )}
-
       {/* Document Types */}
-      <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Document Types</Text>
         <View style={styles.typeGrid}>
           {getTypeStats().map((stat, index) => (
@@ -204,7 +185,7 @@ export default function HomeScreen() {
 
       {/* Processing Status */}
       {stats && stats.processing > 0 && (
-        <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.section}>
+        <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Currently Processing</Text>
           <View style={[styles.processingCard, { backgroundColor: colors.card }]}>
             <View style={[styles.processingIcon, { backgroundColor: colors.warning + "20" }]}>
@@ -221,6 +202,26 @@ export default function HomeScreen() {
           </View>
         </Animated.View>
       )}
+
+      {/* Pending Documents */}
+      {stats && stats.pending > 0 && (
+        <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Analysis</Text>
+          <View style={[styles.processingCard, { backgroundColor: colors.card }]}>
+            <View style={[styles.processingIcon, { backgroundColor: colors.warning + "20" }]}>
+              <Clock size={24} color={colors.warning} />
+            </View>
+            <View style={styles.processingContent}>
+              <Text style={[styles.processingValue, { color: colors.text }]}>
+                {stats.pending}
+              </Text>
+              <Text style={[styles.processingLabel, { color: colors.textSecondary }]}>
+                Documents waiting for analysis
+              </Text>
+            </View>
+          </View>
+        </Animated.View>
+      )}
     </ScrollView>
   )
 }
@@ -231,6 +232,7 @@ interface StatCardProps {
     title: string
     value: number
     color: string
+    isPercentage?: boolean
   }
   style?: object
 }
@@ -243,7 +245,9 @@ const StatCard = ({ stat, style }: StatCardProps) => {
       <View style={[styles.statIcon, { backgroundColor: `${stat.color}20` }]}>
         <stat.icon size={24} color={stat.color} />
       </View>
-      <Text style={[styles.statValue, { color: colors.text }]}>{stat.value}</Text>
+      <Text style={[styles.statValue, { color: colors.text }]}>
+        {stat.value}{stat.isPercentage ? "%" : ""}
+      </Text>
       <Text style={[styles.statTitle, { color: colors.textSecondary }]}>{stat.title}</Text>
     </View>
   )

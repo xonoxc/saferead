@@ -7,7 +7,9 @@ const DocumentCardSkeleton = () => {
   const { colors } = useTheme()
 
   return (
-    <View style={[styles.documentCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <View
+      style={[styles.documentCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+    >
       <View style={styles.cardHeader}>
         <Skeleton width={48} height={48} borderRadius={24} />
         <View style={styles.documentInfo}>

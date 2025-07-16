@@ -14,6 +14,7 @@ export const useDocuments = (filters?: FilterOptions, enabled = true) => {
     },
     initialPageParam: 1,
     enabled,
+    refetchOnMount: true,
   })
 }
 

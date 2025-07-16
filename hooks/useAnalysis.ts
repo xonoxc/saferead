@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Alert } from "react-native"
 import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
-import { attempt, Result } from "@/utils/attempt"
+import { attempt } from "@/utils/attempt"
 import { useAuth } from "@/hooks/useAuth"
 import type { DocumentType } from "@/components/documents"
 import { useSpaceStore } from "@/store/useSpaceStore"
@@ -12,6 +12,7 @@ import { uploadDocument } from "@/services/api"
 import * as DocumentPicker from "expo-document-picker"
 import * as ImagePicker from "expo-image-picker"
 import { useDocuments } from "./queries/docs"
+import { Document } from "@/types"
 
 export function useAnalysis() {
   const { user } = useAuth()
@@ -40,6 +41,58 @@ export function useAnalysis() {
     }
   }
 
+  const handleAnalyzeDocument = async (document: any, docType: DocumentType) => {
+    if (!user) {
+      Alert.alert("Error", "Please log in to analyze documents")
+      return
+    }
+
+    setIsAnalyzing(true)
+
+    try {
+      let documentFile: any
+      let filename: string
+
+      if (document.uri) {
+        documentFile = {
+          uri: document.uri,
+          type: document.type || document.mimeType || "image/jpeg",
+          name: document.name || document.title || "document",
+        }
+        filename = document.title || document.name || "document"
+      } else if (document.content) {
+        const textBlob = new Blob([document.content], { type: "text/plain" })
+        documentFile = new File([textBlob], `${document.title || "document"}.txt`, {
+          type: "text/plain",
+        })
+        filename = document.title || "document.txt"
+      } else {
+        throw new Error("Unsupported document format. Please try again.")
+      }
+
+      const uploadResult = await attempt(
+        uploadDocument({
+          document_file: documentFile,
+          original_filename: filename,
+          document_type: docType,
+        })
+      )
+
+      if (!uploadResult.ok) {
+        throw new Error(uploadResult.error.message || "Failed to analyze document")
+      }
+
+      setAnalysisResult(uploadResult.data)
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Analysis error:", error)
+        Alert.alert("Error", error.message || "Failed to analyze document. Please try again.")
+      }
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
   const handleDocumentUpload = async () => {
     if (!user) {
       Alert.alert("Error", "Please log in to upload documents")
@@ -47,12 +100,12 @@ export function useAnalysis() {
     }
 
     const result = await pickDocument()
-    if (!result.ok) {
-      Alert.alert("Error", result.error.message)
+    if (!result?.ok) {
+      Alert.alert("Error", result?.error?.message)
       return
     }
 
-    await handleAnalyzeResult(result)
+    await handleAnalyzeDocument(result.data, selectedDocumentType)
   }
 
   const handleDocumentScan = async () => {
@@ -63,22 +116,11 @@ export function useAnalysis() {
 
     const result = await scanDocument()
     if (!result.ok) {
-      Alert.alert("Error", result.error.message)
+      Alert.alert("Error", result.error?.message)
       return
     }
 
-    await handleAnalyzeResult(result)
-  }
-
-  const handleAnalyzeResult = async (result: Result<AnalysisResponse, Error>) => {
-    if (!result.ok) {
-      Alert.alert("Error", result.error.message)
-      return
-    }
-
-    setIsAnalyzing(true)
-    setAnalysisResult(result.data)
-    setIsAnalyzing(false)
+    await handleAnalyzeDocument(result.data, selectedDocumentType)
   }
 
   const handleTextAnalysis = async () => {
@@ -95,24 +137,15 @@ export function useAnalysis() {
     const textBlob = new Blob([pastedText], { type: "text/plain" })
     const textFile = new File([textBlob], "pasted-text.txt", { type: "text/plain" })
 
-    const uploadResult = await attempt(
-      uploadDocument({
-        document_file: textFile,
-        original_filename: "pasted-text.txt",
-        document_type: selectedDocumentType,
-      })
+    await handleAnalyzeDocument(
+      {
+        title: "Pasted Text Analysis",
+        content: pastedText,
+        uri: textFile,
+      },
+      selectedDocumentType
     )
-
-    if (!uploadResult.ok) {
-      Alert.alert("Error", uploadResult.error.message)
-      return
-    }
-
-    const uploadResponse = uploadResult.data
-
-    await handleAnalyzeResult(uploadResponse)
   }
-
   const handleRecentDocumentPress = (document: AnalysisResponse) => {
     setAnalysisResult(document)
   }
@@ -126,7 +159,7 @@ export function useAnalysis() {
     isSideBarOpen,
     setIsSideBarOpen,
     handleDocumentScan,
-    handleAnalyzeResult,
+    handleAnalyzeResult: handleAnalyzeDocument,
     pastedText,
     setPastedText,
     selectedDocumentType,
@@ -146,34 +179,58 @@ export function useAnalysis() {
  *
  * Document Picker and Scanner Functions
  * **/
-export async function pickDocument(): Promise<Result<AnalysisResponse, Error>> {
-  const result = await attempt(DocumentPicker.getDocumentAsync())
-
-  if (!result.ok)
+export async function pickDocument() {
+  const result = await attempt(
+    DocumentPicker.getDocumentAsync({
+      type: ["application/pdf", "image/*", "text/*"],
+      copyToCacheDirectory: true,
+    })
+  )
+  if (!result.ok) {
     return {
       ok: false,
       error: new Error("Failed to pick document. Please try again."),
     }
-
-  if (result.data.canceled) {
-    return { ok: false, error: new Error("Document picking was canceled by the user.") }
   }
 
-  const file = result.data.assets[0]
+  if (!result.data.canceled && result.data.assets && result.data.assets.length > 0) {
+    const file = result.data.assets[0]
+    const newDoc: Document = {
+      id: Date.now().toString(),
+      title: file.name,
+      type: "other",
+      content: "",
+      originalFormat: file.mimeType?.includes("pdf")
+        ? "pdf"
+        : file.mimeType?.includes("image")
+          ? "image"
+          : "text",
+      fileSize: file.size || 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isEncrypted: false,
+      tags: [],
+      shared: false,
+      sharedWith: [],
+    }
 
-  return attempt(
-    uploadDocument({
-      original_filename: file.name,
-      document_type: "other",
-      document_file: file,
-    })
-  )
+    return {
+      ok: true,
+      data: {
+        ...newDoc,
+        uri: file.uri,
+        type: file.mimeType || "application/octet-stream",
+        name: file.name,
+        mimeType: file.mimeType,
+      },
+    }
+  }
 }
 
 /*
  * utitlity for scanning function
  * **/
-export async function scanDocument(): Promise<Result<AnalysisResponse, Error>> {
+export async function scanDocument() {
   const result = await attempt(
     ImagePicker.launchCameraAsync({
       allowsEditing: false,
@@ -193,11 +250,29 @@ export async function scanDocument(): Promise<Result<AnalysisResponse, Error>> {
 
   const file = result.data.assets[0]
 
-  return attempt(
-    uploadDocument({
-      original_filename: file.fileName ?? "scanned_image.jpg",
-      document_type: "other",
-      document_file: file,
-    })
-  )
+  const newDoc: Document = {
+    id: Date.now().toString(),
+    title: `Scanned Document ${new Date().toLocaleDateString()}`,
+    type: "other",
+    content: "",
+    originalFormat: "image",
+    fileSize: file.fileSize || 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isEncrypted: false,
+    tags: [],
+    shared: false,
+    sharedWith: [],
+  }
+
+  return {
+    ok: true,
+    data: {
+      ...newDoc,
+      uri: file.uri,
+      type: file.mimeType || "image/jpeg",
+      name: file.fileName,
+      mimeType: file.mimeType || "image/jpeg",
+    },
+  }
 }

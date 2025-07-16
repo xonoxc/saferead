@@ -21,10 +21,10 @@ import { DocumentCardSkeleton } from "@/components/skeletons"
 import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
 import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 
-const SKELETON_COUNT = 5
+const SKELETON_COUNT = 3
 
 export default function DocumentsScreen() {
-  const { colors, isDark } = useTheme()
+  const { colors } = useTheme()
   const { spaceId, spaceName, spaceColor } = useLocalSearchParams<{
     spaceId?: string
     spaceName?: string
@@ -41,7 +41,7 @@ export default function DocumentsScreen() {
     showFilter,
     isLoading,
     selectedDocument,
-    refreshing,
+    isRefreshing,
     setShowFilter,
     setSelectedDocument,
     handleAddDocument,
@@ -87,7 +87,7 @@ export default function DocumentsScreen() {
     )
   }
 
-  if (isLoading) {
+  if (isLoading || isRefreshing) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
@@ -213,9 +213,10 @@ export default function DocumentsScreen() {
           contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl
-              refreshing={refreshing}
+              refreshing={isRefreshing}
               onRefresh={handleRefresh}
               colors={[colors.primary]}
+              progressBackgroundColor={colors.background}
             />
           }
           onEndReached={loadMoreDocuments}

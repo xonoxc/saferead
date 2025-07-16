@@ -1,36 +1,26 @@
-import { useState, useEffect } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { getDocumentStats } from "@/services/api"
-import { attempt } from "@/utils/attempt"
 import { StatsResponse } from "@/types/api/documents.types"
 
 export const useDocumentStats = () => {
-  const [stats, setStats] = useState<StatsResponse | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchStats = async () => {
-    setIsLoading(true)
-    setError(null)
-
-    const result = await attempt(getDocumentStats())
-
-    if (result.ok) {
-      setStats(result.data)
-    } else {
-      setError(result.error.message || "Failed to fetch stats")
-    }
-
-    setIsLoading(false)
-  }
-
-  useEffect(() => {
-    fetchStats()
-  }, [])
+  const {
+    data: stats,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery<StatsResponse, Error>({
+    queryKey: ["documentStats"],
+    queryFn: getDocumentStats,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+    refetchOnMount: true,
+  })
 
   return {
     stats,
     isLoading,
-    error,
-    refetch: fetchStats,
+    error: isError ? error.message : null,
+    refetch,
   }
 }

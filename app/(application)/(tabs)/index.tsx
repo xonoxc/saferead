@@ -21,14 +21,14 @@ import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useTabHideScroll } from "@/hooks/useTabHideScroll"
 
 import { HomeScreenSkeleton } from "@/components/skeletons"
-import { StatsResponse } from "@/types/api/documents.types"
+import type { StatsResponse } from "@/types/api/documents.types"
 
 export default function HomeScreen() {
   const { colors } = useTheme()
   const { user } = useAuth()
   const { stats, isLoading, error, refetch } = useDocumentStats()
   const { handleScroll } = useTabHideScroll()
-  const mainStats = getMainStats(stats, colors)
+  const mainStats = getMainStats(stats as StatsResponse, colors)
   const typeStats = getTypeStats(stats, colors)
 
   if (!user) {
@@ -69,9 +69,17 @@ export default function HomeScreen() {
       bounces
       showsVerticalScrollIndicator={false}
       refreshControl={
-        <RefreshControl refreshing={isLoading} onRefresh={refetch} colors={[colors.primary]} />
+        <RefreshControl
+          refreshing={isLoading}
+          onRefresh={refetch}
+          colors={[colors.text]}
+          progressBackgroundColor={colors.background}
+        />
       }
     >
+      {/* <View>
+        <Logo />
+      </View> */}
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
         <Text style={[styles.greeting, { color: colors.textSecondary }]}>Welcome back,</Text>
         <Text style={[styles.userName, { color: colors.text }]}>{user?.username}</Text>
@@ -152,7 +160,7 @@ export default function HomeScreen() {
   )
 }
 
-const getMainStats = (stats: StatsResponse | null, colors: ColorsType) => {
+const getMainStats = (stats: StatsResponse | undefined, colors: ColorsType) => {
   if (!stats) return []
 
   return [
@@ -184,7 +192,7 @@ const getMainStats = (stats: StatsResponse | null, colors: ColorsType) => {
   ]
 }
 
-function getTypeStats(stats: StatsResponse | null, colors: ColorsType) {
+function getTypeStats(stats: StatsResponse | undefined, colors: ColorsType) {
   if (!stats) return []
 
   return [

@@ -5,4 +5,4 @@ export interface ReactNativeFile {
 }
 
 export const isReactNativeFile = (file: any): file is ReactNativeFile =>
-  typeof file?.uri === "string"
+  typeof file?.uri === "string" && typeof file?.type === "string" && typeof file?.name === "string"

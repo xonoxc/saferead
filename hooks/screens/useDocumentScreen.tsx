@@ -81,7 +81,7 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
     searchQuery,
     showFilter,
     selectedDocument,
-    refreshing: isRefetchingDocs,
+    isRefreshing: isRefetchingDocs,
     setShowFilter,
     setSelectedDocument,
     handleAddDocument,

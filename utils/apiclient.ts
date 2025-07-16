@@ -40,3 +40,16 @@ apiClient.interceptors.request.use(
   },
   error => Promise.reject(error)
 )
+
+apiClient.interceptors.response.use(
+  response => response,
+  async error => {
+    if (error?.response?.status === 401) {
+      await Promise.all([
+        SecureStore.deleteItemAsync("access_token"),
+        SecureStore.deleteItemAsync("user_data"),
+      ])
+    }
+    return Promise.reject(error)
+  }
+)

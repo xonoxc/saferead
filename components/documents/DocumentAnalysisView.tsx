@@ -6,12 +6,13 @@ import {
   TriangleAlert as AlertTriangle,
   CheckCircle,
   TrendingUp,
+  Volume2,
 } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { useVoice } from "@/hooks/useVoice"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { AnalysisResponse } from "@/services/api"
+import { AnalysisResponse } from "@/types/api/documents.types"
 import { attempt } from "@/utils/attempt"
 import CustomBackBtn from "@/components/CustomBackBtn"
 
@@ -127,13 +128,18 @@ export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewP
         >
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Executive Summary</Text>
-            <TouchableOpacity onPress={() => handleSpeak(analysis.summary_text)}>
-              <Text style={[styles.speakButton, { color: colors.primary }]}>🔊 Listen</Text>
+            <TouchableOpacity
+              onPress={() => handleSpeak(analysis.summary_text)}
+              style={styles.speakButton}
+            >
+              <Volume2 color={colors.accent} size={20} />
             </TouchableOpacity>
           </View>
-          <Text style={[styles.summaryText, { color: colors.textSecondary }]}>
-            {analysis.summary_text}
-          </Text>
+          <View style={styles.summaryTextContainer}>
+            <Text style={[styles.summaryText, { color: colors.textSecondary }]}>
+              {analysis.summary_text}
+            </Text>
+          </View>
         </Animated.View>
 
         {/* Risky Points */}
@@ -376,8 +382,13 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.semiBold,
   },
   speakButton: {
-    fontSize: FontSizes.sm,
+    fontSize: FontSizes.xs,
     fontFamily: Fonts.medium,
+    paddingVertical: 3,
+    paddingHorizontal: 9,
+    flexDirection: "row",
+    gap: 4,
+    borderRadius: 8,
   },
   countBadge: {
     paddingHorizontal: 8,
@@ -388,10 +399,14 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.sm,
     fontFamily: Fonts.bold,
   },
+  summaryTextContainer: {
+    width: "100%",
+  },
   summaryText: {
     fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
     lineHeight: 24,
+    textAlign: "justify",
   },
   pointItem: {
     flexDirection: "row",

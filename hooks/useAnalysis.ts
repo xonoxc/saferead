@@ -49,48 +49,47 @@ export function useAnalysis() {
 
     setIsAnalyzing(true)
 
-    try {
-      let documentFile: any
-      let filename: string
+    let documentFile: any
+    let filename: string
 
-      if (document.uri) {
-        documentFile = {
-          uri: document.uri,
-          type: document.type || document.mimeType || "image/jpeg",
-          name: document.name || document.title || "document",
-        }
-        filename = document.title || document.name || "document"
-      } else if (document.content) {
-        const textBlob = new Blob([document.content], { type: "text/plain" })
-        documentFile = new File([textBlob], `${document.title || "document"}.txt`, {
-          type: "text/plain",
-        })
-        filename = document.title || "document.txt"
-      } else {
-        throw new Error("Unsupported document format. Please try again.")
+    if (document.uri) {
+      documentFile = {
+        uri: document.uri,
+        type: document.type || document.mimeType || "image/jpeg",
+        name: document.name || document.title || "document",
       }
+      filename = document.title || document.name || "document"
+    } else if (document.content) {
+      const textBlob = new Blob([document.content], { type: "text/plain" })
+      documentFile = new File([textBlob], `${document.title || "document"}.txt`, {
+        type: "text/plain",
+      })
+      filename = document.title || "document.txt"
+    } else {
+      Alert.alert("Unsupported document format. Please try again.")
 
-      const uploadResult = await attempt(
-        uploadDocument({
-          document_file: documentFile,
-          original_filename: filename,
-          document_type: docType,
-        })
-      )
-
-      if (!uploadResult.ok) {
-        throw new Error(uploadResult.error.message || "Failed to analyze document")
-      }
-
-      setAnalysisResult(uploadResult.data)
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Analysis error:", error)
-        Alert.alert("Error", error.message || "Failed to analyze document. Please try again.")
-      }
-    } finally {
       setIsAnalyzing(false)
+      return
     }
+
+    const uploadResult = await attempt(
+      uploadDocument({
+        document_file: documentFile,
+        original_filename: filename,
+        document_type: docType,
+      })
+    )
+
+    if (!uploadResult.ok) {
+      Alert.alert(uploadResult.error.message || "Failed to analyze document")
+
+      setIsAnalyzing(false)
+      return
+    }
+
+    setAnalysisResult(uploadResult.data)
+
+    setIsAnalyzing(false)
   }
 
   const handleDocumentUpload = async () => {

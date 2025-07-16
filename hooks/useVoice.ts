@@ -111,12 +111,11 @@ export const useVoice = () => {
   const speakText = async (text: string) => {
     console.log("Speaking text:", text)
     const resp = attemptSync(
-      /* Speech.speak(text, {
+      Speech.speak(text, {
         language: "en-US",
         pitch: 1.0,
         rate: 0.8,
-      }) */
-      Speech.speak(text)
+      })
     )
     if (!resp.ok) {
       console.error("Failed to speak text:", resp.error)

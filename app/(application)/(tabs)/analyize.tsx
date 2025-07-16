@@ -1,17 +1,19 @@
 import React from "react"
+import { Button } from "@/components/Button"
+import { Fonts, FontSizes } from "@/constants"
+import UpgradeButton from "@/components/UpgradeButton"
+import { SideBar } from "@/components/sidebar"
+import { useAnalysis } from "@/hooks/useAnalysis"
+import { ChatView } from "@/components/chat"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native"
 import { Upload, Camera, FileText, Menu, LogOut } from "lucide-react-native"
 import Animated, { FadeInDown, FadeIn, FadeOut } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
-import { DocumentTypeSelector } from "@/components/DocumentTypeSelector"
-import { Button } from "@/components/Button"
-import { Fonts, FontSizes } from "@/constants/Fonts"
-import UpgradeButton from "@/components/UpgradeButton"
-import { SideBar } from "@/components/sidebar/Sidebar"
-import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisView"
-import { RecentDocumentItem } from "@/components/documents/RecentDocumentCard"
-import { useAnalysis } from "@/hooks/useAnalysis"
-import { ChatView } from "@/components/chat/ChatView"
+import {
+  DocumentTypeSelector,
+  RecentDocumentItem,
+  DocumentAnalysisView,
+} from "@/components/documents"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()

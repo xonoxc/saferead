@@ -9,7 +9,7 @@ import { useBackendDocuments } from "@/hooks/useBackendDocuments"
 
 import { useAuth } from "@/hooks/useAuth"
 
-import type { DocumentType } from "@/components/DocumentTypeSelector"
+import type { DocumentType } from "@/components/documents"
 import { useSpaceStore } from "@/store/useSpaceStore"
 
 export function useAnalysis() {

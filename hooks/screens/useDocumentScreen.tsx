@@ -35,7 +35,7 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
 
   const documents = data?.pages.flatMap(page => page.results) ?? []
 
-  const { mutateAsync: deleteDocument } = useDeleteDocument()
+  const { mutateAsync: deleteDocument, isPending: isDeleting } = useDeleteDocument()
 
   const handleAddDocument = () => {
     router.push("/(application)/(tabs)/analyize")
@@ -85,6 +85,7 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
     setShowFilter,
     setSelectedDocument,
     handleAddDocument,
+    isDeleting,
     handleDeleteDocument,
     handleRefresh,
     handleSearch,

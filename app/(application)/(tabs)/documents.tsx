@@ -49,6 +49,7 @@ export default function DocumentsScreen() {
     handleSearch,
     handleRefresh,
     loadMoreDocuments,
+    isDeleting,
     FallbackStateWrapper,
   } = useDocumentScreen(spaceId, spaceName)
 
@@ -87,7 +88,7 @@ export default function DocumentsScreen() {
     )
   }
 
-  if (isLoading || isRefreshing) {
+  if (isLoading || isRefreshing || isDeleting) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>

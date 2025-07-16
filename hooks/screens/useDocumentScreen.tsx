@@ -8,50 +8,50 @@ import { Button } from "@/components/Button"
 import { useTheme } from "../useTheme"
 import { FileText } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
+import { useDocuments, useDeleteDocument } from "@/hooks/queries/docs"
+import { attempt } from "@/utils/attempt"
 
 export function useDocumentScreen(spaceId?: string, spaceName?: string) {
-  const {
-    documents,
-    error,
-    hasMore,
-    init,
-    isLoading,
-    currentFilters,
-    refreshDocuments,
-    loadMoreDocuments,
-    loadDocuments,
-    applyFilters,
-    deleteDocument,
-  } = useDocumentsStore()
+  const { init, currentFilters, applyFilters } = useDocumentsStore()
 
   const [searchQuery, setSearchQuery] = useState("")
   const [showFilter, setShowFilter] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<AnalysisResponse | null>(null)
-  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     if (spaceId) init(spaceId)
   }, [spaceId])
 
-  useFocusEffect(() => {
-    loadDocuments()
-  })
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    refetch,
+    isRefetching: isRefetchingDocs,
+    isFetchingNextPage,
+  } = useDocuments(currentFilters)
+
+  const documents = data?.pages.flatMap(page => page.results) ?? []
+
+  const { mutateAsync: deleteDocument } = useDeleteDocument()
 
   const handleAddDocument = () => {
     router.push("/(application)/(tabs)/analyize")
   }
 
   const handleDeleteDocument = async (documentId: string) => {
-    const success = await deleteDocument(documentId)
-    if (success) {
-      Alert.alert("Success", "Document deleted successfully")
+    const resp = await attempt(deleteDocument(documentId))
+    if (!resp.ok) {
+      Alert.alert("Error", resp.error.message || "Failed to delete document")
+      return
     }
+    Alert.alert("Success", "Document deleted successfully~! ✨")
   }
 
   const handleRefresh = async () => {
-    setRefreshing(true)
-    await refreshDocuments()
-    setRefreshing(false)
+    await refetch()
   }
 
   const debouncedSearch = useDebouncedCallback((text: string) => {
@@ -75,19 +75,22 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
     documents,
     error,
     isLoading,
-    hasMore,
+    isFetchingNextPage,
+    hasMore: hasNextPage,
     currentFilters,
     searchQuery,
     showFilter,
     selectedDocument,
-    refreshing,
+    refreshing: isRefetchingDocs,
     setShowFilter,
     setSelectedDocument,
     handleAddDocument,
     handleDeleteDocument,
     handleRefresh,
     handleSearch,
-    loadMoreDocuments,
+    loadMoreDocuments: () => {
+      if (hasNextPage) fetchNextPage()
+    },
     applyFilters,
     FallbackStateWrapper,
   }
@@ -139,7 +142,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 60,
+    gap: 2,
+    height: "100%",
+    paddingVertical: 200,
   },
   emptyStateTitle: {
     fontSize: FontSizes.xl,

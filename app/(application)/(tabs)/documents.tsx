@@ -16,7 +16,11 @@ import { DocumentAnalysisView, DocumentFilter } from "@/components/documents"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants"
 import { AnalysisResponse } from "@/types/api/documents.types"
+import { DocumentCardSkeleton } from "@/components/skeletons"
 import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
+import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
+
+const SKELETON_COUNT = 5
 
 export default function DocumentsScreen() {
   const { colors } = useTheme()
@@ -47,6 +51,8 @@ export default function DocumentsScreen() {
     FallbackStateWrapper,
   } = useDocumentScreen(spaceId, spaceName)
 
+  useTabBarVisibility(!isLoading)
+
   const handleDocumentPress = (document: AnalysisResponse) => {
     setSelectedDocument(document)
   }
@@ -72,9 +78,72 @@ export default function DocumentsScreen() {
     )
   }
 
+  console.log(
+    "🧾 All documents:",
+    documents.map(doc => doc.id)
+  )
+
   if (selectedDocument) {
     return (
       <DocumentAnalysisView analysis={selectedDocument} onBack={() => setSelectedDocument(null)} />
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.header}>
+          {spaceName ? (
+            <View style={styles.spaceHeader}>
+              <Folder size={24} color={spaceColor || colors.primary} />
+              <Text style={[styles.title, { color: spaceColor || colors.text }]}>{spaceName}</Text>
+            </View>
+          ) : (
+            <Text style={[styles.title, { color: colors.text }]}>Your Documents</Text>
+          )}
+          <TouchableOpacity
+            style={[styles.addButton, { backgroundColor: colors.primary }]}
+            onPress={handleAddDocument}
+          >
+            <Plus size={24} color={colors.background} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.searchContainer}>
+          <View
+            style={[
+              styles.searchInputContainer,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <Search size={18} color={colors.textMuted} />
+            <TextInput
+              style={[styles.searchInput, { color: colors.text }]}
+              value={searchQuery}
+              onChangeText={text => handleSearch(text)}
+              placeholder="Search documents..."
+              placeholderTextColor={colors.textMuted}
+              returnKeyType="search"
+              clearButtonMode="while-editing"
+            />
+          </View>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+            onPress={() => setShowFilter(true)}
+          >
+            <Filter size={18} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
+        <FlatList
+          data={Array.from({ length: SKELETON_COUNT }).map((_, i) => ({ id: `skeleton-${i}` }))}
+          keyExtractor={item => item.id}
+          renderItem={() => <DocumentCardSkeleton />}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
     )
   }
 
@@ -126,9 +195,9 @@ export default function DocumentsScreen() {
         </TouchableOpacity>
       </View>
 
-      {error && (
+      {error?.message && (
         <View style={[styles.errorContainer, { backgroundColor: colors.error + "20" }]}>
-          <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
+          <Text style={[styles.errorText, { color: colors.error }]}>{error.message}</Text>
         </View>
       )}
 
@@ -152,7 +221,9 @@ export default function DocumentsScreen() {
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <FallbackStateWrapper />
+        <View style={styles.listContent}>
+          <FallbackStateWrapper />
+        </View>
       )}
 
       <DocumentFilter

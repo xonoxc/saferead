@@ -5,17 +5,17 @@ import { attempt, Result } from "@/utils/attempt"
 import { useAuth } from "@/hooks/useAuth"
 import type { DocumentType } from "@/components/documents"
 import { useSpaceStore } from "@/store/useSpaceStore"
-import { useDocumentsStore } from "@/store/useDocumentStore"
 import { AnalysisResponse } from "@/types/api/documents.types"
 
 import { uploadDocument } from "@/services/api"
 
 import * as DocumentPicker from "expo-document-picker"
 import * as ImagePicker from "expo-image-picker"
+import { useDocuments } from "./queries/docs"
 
 export function useAnalysis() {
   const { user } = useAuth()
-  const { documents: recentDocuments } = useDocumentsStore()
+
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [pastedText, setPastedText] = useState("")
@@ -23,6 +23,9 @@ export function useAnalysis() {
   const [showTextInput, setShowTextInput] = useState(false)
   const [isSideBarOpen, setIsSideBarOpen] = useState(false)
   const { selectedSpace, setSelectedSpace } = useSpaceStore()
+
+  const { data } = useDocuments()
+  const recentDocuments = data?.pages.flatMap(page => page.results) ?? []
 
   useTabBarVisibility(!(isSideBarOpen || !!selectedSpace))
 

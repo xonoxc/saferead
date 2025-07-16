@@ -19,13 +19,17 @@ import { useAuth } from "@/hooks/useAuth"
 import { useDocumentStats } from "@/hooks/useDocumentStats"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useTabHideScroll } from "@/hooks/useTabHideScroll"
-import { LoadingSpinner } from "@/components/LoadingSpinner"
+
+import { HomeScreenSkeleton } from "@/components/skeletons"
+import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 
 export default function HomeScreen() {
   const { colors } = useTheme()
   const { user } = useAuth()
   const { stats, isLoading, error, refetch } = useDocumentStats()
   const { handleScroll } = useTabHideScroll()
+
+  useTabBarVisibility(!isLoading)
 
   if (!user) {
     return (
@@ -104,16 +108,7 @@ export default function HomeScreen() {
   }
 
   if (isLoading) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.loadingContainer}>
-          <LoadingSpinner size="large" />
-          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-            Loading your statistics...
-          </Text>
-        </View>
-      </View>
-    )
+    return <HomeScreenSkeleton />
   }
 
   if (error) {

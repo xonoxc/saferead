@@ -36,7 +36,8 @@ export async function uploadDocument(data: UploadDocumentRequest) {
 
 export async function getDocuments(page?: number, filters?: FilterOptions) {
   const params = prepareGetDocumentParams(page, filters)
-  return apiClient.get("/scanner/documents/", { params })
+  const resp = await apiClient.get("/scanner/documents/", { params })
+  return resp.data
 }
 
 /*

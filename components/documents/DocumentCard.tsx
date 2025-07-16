@@ -9,7 +9,7 @@ import {
 import { useTheme } from "@/hooks/useTheme"
 import { Document } from "@/types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { useDocumentsStore } from "@/store/useDocumentStore"
+import { useDeleteDocument } from "@/hooks/queries/docs"
 
 interface DocumentCardProps {
   document: Document
@@ -19,7 +19,7 @@ interface DocumentCardProps {
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, onAnalyze }) => {
   const { colors } = useTheme()
-  const { deleteDocument } = useDocumentsStore()
+  const { mutateAsync: deleteDocument } = useDeleteDocument()
   const [showMenu, setShowMenu] = useState(false)
 
   const getRiskColor = (risk: string | undefined) => {

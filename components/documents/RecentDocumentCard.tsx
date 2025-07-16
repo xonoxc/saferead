@@ -1,6 +1,6 @@
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useTheme } from "@/hooks/useTheme"
-import { AnalysisResponse } from "@/services/api"
+import { AnalysisResponse } from "@/types/api/documents.types"
 import { FileText, TrendingUp } from "lucide-react-native"
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native"
 

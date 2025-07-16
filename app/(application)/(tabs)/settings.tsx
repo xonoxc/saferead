@@ -20,16 +20,26 @@ import type { User } from "@/types"
 import type { ThemeMode } from "@/hooks/useTheme"
 import { type Router, useRouter } from "expo-router"
 import { DropdownSelector } from "@/components/DropDownSelector"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function SettingsScreen() {
   const { colors, mode, setTheme } = useTheme()
   const { user, logout } = useAuth()
   const router = useRouter()
 
+  const queryClient = useQueryClient()
+
   const handleLogout = () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Sign Out", style: "destructive", onPress: logout },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: async () => {
+          queryClient.clear()
+          await logout()
+        },
+      },
     ])
   }
 

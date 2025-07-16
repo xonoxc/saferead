@@ -1,16 +1,11 @@
-//import { useAuthRequest } from "expo-auth-session"
-//import { makeRedirectUri } from "expo-auth-session"
 import { useState, useEffect, createContext, use } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
 import { User } from "@/types"
-//import * as WebBrowser from "expo-web-browser"
 import { attempt, attemptSync } from "@/utils/attempt"
 import { isWeb } from "@/utils/helpers/platform"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { apiClient } from "@/utils/apiclient"
-
-//import { discovery } from "expo-auth-session/build/providers/Google"
 
 interface AuthContextType {
   user: User | null
@@ -30,7 +25,11 @@ interface AuthContextType {
     success: boolean
     message: string
   }>
-  logout: () => Promise<void>
+  logout: () => Promise<{
+    success: boolean
+    message?: string
+    error?: string
+  }>
   // refreshToken: () => Promise<void>
   updateUser: (user: Partial<User>) => Promise<void>
 }
@@ -148,7 +147,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const resp = await attempt(apiClient.get("/auth/user/"))
     if (!resp.ok) {
-      await logout()
+      const logoutResp = await logout()
+      if (!logoutResp.success) {
+        return {
+          success: false,
+          message: "Failed to logout after login error",
+        }
+      }
       return {
         success: false,
         message: "Failed to fetch user data",
@@ -166,9 +171,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const logout = async () => {
-    await deleteSecureItem("access_token")
-    await deleteSecureItem("user_data")
+    const resp = await attempt(
+      Promise.all([deleteSecureItem("access_token"), deleteSecureItem("user_data")])
+    )
+    if (!resp.ok) {
+      return {
+        success: false,
+        error: resp.error.message,
+      }
+    }
     setUser(null)
+
+    return {
+      success: true,
+      message: "Logout successful",
+    }
   }
   /*
   const loginWithGoogle = async () => {

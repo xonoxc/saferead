@@ -15,6 +15,8 @@ import {
   DocumentAnalysisView,
 } from "@/components/documents"
 
+import { AnalyzeScreenSkeleton } from "@/components/skeletons"
+
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
 
@@ -41,6 +43,10 @@ export default function AnalyzeScreen() {
 
   if (analysisResult) {
     return <DocumentAnalysisView analysis={analysisResult} onBack={() => setAnalysisResult(null)} />
+  }
+
+  if (isAnalyzing) {
+    return <AnalyzeScreenSkeleton />
   }
 
   const handleSpaceClose = () => {

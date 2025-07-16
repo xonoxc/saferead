@@ -78,11 +78,6 @@ export default function DocumentsScreen() {
     )
   }
 
-  console.log(
-    "🧾 All documents:",
-    documents.map(doc => doc.id)
-  )
-
   if (selectedDocument) {
     return (
       <DocumentAnalysisView analysis={selectedDocument} onBack={() => setSelectedDocument(null)} />

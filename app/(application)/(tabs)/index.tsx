@@ -14,22 +14,22 @@ import {
   FileCheck,
   Loader,
 } from "lucide-react-native"
-import { useTheme } from "@/hooks/useTheme"
+import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { useDocumentStats } from "@/hooks/useDocumentStats"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useTabHideScroll } from "@/hooks/useTabHideScroll"
 
 import { HomeScreenSkeleton } from "@/components/skeletons"
-import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
+import { StatsResponse } from "@/types/api/documents.types"
 
 export default function HomeScreen() {
   const { colors } = useTheme()
   const { user } = useAuth()
   const { stats, isLoading, error, refetch } = useDocumentStats()
   const { handleScroll } = useTabHideScroll()
-
-  useTabBarVisibility(!isLoading)
+  const mainStats = getMainStats(stats, colors)
+  const typeStats = getTypeStats(stats, colors)
 
   if (!user) {
     return (
@@ -42,69 +42,6 @@ export default function HomeScreen() {
         </View>
       </View>
     )
-  }
-
-  const getMainStats = () => {
-    if (!stats) return []
-
-    return [
-      {
-        icon: FileText,
-        title: "Total Documents",
-        value: stats.total_documents,
-        color: colors.primary,
-      },
-      {
-        icon: CheckCircle,
-        title: "Completed",
-        value: stats.completed,
-        color: colors.success,
-      },
-      {
-        icon: AlertCircle,
-        title: "Failed",
-        value: stats.failed,
-        color: colors.error,
-      },
-      {
-        icon: TrendingUp,
-        title: "Avg Confidence",
-        value: Math.round(stats.avg_confidence * 100),
-        color: colors.primary,
-        isPercentage: true,
-      },
-    ]
-  }
-
-  const getTypeStats = () => {
-    if (!stats) return []
-
-    return [
-      {
-        icon: Scale,
-        title: "Legal Agreements",
-        value: stats.by_type.legal,
-        color: colors.primary,
-      },
-      {
-        icon: FileCheck,
-        title: "Terms & Conditions",
-        value: stats.by_type.terms,
-        color: colors.secondary,
-      },
-      {
-        icon: Shield,
-        title: "Privacy Policies",
-        value: stats.by_type.privacy,
-        color: colors.accent,
-      },
-      {
-        icon: FileText,
-        title: "Other Documents",
-        value: stats.by_type.other,
-        color: colors.textSecondary,
-      },
-    ]
   }
 
   if (isLoading) {
@@ -143,7 +80,7 @@ export default function HomeScreen() {
       {/* Main Statistics */}
       <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.statsGrid}>
         <StatCard
-          stat={getMainStats()[0]}
+          stat={mainStats[0]}
           style={{
             width: "100%",
             height: 130,
@@ -153,12 +90,12 @@ export default function HomeScreen() {
         <View style={styles.row}>
           <View style={styles.leftColumn}>
             <StatCard
-              stat={getMainStats()[1]}
+              stat={mainStats[1]}
               style={{ width: "100%", height: 130, marginBottom: 12 }}
             />
-            <StatCard stat={getMainStats()[2]} style={{ width: "100%", height: 120 }} />
+            <StatCard stat={mainStats[2]} style={{ width: "100%", height: 120 }} />
           </View>
-          <StatCard stat={getMainStats()[3]} style={{ width: "48%", height: 264 }} />
+          <StatCard stat={mainStats[3]} style={{ width: "48%", height: 264 }} />
         </View>
       </Animated.View>
 
@@ -166,7 +103,7 @@ export default function HomeScreen() {
       <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Document Types</Text>
         <View style={styles.typeGrid}>
-          {getTypeStats().map((stat, index) => (
+          {typeStats.map((stat, index) => (
             <View key={index} style={styles.typeRow}>
               <TypeCard stat={stat} />
             </View>
@@ -213,6 +150,69 @@ export default function HomeScreen() {
       )}
     </ScrollView>
   )
+}
+
+const getMainStats = (stats: StatsResponse | null, colors: ColorsType) => {
+  if (!stats) return []
+
+  return [
+    {
+      icon: FileText,
+      title: "Total Documents",
+      value: stats.total_documents,
+      color: colors.primary,
+    },
+    {
+      icon: CheckCircle,
+      title: "Completed",
+      value: stats.completed,
+      color: colors.success,
+    },
+    {
+      icon: AlertCircle,
+      title: "Failed",
+      value: stats.failed,
+      color: colors.error,
+    },
+    {
+      icon: TrendingUp,
+      title: "Avg Confidence",
+      value: Math.round(stats.avg_confidence * 100),
+      color: colors.primary,
+      isPercentage: true,
+    },
+  ]
+}
+
+function getTypeStats(stats: StatsResponse | null, colors: ColorsType) {
+  if (!stats) return []
+
+  return [
+    {
+      icon: Scale,
+      title: "Legal Agreements",
+      value: stats.by_type.legal,
+      color: colors.primary,
+    },
+    {
+      icon: FileCheck,
+      title: "Terms & Conditions",
+      value: stats.by_type.terms,
+      color: colors.secondary,
+    },
+    {
+      icon: Shield,
+      title: "Privacy Policies",
+      value: stats.by_type.privacy,
+      color: colors.accent,
+    },
+    {
+      icon: FileText,
+      title: "Other Documents",
+      value: stats.by_type.other,
+      color: colors.textSecondary,
+    },
+  ]
 }
 
 interface StatCardProps {
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },

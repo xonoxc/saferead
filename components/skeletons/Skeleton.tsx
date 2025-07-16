@@ -1,5 +1,5 @@
-import React, { useEffect } from "react"
-import { View, StyleSheet, Animated, Easing } from "react-native"
+import React from "react"
+import { View, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 
 interface SkeletonProps {
@@ -11,37 +11,26 @@ interface SkeletonProps {
 
 const Skeleton = ({ width, height, borderRadius = 4, style }: SkeletonProps) => {
   const { colors } = useTheme()
-  const animatedValue = new Animated.Value(0)
-
-  useEffect(() => {
-    const animation = Animated.loop(
-      Animated.timing(animatedValue, {
-        toValue: 1,
-        duration: 1000,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: true,
-      })
-    )
-    animation.start()
-    return () => animation.stop()
-  }, [])
-
-  const translateX = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-200, 200],
-  })
 
   return (
     <View
       style={[
         styles.skeleton,
-        { width, height, borderRadius, backgroundColor: colors.skeletonBackground, ...style },
+        {
+          width,
+          height,
+          borderRadius,
+          backgroundColor: colors.skeletonBackground,
+        },
+        style,
       ]}
     >
-      <Animated.View
+      <View
         style={[
           styles.shimmer,
-          { backgroundColor: colors.skeletonShimmer, transform: [{ translateX }] },
+          {
+            backgroundColor: colors.skeletonShimmer,
+          },
         ]}
       />
     </View>
@@ -51,9 +40,11 @@ const Skeleton = ({ width, height, borderRadius = 4, style }: SkeletonProps) => 
 const styles = StyleSheet.create({
   skeleton: {
     overflow: "hidden",
+    backgroundColor: "#eee",
   },
   shimmer: {
     ...StyleSheet.absoluteFillObject,
+    opacity: 0.4,
   },
 })
 

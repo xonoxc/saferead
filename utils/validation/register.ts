@@ -10,7 +10,7 @@ export const registerSchema = z
   })
   .refine(data => data.password1 === data.password2, {
     message: "Passwords do not match",
-    path: ["confirmPassword"],
+    path: ["password2"],
   })
 
 export type RegisterFormData = z.infer<typeof registerSchema>

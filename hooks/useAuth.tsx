@@ -113,9 +113,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(parsedUserData.data)
         }
       } else {
-        const resp = await attempt(apiClient.get("/auth/user/"))
+        const resp = await attempt<User>(apiClient.get("/auth/user/"))
         if (resp.ok) {
-          const userData = resp.data.data as User
+          const userData = resp.data
           await setSecureItem("user_data", JSON.stringify(userData))
           setUser(userData)
         } else {
@@ -133,19 +133,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     success: boolean
     message: string
   }> => {
-    const result = await attempt(apiClient.post("/auth/login/", data))
+    const result = await attempt<{ key: string }>(apiClient.post("/auth/login/", data))
     if (!result.ok) {
       return {
         success: false,
         message: getErrorMessage(result.error),
       }
     }
+    const token = result.data.key
 
-    const token = result.data.data as { key: string }
+    console.log("token", token)
 
-    await setSecureItem("access_token", token.key)
+    await setSecureItem("access_token", token)
 
-    const resp = await attempt(apiClient.get("/auth/user/"))
+    const resp = await attempt<User>(apiClient.get("/auth/user/"))
     if (!resp.ok) {
       const logoutResp = await logout()
       if (!logoutResp.success) {
@@ -160,7 +161,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
-    const userData = resp.data.data as User
+    const userData = resp.data
     await setSecureItem("user_data", JSON.stringify(userData))
     setUser(userData)
 

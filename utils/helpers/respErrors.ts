@@ -1,4 +1,4 @@
-import { attemptSync, ExpectedError } from "../attempt"
+import { attemptSync } from "../attempt"
 
 /*
  *
@@ -28,6 +28,7 @@ export function extractValidationErrorMessage(message: string | object): string 
     if (!res.ok) {
       return message
     }
+    data = res.data
   }
 
   if (typeof data !== "object" || data === null) {

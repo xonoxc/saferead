@@ -6,6 +6,7 @@ import { attempt, attemptSync } from "@/utils/attempt"
 import { isWeb } from "@/utils/helpers/platform"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { apiClient } from "@/utils/apiclient"
+import { useUserStore } from "@/store/useUserStore"
 
 interface AuthContextType {
   user: User | null
@@ -48,7 +49,7 @@ const redirectURI = makeRedirectUri({
 })
 */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null)
+  const { user, setUser, clearUser } = useUserStore()
   const [isLoading, setIsLoading] = useState(true)
 
   /* 
@@ -142,11 +143,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     const token = result.data.key
 
-    console.log("token", token)
+    const accessTokenSetAttempt = await attempt(setSecureItem("access_token", token))
+    if (!accessTokenSetAttempt.ok) {
+      return {
+        success: false,
+        message: "Failed to store access token",
+      }
+    }
 
-    await setSecureItem("access_token", token)
-
-    const resp = await attempt<User>(apiClient.get("/auth/user/"))
+    const resp = await attempt<User>(
+      apiClient.get("/auth/user/", {
+        headers: {
+          Authorization: `token ${token}`,
+        },
+      })
+    )
     if (!resp.ok) {
       const logoutResp = await logout()
       if (!logoutResp.success) {
@@ -172,16 +183,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const logout = async () => {
-    const resp = await attempt(
-      Promise.all([deleteSecureItem("access_token"), deleteSecureItem("user_data")])
-    )
-    if (!resp.ok) {
-      return {
-        success: false,
-        error: resp.error.message,
-      }
-    }
-    setUser(null)
+    await clearUser()
 
     return {
       success: true,

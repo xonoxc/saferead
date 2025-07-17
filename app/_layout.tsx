@@ -50,18 +50,16 @@ const AppContent = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={onLayout}>
-      <AuthProvider>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(application)" />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style={isDark ? "light" : "dark"} />
-      </AuthProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(application)" />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style={isDark ? "light" : "dark"} />
     </View>
   )
 }
@@ -71,9 +69,11 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ThemeProvider>
-        <AppContent />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </AuthProvider>
     </SafeAreaProvider>
   )
 }

@@ -7,8 +7,6 @@ import { isReactNativeFile } from "@/types/file"
 export async function uploadDocument(data: UploadDocumentRequest) {
   const formData = new FormData()
 
-  console.log("Uploading document with data:", data)
-
   formData.append("original_filename", data.original_filename)
   formData.append("document_type", data.document_type)
 

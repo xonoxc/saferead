@@ -2,7 +2,6 @@ import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tansta
 import { getDocuments, getDocumentById, deleteDocument as deleteDocumentApi } from "@/services/api"
 import type { FilterOptions } from "@/types/docs"
 import type { DocumentsListResponse } from "@/types/api/documents.types"
-import { useScreenFocusCallback } from "@/hooks/screens/useScreenFocusCallback"
 
 export const useDocuments = (filters?: FilterOptions, enabled = true) => {
   const query = useInfiniteQuery<DocumentsListResponse>({
@@ -16,10 +15,6 @@ export const useDocuments = (filters?: FilterOptions, enabled = true) => {
     initialPageParam: 1,
     enabled,
     refetchOnMount: true,
-  })
-
-  useScreenFocusCallback(() => {
-    query.refetch()
   })
 
   return query

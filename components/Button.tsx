@@ -12,7 +12,7 @@ import { Fonts, FontSizes } from "@/constants"
 
 interface ButtonProps {
   title: string
-  onPress: () => void
+  onPress: (() => void) | undefined
   variant?: "primary" | "secondary" | "outline" | "ghost"
   size?: "small" | "medium" | "large"
   loading?: boolean

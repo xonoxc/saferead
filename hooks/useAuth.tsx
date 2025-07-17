@@ -94,13 +94,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   } */
 
-  const deleteSecureItem = async (key: string) => {
+  /* const deleteSecureItem = async (key: string) => {
     if (isWeb()) {
       await AsyncStorage.removeItem(key)
     } else {
       await SecureStore.deleteItemAsync(key)
     }
-  }
+  } */
 
   const loadStoredAuth = async () => {
     setIsLoading(true)

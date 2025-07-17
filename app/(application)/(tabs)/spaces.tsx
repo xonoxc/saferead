@@ -1,7 +1,7 @@
 import { RelativePathString, router } from "expo-router"
 import React, { useState } from "react"
-import { View, StyleSheet, Alert, ScrollView, Text, TouchableOpacity } from "react-native"
-import { Search } from "lucide-react-native"
+import { View, StyleSheet, Alert, ScrollView } from "react-native"
+import { Box, Folder, Search } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useSpaces, useCreateSpace, useDeleteSpace } from "@/hooks/queries/spaces"
@@ -11,6 +11,7 @@ import { SpaceList } from "@/components/spaces/SpaceList"
 import { CreateSpaceForm } from "@/components/spaces/CreateSpaceForm"
 import { Space } from "@/types"
 import { SpacePrivarcy } from "@/types/spaces"
+import { EmptyState } from "@/components/EmptyState"
 
 export default function SpacesScreen() {
   const { colors } = useTheme()
@@ -74,7 +75,11 @@ export default function SpacesScreen() {
             onSpaceSelect={handleSpaceSelectPress}
           />
         ) : (
-          <SpacesFallback onCreate={() => setCreateModalVisible(true)} />
+          <SpacesFallback
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            setShowCreateModal={() => setCreateModalVisible(false)}
+          />
         )}
       </ScrollView>
 
@@ -90,19 +95,35 @@ export default function SpacesScreen() {
   )
 }
 
-function SpacesFallback({ onCreate }: { onCreate: () => void }) {
-  const { colors } = useTheme()
-
+function SpacesFallback({
+  searchQuery,
+  setSearchQuery,
+  setShowCreateModal,
+}: {
+  searchQuery?: string
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>
+  setShowCreateModal: (show: boolean) => void
+}) {
   return (
-    <View style={styles.spacesFallbackContainer}>
-      <Text style={{ color: colors.text }}>No spaces found!</Text>
-
-      <TouchableOpacity
-        onPress={onCreate}
-        style={[styles.fallbackCreateButton, { backgroundColor: colors.primary }]}
-      >
-        <Text>Create One ?</Text>
-      </TouchableOpacity>
+    <View style={styles.emptyStateContainer}>
+      <EmptyState
+        icon={searchQuery ? Search : Box}
+        title={searchQuery ? "No Spaces Found" : "No Spaces Yet"}
+        description={
+          searchQuery
+            ? `No spaces match "${searchQuery}". Try adjusting your search terms or create a new space.`
+            : "Organize your legal documents by creating spaces. Group contracts, agreements, and other documents for better organization and faster access."
+        }
+        actionTitle={searchQuery ? "Create New Space" : "Create Your First Space"}
+        onAction={() => {
+          if (searchQuery) setSearchQuery("")
+          setShowCreateModal(true)
+        }}
+        secondaryActionTitle={searchQuery ? "Clear Search" : "Learn About Spaces"}
+        onSecondaryAction={searchQuery ? () => setSearchQuery("") : () => {}}
+        variant={searchQuery ? "search" : "default"}
+        showFloatingElements={!searchQuery}
+      />
     </View>
   )
 }
@@ -139,7 +160,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   createButtonContainer: {
     marginTop: 16,
@@ -162,5 +183,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
+  },
+  emptyStateContainer: {
+    paddingTop: 120,
   },
 })

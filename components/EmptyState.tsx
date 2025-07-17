@@ -1,17 +1,6 @@
 import React from "react"
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native"
 import type { LucideIcon } from "lucide-react-native"
-import Animated, {
-  FadeInDown,
-  FadeInUp,
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  withSequence,
-  Easing,
-  interpolate,
-} from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
@@ -30,8 +19,6 @@ interface EmptyStateProps {
   variant?: "default" | "search" | "error"
 }
 
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
-
 export const EmptyState: React.FC<EmptyStateProps> = ({
   icon: IconComponent,
   title,
@@ -44,66 +31,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   variant = "default",
 }) => {
   const { colors } = useTheme()
-
-  const iconScale = useSharedValue(1)
-  const floatingY = useSharedValue(0)
-  const pulseOpacity = useSharedValue(0.3)
-  const sparkleScale = useSharedValue(0)
-
-  React.useEffect(() => {
-    // Icon breathing animation
-    iconScale.value = withRepeat(
-      withSequence(
-        withTiming(1.05, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1,
-      false
-    )
-
-    // Floating animation
-    floatingY.value = withRepeat(
-      withSequence(
-        withTiming(-8, { duration: 3000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 3000, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1,
-      false
-    )
-
-    // Pulse animation
-    pulseOpacity.value = withRepeat(
-      withSequence(
-        withTiming(0.6, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0.3, { duration: 2000, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1,
-      false
-    )
-
-    // Sparkle animation
-    sparkleScale.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 1500, easing: Easing.out(Easing.ease) }),
-        withTiming(0, { duration: 1500, easing: Easing.in(Easing.ease) })
-      ),
-      -1,
-      false
-    )
-  }, [])
-
-  const iconAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: iconScale.value }, { translateY: floatingY.value }],
-  }))
-
-  const pulseAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: pulseOpacity.value,
-  }))
-
-  const sparkleAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: sparkleScale.value }],
-    opacity: interpolate(sparkleScale.value, [0, 1], [0, 1]),
-  }))
 
   const getVariantColors = () => {
     switch (variant) {
@@ -129,21 +56,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Floating Background Elements */}
       {showFloatingElements && (
         <View style={styles.backgroundElements}>
           {[...Array(12)].map((_, index) => (
-            <Animated.View
+            <View
               key={index}
-              entering={FadeInUp.delay(index * 200).springify()}
               style={[
                 styles.floatingElement,
-                sparkleAnimatedStyle,
                 {
                   backgroundColor: variantColors.primary + "20",
                   left: Math.random() * screenWidth * 0.8 + screenWidth * 0.1,
                   top: Math.random() * 400 + 100,
-                  animationDelay: `${index * 300}ms`,
                 },
               ]}
             />
@@ -151,71 +74,54 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         </View>
       )}
 
-      {/* Main Content */}
-      <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.content}>
-        {/* Icon Container */}
-        <Animated.View style={[styles.iconContainer, iconAnimatedStyle]}>
-          {/* Pulse Circles */}
-          <Animated.View
+      <View style={styles.content}>
+        <View style={styles.iconContainer}>
+          <View
             style={[
               styles.pulseCircle,
               styles.pulseCircle1,
               { borderColor: variantColors.primary },
-              pulseAnimatedStyle,
             ]}
           />
-          <Animated.View
+          <View
             style={[
               styles.pulseCircle,
               styles.pulseCircle2,
               { borderColor: variantColors.primary },
-              pulseAnimatedStyle,
             ]}
           />
-
-          {/* Icon Wrapper */}
           <View style={[styles.iconWrapper, { backgroundColor: variantColors.background }]}>
             <IconComponent size={48} color={variantColors.primary} />
           </View>
-        </Animated.View>
+        </View>
 
-        {/* Text Content */}
-        <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.textContainer}>
+        <View style={styles.textContainer}>
           <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-
           <Text style={[styles.description, { color: colors.textSecondary }]}>{description}</Text>
-        </Animated.View>
+        </View>
 
-        {/* Action Buttons */}
         {(actionTitle || secondaryActionTitle) && (
-          <Animated.View
-            entering={FadeInDown.delay(700).springify()}
-            style={styles.buttonContainer}
-          >
+          <View style={styles.buttonContainer}>
             {actionTitle && onAction && (
               <Button
                 title={actionTitle}
                 onPress={onAction}
                 variant="primary"
-                size="large"
+                size="medium"
                 fullWidth
               />
             )}
 
             {secondaryActionTitle && onSecondaryAction && (
-              <AnimatedTouchableOpacity
-                entering={FadeInDown.delay(800).springify()}
-                style={styles.secondaryButton}
-                onPress={onSecondaryAction}
-              >
+              <TouchableOpacity style={styles.secondaryButton} onPress={onSecondaryAction}>
                 <Text style={[styles.secondaryButtonText, { color: colors.textSecondary }]}>
                   {secondaryActionTitle}
                 </Text>
-              </AnimatedTouchableOpacity>
+              </TouchableOpacity>
             )}
-          </Animated.View>
+          </View>
         )}
-      </Animated.View>
+      </View>
     </View>
   )
 }
@@ -243,7 +149,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 32,
-    paddingTop: 100,
+    paddingTop: 30,
   },
   iconContainer: {
     position: "relative",
@@ -280,16 +186,17 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     alignItems: "center",
+    marginTop: 20,
     marginBottom: 40,
   },
   title: {
-    fontSize: FontSizes.xxxl,
+    fontSize: FontSizes.lg,
     fontFamily: Fonts.bold,
     textAlign: "center",
     marginBottom: 16,
   },
   description: {
-    fontSize: FontSizes.lg,
+    fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
     textAlign: "center",
     lineHeight: 24,
@@ -305,7 +212,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   secondaryButtonText: {
-    fontSize: FontSizes.md,
+    fontSize: FontSizes.sm,
     fontFamily: Fonts.medium,
   },
 })

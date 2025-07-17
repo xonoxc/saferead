@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native"
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Switch } from "react-native"
 import { TextInput } from "@/components/TextInput"
 import { Button } from "@/components/Button"
 import { useTheme } from "@/hooks/useTheme"
@@ -7,30 +7,42 @@ import { Fonts, FontSizes } from "@/constants/Fonts"
 
 const icons = ["📁", "📄", "🤝", "🏢", "⚖️", "📋", "🔒", "📊", "💼", "📝"]
 const colors_palette = ["#4ECDC4", "#FF6B6B", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98D8C8"]
+const privacyOptions = ["private", "public"]
 
 export const CreateSpaceForm = ({
   onCreate,
   onCancel,
 }: {
-  onCreate: (name: string, desc: string, color: string, icon: string) => void
+  onCreate: (
+    title: string,
+    desc: string,
+    color: string,
+    icon: string,
+    privacy: "private" | "public",
+    is_favorite: boolean
+  ) => void
   onCancel: () => void
 }) => {
   const { colors } = useTheme()
-  const [name, setName] = useState("")
+  const [title, setTitle] = useState("")
   const [desc, setDesc] = useState("")
   const [color, setColor] = useState(colors_palette[0])
   const [icon, setIcon] = useState(icons[0])
+  const [privacy, setPrivacy] = useState<"private" | "public">("private")
+  const [isFavorite, setIsFavorite] = useState(false)
 
   const handleSubmit = () => {
-    if (!name.trim()) {
+    if (!title.trim()) {
       Alert.alert("Error", "Please enter a space name")
       return
     }
-    onCreate(name, desc, color, icon)
-    setName("")
+    onCreate(title, desc, color, icon, privacy, isFavorite)
+    setTitle("")
     setDesc("")
     setColor(colors_palette[0])
     setIcon(icons[0])
+    setPrivacy("private")
+    setIsFavorite(false)
   }
 
   return (
@@ -45,8 +57,8 @@ export const CreateSpaceForm = ({
       <ScrollView style={styles.content}>
         <TextInput
           label="Space Name"
-          value={name}
-          onChangeText={setName}
+          value={title}
+          onChangeText={setTitle}
           placeholder="Enter name"
         />
         <TextInput
@@ -84,6 +96,41 @@ export const CreateSpaceForm = ({
               <Text style={styles.iconText}>{i}</Text>
             </TouchableOpacity>
           ))}
+        </View>
+
+        <Text style={[styles.label, { color: colors.text }]}>Privacy</Text>
+        <View style={styles.privacyContainer}>
+          {privacyOptions.map(option => (
+            <TouchableOpacity
+              key={option}
+              style={[
+                styles.privacyOption,
+                {
+                  backgroundColor: privacy === option ? colors.primary : colors.surface,
+                },
+              ]}
+              onPress={() => setPrivacy(option as "private" | "public")}
+            >
+              <Text
+                style={{
+                  color: privacy === option ? colors.card : colors.text,
+                  fontFamily: Fonts.medium,
+                }}
+              >
+                {option.charAt(0).toUpperCase() + option.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={styles.favoriteContainer}>
+          <Text style={[styles.label, { color: colors.text, marginTop: 0 }]}>Add to Favorites</Text>
+          <Switch
+            value={isFavorite}
+            onValueChange={setIsFavorite}
+            trackColor={{ false: colors.surface, true: colors.primary }}
+            thumbColor={colors.card}
+          />
         </View>
       </ScrollView>
 
@@ -150,5 +197,22 @@ const styles = StyleSheet.create({
   footer: {
     padding: 20,
     paddingBottom: 40,
+  },
+  privacyContainer: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 20,
+  },
+  privacyOption: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  favoriteContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
   },
 })

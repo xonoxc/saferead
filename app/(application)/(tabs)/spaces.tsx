@@ -1,0 +1,155 @@
+import { RelativePathString, router } from "expo-router"
+import React, { useState } from "react"
+import { View, StyleSheet, Alert, ScrollView, Text, TouchableOpacity } from "react-native"
+import { Search } from "lucide-react-native"
+import { useTheme } from "@/hooks/useTheme"
+import { Fonts, FontSizes } from "@/constants/Fonts"
+import { useSpaces, useCreateSpace, useDeleteSpace } from "@/hooks/queries/spaces"
+import { TextInput } from "@/components/TextInput"
+import { LoadingSpinner } from "@/components/LoadingSpinner"
+import { SpaceList } from "@/components/spaces/SpaceList"
+import { CreateSpaceForm } from "@/components/spaces/CreateSpaceForm"
+import { Space } from "@/types"
+
+export default function SpacesScreen() {
+  const { colors } = useTheme()
+  const { data, isLoading } = useSpaces()
+  const { mutate: createSpace } = useCreateSpace()
+  const { mutate: deleteSpace } = useDeleteSpace()
+
+  const spaces = data?.pages.flatMap(page => page.results) ?? []
+
+  const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
+
+  const [searchQuery, setSearchQuery] = useState<string>("")
+
+  const filteredSpaces = spaces.filter(
+    space =>
+      space.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      space.description.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const handleCreateSpace = async (
+    title: string,
+    description: string,
+    color: string,
+    icon: string,
+    privacy: "private" | "public",
+    is_favorite: boolean
+  ) => {
+    createSpace({ title, description, color, icon, privacy, is_favorite })
+  }
+
+  const handleDeleteSpace = (spaceId: string, spaceName: string) => {
+    Alert.alert("Delete Space", `Are you sure you want to delete "${spaceName}"?`, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Delete", style: "destructive", onPress: () => deleteSpace(spaceId) },
+    ])
+  }
+
+  const handleSpaceSelectPress = (space: Space) => {
+    router.push(`/spaces/${space.id}` as RelativePathString)
+  }
+
+  if (isLoading) return <LoadingSpinner />
+
+  return (
+    <View style={[styles.sidebarContent, { backgroundColor: colors.background }]}>
+      <View style={styles.searchContainer}>
+        <View style={[styles.searchInputContainer]}>
+          <Search size={20} color={colors.textMuted} />
+          <TextInput
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search spaces..."
+          />
+        </View>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {spaces.length > 0 ? (
+          <SpaceList
+            spaces={filteredSpaces}
+            onDelete={handleDeleteSpace}
+            onSpaceSelect={handleSpaceSelectPress}
+          />
+        ) : !createModalVisible ? (
+          <SpacesFallback onCreate={() => setCreateModalVisible(true)} />
+        ) : (
+          <CreateSpaceForm
+            onCreate={handleCreateSpace}
+            onCancel={() => setCreateModalVisible(false)}
+          />
+        )}
+      </ScrollView>
+    </View>
+  )
+}
+
+function SpacesFallback({ onCreate }: { onCreate: () => void }) {
+  const { colors } = useTheme()
+
+  return (
+    <View style={styles.spacesFallbackContainer}>
+      <Text style={{ color: colors.text }}>No spaces found!</Text>
+
+      <TouchableOpacity
+        onPress={onCreate}
+        style={[styles.fallbackCreateButton, { backgroundColor: colors.primary }]}
+      >
+        <Text>Create One ?</Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  sidebarContent: {
+    flex: 1,
+    padding: 2,
+  },
+  header: { paddingBottom: 10 },
+  title: {
+    fontSize: FontSizes.xxl,
+    fontFamily: Fonts.bold,
+    textAlign: "center",
+  },
+  searchContainer: {
+    paddingVertical: 16,
+  },
+  searchInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingLeft: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderRadius: 12,
+  },
+  content: {
+    flex: 1,
+    marginBottom: 20,
+  },
+  createButtonContainer: {
+    marginTop: 16,
+  },
+  spacesFallbackContainer: {
+    flex: 1,
+    marginTop: 220,
+    height: "100%",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  fallbackCreateButton: {
+    fontSize: FontSizes.xs,
+    fontFamily: Fonts.medium,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    paddingVertical: 6,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+  },
+})

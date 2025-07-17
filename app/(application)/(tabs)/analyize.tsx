@@ -4,15 +4,13 @@ import UpgradeButton from "@/components/UpgradeButton"
 import { SideBar } from "@/components/sidebar"
 import { useAnalysis } from "@/hooks/useAnalysis"
 import { ChatView } from "@/components/chat"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native"
-import { Upload, Camera, FileText, Menu, LogOut } from "lucide-react-native"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
+import { Upload, Camera, Menu, LogOut } from "lucide-react-native"
 import Animated, { FadeInDown, FadeIn, FadeOut } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
-import {
-  DocumentTypeSelector,
-  RecentDocumentItem,
-  DocumentAnalysisView,
-} from "@/components/documents"
+import { DocumentTypeSelector } from "@/components/documents/DocumentTypeSelector"
+import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisView"
+import { RecentDocumentItem } from "@/components/documents/RecentDocumentCard"
 
 import { AnalyzeScreenSkeleton } from "@/components/skeletons"
 
@@ -23,22 +21,16 @@ export default function AnalyzeScreen() {
     isSideBarOpen,
     setIsSideBarOpen,
     isAnalyzing,
-    analysisResult,
     handleDocumentUpload,
     handleDocumentScan,
     selectedDocumentType,
     setSelectedDocumentType,
     recentDocuments,
-    setAnalysisResult,
     handleRecentDocumentPress,
     selectedSpace,
     isRecentDocumentsLoading,
     setSelectedSpace,
   } = useAnalysis()
-
-  if (analysisResult) {
-    return <DocumentAnalysisView analysis={analysisResult} onBack={() => setAnalysisResult(null)} />
-  }
 
   if (isAnalyzing || isRecentDocumentsLoading)
     return <AnalyzeScreenSkeleton isAnalizing={isAnalyzing} />

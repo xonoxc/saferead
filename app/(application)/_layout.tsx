@@ -26,6 +26,13 @@ export default function ApplicationLayout() {
             headerLeft: () => <CustomBackBtn />,
           }}
         />
+
+        <Stack.Screen
+          name="analysisres"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
     </SafeAreaView>
   )

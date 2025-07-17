@@ -1,5 +1,5 @@
 import { Redirect, Tabs } from "expo-router"
-import { Home, FileText, Settings, TextSearch } from "lucide-react-native"
+import { Home, FileText, Settings, TextSearch, Box } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { getTabBarStyles } from "@/utils/helpers/tabs"
@@ -44,10 +44,10 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
-          name="documents"
+          name="spaces"
           options={{
-            title: "Documents",
-            tabBarIcon: ({ size, color }) => <FileText size={size} color={color} />,
+            title: "Spaces",
+            tabBarIcon: ({ size, color }) => <Box size={size} color={color} />,
           }}
         />
 

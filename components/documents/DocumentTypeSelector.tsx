@@ -1,4 +1,4 @@
-import { DropdownSelector, DropdownOption } from "@/components"
+import { DropdownSelector, DropdownOption } from "../DropDownSelector"
 
 export type DocumentType = "terms" | "privacy" | "legal" | "other"
 

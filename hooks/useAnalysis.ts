@@ -3,7 +3,7 @@ import { Alert } from "react-native"
 import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 import { attempt } from "@/utils/attempt"
 import { useAuth } from "@/hooks/useAuth"
-import type { DocumentType } from "@/components/documents"
+import { DocumentType } from "@/components/documents/DocumentTypeSelector"
 import { useSpaceStore } from "@/store/useSpaceStore"
 import { AnalysisResponse } from "@/types/api/documents.types"
 
@@ -13,11 +13,13 @@ import * as DocumentPicker from "expo-document-picker"
 import * as ImagePicker from "expo-image-picker"
 import { useDocuments } from "./queries/docs"
 import { Document } from "@/types"
+import { useAnalysisStore } from "@/store/useAnalysisStore"
+import { router } from "expo-router"
 
 export function useAnalysis() {
   const { user } = useAuth()
 
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
+  const { analysisResult, setAnalysisResult } = useAnalysisStore()
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType>("other")
   const [showTextInput, setShowTextInput] = useState(false)
@@ -123,6 +125,7 @@ export function useAnalysis() {
 
   const handleRecentDocumentPress = (document: AnalysisResponse) => {
     setAnalysisResult(document)
+    router.push("/analysisres")
   }
 
   return {

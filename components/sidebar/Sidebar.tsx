@@ -9,7 +9,7 @@ import Animated, {
 } from "react-native-reanimated"
 import { TouchableOpacity, View, StyleSheet } from "react-native"
 import { PackagePlus } from "lucide-react-native"
-import { SpacesSidebarContent } from "./SidebarSpacesContent"
+import SidebarContent from "./SidebarContent"
 import CustomBackBtn from "../CustomBackBtn"
 
 import { useSpaceStore } from "@/store/useSpaceStore"
@@ -24,7 +24,6 @@ interface SidebarProps {
 
 export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
   const { colors } = useTheme()
-  const [createFormVisible, setCreateFormVisible] = React.useState(false)
   const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
 
   const translateX = useSharedValue(SCREEN_WIDTH)
@@ -36,11 +35,9 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
     })
   }, [isOpen])
 
-  const handleSpaceSelect = (space: Space) => {
-    // TODO: Replace with actual data fetching or navigation
+  /* const handleSpaceSelect = (space: Space) => {
     setSelectedSpace(space)
-    onClose()
-  }
+  } */
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
@@ -50,20 +47,13 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
     <Animated.View style={[styles.sidebar, { backgroundColor: colors.background }, animatedStyle]}>
       <View style={styles.header}>
         <CustomBackBtn onBack={onClose} />
-        <TouchableOpacity
-          onPress={() => setCreateFormVisible(true)}
-          style={{ padding: 8, paddingHorizontal: 20 }}
-        >
+        <TouchableOpacity style={{ padding: 8, paddingHorizontal: 20 }}>
           <PackagePlus color={colors.text} />
         </TouchableOpacity>
       </View>
 
       <View style={{ flex: 1 }}>
-        <SpacesSidebarContent
-          showCreateModal={createFormVisible}
-          onCreateFormClose={() => setCreateFormVisible(false)}
-          onSpaceSelect={handleSpaceSelect}
-        />
+        <SidebarContent />
       </View>
     </Animated.View>
   )

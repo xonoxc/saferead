@@ -22,7 +22,7 @@ export function ChatView({ space }: ChatViewProps) {
   )
 
   useEffect(() => {
-    setChatHistory([{ text: `Welcome to ${space.name}! How can I help you?`, sender: "bot" }])
+    setChatHistory([{ text: `Welcome to ${space.title}! How can I help you?`, sender: "bot" }])
   }, [space])
 
   const handleSend = () => {
@@ -59,7 +59,7 @@ export function ChatView({ space }: ChatViewProps) {
             ]}
           >
             <Box color={colors.text} size={18} />
-            <Text style={[styles.spaceBadge, { color: colors.text }]}>{space.name}</Text>
+            <Text style={[styles.spaceBadge, { color: colors.text }]}>{space.title}</Text>
           </View>
         </View>
       </View>

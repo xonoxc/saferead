@@ -13,7 +13,8 @@ import Animated, { FadeInDown } from "react-native-reanimated"
 import { Plus, Search, Filter, FileText, Trash2, TrendingUp, Folder } from "lucide-react-native"
 import { useLocalSearchParams } from "expo-router"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
-import { DocumentAnalysisView, DocumentFilter } from "@/components/documents"
+import { DocumentAnalysisView } from "../documents/DocumentAnalysisView"
+import { DocumentFilter } from "../documents/DocumentFilter"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants"
 import { AnalysisResponse } from "@/types/api/documents.types"
@@ -23,7 +24,7 @@ import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 
 const SKELETON_COUNT = 3
 
-export default function DocumentsScreen() {
+export default function SideBarDocumentContent() {
   const { colors } = useTheme()
   const { spaceId, spaceName, spaceColor } = useLocalSearchParams<{
     spaceId?: string

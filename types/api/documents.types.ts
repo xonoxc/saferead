@@ -1,3 +1,10 @@
+export interface PaginatedResponse<T> {
+  count: number
+  next: string | null
+  previous: string | null
+  results: T[]
+}
+
 export interface UploadDocumentRequest {
   document_file: any
   original_filename: string
@@ -20,12 +27,7 @@ export interface AnalysisResponse {
   confidence_score: number
 }
 
-export interface DocumentsListResponse {
-  count: number
-  next: string | null
-  previous: string | null
-  results: AnalysisResponse[]
-}
+export type DocumentsListResponse = PaginatedResponse<AnalysisResponse>
 
 export interface StatsResponse {
   total_documents: number

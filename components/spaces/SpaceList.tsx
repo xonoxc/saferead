@@ -4,7 +4,6 @@ import { Trash2, ChevronRight } from "lucide-react-native"
 import Animated, { FadeInRight } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { useRouter } from "expo-router"
 import type { Space } from "@/types"
 
 export const SpaceList = ({
@@ -45,10 +44,10 @@ export const SpaceList = ({
                   <Text style={styles.emoji}>{space.icon}</Text>
                 </View>
                 <View style={styles.info}>
-                  <Text style={[styles.name, { color: colors.text }]}>{space.name}</Text>
+                  <Text style={[styles.name, { color: colors.text }]}>{space.title}</Text>
                   <Text style={[styles.desc, { color: colors.textSecondary }]}>
                     <Text style={{ color: colors.primary, fontWeight: "600" }}>
-                      {space.documentCount}
+                      {space.document_count}
                     </Text>{" "}
                     documents
                   </Text>
@@ -58,7 +57,7 @@ export const SpaceList = ({
               {/* Right */}
               <View style={styles.right}>
                 <TouchableOpacity
-                  onPress={() => onDelete(space.id, space.name)}
+                  onPress={() => onDelete(space.id, space.title)}
                   style={[styles.moreBtn, { backgroundColor: colors.error + "10" }]}
                 >
                   <Trash2 size={18} color={colors.error} />

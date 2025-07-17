@@ -70,3 +70,46 @@ export async function getDocumentStats() {
   const response = await apiClient.get("/scanner/documents/stats/")
   return response.data
 }
+
+/*
+ * User Space API Functions
+ * **/
+export async function getSpaces(page?: number) {
+  const params = {
+    ...(page && { page }),
+  }
+  const resp = await apiClient.get("/user_space/spaces/", { params })
+  return resp.data
+}
+
+export async function createSpace(data: {
+  title: string
+  description: string
+  color: string
+  icon: string
+  privacy: "private" | "public"
+  is_favorite: boolean
+}) {
+  return apiClient.post("/user_space/spaces/", data)
+}
+
+export async function deleteSpace(spaceId: string) {
+  return apiClient.delete(`/user_space/spaces/${spaceId}/`)
+}
+
+export async function getSpaceDocuments(spaceId: string, page?: number) {
+  const params = {
+    ...(page && { page }),
+  }
+  const resp = await apiClient.get(`/user_space/spaces/${spaceId}/documents/`, { params })
+  return resp.data
+}
+
+export async function getSpaceStats(spaceId: string) {
+  const resp = await apiClient.get(`/user_space/spaces/${spaceId}/stats/`)
+  return resp.data
+}
+
+export async function toggleFavoriteSpace(spaceId: string, data: { is_favorite: boolean }) {
+  return apiClient.post(`/user_space/spaces/${spaceId}/toggle_favorite/`, data)
+}

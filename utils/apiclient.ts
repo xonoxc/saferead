@@ -7,6 +7,7 @@ import { attempt } from "./attempt"
 import { Alert } from "react-native"
 import { router } from "expo-router"
 import { useUserStore } from "@/store/useUserStore"
+import { useGlobalErrorStore } from "@/store/useGlobalErrorStore"
 
 const AUTH_HEADER = "Authorization"
 
@@ -55,10 +56,16 @@ apiClient.interceptors.response.use(
       Alert.alert("Session Expired", "Your session has expired. logging you out...")
 
       const { clearUser } = useUserStore.getState()
-
       await clearUser()
 
       router.replace("/(auth)/login")
+    } else if (error?.response?.status === 500) {
+      const { setError } = useGlobalErrorStore.getState()
+
+      setError({
+        message: "Internal Server Error",
+        code: "500",
+      })
     }
     return Promise.reject(error)
   }

@@ -17,6 +17,8 @@ import React, { useEffect, useState } from "react"
 import { View } from "react-native"
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
 
+import { ErrorBoundary } from "@/components/ErrorBoundry"
+
 SplashScreen.preventAutoHideAsync()
 
 const AppContent = () => {
@@ -71,7 +73,9 @@ export default function RootLayout() {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <AuthProvider>
         <ThemeProvider>
-          <AppContent />
+          <ErrorBoundary>
+            <AppContent />
+          </ErrorBoundary>
         </ThemeProvider>
       </AuthProvider>
     </SafeAreaProvider>

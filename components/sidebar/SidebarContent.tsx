@@ -17,39 +17,64 @@ import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants"
 import { AnalysisResponse } from "@/types/api/documents.types"
 import { DocumentCardSkeleton } from "@/components/skeletons"
-import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
 import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 
 const SKELETON_COUNT = 3
 
-export default function SideBarDocumentContent({
-  spaceId,
-  spaceName,
-}: {
+import type { FilterOptions as DocumentFilters } from "@/types/docs"
+import { EmptyState } from "../EmptyState"
+
+export interface SideBarDocumentContentProps {
   spaceId?: string
   spaceName?: string
-}) {
-  const { colors } = useTheme()
+  isLoading: boolean
+  isRefreshing: boolean
+  isDeleting: boolean
 
-  const {
-    documents,
-    error,
-    hasMore,
-    currentFilters,
-    searchQuery,
-    applyFilters,
-    showFilter,
-    isLoading,
-    isRefreshing,
-    setShowFilter,
-    handleDeleteDocument,
-    handleDocumentSelectPress,
-    handleSearch,
-    handleRefresh,
-    loadMoreDocuments,
-    isDeleting,
-    FallbackStateWrapper,
-  } = useDocumentScreen(spaceId, spaceName)
+  documents: AnalysisResponse[]
+  error: any
+
+  hasMore: boolean
+  currentFilters: DocumentFilters
+  searchQuery: string
+  showFilter: boolean
+
+  applyFilters: (filters: DocumentFilters) => void
+  setShowFilter: (visible: boolean) => void
+  setSearchQuery: (query: string) => void
+
+  handleAddDocument: () => void
+  handleDeleteDocument: (id: string) => void
+  handleDocumentSelectPress: (doc: AnalysisResponse) => void
+  handleSearch: (query: string) => void
+  handleRefresh: () => void
+  loadMoreDocuments: () => void
+
+  FallbackStateWrapper: React.ComponentType
+}
+
+export default function SideBarDocumentContent({
+  documents,
+  error,
+  hasMore,
+  currentFilters,
+  searchQuery,
+  setSearchQuery,
+  applyFilters,
+  showFilter,
+  isLoading,
+  isRefreshing,
+  setShowFilter,
+  handleDeleteDocument,
+  handleDocumentSelectPress,
+  handleSearch,
+  handleAddDocument,
+  handleRefresh,
+  loadMoreDocuments,
+  isDeleting,
+  FallbackStateWrapper,
+}: SideBarDocumentContentProps) {
+  const { colors } = useTheme()
 
   useTabBarVisibility(!isLoading)
 
@@ -183,9 +208,21 @@ export default function SideBarDocumentContent({
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.listContent}>
-          <FallbackStateWrapper />
-        </Animated.View>
+        <EmptyState
+          icon={searchQuery ? Search : FileText}
+          title={searchQuery ? "No Results Found" : "No Documents Yet"}
+          description={
+            searchQuery
+              ? `No documents match "${searchQuery}". Try adjusting your search terms or check your spelling.`
+              : "Start your legal document analysis journey by adding your first document. Upload files, scan documents, or paste text to get started."
+          }
+          actionTitle={searchQuery ? undefined : "Add Your First Document"}
+          onAction={searchQuery ? undefined : handleAddDocument}
+          secondaryActionTitle={searchQuery ? "Clear Search" : "Learn More"}
+          onSecondaryAction={searchQuery ? () => setSearchQuery("") : () => {}}
+          variant={searchQuery ? "search" : "default"}
+          showFloatingElements={!searchQuery}
+        />
       )}
 
       <DocumentFilter

@@ -83,6 +83,7 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
     isLoading,
     isFetchingNextPage,
     hasMore: hasNextPage,
+    setSearchQuery,
     currentFilters,
     searchQuery,
     showFilter,

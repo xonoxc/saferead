@@ -20,21 +20,17 @@ export const SpaceList = ({
   return (
     <>
       {spaces.map(space => (
-        <Animated.View
-          key={space.id}
-          entering={FadeInRight.duration(400).springify()}
-          style={[
-            styles.card,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              shadowColor: colors.shadow ?? "#000",
-            },
-          ]}
-        >
+        <Animated.View key={space.id} entering={FadeInRight.duration(400).springify()}>
           <TouchableOpacity
             activeOpacity={0.9}
-            style={styles.touchWrap}
+            style={[
+              styles.card,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                shadowColor: colors.shadow ?? "#000",
+              },
+            ]}
             onPress={() => onSpaceSelect(space)}
           >
             <View style={styles.content}>

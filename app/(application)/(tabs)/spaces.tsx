@@ -10,18 +10,17 @@ import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { SpaceList } from "@/components/spaces/SpaceList"
 import { CreateSpaceForm } from "@/components/spaces/CreateSpaceForm"
 import { Space } from "@/types"
+import { SpacePrivarcy } from "@/types/spaces"
 
 export default function SpacesScreen() {
   const { colors } = useTheme()
   const { data, isLoading } = useSpaces()
   const { mutate: createSpace } = useCreateSpace()
   const { mutate: deleteSpace } = useDeleteSpace()
+  const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
+  const [searchQuery, setSearchQuery] = useState<string>("")
 
   const spaces = data?.pages.flatMap(page => page.results) ?? []
-
-  const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
-
-  const [searchQuery, setSearchQuery] = useState<string>("")
 
   const filteredSpaces = spaces.filter(
     space =>
@@ -34,10 +33,11 @@ export default function SpacesScreen() {
     description: string,
     color: string,
     icon: string,
-    privacy: "private" | "public",
+    privacy: SpacePrivarcy,
     is_favorite: boolean
   ) => {
     createSpace({ title, description, color, icon, privacy, is_favorite })
+    setCreateModalVisible(false)
   }
 
   const handleDeleteSpace = (spaceId: string, spaceName: string) => {
@@ -73,15 +73,19 @@ export default function SpacesScreen() {
             onDelete={handleDeleteSpace}
             onSpaceSelect={handleSpaceSelectPress}
           />
-        ) : !createModalVisible ? (
-          <SpacesFallback onCreate={() => setCreateModalVisible(true)} />
         ) : (
+          <SpacesFallback onCreate={() => setCreateModalVisible(true)} />
+        )}
+      </ScrollView>
+
+      {createModalVisible && (
+        <View style={[StyleSheet.absoluteFillObject, styles.modalOverlay]}>
           <CreateSpaceForm
             onCreate={handleCreateSpace}
             onCancel={() => setCreateModalVisible(false)}
           />
-        )}
-      </ScrollView>
+        </View>
+      )}
     </View>
   )
 }
@@ -125,6 +129,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderWidth: 1,
     borderRadius: 12,
+  },
+  modalOverlay: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+    zIndex: 100,
   },
   content: {
     flex: 1,

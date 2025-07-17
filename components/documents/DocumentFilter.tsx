@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from "react-native"
 import { Filter, X, Calendar, TrendingUp, FileText, Clock } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { TextInput } from "@/components"
+import { TextInput } from "@/components/TextInput"
 import {
   Fonts,
   FontSizes,

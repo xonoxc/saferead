@@ -8,8 +8,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { TouchableOpacity, View, StyleSheet, Text } from "react-native"
-import SidebarContent from "./SidebarContent"
 import CustomBackBtn from "../CustomBackBtn"
+import SideBarDocumentContent from "./SidebarContent"
 import { useLocalSearchParams } from "expo-router"
 import { Folder, Plus } from "lucide-react-native"
 import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
@@ -30,7 +30,28 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
     spaceColor?: string
   }>()
 
-  const { handleAddDocument } = useDocumentScreen(spaceId, spaceName)
+  const {
+    documents,
+    error,
+    isLoading,
+    hasMore,
+    currentFilters,
+    searchQuery,
+    showFilter,
+    isRefreshing,
+    setShowFilter,
+    handleAddDocument,
+    handleDocumentSelectPress,
+
+    isDeleting,
+    setSearchQuery,
+    handleDeleteDocument,
+    handleRefresh,
+    handleSearch,
+    loadMoreDocuments,
+    applyFilters,
+    FallbackStateWrapper,
+  } = useDocumentScreen(spaceId, spaceName)
 
   const translateX = useSharedValue(SCREEN_WIDTH)
 
@@ -66,7 +87,29 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
       </View>
 
       <View style={{ flex: 1 }}>
-        <SidebarContent />
+        <SideBarDocumentContent
+          spaceId={spaceId}
+          spaceName={spaceName}
+          documents={documents}
+          error={error}
+          isLoading={isLoading}
+          isRefreshing={isRefreshing}
+          isDeleting={isDeleting}
+          hasMore={hasMore}
+          currentFilters={currentFilters}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          showFilter={showFilter}
+          applyFilters={applyFilters}
+          setShowFilter={setShowFilter}
+          handleAddDocument={handleAddDocument}
+          handleDeleteDocument={handleDeleteDocument}
+          handleDocumentSelectPress={handleDocumentSelectPress}
+          handleSearch={handleSearch}
+          handleRefresh={handleRefresh}
+          loadMoreDocuments={loadMoreDocuments}
+          FallbackStateWrapper={FallbackStateWrapper}
+        />
       </View>
     </Animated.View>
   )

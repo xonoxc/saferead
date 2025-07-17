@@ -156,7 +156,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    fontWeight: "900",
     fontSize: FontSizes.xxxl,
     fontFamily: Fonts.regular,
     textAlign: "center",

@@ -91,7 +91,7 @@ export default function DocumentsScreen() {
   if (isLoading || isRefreshing || isDeleting) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
+        <View style={styles.header}>
           {spaceName ? (
             <View style={styles.spaceHeader}>
               <Folder size={24} color={spaceColor || colors.primary} />
@@ -106,8 +106,8 @@ export default function DocumentsScreen() {
           >
             <Plus size={24} color={colors.background} />
           </TouchableOpacity>
-        </Animated.View>
-        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.searchContainer}>
+        </View>
+        <View style={styles.searchContainer}>
           <View
             style={[
               styles.searchInputContainer,
@@ -137,7 +137,7 @@ export default function DocumentsScreen() {
           >
             <Filter size={18} color={colors.textSecondary} />
           </TouchableOpacity>
-        </Animated.View>
+        </View>
         <FlatList
           data={Array.from({ length: SKELETON_COUNT }).map((_, i) => ({ id: `skeleton-${i}` }))}
           keyExtractor={item => item.id}

@@ -89,8 +89,9 @@ export function useAnalysis() {
     }
 
     setAnalysisResult(uploadResult.data)
-
     setIsAnalyzing(false)
+
+    router.push("/analysisres")
   }
 
   const handleDocumentUpload = async () => {

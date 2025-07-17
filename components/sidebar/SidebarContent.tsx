@@ -10,10 +10,8 @@ import {
   TextInput,
 } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
-import { Plus, Search, Filter, FileText, Trash2, TrendingUp, Folder } from "lucide-react-native"
-import { useLocalSearchParams } from "expo-router"
+import { Search, Filter, FileText, Trash2, TrendingUp } from "lucide-react-native"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
-import { DocumentAnalysisView } from "../documents/DocumentAnalysisView"
 import { DocumentFilter } from "../documents/DocumentFilter"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants"
@@ -24,13 +22,14 @@ import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 
 const SKELETON_COUNT = 3
 
-export default function SideBarDocumentContent() {
+export default function SideBarDocumentContent({
+  spaceId,
+  spaceName,
+}: {
+  spaceId?: string
+  spaceName?: string
+}) {
   const { colors } = useTheme()
-  const { spaceId, spaceName, spaceColor } = useLocalSearchParams<{
-    spaceId?: string
-    spaceName?: string
-    spaceColor?: string
-  }>()
 
   const {
     documents,
@@ -41,12 +40,10 @@ export default function SideBarDocumentContent() {
     applyFilters,
     showFilter,
     isLoading,
-    selectedDocument,
     isRefreshing,
     setShowFilter,
-    setSelectedDocument,
-    handleAddDocument,
     handleDeleteDocument,
+    handleDocumentSelectPress,
     handleSearch,
     handleRefresh,
     loadMoreDocuments,
@@ -56,15 +53,11 @@ export default function SideBarDocumentContent() {
 
   useTabBarVisibility(!isLoading)
 
-  const handleDocumentPress = (document: AnalysisResponse) => {
-    setSelectedDocument(document)
-  }
-
   const renderDocument = ({ item, index }: { item: AnalysisResponse; index: number }) => (
     <Animated.View entering={FadeInDown.delay(index * 50 + 300).springify()}>
       <DocumentCard
         document={item}
-        onPress={() => handleDocumentPress(item)}
+        onPress={() => handleDocumentSelectPress(item)}
         onDelete={handleDeleteDocument}
       />
     </Animated.View>
@@ -83,31 +76,10 @@ export default function SideBarDocumentContent() {
     )
   }
 
-  if (selectedDocument) {
-    return (
-      <DocumentAnalysisView analysis={selectedDocument} onBack={() => setSelectedDocument(null)} />
-    )
-  }
-
   if (isLoading || isRefreshing || isDeleting) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.header}>
-          {spaceName ? (
-            <View style={styles.spaceHeader}>
-              <Folder size={24} color={spaceColor || colors.primary} />
-              <Text style={[styles.title, { color: spaceColor || colors.text }]}>{spaceName}</Text>
-            </View>
-          ) : (
-            <Text style={[styles.title, { color: colors.text }]}>Your Documents</Text>
-          )}
-          <TouchableOpacity
-            style={[styles.addButton, { backgroundColor: colors.primary }]}
-            onPress={handleAddDocument}
-          >
-            <Plus size={24} color={colors.background} />
-          </TouchableOpacity>
-        </View>
+        <View style={styles.header}></View>
         <View style={styles.searchContainer}>
           <View
             style={[
@@ -152,23 +124,6 @@ export default function SideBarDocumentContent() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
-        {spaceName ? (
-          <View style={styles.spaceHeader}>
-            <Folder size={24} color={spaceColor || colors.primary} />
-            <Text style={[styles.title, { color: spaceColor || colors.text }]}>{spaceName}</Text>
-          </View>
-        ) : (
-          <Text style={[styles.title, { color: colors.text }]}>Your Documents</Text>
-        )}
-        <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: colors.primary }]}
-          onPress={handleAddDocument}
-        >
-          <Plus size={24} color={colors.background} />
-        </TouchableOpacity>
-      </Animated.View>
-
       <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.searchContainer}>
         <View
           style={[
@@ -390,10 +345,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     paddingBottom: 10,
-  },
-  title: {
-    fontSize: FontSizes.xxl,
-    fontFamily: Fonts.bold,
   },
   spaceHeader: {
     flexDirection: "row",

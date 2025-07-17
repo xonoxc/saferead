@@ -10,13 +10,14 @@ import { FileText } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 import { useDocuments, useDeleteDocument } from "@/hooks/queries/docs"
 import { attempt } from "@/utils/attempt"
+import { useAnalysisStore } from "@/store/useAnalysisStore"
 
 export function useDocumentScreen(spaceId?: string, spaceName?: string) {
   const { init, currentFilters, applyFilters } = useDocumentsStore()
 
   const [searchQuery, setSearchQuery] = useState("")
   const [showFilter, setShowFilter] = useState(false)
-  const [selectedDocument, setSelectedDocument] = useState<AnalysisResponse | null>(null)
+  const { setAnalysisResult } = useAnalysisStore()
 
   useEffect(() => {
     if (spaceId) init(spaceId)
@@ -63,6 +64,11 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
     debouncedSearch(text)
   }
 
+  const handleDocumentSelectPress = (document: AnalysisResponse) => {
+    setAnalysisResult(document)
+    router.push("/analysisres")
+  }
+
   const FallbackStateWrapper = () => (
     <FallBackState
       searchQuery={searchQuery}
@@ -80,11 +86,10 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
     currentFilters,
     searchQuery,
     showFilter,
-    selectedDocument,
     isRefreshing: isRefetchingDocs,
     setShowFilter,
-    setSelectedDocument,
     handleAddDocument,
+    handleDocumentSelectPress,
     isDeleting,
     handleDeleteDocument,
     handleRefresh,

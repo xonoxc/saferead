@@ -9,7 +9,6 @@ import { Upload, Camera, Menu, LogOut } from "lucide-react-native"
 import Animated, { FadeInDown, FadeIn, FadeOut } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { DocumentTypeSelector } from "@/components/documents/DocumentTypeSelector"
-import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisView"
 import { RecentDocumentItem } from "@/components/documents/RecentDocumentCard"
 
 import { AnalyzeScreenSkeleton } from "@/components/skeletons"

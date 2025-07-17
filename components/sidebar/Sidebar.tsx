@@ -7,13 +7,13 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
-import { TouchableOpacity, View, StyleSheet } from "react-native"
-import { PackagePlus } from "lucide-react-native"
+import { TouchableOpacity, View, StyleSheet, Text } from "react-native"
 import SidebarContent from "./SidebarContent"
 import CustomBackBtn from "../CustomBackBtn"
-
-import { useSpaceStore } from "@/store/useSpaceStore"
-import { Space } from "@/types"
+import { useLocalSearchParams } from "expo-router"
+import { Folder, Plus } from "lucide-react-native"
+import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
+import { Fonts, FontSizes } from "@/constants"
 
 const SCREEN_WIDTH = getScreenWidth()
 
@@ -24,7 +24,13 @@ interface SidebarProps {
 
 export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
   const { colors } = useTheme()
-  const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
+  const { spaceId, spaceName, spaceColor } = useLocalSearchParams<{
+    spaceId?: string
+    spaceName?: string
+    spaceColor?: string
+  }>()
+
+  const { handleAddDocument } = useDocumentScreen(spaceId, spaceName)
 
   const translateX = useSharedValue(SCREEN_WIDTH)
 
@@ -35,10 +41,6 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
     })
   }, [isOpen])
 
-  /* const handleSpaceSelect = (space: Space) => {
-    setSelectedSpace(space)
-  } */
-
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
   }))
@@ -47,8 +49,19 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
     <Animated.View style={[styles.sidebar, { backgroundColor: colors.background }, animatedStyle]}>
       <View style={styles.header}>
         <CustomBackBtn onBack={onClose} />
-        <TouchableOpacity style={{ padding: 8, paddingHorizontal: 20 }}>
-          <PackagePlus color={colors.text} />
+        {spaceName ? (
+          <View style={styles.sideBarTitle}>
+            <Folder size={24} color={spaceColor || colors.primary} />
+            <Text style={[styles.title, { color: spaceColor || colors.text }]}>{spaceName}</Text>
+          </View>
+        ) : (
+          <Text style={[styles.title, { color: colors.text }]}>Your Documents</Text>
+        )}
+        <TouchableOpacity
+          style={[styles.addDocumentButton, { backgroundColor: colors.primary }]}
+          onPress={handleAddDocument}
+        >
+          <Plus size={24} color={colors.background} />
         </TouchableOpacity>
       </View>
 
@@ -67,7 +80,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: "100%",
     zIndex: 999,
-    padding: 20,
     shadowOpacity: 0.3,
     shadowRadius: 0,
     shadowOffset: { width: 2, height: 0 },
@@ -76,7 +88,22 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    gap: 50,
     marginBottom: 24,
+  },
+  addDocumentButton: {
+    alignItems: "center",
+    padding: 5,
+    justifyContent: "center",
+    borderRadius: 100,
+  },
+  sideBarTitle: {
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: FontSizes.lg,
+    fontFamily: Fonts.medium,
   },
   title: {
     fontSize: 22,

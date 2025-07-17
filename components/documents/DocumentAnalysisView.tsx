@@ -55,6 +55,7 @@ export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewP
           styles.header,
           {
             shadowColor: isDark ? "transparent" : colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
           },
         ]}
       >

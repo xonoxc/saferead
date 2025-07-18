@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
-import { ArrowLeft, Star, Settings, FileText } from "lucide-react-native"
+import { Star, Settings, FileText } from "lucide-react-native"
 import Animated, {
   FadeInDown,
   FadeInRight,
@@ -8,7 +8,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated"
-import { router, useLocalSearchParams } from "expo-router"
+import { useLocalSearchParams } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useSpaces } from "@/hooks/queries/spaces"
 import { Alert } from "react-native"
@@ -17,6 +17,7 @@ import { Fonts, FontSizes } from "@/constants/Fonts"
 import { updateSpace } from "@/services/api"
 import SpaceIcon from "@/components/spaces/Icon"
 import type { SpaceIconName } from "@/constants/spaceform"
+import CustomBackBtn from "@/components/CustomBackBtn"
 
 export default function SpaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -88,12 +89,7 @@ export default function SpaceDetailScreen() {
         style={[styles.header, { backgroundColor: colors.background }]}
       >
         <View style={styles.headerTop}>
-          <TouchableOpacity
-            style={[styles.backButton, { backgroundColor: colors.surface }]}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft size={24} color={colors.text} />
-          </TouchableOpacity>
+          <CustomBackBtn />
 
           <View style={styles.headerActions}>
             <Animated.View style={animatedStyle}>

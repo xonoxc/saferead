@@ -50,3 +50,18 @@ export const iconOptions: LucideIcon[] = [
   Briefcase,
   Pencil,
 ]
+
+export const iconMap = {
+  folder: Folder,
+  filetext: FileText,
+  handshake: Handshake,
+  building: Building,
+  scale: Scale,
+  clipboardlist: ClipboardList,
+  lock: Lock,
+  barchart: BarChart,
+  briefcase: Briefcase,
+  pencil: Pencil,
+} as const
+
+export type SpaceIconName = keyof typeof iconMap

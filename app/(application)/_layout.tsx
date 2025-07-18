@@ -37,6 +37,13 @@ export default function ApplicationLayout() {
               headerShown: false,
             }}
           />
+
+          <Stack.Screen
+            name="spaces/[id]"
+            options={{
+              headerShown: false,
+            }}
+          />
         </Stack>
       </SafeAreaView>
     </QueryClientProvider>

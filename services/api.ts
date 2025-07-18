@@ -4,6 +4,15 @@ import { attempt } from "@/utils/attempt"
 import type { UploadDocumentRequest } from "@/types/api/documents.types"
 import { isReactNativeFile } from "@/types/file"
 
+type SpaceDataParam = {
+  title: string
+  description: string
+  color: string
+  icon: string
+  privacy: "private" | "public"
+  is_favorite?: boolean
+}
+
 export async function uploadDocument(data: UploadDocumentRequest) {
   const formData = new FormData()
 
@@ -82,19 +91,16 @@ export async function getSpaces(page?: number) {
   return resp.data
 }
 
-export async function createSpace(data: {
-  title: string
-  description: string
-  color: string
-  icon: string
-  privacy: "private" | "public"
-  is_favorite: boolean
-}) {
+export async function createSpace(data: SpaceDataParam) {
   return apiClient.post("/user_space/spaces/", data)
 }
 
 export async function deleteSpace(spaceId: string) {
   return apiClient.delete(`/user_space/spaces/${spaceId}/`)
+}
+
+export async function updateSpace(spaceId: string, data: Partial<SpaceDataParam>) {
+  return apiClient.put(`/user_space/spaces/${spaceId}/`, data)
 }
 
 export async function getSpaceDocuments(spaceId: string, page?: number) {

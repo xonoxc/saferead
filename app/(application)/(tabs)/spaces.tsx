@@ -78,7 +78,7 @@ export default function SpacesScreen() {
           <SpacesFallback
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            setShowCreateModal={() => setCreateModalVisible(false)}
+            setShowCreateModal={() => setCreateModalVisible(true)}
           />
         )}
       </ScrollView>
@@ -104,6 +104,16 @@ function SpacesFallback({
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>
   setShowCreateModal: (show: boolean) => void
 }) {
+  const handleActionButtonPress = () => {
+    if (searchQuery) setSearchQuery("")
+    setShowCreateModal(true)
+  }
+
+  const handleSecondaryActionPress = () => {
+    if (!searchQuery) return
+    setSearchQuery("")
+  }
+
   return (
     <View style={styles.emptyStateContainer}>
       <EmptyState
@@ -115,12 +125,9 @@ function SpacesFallback({
             : "Organize your legal documents by creating spaces. Group contracts, agreements, and other documents for better organization and faster access."
         }
         actionTitle={searchQuery ? "Create New Space" : "Create Your First Space"}
-        onAction={() => {
-          if (searchQuery) setSearchQuery("")
-          setShowCreateModal(true)
-        }}
+        onAction={handleActionButtonPress}
         secondaryActionTitle={searchQuery ? "Clear Search" : "Learn About Spaces"}
-        onSecondaryAction={searchQuery ? () => setSearchQuery("") : () => {}}
+        onSecondaryAction={handleSecondaryActionPress}
         variant={searchQuery ? "search" : "default"}
         showFloatingElements={!searchQuery}
       />

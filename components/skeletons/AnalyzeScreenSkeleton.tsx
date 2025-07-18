@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
   },
   overlayText: {
     fontSize: FontSizes.xl,
-    fontWeight: "bold",
     fontFamily: Fonts.bold,
   },
   header: {

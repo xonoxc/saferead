@@ -79,10 +79,10 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
           <Text style={[styles.title, { color: colors.text }]}>Your Documents</Text>
         )}
         <TouchableOpacity
-          style={[styles.addDocumentButton, { backgroundColor: colors.primary }]}
+          style={[styles.addDocumentButton, { backgroundColor: colors.background }]}
           onPress={handleAddDocument}
         >
-          <Plus size={24} color={colors.background} />
+          <Plus size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -130,9 +130,9 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     alignItems: "center",
-    paddingHorizontal: 24,
+    paddingHorizontal: 30,
     gap: 50,
     marginBottom: 24,
   },
@@ -149,8 +149,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: FontSizes.lg,
+    fontFamily: Fonts.bold,
   },
   item: {
     paddingVertical: 12,

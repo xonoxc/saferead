@@ -4,8 +4,36 @@ import { TextInput } from "@/components/TextInput"
 import { Button } from "@/components/Button"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { Easing, SlideInDown, SlideOutDown } from "react-native-reanimated"
 
-const icons = ["📁", "📄", "🤝", "🏢", "⚖️", "📋", "🔒", "📊", "💼", "📝"]
+import {
+  Folder,
+  FileText,
+  Handshake,
+  Building,
+  Scale,
+  ClipboardList,
+  Lock,
+  BarChart,
+  Briefcase,
+  Pencil,
+  LucideIcon,
+} from "lucide-react-native"
+import Animated, { SlideInUp } from "react-native-reanimated"
+
+const iconOptions: LucideIcon[] = [
+  Folder,
+  FileText,
+  Handshake,
+  Building,
+  Scale,
+  ClipboardList,
+  Lock,
+  BarChart,
+  Briefcase,
+  Pencil,
+]
+
 const colors_palette = ["#4ECDC4", "#FF6B6B", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98D8C8"]
 const privacyOptions = ["private", "public"]
 
@@ -27,7 +55,7 @@ export const CreateSpaceForm = ({
   const [title, setTitle] = useState("")
   const [desc, setDesc] = useState("")
   const [color, setColor] = useState(colors_palette[0])
-  const [icon, setIcon] = useState(icons[0])
+  const [icon, setIcon] = useState<LucideIcon>(iconOptions[0])
   const [privacy, setPrivacy] = useState<"private" | "public">("private")
   const [isFavorite, setIsFavorite] = useState(false)
 
@@ -40,13 +68,17 @@ export const CreateSpaceForm = ({
     setTitle("")
     setDesc("")
     setColor(colors_palette[0])
-    setIcon(icons[0])
+    setIcon(iconOptions[0])
     setPrivacy("private")
     setIsFavorite(false)
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <Animated.View
+      entering={SlideInDown.duration(200).easing(Easing.out(Easing.exp))}
+      exiting={SlideOutDown.duration(200).easing(Easing.in(Easing.exp))}
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Create New Space</Text>
         <TouchableOpacity onPress={onCancel}>
@@ -82,20 +114,27 @@ export const CreateSpaceForm = ({
         </View>
 
         <Text style={[styles.label, { color: colors.text }]}>Choose Icon</Text>
+
         <View style={styles.grid}>
-          {icons.map(i => (
-            <TouchableOpacity
-              key={i}
-              style={[
-                styles.icon,
-                { backgroundColor: colors.surface },
-                i === icon && { backgroundColor: colors.primary + "20" },
-              ]}
-              onPress={() => setIcon(i)}
-            >
-              <Text style={styles.iconText}>{i}</Text>
-            </TouchableOpacity>
-          ))}
+          {iconOptions.map((IconComp, index) => {
+            const isSelected = IconComp === icon
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.icon,
+                  {
+                    backgroundColor: isSelected ? colors.primary + "20" : colors.surface,
+                    borderWidth: isSelected ? 2 : 0,
+                    borderColor: colors.primary,
+                  },
+                ]}
+                onPress={() => setIcon(IconComp)}
+              >
+                <IconComp size={24} color={colors.text} />
+              </TouchableOpacity>
+            )
+          })}
         </View>
 
         <Text style={[styles.label, { color: colors.text }]}>Privacy</Text>
@@ -137,7 +176,7 @@ export const CreateSpaceForm = ({
       <View style={styles.footer}>
         <Button title="Create Space" onPress={handleSubmit} variant="primary" fullWidth />
       </View>
-    </View>
+    </Animated.View>
   )
 }
 

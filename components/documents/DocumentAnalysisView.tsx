@@ -15,6 +15,7 @@ import { Fonts, FontSizes } from "@/constants/Fonts"
 import { AnalysisResponse } from "@/types/api/documents.types"
 import { attempt } from "@/utils/attempt"
 import CustomBackBtn from "@/components/CustomBackBtn"
+import { getDocumentShareContent } from "@/constants/share"
 
 interface DocumentAnalysisViewProps {
   analysis: AnalysisResponse
@@ -28,8 +29,7 @@ export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewP
   const [showAllFavorable, setShowAllFavorable] = useState(false)
 
   const handleShare = async () => {
-    const shareContent = `Document Analysis: ${analysis.original_filename}\n\nSummary: ${analysis.summary_text}\n\nRisks: ${analysis.risky_points.length}\nFavorable Points: ${analysis.favourable_points.length}\nConfidence: ${(analysis.confidence_score * 100).toFixed(0)}%`
-
+    const shareContent = getDocumentShareContent(analysis)
     const result = await attempt(
       Share.share({
         message: shareContent,

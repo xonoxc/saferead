@@ -104,6 +104,8 @@ function SpacesFallback({
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>
   setShowCreateModal: (show: boolean) => void
 }) {
+  const details = getFallbackDetails(searchQuery)
+
   const handleActionButtonPress = () => {
     if (searchQuery) setSearchQuery("")
     setShowCreateModal(true)
@@ -118,21 +120,39 @@ function SpacesFallback({
     <View style={styles.emptyStateContainer}>
       <EmptyState
         icon={searchQuery ? Search : Box}
-        title={searchQuery ? "No Spaces Found" : "No Spaces Yet"}
-        description={
-          searchQuery
-            ? `No spaces match "${searchQuery}". Try adjusting your search terms or create a new space.`
-            : "Organize your legal documents by creating spaces. Group contracts, agreements, and other documents for better organization and faster access."
-        }
-        actionTitle={searchQuery ? "Create New Space" : "Create Your First Space"}
+        title={details.title}
+        description={details.description}
+        actionTitle={details.actionTitle}
         onAction={handleActionButtonPress}
-        secondaryActionTitle={searchQuery ? "Clear Search" : "Learn About Spaces"}
+        secondaryActionTitle={details.secondaryActionTitle}
         onSecondaryAction={handleSecondaryActionPress}
-        variant={searchQuery ? "search" : "default"}
+        variant={details.variant as "search" | "default"}
         showFloatingElements={!searchQuery}
       />
     </View>
   )
+}
+
+/*
+ * Helper funciton to format and get the detaild needed for fallback state based on search query
+ * **/
+function getFallbackDetails(searchQuery?: string) {
+  const description = searchQuery
+    ? `No spaces match "${searchQuery}". Try adjusting your search terms or create a new space.`
+    : "Organize your legal documents by creating spaces. Group contracts, agreements, and other documents for better organization and faster access."
+
+  const title = searchQuery ? "No Spaces Found" : "No Spaces Yet"
+  const actionTitle = searchQuery ? "Create New Space" : "Create Your First Space"
+  const secondaryActionTitle = searchQuery ? "Clear Search" : "Learn About Spaces"
+  const variant = searchQuery ? "search" : "default"
+
+  return {
+    title,
+    description,
+    actionTitle,
+    secondaryActionTitle,
+    variant,
+  }
 }
 
 const styles = StyleSheet.create({

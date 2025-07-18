@@ -33,7 +33,27 @@ const iconOptions: LucideIcon[] = [
   Pencil,
 ]
 
-const colors_palette = ["#4ECDC4", "#FF6B6B", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98D8C8"]
+const colors_palette = [
+  "#4ECDC4", // teal
+  "#FF6B6B", // coral red
+  "#45B7D1", // sky blue
+  "#96CEB4", // mint green
+  "#FFEAA7", // soft yellow
+  "#DDA0DD", // plum purple
+  "#98D8C8", // aqua green
+
+  "#F9A825", // golden amber
+  "#AB47BC", // vibrant purple
+  "#FF7043", // sunset orange
+  "#29B6F6", // bright sky blue
+  "#EF5350", // soft red
+  "#BA68C8", // lavender
+  "#FFB74D", // warm orange
+  "#90CAF9", // soft light blue
+  "#FFD54F", // sunflower yellow
+  "#A1887F", // cocoa brown
+  "#B0BEC5", // cloudy grey ☁️
+]
 const privacyOptions = ["private", "public"]
 
 export const CreateSpaceForm = ({
@@ -85,7 +105,12 @@ export const CreateSpaceForm = ({
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        bounces={true}
+      >
         <TextInput
           label="Space Name"
           value={title}
@@ -180,12 +205,12 @@ export const CreateSpaceForm = ({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, paddingBottom: 40 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
+    padding: 10,
     paddingTop: 60,
   },
   title: {
@@ -198,7 +223,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   label: {
     fontSize: FontSizes.md,

@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Switch } from "react-native"
+import React from "react"
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Switch } from "react-native"
 import { TextInput } from "@/components/TextInput"
 import { Button } from "@/components/Button"
 import { useTheme } from "@/hooks/useTheme"
@@ -8,6 +8,7 @@ import { Easing, SlideInDown, SlideOutDown } from "react-native-reanimated"
 import Animated from "react-native-reanimated"
 import type { LucideIcon } from "lucide-react-native"
 import { colors_palette, iconOptions, privacyOptions } from "@/constants/spaceform"
+import useCreateSpaceForm from "@/hooks/screens/useCreateSpaceForm"
 
 export const CreateSpaceForm = ({
   onCreate,
@@ -24,26 +25,26 @@ export const CreateSpaceForm = ({
   onCancel: () => void
 }) => {
   const { colors } = useTheme()
-  const [title, setTitle] = useState("")
-  const [desc, setDesc] = useState("")
-  const [color, setColor] = useState(colors_palette[0])
-  const [icon, setIcon] = useState<LucideIcon>(iconOptions[0])
-  const [privacy, setPrivacy] = useState<"private" | "public">("private")
-  const [isFavorite, setIsFavorite] = useState(false)
+  const {
+    privacy,
+    title,
+    icon,
+    setDesc,
+    setIcon,
+    setColor,
+    color,
+    desc,
+    setTitle,
+    isFavorite,
+    setPrivacy,
+    handleSubmit,
+    setIsFavorite,
 
-  const handleSubmit = () => {
-    if (!title.trim()) {
-      Alert.alert("Error", "Please enter a space name")
-      return
-    }
-    onCreate(title, desc, color, iconOptions[0], privacy, isFavorite)
-    setTitle("")
-    setDesc("")
-    setColor(colors_palette[0])
-    setIcon(iconOptions[0])
-    setPrivacy("private")
-    setIsFavorite(false)
-  }
+    /* form specific valuess */
+    formState,
+    control,
+    handleFormSubmit,
+  } = useCreateSpaceForm({ onCreate })
 
   return (
     <Animated.View

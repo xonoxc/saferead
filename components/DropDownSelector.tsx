@@ -51,6 +51,7 @@ export function DropdownSelector<T>({
           <Animated.View style={[styles.modal, { backgroundColor: colors.card }]}>
             <FlatList
               data={options}
+              bounces={true}
               keyExtractor={item => `${item.value}`}
               renderItem={({ item, index }) => {
                 const isLast = index === options.length - 1

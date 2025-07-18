@@ -76,6 +76,7 @@ export default function SpaceDetailScreen() {
 
       <FlatList
         data={documents}
+        bounces={true}
         renderItem={renderDocument}
         keyExtractor={item => item.id}
         onEndReached={() => hasNextPage && !isFetchingNextPage && fetchNextPage()}

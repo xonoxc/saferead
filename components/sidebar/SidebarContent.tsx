@@ -138,6 +138,7 @@ export default function SideBarDocumentContent({
         </View>
         <FlatList
           data={Array.from({ length: SKELETON_COUNT }).map((_, i) => ({ id: `skeleton-${i}` }))}
+          bounces={true}
           keyExtractor={item => item.id}
           renderItem={() => <DocumentCardSkeleton />}
           contentContainerStyle={styles.listContent}
@@ -190,6 +191,7 @@ export default function SideBarDocumentContent({
       {isDocumentsDataAvailable() ? (
         <FlatList
           data={documents}
+          bounces={true}
           renderItem={renderDocument}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.listContent}

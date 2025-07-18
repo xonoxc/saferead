@@ -212,6 +212,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   emptyStateContainer: {
-    paddingTop: 120,
+    paddingVertical: 120,
   },
 })

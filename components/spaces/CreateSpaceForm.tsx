@@ -46,12 +46,14 @@ const colors_palette = [
   "#AB47BC", // vibrant purple
   "#FF7043", // sunset orange
   "#29B6F6", // bright sky blue
+  "#66BB6A", // leafy green
   "#EF5350", // soft red
-  "#BA68C8", // lavender
-  "#FFB74D", // warm orange
-  "#90CAF9", // soft light blue
-  "#FFD54F", // sunflower yellow
-  "#A1887F", // cocoa brown
+  "#BA68C8", // lavender 💐
+  "#FFB74D", // warm orange 🍊
+  "#81C784", // pastel green matcha 🍵
+  "#90CAF9", // soft light blue 💎
+  "#FFD54F", // sunflower yellow 🌻
+  "#A1887F", // cocoa brown 🍫
   "#B0BEC5", // cloudy grey ☁️
 ]
 const privacyOptions = ["private", "public"]

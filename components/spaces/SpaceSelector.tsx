@@ -14,7 +14,7 @@ export function SpaceSelector({ spaces, selectedSpace, onSelectSpace }: SpaceSel
   const { colors } = useTheme()
 
   const spaceItems: DropdownOption<string>[] = spaces.map(space => ({
-    label: space.name,
+    label: space.title,
     value: space.id,
   }))
 

@@ -1,7 +1,6 @@
 import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query"
 import {
   getSpaces,
-  createSpace as createSpaceApi,
   deleteSpace as deleteSpaceApi,
   getSpaceDocuments as getSpaceDocumentsApi,
   getSpaceStats as getSpaceStatsApi,
@@ -25,16 +24,6 @@ export const useSpaces = (enabled = true) => {
   })
 
   return query
-}
-
-export const useCreateSpace = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: createSpaceApi,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["spaces"] })
-    },
-  })
 }
 
 export const useDeleteSpace = () => {

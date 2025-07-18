@@ -4,7 +4,8 @@ import { View, StyleSheet, Alert, ScrollView } from "react-native"
 import { Box, LucideIcon, Search } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { useSpaces, useCreateSpace, useDeleteSpace } from "@/hooks/queries/spaces"
+import { useSpaces, useDeleteSpace } from "@/hooks/queries/spaces"
+import { createSpace } from "@/services/api"
 import { TextInput } from "@/components/TextInput"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { SpaceList } from "@/components/spaces/SpaceList"
@@ -12,14 +13,18 @@ import { CreateSpaceForm } from "@/components/spaces/CreateSpaceForm"
 import { Space } from "@/types"
 import { SpacePrivarcy } from "@/types/spaces"
 import { EmptyState } from "@/components/EmptyState"
+import { attempt } from "@/utils/attempt"
+import { getErrorMessage } from "@/utils/helpers/respErrors"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function SpacesScreen() {
   const { colors } = useTheme()
   const { data, isLoading } = useSpaces()
-  const { mutate: createSpace } = useCreateSpace()
   const { mutate: deleteSpace } = useDeleteSpace()
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState<string>("")
+
+  const queryClient = useQueryClient()
 
   const spaces = data?.pages.flatMap(page => page.results) ?? []
 
@@ -37,7 +42,18 @@ export default function SpacesScreen() {
     privacy: SpacePrivarcy,
     is_favorite: boolean
   ) => {
-    createSpace({ title, description, color, icon: icon.name, privacy, is_favorite })
+    const result = await attempt(
+      createSpace({ title, description, color, icon: icon.name, privacy, is_favorite })
+    )
+    if (!result.ok) {
+      const errorMessage = getErrorMessage(result.error)
+      Alert.alert("Error", errorMessage || "Failed to create space")
+      return
+    }
+
+    await queryClient.invalidateQueries({
+      queryKey: ["spaces"],
+    })
     setCreateModalVisible(false)
   }
 
@@ -49,6 +65,7 @@ export default function SpacesScreen() {
   }
 
   const handleSpaceSelectPress = (space: Space) => {
+    console.log("Space selected:", space)
     router.push(`/spaces/${space.id}` as RelativePathString)
   }
 

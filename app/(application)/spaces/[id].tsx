@@ -12,6 +12,7 @@ import CustomBackBtn from "@/components/CustomBackBtn"
 
 export default function SpaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
+
   const { colors } = useTheme()
 
   const {

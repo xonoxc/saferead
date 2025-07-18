@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native"
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
 import { ServerCrash, MessageCircle, TriangleAlert as AlertTriangle } from "lucide-react-native"
 import Animated, {
   FadeInDown,
@@ -16,8 +16,7 @@ import { useTheme } from "@/hooks/useTheme"
 import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { router } from "expo-router"
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window")
+import { useWindowDimensions } from "react-native"
 
 interface ServerErrorScreenProps {
   onRetry?: () => void
@@ -37,6 +36,7 @@ export default function ServerErrorScreen({
   showSupportButton = true,
 }: ServerErrorScreenProps) {
   const { colors } = useTheme()
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions()
 
   const serverIconRotation = useSharedValue(0)
   const glitchOffset = useSharedValue(0)
@@ -116,131 +116,135 @@ export default function ServerErrorScreen({
       {/* Background Elements */}
       <View style={styles.backgroundElements}>
         {[...Array(15)].map((_, index) => (
-          <Animated.View
-            key={index}
-            entering={FadeInUp.delay(index * 150).springify()}
-            style={[
-              styles.backgroundElement,
-              sparkleAnimatedStyle,
-              {
-                backgroundColor: colors.warning + "20",
-                left: Math.random() * screenWidth,
-                top: Math.random() * screenHeight,
-                animationDelay: `${index * 200}ms`,
-              },
-            ]}
-          />
+          <Animated.View entering={FadeInUp.delay(index * 150).springify()} key={index}>
+            <Animated.View
+              style={[
+                styles.backgroundElement,
+                sparkleAnimatedStyle,
+                {
+                  backgroundColor: colors.warning + "20",
+                  left: Math.random() * screenWidth,
+                  top: Math.random() * screenHeight,
+                  animationDelay: `${index * 200}ms`,
+                },
+              ]}
+            />
+          </Animated.View>
         ))}
       </View>
 
       {/* Main Content */}
-      <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.content}>
-        {/* Error Code Badge */}
-        <Animated.View
-          entering={FadeInDown.delay(200).springify()}
-          style={[styles.errorBadge, { backgroundColor: colors.error + "15" }]}
-        >
-          <Text style={[styles.errorCode, { color: colors.error }]}>{errorCode}</Text>
-        </Animated.View>
-
-        {/* Icon Container */}
-        <Animated.View style={[styles.iconContainer, floatingAnimatedStyle]}>
-          {/* Warning Indicators */}
-          <Animated.View
-            style={[
-              styles.warningIndicator,
-              styles.warningIndicator1,
-              { backgroundColor: colors.warning },
-              sparkleAnimatedStyle,
-            ]}
-          >
-            <AlertTriangle size={12} color="#FFFFFF" />
+      <Animated.View entering={FadeInDown.delay(300).springify()}>
+        <Animated.View style={styles.content}>
+          {/* Error Code Badge */}
+          <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <View style={[styles.errorBadge, { backgroundColor: colors.error + "15" }]}>
+              <Text style={[styles.errorCode, { color: colors.error }]}>{errorCode}</Text>
+            </View>
           </Animated.View>
 
-          <Animated.View
-            style={[
-              styles.warningIndicator,
-              styles.warningIndicator2,
-              { backgroundColor: colors.error },
-              sparkleAnimatedStyle,
-            ]}
-          >
-            <AlertTriangle size={10} color="#FFFFFF" />
+          {/* Icon Container */}
+          <Animated.View style={floatingAnimatedStyle}>
+            <View style={styles.iconContainer}>
+              {/* Warning Indicators */}
+              <Animated.View
+                style={[
+                  styles.warningIndicator,
+                  styles.warningIndicator1,
+                  { backgroundColor: colors.warning },
+                  sparkleAnimatedStyle,
+                ]}
+              >
+                <AlertTriangle size={12} color="#FFFFFF" />
+              </Animated.View>
+
+              <Animated.View
+                style={[
+                  styles.warningIndicator,
+                  styles.warningIndicator2,
+                  { backgroundColor: colors.error },
+                  sparkleAnimatedStyle,
+                ]}
+              >
+                <AlertTriangle size={10} color="#FFFFFF" />
+              </Animated.View>
+
+              {/* Server Icon */}
+              <Animated.View
+                style={[
+                  styles.iconWrapper,
+                  { backgroundColor: colors.warning + "15" },
+                  serverIconAnimatedStyle,
+                ]}
+              >
+                <ServerCrash size={48} color={colors.warning} />
+              </Animated.View>
+            </View>
           </Animated.View>
 
-          {/* Server Icon */}
-          <Animated.View
-            style={[
-              styles.iconWrapper,
-              { backgroundColor: colors.warning + "15" },
-              serverIconAnimatedStyle,
-            ]}
-          >
-            <ServerCrash size={48} color={colors.warning} />
-          </Animated.View>
-        </Animated.View>
-
-        {/* Text Content */}
-        <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.textContainer}>
-          <Text style={[styles.title, { color: colors.text }]}>Server Error</Text>
-
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{errorMessage}</Text>
-
-          <Text style={[styles.description, { color: colors.textMuted }]}>
-            We're experiencing technical difficulties. Our team has been notified and is working to
-            fix this issue.
-          </Text>
-        </Animated.View>
-
-        {/* Status Info */}
-        <Animated.View
-          entering={FadeInDown.delay(700).springify()}
-          style={[styles.statusContainer, { backgroundColor: colors.surface }]}
-        >
-          <View style={styles.statusHeader}>
-            <View style={[styles.statusDot, { backgroundColor: colors.warning }]} />
-            <Text style={[styles.statusTitle, { color: colors.text }]}>System Status</Text>
-          </View>
-
-          <Text style={[styles.statusText, { color: colors.textSecondary }]}>
-            We're working to restore normal service as quickly as possible. Please try again in a
-            few minutes.
-          </Text>
-
-          <View style={styles.statusTime}>
-            <Text style={[styles.statusTimeText, { color: colors.textMuted }]}>
-              Estimated fix time: 5-10 minutes
-            </Text>
-          </View>
-        </Animated.View>
-
-        {/* Action Buttons */}
-        <Animated.View entering={FadeInDown.delay(900).springify()} style={styles.buttonContainer}>
-          {showRetryButton && (
-            <Button
-              title="Try Again"
-              onPress={handleTryAgainPress}
-              variant="primary"
-              size="large"
-              fullWidth
-            />
-          )}
-
-          {showSupportButton && (
-            <TouchableOpacity style={styles.supportButton} onPress={onContactSupport}>
-              <MessageCircle size={20} color={colors.textSecondary} />
-              <Text style={[styles.supportText, { color: colors.textSecondary }]}>
-                Contact Support
+          {/* Text Content */}
+          <Animated.View entering={FadeInDown.delay(500).springify()}>
+            <View style={styles.textContainer}>
+              <Text style={[styles.title, { color: colors.text }]}>Server Error</Text>
+              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{errorMessage}</Text>
+              <Text style={[styles.description, { color: colors.textMuted }]}>
+                We're experiencing technical difficulties. Our team has been notified and is working
+                to fix this issue.
               </Text>
-            </TouchableOpacity>
-          )}
-        </Animated.View>
+            </View>
+          </Animated.View>
 
-        {/* Footer Info */}
-        <Animated.View entering={FadeInDown.delay(1100).springify()} style={styles.footer}>
-          <Text style={[styles.footerText, { color: colors.textMuted }]}>
-            Error ID: {Date.now().toString(36).toUpperCase()}
-          </Text>
+          {/* Status Info */}
+          <Animated.View entering={FadeInDown.delay(700).springify()}>
+            <View style={[styles.statusContainer, { backgroundColor: colors.surface }]}>
+              <View style={styles.statusHeader}>
+                <View style={[styles.statusDot, { backgroundColor: colors.warning }]} />
+                <Text style={[styles.statusTitle, { color: colors.text }]}>System Status</Text>
+              </View>
+              <Text style={[styles.statusText, { color: colors.textSecondary }]}>
+                We're working to restore normal service as quickly as possible. Please try again in
+                a few minutes.
+              </Text>
+              <View style={styles.statusTime}>
+                <Text style={[styles.statusTimeText, { color: colors.textMuted }]}>
+                  Estimated fix time: 5-10 minutes
+                </Text>
+              </View>
+            </View>
+          </Animated.View>
+
+          {/* Action Buttons */}
+          <Animated.View entering={FadeInDown.delay(900).springify()}>
+            <View style={styles.buttonContainer}>
+              {showRetryButton && (
+                <Button
+                  title="Try Again"
+                  onPress={handleTryAgainPress}
+                  variant="primary"
+                  size="large"
+                  fullWidth
+                />
+              )}
+
+              {showSupportButton && (
+                <TouchableOpacity style={styles.supportButton} onPress={onContactSupport}>
+                  <MessageCircle size={20} color={colors.textSecondary} />
+                  <Text style={[styles.supportText, { color: colors.textSecondary }]}>
+                    Contact Support
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </Animated.View>
+
+          {/* Footer */}
+          <Animated.View entering={FadeInDown.delay(1100).springify()}>
+            <View style={styles.footer}>
+              <Text style={[styles.footerText, { color: colors.textMuted }]}>
+                Error ID: {Date.now().toString(36).toUpperCase()}
+              </Text>
+            </View>
+          </Animated.View>
         </Animated.View>
       </Animated.View>
     </View>

@@ -9,6 +9,7 @@ import Animated from "react-native-reanimated"
 import type { LucideIcon } from "lucide-react-native"
 import { colors_palette, iconOptions, privacyOptions } from "@/constants/spaceform"
 import useCreateSpaceForm from "@/hooks/screens/useCreateSpaceForm"
+import { Controller } from "react-hook-form"
 
 export const CreateSpaceForm = ({
   onCreate,
@@ -25,134 +26,163 @@ export const CreateSpaceForm = ({
   onCancel: () => void
 }) => {
   const { colors } = useTheme()
-  const {
-    privacy,
-    title,
-    icon,
-    setDesc,
-    setIcon,
-    setColor,
-    color,
-    desc,
-    setTitle,
-    isFavorite,
-    setPrivacy,
-    handleSubmit,
-    setIsFavorite,
-
-    /* form specific valuess */
-    formState,
-    control,
-    handleFormSubmit,
-  } = useCreateSpaceForm({ onCreate })
+  const { control, handleFormSubmit, handleSubmit } = useCreateSpaceForm({
+    onCreate,
+  })
 
   return (
     <Animated.View
       entering={SlideInDown.duration(200).easing(Easing.out(Easing.exp))}
       exiting={SlideOutDown.duration(200).easing(Easing.in(Easing.exp))}
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={{ flex: 1, backgroundColor: colors.background }}
     >
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Create New Space</Text>
-        <TouchableOpacity onPress={onCancel}>
-          <Text style={[styles.cancel, { color: colors.primary }]}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
-        bounces={true}
-      >
-        <TextInput
-          label="Space Name"
-          value={title}
-          onChangeText={setTitle}
-          placeholder="Enter name"
-        />
-        <TextInput
-          label="Description (Optional)"
-          value={desc}
-          onChangeText={setDesc}
-          placeholder="Enter description"
-          multiline
-          numberOfLines={3}
-        />
-
-        <Text style={[styles.label, { color: colors.text }]}>Choose Color</Text>
-        <View style={styles.grid}>
-          {colors_palette.map(c => (
-            <TouchableOpacity
-              key={c}
-              style={[styles.color, { backgroundColor: c }, c === color && styles.selected]}
-              onPress={() => setColor(c)}
-            />
-          ))}
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.text }]}>Create New Space</Text>
+          <TouchableOpacity onPress={onCancel}>
+            <Text style={[styles.cancel, { color: colors.primary }]}>Cancel</Text>
+          </TouchableOpacity>
         </View>
 
-        <Text style={[styles.label, { color: colors.text }]}>Choose Icon</Text>
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          bounces={true}
+        >
+          <Controller
+            control={control}
+            name="title"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                label="Space Name"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Enter name"
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="desc"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                label="Description (Optional)"
+                value={value ?? ""}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Enter description"
+                multiline
+                numberOfLines={3}
+              />
+            )}
+          />
 
-        <View style={styles.grid}>
-          {iconOptions.map((IconComp, index) => {
-            const isSelected = IconComp === icon
-            return (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.icon,
-                  {
-                    backgroundColor: isSelected ? colors.primary + "20" : colors.surface,
-                    borderWidth: isSelected ? 2 : 0,
-                    borderColor: colors.primary,
-                  },
-                ]}
-                onPress={() => setIcon(IconComp)}
-              >
-                <IconComp size={24} color={colors.text} />
-              </TouchableOpacity>
-            )
-          })}
-        </View>
+          <Text style={[styles.label, { color: colors.text }]}>Choose Color</Text>
+          <Controller
+            control={control}
+            name="color"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.grid}>
+                {colors_palette.map(c => (
+                  <TouchableOpacity
+                    key={c}
+                    style={[styles.color, { backgroundColor: c }, c === value && styles.selected]}
+                    onPress={() => onChange(c)}
+                  />
+                ))}
+              </View>
+            )}
+          />
 
-        <Text style={[styles.label, { color: colors.text }]}>Privacy</Text>
-        <View style={styles.privacyContainer}>
-          {privacyOptions.map(option => (
-            <TouchableOpacity
-              key={option}
-              style={[
-                styles.privacyOption,
-                {
-                  backgroundColor: privacy === option ? colors.primary : colors.surface,
-                },
-              ]}
-              onPress={() => setPrivacy(option as "private" | "public")}
-            >
-              <Text
-                style={{
-                  color: privacy === option ? colors.card : colors.text,
-                  fontFamily: Fonts.medium,
-                }}
-              >
-                {option.charAt(0).toUpperCase() + option.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+          <Text style={[styles.label, { color: colors.text }]}>Choose Icon</Text>
+          <Controller
+            control={control}
+            name="icon"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.grid}>
+                {iconOptions.map((IconComp, index) => {
+                  const isSelected = IconComp === value
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.icon,
+                        {
+                          backgroundColor: isSelected ? colors.primary + "20" : colors.surface,
+                          borderWidth: isSelected ? 2 : 0,
+                          borderColor: colors.primary,
+                        },
+                      ]}
+                      onPress={() => onChange(IconComp)}
+                    >
+                      <IconComp size={24} color={colors.text} />
+                    </TouchableOpacity>
+                  )
+                })}
+              </View>
+            )}
+          />
 
-        <View style={styles.favoriteContainer}>
-          <Text style={[styles.label, { color: colors.text, marginTop: 0 }]}>Add to Favorites</Text>
-          <Switch
-            value={isFavorite}
-            onValueChange={setIsFavorite}
-            trackColor={{ false: colors.surface, true: colors.primary }}
-            thumbColor={colors.card}
+          <Text style={[styles.label, { color: colors.text }]}>Privacy</Text>
+          <Controller
+            control={control}
+            name="privacy"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.privacyContainer}>
+                {privacyOptions.map(option => (
+                  <TouchableOpacity
+                    key={option}
+                    style={[
+                      styles.privacyOption,
+                      {
+                        backgroundColor: value === option ? colors.primary : colors.surface,
+                      },
+                    ]}
+                    onPress={() => onChange(option as "private" | "public")}
+                  >
+                    <Text
+                      style={{
+                        color: value === option ? colors.card : colors.text,
+                        fontFamily: Fonts.medium,
+                      }}
+                    >
+                      {option.charAt(0).toUpperCase() + option.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="is_favorite"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.favoriteContainer}>
+                <Text style={[styles.label, { color: colors.text, marginTop: 0 }]}>
+                  Add to Favorites
+                </Text>
+                <Switch
+                  value={value}
+                  onValueChange={onChange}
+                  trackColor={{ false: colors.surface, true: colors.primary }}
+                  thumbColor={colors.card}
+                />
+              </View>
+            )}
+          />
+        </ScrollView>
+
+        <View style={styles.footer}>
+          <Button
+            title="Create Space"
+            onPress={handleFormSubmit(handleSubmit)}
+            variant="primary"
+            fullWidth
           />
         </View>
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <Button title="Create Space" onPress={handleSubmit} variant="primary" fullWidth />
       </View>
     </Animated.View>
   )
@@ -165,7 +195,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 10,
-    paddingTop: 60,
+    paddingTop: 20,
   },
   title: {
     fontSize: FontSizes.xl,
@@ -223,7 +253,7 @@ const styles = StyleSheet.create({
   privacyOption: {
     flex: 1,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 18,
     alignItems: "center",
   },
   favoriteContainer: {

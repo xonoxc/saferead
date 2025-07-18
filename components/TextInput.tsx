@@ -7,6 +7,8 @@ import {
   StyleProp,
   TextStyle,
   ViewStyle,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
 } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
@@ -24,6 +26,7 @@ interface TextInputProps {
   autoCapitalize?: "none" | "sentences" | "words" | "characters"
   autoCorrect?: boolean
   editable?: boolean
+  onBlur?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void
 
   containerStyle?: StyleProp<ViewStyle>
   labelStyle?: StyleProp<TextStyle>
@@ -44,6 +47,7 @@ export const TextInput: React.FC<TextInputProps> = ({
   autoCapitalize = "sentences",
   autoCorrect = true,
   editable = true,
+  onBlur,
   containerStyle,
   labelStyle,
   inputStyle,
@@ -64,6 +68,13 @@ export const TextInput: React.FC<TextInputProps> = ({
     inputStyle, // ⬅️ custom style gets merged
   ]
 
+  const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    setIsFocused(false)
+    if (onBlur) {
+      onBlur(e)
+    }
+  }
+
   return (
     <View style={[styles.container, containerStyle]}>
       {label && <Text style={[styles.label, { color: colors.text }, labelStyle]}>{label}</Text>}
@@ -81,7 +92,7 @@ export const TextInput: React.FC<TextInputProps> = ({
         autoCorrect={autoCorrect}
         editable={editable}
         onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
+        onBlur={handleBlur}
       />
       {error && <Text style={[styles.error, { color: colors.error }, errorStyle]}>{error}</Text>}
     </View>

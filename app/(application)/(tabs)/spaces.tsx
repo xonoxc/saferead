@@ -1,7 +1,7 @@
 import { RelativePathString, router } from "expo-router"
 import React, { useState } from "react"
 import { View, StyleSheet, Alert, ScrollView } from "react-native"
-import { Box, Folder, Search } from "lucide-react-native"
+import { Box, LucideIcon, Search } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useSpaces, useCreateSpace, useDeleteSpace } from "@/hooks/queries/spaces"
@@ -33,11 +33,11 @@ export default function SpacesScreen() {
     title: string,
     description: string,
     color: string,
-    icon: string,
+    icon: LucideIcon,
     privacy: SpacePrivarcy,
     is_favorite: boolean
   ) => {
-    createSpace({ title, description, color, icon, privacy, is_favorite })
+    createSpace({ title, description, color, icon: icon.name, privacy, is_favorite })
     setCreateModalVisible(false)
   }
 

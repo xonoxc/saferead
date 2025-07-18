@@ -5,7 +5,7 @@ import { Button } from "@/components/Button"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { Easing, SlideInDown, SlideOutDown } from "react-native-reanimated"
-
+import Animated from "react-native-reanimated"
 import {
   Folder,
   FileText,
@@ -19,7 +19,6 @@ import {
   Pencil,
   LucideIcon,
 } from "lucide-react-native"
-import Animated, { SlideInUp } from "react-native-reanimated"
 
 const iconOptions: LucideIcon[] = [
   Folder,
@@ -45,7 +44,7 @@ export const CreateSpaceForm = ({
     title: string,
     desc: string,
     color: string,
-    icon: string,
+    icon: LucideIcon,
     privacy: "private" | "public",
     is_favorite: boolean
   ) => void
@@ -64,7 +63,7 @@ export const CreateSpaceForm = ({
       Alert.alert("Error", "Please enter a space name")
       return
     }
-    onCreate(title, desc, color, icon, privacy, isFavorite)
+    onCreate(title, desc, color, iconOptions[0], privacy, isFavorite)
     setTitle("")
     setDesc("")
     setColor(colors_palette[0])
@@ -86,7 +85,7 @@ export const CreateSpaceForm = ({
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         <TextInput
           label="Space Name"
           value={title}

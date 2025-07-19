@@ -44,7 +44,7 @@ export const TextInput: React.FC<TextInputProps> = ({
   multiline,
   numberOfLines,
   keyboardType = "default",
-  autoCapitalize = "sentences",
+  autoCapitalize = "none",
   autoCorrect = true,
   editable = true,
   onBlur,

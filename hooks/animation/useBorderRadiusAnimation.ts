@@ -11,5 +11,5 @@ export const useAnimatedBorderRadius = (initial: number, to: number, duration = 
     borderRadius: radius.value,
   }))
 
-  return { animatedStyle, animate, radius }
+  return { animatedStyle, animate }
 }

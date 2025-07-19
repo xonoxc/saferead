@@ -10,6 +10,7 @@ import { colors_palette, iconMap, type SpaceIconName } from "@/constants/spacefo
 import useCreateSpaceForm from "@/hooks/screens/useCreateSpaceForm"
 import { Controller, ControllerRenderProps, useWatch } from "react-hook-form"
 import { Globe, LockIcon } from "lucide-react-native"
+import { useAnimatedBorderRadius } from "@/hooks/animation/useBorderRadiusAnimation"
 
 export const CreateSpaceForm = ({
   onCreate,
@@ -38,8 +39,6 @@ export const CreateSpaceForm = ({
       style={{
         flex: 1,
         backgroundColor: colors.background,
-        borderTopColor: colors.border,
-        borderTopWidth: 1,
       }}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -125,13 +124,13 @@ export const CreateSpaceForm = ({
             render={({ field: { onChange, value } }) => (
               <View style={styles.favoriteContainer}>
                 <Text style={[styles.label, { color: colors.text, marginTop: 0 }]}>
-                  Add to Favorites
+                  Faourite Space ?
                 </Text>
                 <Switch
                   value={value}
                   onValueChange={onChange}
-                  trackColor={{ false: colors.surface, true: colors.primary }}
-                  thumbColor={colors.card}
+                  trackColor={{ false: colors.accent, true: colors.primary }}
+                  thumbColor={value ? colors.surface : colors.text}
                 />
               </View>
             )}
@@ -157,6 +156,8 @@ interface IConSelectorProps {
   selectedColor: string
 }
 
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
+
 const IconSelector = ({ selectedColor, field: { onChange, value } }: IConSelectorProps) => {
   const { colors } = useTheme()
 
@@ -166,21 +167,23 @@ const IconSelector = ({ selectedColor, field: { onChange, value } }: IConSelecto
         const isSelected = value === IconName
 
         return (
-          <TouchableOpacity
+          <AnimatedTouchableOpacity
             key={IconName}
             style={[
               styles.icon,
               {
                 backgroundColor: isSelected ? colors.primary : colors.surface,
-                borderRadius: isSelected ? 35 : 20,
+                borderRadius: isSelected ? 35 : 16,
                 borderColor: isSelected ? colors.card : "transparent",
                 borderWidth: 2,
               },
             ]}
-            onPress={() => onChange(IconName)}
+            onPress={() => {
+              onChange(IconName)
+            }}
           >
             <Icon size={24} color={isSelected ? colors.background : selectedColor} />
-          </TouchableOpacity>
+          </AnimatedTouchableOpacity>
         )
       })}
     </View>
@@ -256,7 +259,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 10,
-    paddingTop: 20,
+    paddingTop: 10,
   },
   title: {
     fontSize: FontSizes.xl,

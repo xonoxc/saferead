@@ -4,7 +4,7 @@ import { Check, Sparkles, Shield, Zap, Brain } from "lucide-react-native"
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts } from "@/constants/Fonts"
-import CustomBackBtn from "@/components/CustomBackBtn"
+import { CustomBackBtn } from "@/components"
 
 export default function PremiumScreen() {
   const { colors } = useTheme()
@@ -14,7 +14,7 @@ export default function PremiumScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.header}>
-        <CustomBackBtn containerWidth={45} />
+        <CustomBackBtn />
       </Animated.View>
 
       <ScrollView

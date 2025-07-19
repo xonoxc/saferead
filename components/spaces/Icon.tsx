@@ -18,8 +18,6 @@ export default function SpaceIcon({
 }: SpaceIconProps) {
   const Icon = iconMap[name]
 
-  console.log("Rendering SpaceIcon:", name, Icon)
-
   if (!Icon) {
     return (
       <View style={[styles.iconWrapper, background && { backgroundColor: `${color}20` }]}>

@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
-import { Star, Settings, FileText } from "lucide-react-native"
+import { Star, Settings, FileText, TrendingUp, Calendar } from "lucide-react-native"
 import Animated, {
   FadeInDown,
   FadeInRight,
@@ -46,8 +46,6 @@ export default function SpaceDetailScreen() {
     }
   }
 
-  console.log("iconname", space?.icon as SpaceIconName)
-
   const stats = [
     {
       icon: FileText,
@@ -55,22 +53,22 @@ export default function SpaceDetailScreen() {
       value: space?.document_count,
       color: space?.color,
     },
-    /* {
+    {
       icon: TrendingUp,
       label: "Analyzed",
-      value: spaceDocuments.filter(d => d.analysis).length,
+      value: space?.recent_documents.length,
       color: colors.success,
-    }, */
+    },
     /* {
       icon: Calendar,
       label: "This Month",
-      value: spaceDocuments.filter(d => {
+      value: .filter(d => {
         const docDate = new Date(d.createdAt)
         const now = new Date()
         return docDate.getMonth() === now.getMonth() && docDate.getFullYear() === now.getFullYear()
       }).length,
       color: colors.warning,
-    }, */
+    },  */
   ]
 
   if (!space) {

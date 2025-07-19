@@ -107,6 +107,8 @@ export default function HomeScreen() {
         </View>
       </Animated.View>
 
+      <View style={[styles.sectionSeparator, { backgroundColor: colors.card }]} />
+
       {/* Document Types */}
       <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Document Types</Text>
@@ -255,7 +257,7 @@ const TypeCard = ({ stat }: StatCardProps) => {
   const { colors } = useTheme()
 
   return (
-    <View style={[styles.typeCard, { backgroundColor: colors.card }]}>
+    <View style={[styles.typeCard, { borderColor: colors.border }]}>
       <View style={[styles.typeIcon, { backgroundColor: `${stat.color}20` }]}>
         <stat.icon size={20} color={stat.color} />
       </View>
@@ -373,6 +375,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     elevation: 2,
     shadowColor: "#000",
+    borderBottomWidth: 1,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,

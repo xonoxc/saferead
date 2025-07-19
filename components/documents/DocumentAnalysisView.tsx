@@ -14,7 +14,7 @@ import { useVoice } from "@/hooks/useVoice"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { AnalysisResponse } from "@/types/api/documents.types"
 import { attempt } from "@/utils/attempt"
-import CustomBackBtn from "@/components/CustomBackBtn"
+import { CustomBackBtn } from "../CustomBackBtn"
 import { getDocumentShareContent } from "@/constants/share"
 
 interface DocumentAnalysisViewProps {

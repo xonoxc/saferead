@@ -10,7 +10,6 @@ import { colors_palette, iconMap, type SpaceIconName } from "@/constants/spacefo
 import useCreateSpaceForm from "@/hooks/screens/useCreateSpaceForm"
 import { Controller, ControllerRenderProps, useWatch } from "react-hook-form"
 import { Globe, LockIcon } from "lucide-react-native"
-import { useAnimatedBorderRadius } from "@/hooks/animation/useBorderRadiusAnimation"
 
 export const CreateSpaceForm = ({
   onCreate,

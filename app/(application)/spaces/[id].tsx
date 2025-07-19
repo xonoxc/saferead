@@ -53,7 +53,7 @@ export default function SpaceDetailScreen() {
       icon: FileText,
       label: "Documents",
       value: space?.document_count,
-      color: colors.primary,
+      color: space?.color,
     },
     /* {
       icon: TrendingUp,
@@ -89,34 +89,34 @@ export default function SpaceDetailScreen() {
         style={[styles.header, { backgroundColor: colors.background }]}
       >
         <View style={styles.headerTop}>
-          <CustomBackBtn />
+          <CustomBackBtn color={space.color} />
 
           <View style={styles.headerActions}>
             <Animated.View style={animatedStyle}>
               <TouchableOpacity
                 style={[
                   styles.favoriteButton,
-                  { backgroundColor: space.is_favorite ? colors.warning + "20" : colors.surface },
+                  { backgroundColor: space.is_favorite ? space.color + "20" : colors.surface },
                 ]}
                 onPress={handleFavoritePress}
               >
                 <Star
                   size={20}
-                  color={colors.warning}
-                  fill={space.is_favorite ? colors.warning : "transparent"}
+                  color={space.color}
+                  fill={space.is_favorite ? space.color : "transparent"}
                 />
               </TouchableOpacity>
             </Animated.View>
 
             <TouchableOpacity style={[styles.settingsButton, { backgroundColor: colors.surface }]}>
-              <Settings size={20} color={colors.textSecondary} />
+              <Settings size={20} color={space.color} />
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.spaceInfo}>
           <View style={[styles.spaceIconLarge, { backgroundColor: `${space.color}20` }]}>
-            <SpaceIcon name={space.icon as SpaceIconName} />
+            <SpaceIcon name={space.icon as SpaceIconName} color={space.color} size={50} />
           </View>
 
           <View style={styles.spaceMeta}>
@@ -194,11 +194,13 @@ const styles = StyleSheet.create({
   spaceInfo: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "flex-start",
+    width: "100%",
   },
   spaceIconLarge: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 20,
@@ -210,7 +212,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   spaceTitle: {
-    fontSize: FontSizes.xxxl,
+    fontSize: FontSizes.xxl,
     fontFamily: Fonts.bold,
     marginBottom: 4,
   },

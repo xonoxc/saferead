@@ -6,10 +6,11 @@ import { TouchableOpacity, StyleSheet } from "react-native"
 export default function CustomBackBtn({
   containerWidth,
   onBack,
+  color,
 }: {
   containerWidth?: number
-
   onBack?: () => void
+  color?: string
 }) {
   const { colors } = useTheme()
   const router = useRouter()
@@ -26,10 +27,10 @@ export default function CustomBackBtn({
 
   return (
     <TouchableOpacity
-      style={[styles.container, { borderColor: colors.border, width }]}
+      style={[styles.container, { borderColor: color ?? colors.border, width }]}
       onPress={handleBackPress}
     >
-      <ChevronLeft color={colors.text} />
+      <ChevronLeft color={color ?? colors.text} />
     </TouchableOpacity>
   )
 }

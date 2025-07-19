@@ -40,6 +40,7 @@ export default function useCreateSpaceForm({ onCreate }: CreateSpaceFormProps) {
   })
 
   const handleSubmit = async (data: CreateSpaceFormType) => {
+    console.log("icon value being submitted:", data.icon)
     await onCreate(data.title, data.desc, data.color, data.icon, data.privacy, data.is_favorite)
     reset()
   }

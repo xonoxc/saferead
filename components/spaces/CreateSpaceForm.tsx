@@ -1,15 +1,15 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Switch } from "react-native"
 import { TextInput } from "@/components/TextInput"
 import { Button } from "@/components/Button"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { Easing, SlideInDown, SlideOutDown } from "react-native-reanimated"
-import Animated from "react-native-reanimated"
-import type { LucideIcon } from "lucide-react-native"
-import { colors_palette, iconOptions, privacyOptions } from "@/constants/spaceform"
+import { Easing, SlideInDown, SlideOutDown, useSharedValue } from "react-native-reanimated"
+import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated"
+import { colors_palette, iconMap, type SpaceIconName } from "@/constants/spaceform"
 import useCreateSpaceForm from "@/hooks/screens/useCreateSpaceForm"
-import { Controller } from "react-hook-form"
+import { Controller, ControllerRenderProps, useWatch } from "react-hook-form"
+import { Globe, LockIcon } from "lucide-react-native"
 
 export const CreateSpaceForm = ({
   onCreate,
@@ -19,22 +19,28 @@ export const CreateSpaceForm = ({
     title: string,
     desc: string,
     color: string,
-    icon: LucideIcon,
+    icon: SpaceIconName,
     privacy: "private" | "public",
     is_favorite: boolean
-  ) => void
+  ) => Promise<void>
   onCancel: () => void
 }) => {
   const { colors } = useTheme()
-  const { control, handleFormSubmit, handleSubmit } = useCreateSpaceForm({
+  const { control, handleFormSubmit, handleSubmit, formState } = useCreateSpaceForm({
     onCreate,
   })
+  const selectedColor = useWatch({ control, name: "color" }) ?? colors.text
 
   return (
     <Animated.View
       entering={SlideInDown.duration(200).easing(Easing.out(Easing.exp))}
       exiting={SlideOutDown.duration(200).easing(Easing.in(Easing.exp))}
-      style={{ flex: 1, backgroundColor: colors.background }}
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+        borderTopColor: colors.border,
+        borderTopWidth: 1,
+      }}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
@@ -60,6 +66,7 @@ export const CreateSpaceForm = ({
                 onChangeText={onChange}
                 onBlur={onBlur}
                 placeholder="Enter name"
+                error={formState.errors.title?.message}
               />
             )}
           />
@@ -68,13 +75,14 @@ export const CreateSpaceForm = ({
             name="desc"
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                label="Description (Optional)"
+                label="Description"
                 value={value ?? ""}
                 onChangeText={onChange}
                 onBlur={onBlur}
                 placeholder="Enter description"
                 multiline
                 numberOfLines={3}
+                error={formState.errors.desc?.message}
               />
             )}
           />
@@ -97,63 +105,18 @@ export const CreateSpaceForm = ({
           />
 
           <Text style={[styles.label, { color: colors.text }]}>Choose Icon</Text>
+
           <Controller
             control={control}
             name="icon"
-            render={({ field: { onChange, value } }) => (
-              <View style={styles.grid}>
-                {iconOptions.map((IconComp, index) => {
-                  const isSelected = IconComp === value
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      style={[
-                        styles.icon,
-                        {
-                          backgroundColor: isSelected ? colors.primary + "20" : colors.surface,
-                          borderWidth: isSelected ? 2 : 0,
-                          borderColor: colors.primary,
-                        },
-                      ]}
-                      onPress={() => onChange(IconComp)}
-                    >
-                      <IconComp size={24} color={colors.text} />
-                    </TouchableOpacity>
-                  )
-                })}
-              </View>
-            )}
+            render={({ field }) => <IconSelector field={field} selectedColor={selectedColor} />}
           />
 
           <Text style={[styles.label, { color: colors.text }]}>Privacy</Text>
           <Controller
             control={control}
             name="privacy"
-            render={({ field: { onChange, value } }) => (
-              <View style={styles.privacyContainer}>
-                {privacyOptions.map(option => (
-                  <TouchableOpacity
-                    key={option}
-                    style={[
-                      styles.privacyOption,
-                      {
-                        backgroundColor: value === option ? colors.primary : colors.surface,
-                      },
-                    ]}
-                    onPress={() => onChange(option as "private" | "public")}
-                  >
-                    <Text
-                      style={{
-                        color: value === option ? colors.card : colors.text,
-                        fontFamily: Fonts.medium,
-                      }}
-                    >
-                      {option.charAt(0).toUpperCase() + option.slice(1)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
+            render={({ field }) => <PrivacySelector field={field} />}
           />
 
           <Controller
@@ -177,14 +140,112 @@ export const CreateSpaceForm = ({
 
         <View style={styles.footer}>
           <Button
-            title="Create Space"
+            title={formState.isSubmitting ? "Creating..." : "Create Space"}
             onPress={handleFormSubmit(handleSubmit)}
+            disabled={formState.isSubmitting}
             variant="primary"
             fullWidth
           />
         </View>
       </View>
     </Animated.View>
+  )
+}
+
+interface IConSelectorProps {
+  field: ControllerRenderProps<any, "icon">
+  selectedColor: string
+}
+
+const IconSelector = ({ selectedColor, field: { onChange, value } }: IConSelectorProps) => {
+  const { colors } = useTheme()
+
+  return (
+    <View style={styles.grid}>
+      {Object.entries(iconMap).map(([IconName, Icon]) => {
+        const isSelected = value === IconName
+
+        return (
+          <TouchableOpacity
+            key={IconName}
+            style={[
+              styles.icon,
+              {
+                backgroundColor: isSelected ? colors.primary : colors.surface,
+                borderRadius: isSelected ? 35 : 20,
+                borderColor: isSelected ? colors.card : "transparent",
+                borderWidth: 2,
+              },
+            ]}
+            onPress={() => onChange(IconName)}
+          >
+            <Icon size={24} color={isSelected ? colors.background : selectedColor} />
+          </TouchableOpacity>
+        )
+      })}
+    </View>
+  )
+}
+
+interface PrivacySelectorProps {
+  field: ControllerRenderProps<any, "privacy">
+}
+
+const PrivacySelector: React.FC<PrivacySelectorProps> = ({ field: { value, onChange } }) => {
+  const { colors } = useTheme()
+  const options = ["private", "public"]
+  const index = options.indexOf(value)
+
+  const translateX = useSharedValue(index * 100)
+
+  useEffect(() => {
+    translateX.value = withTiming(index * 160, { duration: 200 })
+  }, [index])
+
+  const bgStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    borderRadius: 20,
+  }))
+
+  return (
+    <View style={[styles.privacyContainer, { backgroundColor: colors.background }]}>
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            width: "50%",
+            height: "100%",
+            backgroundColor: colors.primary,
+          },
+          bgStyle,
+        ]}
+      />
+      {options.map(option => {
+        const Icon = option === "private" ? LockIcon : Globe
+        const isSelected = value === option
+        const iconColor = isSelected ? colors.background : colors.text
+        const textColor = isSelected ? colors.card : colors.text
+
+        return (
+          <TouchableOpacity
+            key={option}
+            style={[styles.privacyOption]}
+            onPress={() => onChange(option)}
+          >
+            <Icon size={14} color={iconColor} />
+            <Text
+              style={{
+                color: textColor,
+                fontFamily: Fonts.medium,
+                marginLeft: 6,
+              }}
+            >
+              {option.charAt(0).toUpperCase() + option.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        )
+      })}
+    </View>
   )
 }
 
@@ -252,8 +313,11 @@ const styles = StyleSheet.create({
   },
   privacyOption: {
     flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
     padding: 12,
-    borderRadius: 18,
+    borderRadius: 20,
     alignItems: "center",
   },
   favoriteContainer: {

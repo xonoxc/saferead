@@ -2,12 +2,12 @@ import CustomBackBtn from "@/components/CustomBackBtn"
 import { useTheme } from "@/hooks/useTheme"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Stack } from "expo-router"
+import { useState } from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
-
-const queryClient = new QueryClient()
 
 export default function ApplicationLayout() {
   const { colors } = useTheme()
+  const [queryClient] = useState(() => new QueryClient())
 
   return (
     <QueryClientProvider client={queryClient}>

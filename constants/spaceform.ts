@@ -38,19 +38,6 @@ export const colors_palette = [
 
 export const privacyOptions = ["private", "public"]
 
-export const iconOptions: LucideIcon[] = [
-  Folder,
-  FileText,
-  Handshake,
-  Building,
-  Scale,
-  ClipboardList,
-  Lock,
-  BarChart,
-  Briefcase,
-  Pencil,
-]
-
 export const iconMap = {
   folder: Folder,
   filetext: FileText,

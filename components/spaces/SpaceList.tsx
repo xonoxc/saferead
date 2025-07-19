@@ -1,100 +1,66 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import { Star, ChevronRight, Calendar, FileText } from "lucide-react-native"
-import Animated, {
-  FadeInRight,
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from "react-native-reanimated"
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native"
+import { Star, FileText, Trash2 } from "lucide-react-native"
+import Animated, { FadeIn } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import type { Space } from "@/types"
 import SpaceIcon from "./Icon"
 import { SpaceIconName } from "@/constants/spaceform"
 
+const { width } = Dimensions.get("window")
+const GRID_ITEM_WIDTH = (width - 60) / 2
+
 interface SpaceListProps {
-  spaces: Space[]
+  space: Space
+  viewMode: "list" | "grid"
   onDelete: (id: string, name: string) => void
   onSpaceSelect: (space: Space) => void
 }
 
-export const SpaceList: React.FC<SpaceListProps> = ({ spaces, onDelete, onSpaceSelect }) => {
+export const SpaceList: React.FC<SpaceListProps> = ({
+  space,
+  viewMode,
+  onDelete,
+  onSpaceSelect,
+}) => {
   const { colors } = useTheme()
 
-  const SpaceCard: React.FC<{ space: Space; index: number }> = ({ space, index }) => {
-    const scale = useSharedValue(1)
-
-    const animatedStyle = useAnimatedStyle(() => ({
-      transform: [{ scale: scale.value }],
-    }))
-
-    const handlePressIn = () => {
-      scale.value = withSpring(0.98)
-    }
-
-    const handlePressOut = () => {
-      scale.value = withSpring(1)
-    }
-
+  if (viewMode === "grid") {
     return (
-      <Animated.View entering={FadeInRight.delay(index * 100).springify()} style={animatedStyle}>
+      <Animated.View entering={FadeIn.duration(500)}>
         <TouchableOpacity
-          style={[styles.spaceCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+          style={[
+            styles.gridItem,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
           onPress={() => onSpaceSelect(space)}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          activeOpacity={1}
+          activeOpacity={0.8}
         >
-          {/* Header */}
-          <View style={styles.cardHeader}>
-            <View style={styles.cardHeaderLeft}>
-              <View style={[styles.spaceIcon, { backgroundColor: `${space.color}20` }]}>
-                <Text style={styles.spaceEmoji}>
-                  <SpaceIcon name={space.icon as SpaceIconName} />
-                </Text>
-              </View>
-              <View style={styles.spaceInfo}>
-                <View style={styles.titleRow}>
-                  <Text style={[styles.spaceName, { color: colors.text }]} numberOfLines={1}>
-                    {space.title}
-                  </Text>
-                  {space.is_favorite && (
-                    <Star size={16} color={colors.warning} fill={colors.warning} />
-                  )}
-                </View>
-              </View>
+          <View style={styles.gridHeader}>
+            <View style={[styles.gridIconContainer, { backgroundColor: `${space.color}20` }]}>
+              <SpaceIcon name={space.icon as SpaceIconName} size={24} color={space.color} />
             </View>
-
+            {space.is_favorite && (
+              <Star size={16} color={colors.warning} fill={colors.warning} />
+            )}
+          </View>
+          <Text style={[styles.gridTitle, { color: colors.text }]} numberOfLines={2}>
+            {space.title}
+          </Text>
+          <View style={styles.gridFooter}>
+            <View style={styles.gridStat}>
+              <FileText size={14} color={colors.textMuted} />
+              <Text style={[styles.gridStatText, { color: colors.textMuted }]}>
+                {space.document_count}
+              </Text>
+            </View>
             <TouchableOpacity
-              style={[styles.deleteButton, { backgroundColor: colors.error + "10" }]}
+              style={styles.deleteButton}
               onPress={() => onDelete(space.id, space.title)}
             >
-              <Text style={[styles.deleteButtonText, { color: colors.error }]}>×</Text>
+              <Trash2 size={16} color={colors.error} />
             </TouchableOpacity>
-          </View>
-
-          {/* Stats */}
-          <View style={styles.cardStats}>
-            <View style={styles.statItem}>
-              <FileText size={16} color={colors.primary} />
-              <Text style={[styles.statText, { color: colors.primary }]}>
-                {space.document_count} documents
-              </Text>
-            </View>
-
-            <View style={styles.statItem}>
-              <Calendar size={16} color={colors.textMuted} />
-              <Text style={[styles.statText, { color: colors.textMuted }]}>
-                {new Date(space.created_at).toLocaleDateString()}
-              </Text>
-            </View>
-          </View>
-
-          {/* Footer */}
-          <View style={styles.cardFooter}>
-            <View style={[styles.colorIndicator, { backgroundColor: space.color }]} />
-            <ChevronRight size={20} color={colors.textMuted} />
           </View>
         </TouchableOpacity>
       </Animated.View>
@@ -102,106 +68,121 @@ export const SpaceList: React.FC<SpaceListProps> = ({ spaces, onDelete, onSpaceS
   }
 
   return (
-    <View style={styles.container}>
-      {spaces.map((space, index) => (
-        <SpaceCard key={space.id} space={space} index={index} />
-      ))}
-    </View>
+    <Animated.View entering={FadeIn.duration(500)} style={styles.listItemContainer}>
+      <TouchableOpacity
+        style={[styles.listItem, { backgroundColor: colors.card, borderColor: colors.border }]}
+        onPress={() => onSpaceSelect(space)}
+        activeOpacity={0.8}
+      >
+        <View style={[styles.listIconContainer, { backgroundColor: `${space.color}20` }]}>
+          <SpaceIcon name={space.icon as SpaceIconName} size={22} color={space.color} />
+        </View>
+        <View style={styles.listItemContent}>
+          <Text style={[styles.listTitle, { color: colors.text }]} numberOfLines={1}>
+            {space.title}
+          </Text>
+          <Text style={[styles.listSubtitle, { color: colors.textMuted }]}>
+            {space.document_count} documents
+          </Text>
+        </View>
+        <View style={styles.listItemActions}>
+          {space.is_favorite && <Star size={18} color={colors.warning} fill={colors.warning} />}
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => onDelete(space.id, space.title)}
+          >
+            <Trash2 size={18} color={colors.error} />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 16,
-    paddingHorizontal: 20,
-  },
-  spaceCard: {
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  cardHeaderLeft: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    flex: 1,
-  },
-  spaceIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 16,
-  },
-  spaceEmoji: {
-    fontSize: 28,
-  },
-  spaceInfo: {
-    flex: 1,
-  },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 6,
-  },
-  spaceName: {
-    fontSize: FontSizes.xl,
-    fontFamily: Fonts.bold,
-    flex: 1,
-  },
-  spaceDescription: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
-    lineHeight: 20,
-  },
-  deleteButton: {
-    width: 32,
-    height: 32,
+  // Grid Styles
+  gridItem: {
+    width: GRID_ITEM_WIDTH,
     borderRadius: 16,
+    padding: 16,
+    margin: 10,
+    borderWidth: 1,
+    justifyContent: "space-between",
+    height: 150,
+  },
+  gridHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  gridIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
   },
-  deleteButtonText: {
-    fontSize: 20,
+  gridTitle: {
     fontFamily: Fonts.bold,
+    fontSize: FontSizes.md,
+    marginTop: 12,
   },
-  cardStats: {
+  gridFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.05)",
+    alignItems: "center",
+    marginTop: 12,
   },
-  statItem: {
+  gridStat: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 4,
   },
-  statText: {
-    fontSize: FontSizes.sm,
+  gridStatText: {
     fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
   },
-  cardFooter: {
+
+  // List Styles
+  listItemContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  listItem: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
   },
-  colorIndicator: {
-    width: 24,
-    height: 4,
-    borderRadius: 2,
+  listIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  listItemContent: {
+    flex: 1,
+  },
+  listTitle: {
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.lg,
+    marginBottom: 2,
+  },
+  listSubtitle: {
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+  },
+  listItemActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+
+  // Common
+  deleteButton: {
+    padding: 4,
   },
 })

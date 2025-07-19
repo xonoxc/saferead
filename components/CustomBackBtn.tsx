@@ -1,45 +1,37 @@
 import { useTheme } from "@/hooks/useTheme"
-import { useRouter } from "expo-router"
+import { router } from "expo-router"
 import { ChevronLeft } from "lucide-react-native"
-import { TouchableOpacity, StyleSheet } from "react-native"
+import { TouchableOpacity, StyleSheet, ViewStyle } from "react-native"
 
-export default function CustomBackBtn({
-  containerWidth,
-  onBack,
-  color,
+export function CustomBackBtn({
+  onPress,
+  style,
 }: {
-  containerWidth?: number
-  onBack?: () => void
-  color?: string
+  onPress?: () => void
+  style?: ViewStyle
 }) {
   const { colors } = useTheme()
-  const router = useRouter()
-
-  const width = containerWidth ?? 50
-
-  const handleBackPress = () => {
-    if (onBack) {
-      onBack()
-      return
+  const handlePress = () => {
+    if (onPress) {
+      onPress()
+    } else {
+      if (router.canGoBack()) router.back()
     }
-    router.back()
   }
-
   return (
     <TouchableOpacity
-      style={[styles.container, { borderColor: color ?? colors.border, width }]}
-      onPress={handleBackPress}
+      onPress={handlePress}
+      style={[styles.button, { borderColor: colors.border }, style]}
     >
-      <ChevronLeft color={color ?? colors.text} />
+      <ChevronLeft size={24} color={colors.text} />
     </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  button: {
     padding: 8,
-    borderWidth: 2,
-    borderRadius: 13,
-    boxShadow: "none",
+    borderRadius: 12,
+    borderWidth: 1,
   },
 })

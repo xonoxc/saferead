@@ -17,7 +17,7 @@ import { Fonts, FontSizes } from "@/constants/Fonts"
 import { updateSpace } from "@/services/api"
 import SpaceIcon from "@/components/spaces/Icon"
 import type { SpaceIconName } from "@/constants/spaceform"
-import CustomBackBtn from "@/components/CustomBackBtn"
+import { CustomBackBtn } from "@/components"
 
 export default function SpaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -89,7 +89,7 @@ export default function SpaceDetailScreen() {
         style={[styles.header, { backgroundColor: colors.background }]}
       >
         <View style={styles.headerTop}>
-          <CustomBackBtn color={space.color} />
+          <CustomBackBtn style={{ borderColor: space.color }} />
 
           <View style={styles.headerActions}>
             <Animated.View style={animatedStyle}>

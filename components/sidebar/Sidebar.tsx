@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { TouchableOpacity, View, StyleSheet, Text } from "react-native"
-import CustomBackBtn from "../CustomBackBtn"
+import { CustomBackBtn } from "../CustomBackBtn"
 import SideBarDocumentContent from "./SidebarContent"
 import { useLocalSearchParams } from "expo-router"
 import { Folder, Plus } from "lucide-react-native"

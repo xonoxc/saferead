@@ -1,9 +1,8 @@
 import { RelativePathString, router } from "expo-router"
 import React, { useState } from "react"
-import { View, StyleSheet, Alert, ScrollView } from "react-native"
-import { Box, LucideIcon, Search } from "lucide-react-native"
+import { View, StyleSheet, Alert, TouchableOpacity, FlatList, Text } from "react-native"
+import { Box, Search, Plus, LayoutGrid, List } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useSpaces, useDeleteSpace } from "@/hooks/queries/spaces"
 import { createSpace } from "@/services/api"
 import { TextInput } from "@/components/TextInput"
@@ -16,13 +15,18 @@ import { EmptyState } from "@/components/EmptyState"
 import { attempt } from "@/utils/attempt"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { useQueryClient } from "@tanstack/react-query"
+import { SpaceIconName } from "@/constants/spaceform"
+import { Fonts, FontSizes } from "@/constants"
+
+type ViewMode = "list" | "grid"
 
 export default function SpacesScreen() {
   const { colors } = useTheme()
-  const { data, isLoading } = useSpaces()
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useSpaces()
   const { mutate: deleteSpace } = useDeleteSpace()
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState<string>("")
+  const [viewMode, setViewMode] = useState<ViewMode>("list")
 
   const queryClient = useQueryClient()
 
@@ -38,12 +42,12 @@ export default function SpacesScreen() {
     title: string,
     description: string,
     color: string,
-    icon: LucideIcon,
+    icon: SpaceIconName,
     privacy: SpacePrivarcy,
     is_favorite: boolean
   ) => {
     const result = await attempt(
-      createSpace({ title, description, color, icon: icon.name, privacy, is_favorite })
+      createSpace({ title, description, color, icon, privacy, is_favorite })
     )
     if (!result.ok) {
       const errorMessage = getErrorMessage(result.error)
@@ -71,10 +75,29 @@ export default function SpacesScreen() {
 
   if (isLoading) return <LoadingSpinner />
 
-  return (
-    <View style={[styles.sidebarContent, { backgroundColor: colors.background }]}>
+  const renderHeader = () => (
+    <View style={styles.headerContainer}>
+      <View style={styles.header}>
+        <View style={{ width: "auto" }}>
+          <Text style={[styles.titleText, { color: colors.text }]}>Spaces</Text>
+        </View>
+        <View style={styles.headerIcons}>
+          <TouchableOpacity onPress={() => setViewMode("list")} style={styles.iconButton}>
+            <List size={24} color={viewMode === "list" ? colors.primary : colors.textMuted} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setViewMode("grid")} style={styles.iconButton}>
+            <LayoutGrid size={24} color={viewMode === "grid" ? colors.primary : colors.textMuted} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setCreateModalVisible(true)}
+            style={[styles.createButton, { backgroundColor: colors.primary }]}
+          >
+            <Plus size={20} color={colors.background} />
+          </TouchableOpacity>
+        </View>
+      </View>
       <View style={styles.searchContainer}>
-        <View style={[styles.searchInputContainer]}>
+        <View style={[styles.searchInputContainer, { borderColor: colors.border }]}>
           <Search size={20} color={colors.textMuted} />
           <TextInput
             value={searchQuery}
@@ -83,22 +106,41 @@ export default function SpacesScreen() {
           />
         </View>
       </View>
+    </View>
+  )
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {spaces.length > 0 ? (
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <FlatList
+        data={filteredSpaces}
+        key={viewMode}
+        numColumns={viewMode === "grid" ? 2 : 1}
+        renderItem={({ item }) => (
           <SpaceList
-            spaces={filteredSpaces}
+            space={item}
+            viewMode={viewMode}
             onDelete={handleDeleteSpace}
             onSpaceSelect={handleSpaceSelectPress}
           />
-        ) : (
+        )}
+        keyExtractor={item => item.id}
+        ListHeaderComponent={renderHeader}
+        ListEmptyComponent={
           <SpacesFallback
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             setShowCreateModal={() => setCreateModalVisible(true)}
           />
-        )}
-      </ScrollView>
+        }
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage()
+          }
+        }}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={isFetchingNextPage ? <LoadingSpinner /> : null}
+        contentContainerStyle={{ flexGrow: 1 }}
+      />
 
       {createModalVisible && (
         <View style={[StyleSheet.absoluteFillObject, styles.modalOverlay]}>
@@ -125,7 +167,7 @@ function SpacesFallback({
 
   const handleActionButtonPress = () => {
     if (searchQuery) setSearchQuery("")
-    setShowCreateModal(true)
+    else setShowCreateModal(true)
   }
 
   const handleSecondaryActionPress = () => {
@@ -150,9 +192,6 @@ function SpacesFallback({
   )
 }
 
-/*
- * Helper funciton to format and get the detaild needed for fallback state based on search query
- * **/
 function getFallbackDetails(searchQuery?: string) {
   const description = searchQuery
     ? `No spaces match "${searchQuery}". Try adjusting your search terms or create a new space.`
@@ -160,7 +199,7 @@ function getFallbackDetails(searchQuery?: string) {
 
   const title = searchQuery ? "No Spaces Found" : "No Spaces Yet"
   const actionTitle = searchQuery ? "Create New Space" : "Create Your First Space"
-  const secondaryActionTitle = searchQuery ? "Clear Search" : "Learn About Spaces"
+  const secondaryActionTitle = searchQuery ? "Clear Search" : undefined
   const variant = searchQuery ? "search" : "default"
 
   return {
@@ -173,18 +212,39 @@ function getFallbackDetails(searchQuery?: string) {
 }
 
 const styles = StyleSheet.create({
-  sidebarContent: {
+  container: {
     flex: 1,
-    padding: 2,
   },
-  header: { paddingBottom: 10 },
-  title: {
-    fontSize: FontSizes.xxl,
+  headerContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  titleText: {
+    fontSize: FontSizes.xl,
     fontFamily: Fonts.bold,
-    textAlign: "center",
+    padding: 5,
+  },
+  headerIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  iconButton: {
+    padding: 4,
+  },
+  createButton: {
+    padding: 8,
+    borderRadius: 12,
   },
   searchContainer: {
-    paddingVertical: 16,
+    paddingVertical: 8,
   },
   searchInputContainer: {
     flexDirection: "row",
@@ -192,8 +252,6 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingLeft: 12,
     paddingHorizontal: 10,
-    borderWidth: 1,
-    borderRadius: 12,
   },
   modalOverlay: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -202,33 +260,7 @@ const styles = StyleSheet.create({
     padding: 16,
     zIndex: 100,
   },
-  content: {
-    flex: 1,
-    marginBottom: 10,
-  },
-  createButtonContainer: {
-    marginTop: 16,
-  },
-  spacesFallbackContainer: {
-    flex: 1,
-    marginTop: 220,
-    height: "100%",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  fallbackCreateButton: {
-    fontSize: FontSizes.xs,
-    fontFamily: Fonts.medium,
-    paddingHorizontal: 14,
-    flexDirection: "row",
-    paddingVertical: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-  },
   emptyStateContainer: {
-    paddingVertical: 120,
+    paddingTop: 120,
   },
 })

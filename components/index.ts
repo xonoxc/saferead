@@ -18,8 +18,6 @@ export * from "./VoiceRecorder"
 
 export * from "./BlurView"
 
-export * from "./UpgradeButton"
-
 export * from "./LoadingSpinner"
 
 export * from "./ErrorMessage"

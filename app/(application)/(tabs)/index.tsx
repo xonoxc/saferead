@@ -107,8 +107,6 @@ export default function HomeScreen() {
         </View>
       </Animated.View>
 
-      <View style={[styles.sectionSeparator, { backgroundColor: colors.card }]} />
-
       {/* Document Types */}
       <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Document Types</Text>

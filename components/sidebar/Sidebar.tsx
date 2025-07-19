@@ -69,7 +69,7 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
   return (
     <Animated.View style={[styles.sidebar, { backgroundColor: colors.background }, animatedStyle]}>
       <View style={styles.header}>
-        <CustomBackBtn onBack={onClose} />
+        <CustomBackBtn onPress={onClose} />
         {spaceName ? (
           <View style={styles.sideBarTitle}>
             <Folder size={24} color={spaceColor || colors.primary} />

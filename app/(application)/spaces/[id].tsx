@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
-import { Star, Settings, FileText, TrendingUp, Calendar } from "lucide-react-native"
+import { Star, Settings, FileText, TrendingUp } from "lucide-react-native"
 import Animated, {
   FadeInDown,
   FadeInRight,

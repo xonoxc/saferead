@@ -60,7 +60,7 @@ export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewP
         ]}
       >
         <View>
-          <CustomBackBtn containerWidth={44} onBack={onBack} />
+          <CustomBackBtn onPress={onBack} />
         </View>
         <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
           {analysis.original_filename || "Document Analysis"}

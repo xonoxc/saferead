@@ -203,7 +203,7 @@ export default function ServerErrorScreen({
           </View>
 
           <Text style={[styles.statusText, { color: colors.textSecondary }]}>
-            We're working to restore normal service as quickly as possible. Please try again in a
+            We&apos;re working to restore normal service as quickly as possible. Please try again in a
             few minutes.
           </Text>
 

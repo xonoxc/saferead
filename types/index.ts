@@ -116,7 +116,7 @@ export interface Space {
   is_active: boolean
   is_favorite: boolean
   document_count: number
-  recent_documents: string
+  recent_documents: any[]
   user_username: string
   created_at: string
   updated_at: string

@@ -1,6 +1,6 @@
-import React from "react"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
-import { Star, Settings, FileText, TrendingUp } from "lucide-react-native"
+import React, { useState } from "react"
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native"
+import { Star, Settings, FileText, TrendingUp, Plus, MessageSquare } from "lucide-react-native"
 import Animated, {
   FadeInDown,
   FadeInRight,
@@ -8,7 +8,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated"
-import { useLocalSearchParams } from "expo-router"
+import { useLocalSearchParams, useRouter } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useSpaces } from "@/hooks/queries/spaces"
 import { Alert } from "react-native"
@@ -18,11 +18,18 @@ import { updateSpace } from "@/services/api"
 import SpaceIcon from "@/components/spaces/Icon"
 import type { SpaceIconName } from "@/constants/spaceform"
 import { CustomBackBtn } from "@/components"
+import { UserSpaceDocumentCard } from "@/components/documents/UserSpaceDocumentCard"
+import { useSpaceStore } from "@/store/useSpaceStore"
+import { BottomSheet } from "@/components/BottomSheet"
+import { UploadDocumentForm } from "@/components/spaces/UploadDocumentForm"
 
 export default function SpaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const { colors } = useTheme()
   const { data: spaces } = useSpaces()
+  const router = useRouter()
+  const setSpace = useSpaceStore(s => s.setSelectedSpace)
+  const [isSheetVisible, setSheetVisible] = useState(false)
 
   const flattendSpaces = spaces?.pages.flatMap(page => page.results) ?? []
 
@@ -71,6 +78,13 @@ export default function SpaceDetailScreen() {
     },  */
   ]
 
+  const handleOpenChat = () => {
+    if (space) {
+      setSpace(space)
+      router.push("/(application)/(tabs)/analyize")
+    }
+  }
+
   if (!space) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -90,11 +104,19 @@ export default function SpaceDetailScreen() {
           <CustomBackBtn style={{ borderColor: space.color }} />
 
           <View style={styles.headerActions}>
+            <TouchableOpacity
+              style={[styles.settingsButton, { backgroundColor: colors.surface }]}
+              onPress={() => setSheetVisible(true)}
+            >
+              <Plus size={20} color={space.color} />
+            </TouchableOpacity>
             <Animated.View style={animatedStyle}>
               <TouchableOpacity
                 style={[
                   styles.favoriteButton,
-                  { backgroundColor: space.is_favorite ? space.color + "20" : colors.surface },
+                  {
+                    backgroundColor: space.is_favorite ? space.color + "20" : colors.surface,
+                  },
                 ]}
                 onPress={handleFavoritePress}
               >
@@ -145,6 +167,28 @@ export default function SpaceDetailScreen() {
           </Animated.View>
         ))}
       </Animated.View>
+
+      <View style={styles.chatButtonContainer}>
+        <TouchableOpacity onPress={handleOpenChat} style={styles.chatButton}>
+          <MessageSquare size={20} color={"white"} />
+          <Text style={styles.chatButtonText}>Open Chat</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.documentsContainer}>
+        <Text style={[styles.documentsTitle, { color: colors.text }]}>Recent Documents</Text>
+        <FlatList
+          data={space.recent_documents}
+          renderItem={({ item }) => <UserSpaceDocumentCard document={item} />}
+          keyExtractor={item => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.documentsList}
+        />
+      </View>
+
+      <BottomSheet visible={isSheetVisible} onClose={() => setSheetVisible(false)}>
+        <UploadDocumentForm visible={isSheetVisible} onClose={() => setSheetVisible(false)} />
+      </BottomSheet>
     </View>
   )
 }
@@ -261,56 +305,20 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     textAlign: "center",
   },
-  searchSection: {
-    flexDirection: "row",
+  chatButtonContainer: {
     paddingHorizontal: 20,
-    gap: 12,
-    marginBottom: 16,
+    marginVertical: 10,
   },
-  searchContainer: {
-    flex: 1,
+  chatButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    gap: 12,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
-  },
-  addDocButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
     justifyContent: "center",
-    alignItems: "center",
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    gap: 10,
   },
-  quickActions: {
-    marginHorizontal: 20,
-    marginBottom: 16,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    gap: 12,
-  },
-  quickAction: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    gap: 12,
-  },
-  quickActionText: {
+  chatButtonText: {
+    color: "white",
     fontSize: FontSizes.md,
-    fontFamily: Fonts.medium,
+    fontFamily: Fonts.bold,
   },
   documentsContainer: {
     flex: 1,
@@ -328,6 +336,7 @@ const styles = StyleSheet.create({
   documentsTitle: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.semiBold,
+    marginBottom: 10,
   },
   filterButton: {
     width: 36,

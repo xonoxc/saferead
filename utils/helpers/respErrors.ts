@@ -5,10 +5,9 @@ import { attemptSync } from "../attempt"
  * Get error message wrapper
  * **/
 export function getErrorMessage(error: any): string {
-  if (error.status === 400) {
+  if (error.status >= 400 && error.status < 500) {
     return extractValidationErrorMessage(error.message)
-  }
-  if (error.status === 500) {
+  } else if (error.status === 500) {
     return "Internal server error, try again later~ 🥺"
   }
 

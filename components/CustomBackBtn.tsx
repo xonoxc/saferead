@@ -3,13 +3,7 @@ import { router } from "expo-router"
 import { ChevronLeft } from "lucide-react-native"
 import { TouchableOpacity, StyleSheet, ViewStyle } from "react-native"
 
-export function CustomBackBtn({
-  onPress,
-  style,
-}: {
-  onPress?: () => void
-  style?: ViewStyle
-}) {
+export function CustomBackBtn({ onPress, style }: { onPress?: () => void; style?: ViewStyle }) {
   const { colors } = useTheme()
   const handlePress = () => {
     if (onPress) {
@@ -32,6 +26,6 @@ const styles = StyleSheet.create({
   button: {
     padding: 8,
     borderRadius: 12,
-    borderWidth: 1,
+    borderWidth: 2,
   },
 })

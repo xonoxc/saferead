@@ -119,3 +119,15 @@ export async function getSpaceStats(spaceId: string) {
 export async function toggleFavoriteSpace(spaceId: string, data: { is_favorite: boolean }) {
   return apiClient.post(`/user_space/spaces/${spaceId}/toggle_favorite/`, data)
 }
+
+export async function addDocumentToSpace(data: {
+  space: string
+  document_file: any
+  document_type: string
+  display_name?: string
+  is_pinned?: boolean
+  notes?: string
+  tags?: string[]
+}) {
+  return apiClient.post("user_space/documents/", data)
+}

@@ -1,4 +1,4 @@
-export * from "./UpgradeButton"
+export { default as UpgradeButton } from "./UpgradeButton";
 
 export * from "./sidebar/Sidebar"
 

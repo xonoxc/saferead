@@ -69,7 +69,6 @@ export default function SpacesScreen() {
   }
 
   const handleSpaceSelectPress = (space: Space) => {
-    console.log("Space selected:", space)
     router.push(`/spaces/${space.id}` as RelativePathString)
   }
 

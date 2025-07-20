@@ -115,8 +115,15 @@ export function useAnalysis() {
     }
 
     const result = await pickDocument()
-    if (!result?.ok) {
-      Alert.alert("Error", result?.error?.message)
+    if (!result.ok) {
+      if (result.canceled) return
+
+      Alert.alert("Error", result.error?.message || "Failed to pick document", [
+        {
+          text: "OK",
+          onPress: () => {},
+        },
+      ])
       return
     }
 
@@ -143,6 +150,10 @@ export function useAnalysis() {
     router.push("/analysisres")
   }
 
+  const handleSpaceClose = () => {
+    setSelectedSpace(null)
+  }
+
   return {
     user,
     isAnalyzing,
@@ -160,8 +171,8 @@ export function useAnalysis() {
     setShowTextInput,
     isRecentDocumentsLoading,
     selectedSpace,
-    setSelectedSpace,
     recentDocuments,
+    handleSpaceClose,
     handleRecentDocumentPress,
   }
 }
@@ -177,44 +188,61 @@ export async function pickDocument() {
       copyToCacheDirectory: true,
     })
   )
+
   if (!result.ok) {
+    console.log("Document Picker Error:", result.error)
     return {
       ok: false,
       error: new Error("Failed to pick document. Please try again."),
     }
   }
 
-  if (!result.data.canceled && result.data.assets && result.data.assets.length > 0) {
-    const file = result.data.assets[0]
-    const newDoc: Document = {
-      id: Date.now().toString(),
-      title: file.name,
-      type: "other",
-      content: "",
-      originalFormat: file.mimeType?.includes("pdf")
-        ? "pdf"
-        : file.mimeType?.includes("image")
-          ? "image"
-          : "text",
-      fileSize: file.size || 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      isEncrypted: false,
-      tags: [],
-      shared: false,
-      sharedWith: [],
+  const isSelectionCanceled = result.data.canceled
+  if (isSelectionCanceled) {
+    return {
+      ok: false,
+      canceled: true,
+      error: new Error("Document selection was canceled."),
     }
+  }
 
+  const assets = !!(result.data.assets && result.data.assets.length > 0)
+  if (!assets) {
     return {
       ok: true,
-      data: {
-        ...newDoc,
-        uri: file.uri,
-        type: file.mimeType || "application/octet-stream",
-        name: file.name,
-        mimeType: file.mimeType,
-      },
+      error: new Error("No document selected. Please try again."),
     }
+  }
+
+  const file = result.data.assets[0]
+  const newDoc: Document = {
+    id: Date.now().toString(),
+    title: file.name,
+    type: "other",
+    content: "",
+    originalFormat: file.mimeType?.includes("pdf")
+      ? "pdf"
+      : file.mimeType?.includes("image")
+        ? "image"
+        : "text",
+    fileSize: file.size || 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isEncrypted: false,
+    tags: [],
+    shared: false,
+    sharedWith: [],
+  }
+
+  return {
+    ok: true,
+    data: {
+      ...newDoc,
+      uri: file.uri,
+      type: file.mimeType || "application/octet-stream",
+      name: file.name,
+      mimeType: file.mimeType,
+    },
   }
 }
 
@@ -235,11 +263,19 @@ export async function scanDocument() {
       error: new Error("Failed to launch camera. Please try again."),
     }
 
-  if (result.data.canceled || !result.data.assets?.[0]) {
-    return { ok: false, error: new Error("Scan was canceled or no image was returned.") }
+  const isCanceled = result.data.canceled
+  if (isCanceled) {
+    return {
+      ok: false,
+      canceled: true,
+      error: new Error("Canceled scanning. Please try again."),
+    }
   }
 
   const file = result.data.assets[0]
+  if (!file) {
+    return { ok: false, error: new Error("Scan was canceled or no image was returned.") }
+  }
 
   const newDoc: Document = {
     id: Date.now().toString(),

@@ -1,20 +1,22 @@
-import React from "react"
+import React, { useState } from "react"
 import { Fonts, FontSizes } from "@/constants"
 import UpgradeButton from "@/components/UpgradeButton"
 import { SideBar } from "@/components/sidebar"
 import { useAnalysis } from "@/hooks/useAnalysis"
 import { ChatView } from "@/components/chat"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
-import { Upload, Camera, Menu, LogOut } from "lucide-react-native"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from "react-native"
+import { Upload, Camera, Menu, LogOut, LayoutGrid, List } from "lucide-react-native"
 import Animated, { FadeInDown, FadeIn, FadeOut } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { DocumentTypeSelector } from "@/components/documents/DocumentTypeSelector"
 import { RecentDocumentItem } from "@/components/documents/RecentDocumentCard"
 
 import { AnalyzeScreenSkeleton } from "@/components/skeletons"
+import type { ViewType } from "@/types/view"
 
 export default function AnalyzeScreen() {
   const { colors } = useTheme()
+  const [viewType, setViewType] = useState<ViewType>("list")
 
   const {
     isSideBarOpen,
@@ -37,6 +39,14 @@ export default function AnalyzeScreen() {
   const handleSpaceClose = () => {
     setSelectedSpace(null)
   }
+
+  const renderRecentItem = ({ item }: { item: any }) => (
+    <RecentDocumentItem
+      document={item}
+      onPress={() => handleRecentDocumentPress(item)}
+      viewType={viewType}
+    />
+  )
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -95,7 +105,10 @@ export default function AnalyzeScreen() {
               <TouchableOpacity
                 style={[
                   styles.uploadOption,
-                  { borderColor: colors.border, backgroundColor: colors.card },
+                  {
+                    borderColor: colors.border,
+                    backgroundColor: colors.card,
+                  },
                 ]}
                 onPress={handleDocumentScan}
               >
@@ -108,7 +121,10 @@ export default function AnalyzeScreen() {
               <TouchableOpacity
                 style={[
                   styles.uploadOption,
-                  { borderColor: colors.border, backgroundColor: colors.card },
+                  {
+                    borderColor: colors.border,
+                    backgroundColor: colors.card,
+                  },
                 ]}
                 onPress={handleDocumentUpload}
               >
@@ -131,16 +147,32 @@ export default function AnalyzeScreen() {
                 entering={FadeInDown.delay(600).springify()}
                 style={styles.recentSection}
               >
-                <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>
-                  Recent Analysis
-                </Text>
-                {recentDocuments.slice(0, 5).map(doc => (
-                  <RecentDocumentItem
-                    key={doc.id}
-                    document={doc}
-                    onPress={() => handleRecentDocumentPress(doc)}
-                  />
-                ))}
+                <View style={styles.recentHeader}>
+                  <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>
+                    Recent Analysis
+                  </Text>
+                  <View style={styles.viewToggle}>
+                    <TouchableOpacity onPress={() => setViewType("list")}>
+                      <List size={20} color={viewType === "list" ? colors.primary : colors.text} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setViewType("grid")}>
+                      <LayoutGrid
+                        size={20}
+                        color={viewType === "grid" ? colors.primary : colors.text}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <FlatList
+                  data={recentDocuments.slice(0, 5)}
+                  renderItem={renderRecentItem}
+                  keyExtractor={item => item.id}
+                  numColumns={viewType === "grid" ? 2 : 1}
+                  key={viewType}
+                  scrollEnabled={false}
+                  columnWrapperStyle={viewType === "grid" ? { gap: 10 } : undefined}
+                  contentContainerStyle={{ gap: 10 }}
+                />
               </Animated.View>
             )}
           </ScrollView>
@@ -275,5 +307,15 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
     textAlign: "center",
+  },
+  recentHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  viewToggle: {
+    flexDirection: "row",
+    gap: 16,
   },
 })

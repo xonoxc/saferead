@@ -18,7 +18,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { SpaceIconName } from "@/constants/spaceform"
 import { Fonts, FontSizes } from "@/constants"
 
-type ViewMode = "list" | "grid"
+import type { ViewType } from "@/types/view"
 
 export default function SpacesScreen() {
   const { colors } = useTheme()
@@ -26,7 +26,7 @@ export default function SpacesScreen() {
   const { mutate: deleteSpace } = useDeleteSpace()
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [viewMode, setViewMode] = useState<ViewMode>("list")
+  const [viewMode, setViewMode] = useState<ViewType>("list")
 
   const queryClient = useQueryClient()
 

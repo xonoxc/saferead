@@ -2,7 +2,7 @@ import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisVie
 import { useTheme } from "@/hooks/useTheme"
 import { useAnalysisStore } from "@/store/useAnalysisStore"
 import { router } from "expo-router"
-import { View, Text, SafeAreaView, StyleSheet } from "react-native"
+import { View, Text, SafeAreaView } from "react-native"
 
 export default function DocumentAnalyisResultScreen() {
   const { analysisResult } = useAnalysisStore()

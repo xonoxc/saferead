@@ -1,9 +1,10 @@
 import { create } from "zustand"
 import * as SecureStore from "expo-secure-store"
-import { User } from "@/types"
 import { attempt } from "@/utils/attempt"
 import { isWeb } from "@/utils/helpers/platform"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+
+import type { User } from "@/types"
 
 interface UserStoreState {
   user: User | null

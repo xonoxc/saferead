@@ -16,11 +16,12 @@ import {
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import type { User } from "@/types"
-import type { ThemeMode } from "@/hooks/useTheme"
-import { type Router, useRouter } from "expo-router"
 import { DropdownSelector } from "@/components/DropDownSelector"
 import { useQueryClient } from "@tanstack/react-query"
+
+import { type Router, useRouter } from "expo-router"
+import type { User } from "@/types"
+import type { ThemeMode } from "@/hooks/useTheme"
 
 export default function SettingsScreen() {
   const { colors, mode, setTheme } = useTheme()

@@ -1,4 +1,5 @@
 import { create } from "zustand"
+
 import type { FilterOptions } from "@/types/docs"
 
 type State = {

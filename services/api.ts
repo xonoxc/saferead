@@ -1,9 +1,10 @@
 import { apiClient } from "@/utils/apiclient"
-import type { FilterOptions } from "@/types/docs"
 import { attempt } from "@/utils/attempt"
-import type { UploadDocumentRequest } from "@/types/api/documents.types"
-import { isReactNativeFile, ReactNativeFile } from "@/types/file"
 import { buildFileUploadFormData } from "@/utils/helpers/files"
+
+import type { FilterOptions } from "@/types/docs"
+import type { UploadDocumentRequest } from "@/types/api/documents.types"
+import type { ReactNativeFile } from "@/types/file"
 
 type SpaceDataParam = {
   title: string

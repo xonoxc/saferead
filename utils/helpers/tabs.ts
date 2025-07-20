@@ -1,5 +1,6 @@
-import type { ColorsType } from "@/hooks/useTheme"
 import { Platform, type ViewStyle } from "react-native"
+
+import type { ColorsType } from "@/hooks/useTheme"
 
 export function getTabBarStyles(colors: ColorsType) {
   return Platform.select<ViewStyle>({

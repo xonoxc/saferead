@@ -1,4 +1,5 @@
 import { create } from "zustand"
+
 import type { Space } from "@/types"
 
 interface SpaceState {

@@ -1,9 +1,10 @@
 import React from "react"
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native"
-import type { LucideIcon } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+
+import type { LucideIcon } from "lucide-react-native"
 
 const { width: screenWidth } = Dimensions.get("window")
 

@@ -16,11 +16,12 @@ import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { updateSpace } from "@/services/api"
 import SpaceIcon from "@/components/spaces/Icon"
-import type { SpaceIconName } from "@/constants/spaceform"
 import { CustomBackBtn } from "@/components"
 import { UserSpaceDocumentCard } from "@/components/documents/UserSpaceDocumentCard"
 import { useSpaceStore } from "@/store/useSpaceStore"
 import { UploadDocumentForm } from "@/components/spaces/UploadDocumentForm"
+
+import type { SpaceIconName } from "@/constants/spaceform"
 
 export default function SpaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()

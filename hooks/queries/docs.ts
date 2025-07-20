@@ -1,5 +1,6 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getDocuments, getDocumentById, deleteDocument as deleteDocumentApi } from "@/services/api"
+
 import type { FilterOptions } from "@/types/docs"
 import type { DocumentsListResponse } from "@/types/api/documents.types"
 

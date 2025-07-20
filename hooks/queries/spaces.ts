@@ -6,8 +6,9 @@ import {
   getSpaceStats as getSpaceStatsApi,
   toggleFavoriteSpace as toggleFavoriteSpaceApi,
 } from "@/services/api"
+
+import type { PaginatedSpaceDocuments } from "@/types/api/spaces.documents.types"
 import type { PaginatedSpaces, Space } from "@/types/api/spaces.types"
-import { PaginatedSpaceDocuments } from "@/types/api/spaces.documents.types"
 
 export const useSpaces = (enabled = true) => {
   const query = useInfiniteQuery<PaginatedSpaces>({

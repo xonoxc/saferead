@@ -19,10 +19,11 @@ import { AnalysisResponse } from "@/types/api/documents.types"
 import { DocumentCardSkeleton } from "@/components/skeletons"
 import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 
-const SKELETON_COUNT = 3
+import { EmptyState } from "../EmptyState"
 
 import type { FilterOptions as DocumentFilters } from "@/types/docs"
-import { EmptyState } from "../EmptyState"
+
+const SKELETON_COUNT = 3
 
 export interface SideBarDocumentContentProps {
   spaceId?: string

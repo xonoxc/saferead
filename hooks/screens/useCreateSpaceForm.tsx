@@ -1,9 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import type { z } from "zod"
-
-import { colors_palette, SpaceIconName } from "@/constants/spaceform"
+import { colors_palette, type SpaceIconName } from "@/constants/spaceform"
 import { createSpaceSchema } from "@/utils/validation/space"
+
+import type { z } from "zod"
 
 export type CreateSpaceFormProps = {
   onCreate: (

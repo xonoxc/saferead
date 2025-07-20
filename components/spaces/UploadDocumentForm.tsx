@@ -69,10 +69,15 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
   }
 
   const onSubmit = async (data: FormData) => {
+    const file = {
+      uri: data.file.uri,
+      name: data.file.name,
+      type: data.file.mimeType || "application/octet-stream",
+    }
     const resp = await attempt(
       addDocumentToSpace({
         space: spaceId,
-        document_file: data.file,
+        document_file: file,
         display_name: data.displayName,
         document_type: data.documentType,
       })

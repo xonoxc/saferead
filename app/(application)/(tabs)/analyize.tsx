@@ -40,6 +40,7 @@ export default function AnalyzeScreen() {
 
       {/* Header */}
       <AnalyzeHeader
+        selectedSpace={selectedSpace}
         setIsSideBarOpen={setIsSideBarOpen}
         onSpaceExitButtonPress={handleSpaceClose}
         colors={colors}

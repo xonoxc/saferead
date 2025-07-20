@@ -8,27 +8,21 @@ export default function DocumentAnalyisResultScreen() {
   const { analysisResult } = useAnalysisStore()
   const { colors } = useTheme()
 
-  const handleBackPress = () => {
-    router.back()
-  }
+  const handleBackPress = () => router.back()
 
-  if (!analysisResult) {
-    return (
-      <View>
-        <Text>No analysis result found.</Text>
-      </View>
-    )
-  }
+  if (!analysisResult) return <Fallback />
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <DocumentAnalysisView onBack={handleBackPress} analysis={analysisResult} />
     </SafeAreaView>
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-})
+function Fallback() {
+  return (
+    <View>
+      <Text>No analysis result found.</Text>
+    </View>
+  )
+}

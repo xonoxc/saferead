@@ -15,9 +15,12 @@ import { useDocuments } from "./queries/docs"
 import { Document } from "@/types"
 import { useAnalysisStore } from "@/store/useAnalysisStore"
 import { router } from "expo-router"
+import { useQueryClient } from "@tanstack/react-query"
 
 export function useAnalysis() {
   const { user } = useAuth()
+
+  const queryClient = useQueryClient()
 
   const { analysisResult, setAnalysisResult } = useAnalysisStore()
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -87,6 +90,15 @@ export function useAnalysis() {
       setIsAnalyzing(false)
       return
     }
+
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: ["documents"],
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ["document"],
+      }),
+    ])
 
     setAnalysisResult(uploadResult.data)
     setIsAnalyzing(false)

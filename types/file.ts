@@ -1,6 +1,7 @@
 export interface ReactNativeFile {
   uri: string
   type?: string
+  mimeType?: string
   name?: string
 }
 

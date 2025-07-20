@@ -47,7 +47,12 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
   })
 
   const pickDocument = async () => {
-    const result = await attempt(DocumentPicker.getDocumentAsync({}))
+    const result = await attempt(
+      DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: true,
+      })
+    )
     if (!result.ok || !result.data?.assets?.length) {
       return
     }

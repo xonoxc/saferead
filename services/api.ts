@@ -2,7 +2,8 @@ import { apiClient } from "@/utils/apiclient"
 import type { FilterOptions } from "@/types/docs"
 import { attempt } from "@/utils/attempt"
 import type { UploadDocumentRequest } from "@/types/api/documents.types"
-import { isReactNativeFile } from "@/types/file"
+import { isReactNativeFile, ReactNativeFile } from "@/types/file"
+import { buildFileUploadFormData } from "@/utils/helpers/files"
 
 type SpaceDataParam = {
   title: string
@@ -14,27 +15,13 @@ type SpaceDataParam = {
 }
 
 export async function uploadDocument(data: UploadDocumentRequest) {
-  const formData = new FormData()
-
-  formData.append("original_filename", data.original_filename)
-  formData.append("document_type", data.document_type)
-
-  const file = data.document_file
-
-  if (isReactNativeFile(file)) {
-    formData.append("document_file", {
-      uri: file.uri,
-      type: file.type ?? "application/octet-stream",
-      name: file.name ?? data.original_filename,
-    } as unknown as Blob)
-  } else if (file instanceof File || file instanceof Blob) {
-    formData.append("document_file", file, data.original_filename)
-  } else {
-    return {
-      success: false,
-      error_message: "Invalid file type. Please provide a valid file.",
-    }
-  }
+  const formData = buildFileUploadFormData("document_file", data.document_file, {
+    originalFilename: data.original_filename,
+    extras: {
+      original_filename: data.original_filename,
+      document_type: data.document_type,
+    },
+  })
 
   return apiClient.post("/scanner/documents/", formData, {
     headers: {
@@ -122,12 +109,28 @@ export async function toggleFavoriteSpace(spaceId: string, data: { is_favorite: 
 
 export async function addDocumentToSpace(data: {
   space: string
-  document_file: any
+  document_file: ReactNativeFile | File | Blob
   document_type: string
   display_name?: string
   is_pinned?: boolean
   notes?: string
   tags?: string[]
 }) {
-  return apiClient.post("user_space/documents/", data)
+  const formData = buildFileUploadFormData("document_file", data.document_file, {
+    originalFilename: data.display_name,
+    extras: {
+      space: data.space,
+      document_type: data.document_type,
+      display_name: data.display_name,
+      is_pinned: data.is_pinned,
+      notes: data.notes,
+      tags: data.tags?.join(","),
+    },
+  })
+
+  return apiClient.post("/user_space/documents/", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
 }

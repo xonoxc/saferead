@@ -5,16 +5,20 @@ import { View, StyleSheet, Text, FlatList } from "react-native"
 export default function SpaceRecentDocumentList({
   documents,
   colors,
+  spaceColor,
 }: {
   documents: any[]
   colors: { text: string; background: string }
+  spaceColor: string
 }) {
   return (
     <View style={styles.documentsContainer}>
       <Text style={[styles.documentsTitle, { color: colors.text }]}>Recent Documents</Text>
       <FlatList
         data={documents}
-        renderItem={({ item }) => <UserSpaceDocumentCard document={item} />}
+        renderItem={({ item }) => (
+          <UserSpaceDocumentCard document={item} spaceColor={spaceColor} />
+        )}
         keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.documentsList}

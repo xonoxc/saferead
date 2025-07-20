@@ -1,136 +1,142 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import { FileText, Calendar } from "lucide-react-native"
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native"
+import { Calendar, Tag } from "lucide-react-native"
+import * as WebBrowser from "expo-web-browser"
 import { useTheme } from "@/hooks/useTheme"
 import { UserSpaceDocument } from "@/types/api/spaces.documents.types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { getFileIcon } from "@/utils/helpers/files"
 
 interface UserSpaceDocumentCardProps {
   document: UserSpaceDocument
-  onPress?: () => void
+  spaceColor?: string
 }
 
 export const UserSpaceDocumentCard: React.FC<UserSpaceDocumentCardProps> = ({
   document,
-  onPress,
+  spaceColor,
 }) => {
   const { colors } = useTheme()
+  const FileIcon = getFileIcon(document.file_extension)
+  const cardColor = spaceColor || colors.primary
+
+  const handlePress = async () => {
+    if (document.download_url) {
+      try {
+        await WebBrowser.openBrowserAsync(document.download_url)
+      } catch (error) {
+        Alert.alert("Error", "Could not open the document.")
+      }
+    }
+  }
 
   return (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
-      onPress={onPress}
+      onPress={handlePress}
       activeOpacity={0.7}
     >
       <View style={styles.header}>
-        <View style={styles.iconContainer}>
-          <FileText size={20} color={colors.primary} />
+        <View
+          style={[
+            styles.iconContainer,
+            { backgroundColor: cardColor + "20", borderColor: cardColor + "30" },
+          ]}
+        >
+          <FileIcon size={24} color={cardColor} />
         </View>
         <View style={styles.titleContainer}>
           <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
             {document.display_name}
           </Text>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            {document.document_type}
+            {document.file_size}
           </Text>
         </View>
       </View>
 
-      <View style={styles.content}>
+      <View style={styles.footer}>
         <View style={styles.dateContainer}>
           <Calendar size={14} color={colors.textMuted} />
           <Text style={[styles.date, { color: colors.textMuted }]}>
             {new Date(document.created_at).toLocaleDateString()}
           </Text>
         </View>
-      </View>
-
-      {document.tags && document.tags.length > 0 && (
-        <View style={styles.tagsContainer}>
-          {document.tags.slice(0, 3).map((tag, index) => (
-            <View key={index} style={[styles.tag, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.tagText, { color: colors.textSecondary }]}>{tag}</Text>
-            </View>
-          ))}
-          {document.tags.length > 3 && (
-            <Text style={[styles.moreTagsText, { color: colors.textMuted }]}>
-              +{document.tags.length - 3} more
+        {document.tags && document.tags.length > 0 && (
+          <View style={styles.tagsContainer}>
+            <Tag size={14} color={colors.textMuted} />
+            <Text style={[styles.tagText, { color: colors.textMuted }]}>
+              {document.tags.slice(0, 2).join(", ")}
             </Text>
-          )}
-        </View>
-      )}
+          </View>
+        )}
+      </View>
     </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     marginVertical: 8,
     borderWidth: 1,
-    elevation: 2,
+    elevation: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 2,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 16,
+    borderWidth: 1,
   },
   titleContainer: {
     flex: 1,
   },
   title: {
-    fontSize: FontSizes.lg,
+    fontSize: FontSizes.md,
     fontFamily: Fonts.semiBold,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   subtitle: {
     fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
   },
-  content: {
-    marginBottom: 12,
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#00000010",
   },
   dateContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
   },
   date: {
-    fontSize: FontSizes.sm,
+    fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
-    marginLeft: 4,
+    marginLeft: 6,
   },
   tagsContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
     alignItems: "center",
-  },
-  tag: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginRight: 6,
-    marginBottom: 4,
   },
   tagText: {
     fontSize: FontSizes.xs,
-    fontFamily: Fonts.medium,
-  },
-  moreTagsText: {
-    fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
+    marginLeft: 6,
   },
 })

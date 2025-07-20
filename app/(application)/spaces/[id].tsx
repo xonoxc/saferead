@@ -45,10 +45,14 @@ export default function SpaceDetailScreen() {
       <SpaceDetailsStats stats={stats} colors={colors} />
 
       {/* Recent Documents */}
-      <SpaceRecentDocumentList documents={space.recent_documents} colors={colors} />
+      <SpaceRecentDocumentList
+        documents={space.recent_documents}
+        colors={colors}
+        spaceColor={space.color}
+      />
 
       {/* Open Chat Button */}
-      <SpaceDetailsOpenChatBtn onPress={handleOpenChat} />
+      <SpaceDetailsOpenChatBtn onPress={handleOpenChat} color={space.color} />
 
       {/* Upload Document Button */}
       {isSheetVisible && (

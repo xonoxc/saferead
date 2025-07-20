@@ -49,7 +49,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       icon: TrendingUp,
       label: "Analyzed",
       value: space?.recent_documents.length,
-      color: colors.success,
+      color: space?.color,
     },
     /* {
       icon: Calendar,
@@ -62,6 +62,8 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       color: colors.warning,
     },  */
   ]
+
+  console.log("space.recent_documents", JSON.stringify(space?.recent_documents, null, 2))
 
   const handleOpenChat = () => {
     if (space) {

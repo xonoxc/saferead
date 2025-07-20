@@ -1,32 +1,51 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
+import React from "react"
+import { View, StyleSheet, TouchableOpacity } from "react-native"
 import { MessageSquare } from "lucide-react-native"
-import { Fonts, FontSizes } from "@/constants"
+import Animated, { FadeInUp, FadeOut } from "react-native-reanimated"
 
-export default function SpaceDetailsOpenChatBtn({ onPress }: { onPress?: () => void }) {
+interface SpaceDetailsOpenChatBtnProps {
+  onPress?: () => void
+  color: string
+}
+
+export default function SpaceDetailsOpenChatBtn({
+  onPress,
+  color,
+}: SpaceDetailsOpenChatBtnProps) {
   return (
-    <View style={styles.chatButtonContainer}>
-      <TouchableOpacity onPress={onPress} style={styles.chatButton}>
-        <MessageSquare size={20} color={"white"} />
-        <Text style={styles.chatButtonText}>Open Chat</Text>
+    <Animated.View
+      style={[styles.chatButtonContainer]}
+      entering={FadeInUp.delay(500).springify()}
+      exiting={FadeOut}
+    >
+      <TouchableOpacity
+        onPress={onPress}
+        style={[styles.chatButton, { backgroundColor: color }]}
+        activeOpacity={0.8}
+      >
+        <MessageSquare size={28} color={"white"} />
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
   chatButtonContainer: {
-    paddingHorizontal: 20,
-    marginVertical: 10,
+    position: "absolute",
+    bottom: 30,
+    right: 30,
+    zIndex: 10,
   },
   chatButton: {
-    flexDirection: "row",
-    alignItems: "center",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     justifyContent: "center",
-    gap: 10,
-  },
-  chatButtonText: {
-    color: "white",
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.bold,
+    alignItems: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
 })

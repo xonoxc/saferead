@@ -1,4 +1,5 @@
 import { isReactNativeFile, type ReactNativeFile } from "@/types/file"
+import { FileText, FileJson, File, FileImage, FileQuestion } from "lucide-react-native"
 
 /*
  * Utility functions for handling file objects
@@ -62,4 +63,21 @@ export function buildFileUploadFormData(
   }
 
   return formData
+}
+
+export function getFileIcon(extension: string) {
+  switch (extension.toLowerCase()) {
+    case ".pdf":
+      return FileText
+    case ".json":
+      return FileJson
+    case ".png":
+    case ".jpg":
+    case ".jpeg":
+      return FileImage
+    case ".txt":
+      return File
+    default:
+      return FileQuestion
+  }
 }

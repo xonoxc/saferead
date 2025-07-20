@@ -20,7 +20,6 @@ import type { SpaceIconName } from "@/constants/spaceform"
 import { CustomBackBtn } from "@/components"
 import { UserSpaceDocumentCard } from "@/components/documents/UserSpaceDocumentCard"
 import { useSpaceStore } from "@/store/useSpaceStore"
-import { BottomSheet } from "@/components/BottomSheet"
 import { UploadDocumentForm } from "@/components/spaces/UploadDocumentForm"
 
 export default function SpaceDetailScreen() {
@@ -84,6 +83,8 @@ export default function SpaceDetailScreen() {
       router.push("/(application)/(tabs)/analyize")
     }
   }
+
+  const handleBottomSheetClose = () => setSheetVisible(false)
 
   if (!space) {
     return (
@@ -186,9 +187,15 @@ export default function SpaceDetailScreen() {
         />
       </View>
 
-      <BottomSheet visible={isSheetVisible} onClose={() => setSheetVisible(false)}>
-        <UploadDocumentForm visible={isSheetVisible} onClose={() => setSheetVisible(false)} />
-      </BottomSheet>
+      {isSheetVisible && (
+        <View style={styles.modalOverlay}>
+          <UploadDocumentForm
+            spaceId={space.id}
+            onCancel={handleBottomSheetClose}
+            onUploadSuccess={handleBottomSheetClose}
+          />
+        </View>
+      )}
     </View>
   )
 }
@@ -199,7 +206,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   header: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 14,
     paddingBottom: 24,
   },
   headerTop: {
@@ -344,5 +351,12 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    zIndex: 100,
   },
 })

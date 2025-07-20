@@ -10,8 +10,8 @@ import { attempt } from "@/utils/attempt"
 import { addDocumentToSpace } from "@/services/api"
 import { useTheme } from "@/hooks/useTheme"
 import { FontSizes, Fonts } from "@/constants/Fonts"
-import Animated, { SlideInDown, SlideOutDown, Easing } from "react-native-reanimated"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
+import { Drawer } from "../Drawer"
 
 const schema = z.object({
   displayName: z.string().min(1, "Name is required"),
@@ -84,14 +84,7 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
   }
 
   return (
-    <Animated.View
-      entering={SlideInDown.duration(200).easing(Easing.out(Easing.exp))}
-      exiting={SlideOutDown.duration(200).easing(Easing.in(Easing.exp))}
-      style={{
-        backgroundColor: colors.background,
-        flexGrow: 1,
-      }}
-    >
+    <Drawer>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>Upload Document</Text>
@@ -166,13 +159,15 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
           />
         </View>
       </View>
-    </Animated.View>
+    </Drawer>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: "100%",
+    flex: 1,
+    width: "100%",
+    paddingHorizontal: 16,
   },
   header: {
     flexDirection: "row",
@@ -190,7 +185,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 10,
     paddingTop: 20,
   },
   picker: {

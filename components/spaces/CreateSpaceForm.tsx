@@ -4,12 +4,13 @@ import { TextInput } from "@/components/TextInput"
 import { Button } from "@/components/Button"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { Easing, SlideInDown, SlideOutDown, useSharedValue } from "react-native-reanimated"
+import { useSharedValue } from "react-native-reanimated"
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated"
 import { colors_palette, iconMap, type SpaceIconName } from "@/constants/spaceform"
 import useCreateSpaceForm from "@/hooks/screens/useCreateSpaceForm"
 import { Controller, ControllerRenderProps, useWatch } from "react-hook-form"
 import { Globe, LockIcon } from "lucide-react-native"
+import { Drawer } from "../Drawer"
 
 export const CreateSpaceForm = ({
   onCreate,
@@ -32,14 +33,7 @@ export const CreateSpaceForm = ({
   const selectedColor = useWatch({ control, name: "color" }) ?? colors.text
 
   return (
-    <Animated.View
-      entering={SlideInDown.duration(200).easing(Easing.out(Easing.exp))}
-      exiting={SlideOutDown.duration(200).easing(Easing.in(Easing.exp))}
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-      }}
-    >
+    <Drawer>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>Create New Space</Text>
@@ -146,7 +140,7 @@ export const CreateSpaceForm = ({
           />
         </View>
       </View>
-    </Animated.View>
+    </Drawer>
   )
 }
 

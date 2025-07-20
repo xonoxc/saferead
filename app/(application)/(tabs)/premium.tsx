@@ -14,7 +14,9 @@ export default function PremiumScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.header}>
-        <CustomBackBtn />
+        <View style={{ width: "15%" }}>
+          <CustomBackBtn />
+        </View>
       </Animated.View>
 
       <ScrollView

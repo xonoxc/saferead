@@ -86,24 +86,26 @@ export function useAnalysis() {
 
     if (!uploadResult.ok) {
       Alert.alert(uploadResult.error.message || "Failed to analyze document")
+    } else {
+      setAnalysisResult(uploadResult.data)
 
-      setIsAnalyzing(false)
-      return
+      router.push("/analysisres")
     }
 
     await Promise.all([
       queryClient.invalidateQueries({
-        queryKey: ["documents"],
+        predicate: query => Array.isArray(query.queryKey) && query.queryKey[0] === "documents",
       }),
       queryClient.invalidateQueries({
         queryKey: ["document"],
       }),
+
+      queryClient.invalidateQueries({
+        queryKey: ["documentStats"],
+      }),
     ])
 
-    setAnalysisResult(uploadResult.data)
     setIsAnalyzing(false)
-
-    router.push("/analysisres")
   }
 
   const handleDocumentUpload = async () => {

@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native"
+import { View } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { type DocumentType, DocumentTypeSelector } from "../documents/DocumentTypeSelector"
 
@@ -34,7 +34,7 @@ export default function AnalyizeDefaultContent({
   onRecentDocumentPress,
 }: AnalyizeDefaultContentProps) {
   return (
-    <View style={styles.content}>
+    <View style={{ flex: 1, padding: 20 }}>
       {/* Document Type Selector */}
       <Animated.View entering={FadeInDown.delay(200).springify()}>
         <DocumentTypeSelector selectedType={selectedDocType} onSelect={onDocumentSelectType} />
@@ -58,10 +58,3 @@ export default function AnalyizeDefaultContent({
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-})

@@ -1,5 +1,5 @@
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { useTheme } from "@/hooks/useTheme"
+import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { AnalysisResponse } from "@/types/api/documents.types"
 import { FileText, TrendingUp } from "lucide-react-native"
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native"
@@ -16,32 +16,8 @@ export const RecentDocumentItem = ({
   viewType = "list",
 }: RecentDocumentItemProps) => {
   const { colors, isDark } = useTheme()
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return colors.success
-      case "processing":
-        return colors.warning
-      case "failed":
-        return colors.error
-      default:
-        return colors.textSecondary
-    }
-  }
-
-  const getDocumentTypeLabel = (type: string) => {
-    const types: Record<string, string> = {
-      terms: "Terms & Conditions",
-      privacy: "Privacy Policy",
-      legal: "Legal Agreement",
-      other: "Other Document",
-    }
-    return types[type] || type
-  }
-
   const isGridView = viewType === "grid"
-  const statusColor = getStatusColor(document.status)
+  const statusColor = getStatusColor(document.status, colors)
 
   return (
     <TouchableOpacity
@@ -57,26 +33,16 @@ export const RecentDocumentItem = ({
       ]}
       onPress={onPress}
     >
-      <View
-        style={[
-          styles.documentHeader,
-          isGridView && styles.gridDocumentHeader,
-        ]}
-      >
+      <View style={[styles.documentHeader, isGridView && styles.gridDocumentHeader]}>
         <View
           style={[
             styles.documentIcon,
             {
-              backgroundColor: isGridView
-                ? statusColor + "20"
-                : colors.primary + "20",
+              backgroundColor: isGridView ? statusColor + "20" : colors.primary + "20",
             },
           ]}
         >
-          <FileText
-            size={20}
-            color={isGridView ? statusColor : colors.primary}
-          />
+          <FileText size={20} color={isGridView ? statusColor : colors.primary} />
         </View>
         <View style={styles.documentInfo}>
           <Text
@@ -90,28 +56,17 @@ export const RecentDocumentItem = ({
             {document.original_filename}
           </Text>
           {!isGridView && (
-            <Text
-              style={[styles.documentType, { color: colors.textSecondary }]}
-            >
+            <Text style={[styles.documentType, { color: colors.textSecondary }]}>
               {getDocumentTypeLabel(document.document_type)}
             </Text>
           )}
         </View>
         {!isGridView && (
           <View style={styles.documentMeta}>
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: statusColor + "20" },
-              ]}
-            >
-              <Text style={[styles.statusText, { color: statusColor }]}>
-                {document.status}
-              </Text>
+            <View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
+              <Text style={[styles.statusText, { color: statusColor }]}>{document.status}</Text>
             </View>
-            <Text
-              style={[styles.documentDate, { color: colors.textSecondary }]}
-            >
+            <Text style={[styles.documentDate, { color: colors.textSecondary }]}>
               {new Date(document.created_at).toLocaleDateString()}
             </Text>
           </View>
@@ -128,8 +83,7 @@ export const RecentDocumentItem = ({
           </View>
           <View style={styles.statItem}>
             <Text style={[styles.statText, { color: colors.textSecondary }]}>
-              {document.risky_points.length} risks •{" "}
-              {document.favourable_points.length} favorable
+              {document.risky_points.length} risks • {document.favourable_points.length} favorable
             </Text>
           </View>
         </View>
@@ -140,6 +94,29 @@ export const RecentDocumentItem = ({
 
 function isDocumentComplete(document: AnalysisResponse): boolean {
   return document.status === "completed"
+}
+
+const getStatusColor = (status: string, colors: ColorsType) => {
+  switch (status) {
+    case "completed":
+      return colors.success
+    case "processing":
+      return colors.warning
+    case "failed":
+      return colors.error
+    default:
+      return colors.textSecondary
+  }
+}
+
+const getDocumentTypeLabel = (type: string) => {
+  const types: Record<string, string> = {
+    terms: "Terms & Conditions",
+    privacy: "Privacy Policy",
+    legal: "Legal Agreement",
+    other: "Other Document",
+  }
+  return types[type] || type
 }
 
 const styles = StyleSheet.create({

@@ -1,116 +1,65 @@
-import React, { useState } from "react"
-import { View, StyleSheet, ScrollView, Alert } from "react-native"
-import { router } from "expo-router"
+import React from "react"
+import { View, StyleSheet, ScrollView } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { Controller } from "react-hook-form"
 import { TextInput, Button, ModalLoadingSpinner } from "@/components/"
 import { Fonts, FontSizes } from "@/constants"
-import {
-  type ChangePasswordFormSchema,
-  changePasswordFormSchema,
-} from "@/utils/validation/change-password"
-import { apiClient } from "@/utils/apiclient"
-import { getErrorMessage } from "@/utils/helpers/respErrors"
-import { attempt } from "@/utils/attempt"
-import { useAuth } from "@/hooks/useAuth"
 import { SafeAreaView } from "react-native-safe-area-context"
+import useChangePassScreen from "@/hooks/screens/useChangePassScreen"
 
 export default function ChangePasswordScreen() {
   const { colors } = useTheme()
-  const { logout } = useAuth()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ChangePasswordFormSchema>({
-    mode: "onChange",
-    resolver: zodResolver(changePasswordFormSchema),
-    defaultValues: {
-      new_password1: "",
-      new_password2: "",
-    },
-  })
-
-  const onSubmit = async (data: ChangePasswordFormSchema) => {
-    setIsSubmitting(true)
-    const result = await attempt(apiClient.post("/auth/password/change/", data))
-    setIsSubmitting(false)
-
-    if (!result.ok) {
-      Alert.alert("Error", getErrorMessage(result.error))
-      return
-    }
-
-    Alert.alert("Success", "Your password has been changed successfully. Please sign in again.", [
-      {
-        text: "OK",
-        onPress: async () => {
-          await logout()
-          router.replace("/(auth)/login")
-        },
-      },
-    ])
-  }
+  const { isSubmitting, errors, control, handleSubmit } = useChangePassScreen()
 
   return (
-    <>
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <ModalLoadingSpinner visible={isSubmitting} message="Changing password..." />
-        <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-          <View style={styles.content}>
-            {/*
-            <View style={styles.header}>
-              <Text style={[styles.title, { color: colors.text }]}>Change Password</Text>
-            </View>
-            */}
-            <View style={styles.form}>
-              <Controller
-                control={control}
-                name="new_password1"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    label="New Password"
-                    value={value}
-                    onChangeText={onChange}
-                    placeholder="Enter your new password"
-                    secureTextEntry
-                    error={errors.new_password1?.message}
-                  />
-                )}
-              />
-
-              <Controller
-                control={control}
-                name="new_password2"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    label="Confirm New Password"
-                    value={value}
-                    onChangeText={onChange}
-                    placeholder="Confirm your new password"
-                    secureTextEntry
-                    error={errors.new_password2?.message}
-                  />
-                )}
-              />
-
-              <View style={styles.buttonContainer}>
-                <Button
-                  title="Change Password"
-                  onPress={handleSubmit(onSubmit)}
-                  loading={isSubmitting}
-                  fullWidth
-                  size="large"
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <ModalLoadingSpinner visible={isSubmitting} message="Changing password..." />
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.content}>
+          <View style={styles.form}>
+            <Controller
+              control={control}
+              name="new_password1"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  label="New Password"
+                  value={value}
+                  onChangeText={onChange}
+                  placeholder="Enter your new password"
+                  secureTextEntry
+                  error={errors.new_password1?.message}
                 />
-              </View>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="new_password2"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  label="Confirm New Password"
+                  value={value}
+                  onChangeText={onChange}
+                  placeholder="Confirm your new password"
+                  secureTextEntry
+                  error={errors.new_password2?.message}
+                />
+              )}
+            />
+
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Change Password"
+                onPress={handleSubmit}
+                loading={isSubmitting}
+                fullWidth
+                size="large"
+              />
             </View>
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 

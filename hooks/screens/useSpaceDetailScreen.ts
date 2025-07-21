@@ -14,6 +14,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
   const { data: spaces } = useSpaces()
   const router = useRouter()
   const setSpace = useSpaceStore(s => s.setSelectedSpace)
+
   const [isSheetVisible, setSheetVisible] = useState(false)
 
   const flattendSpaces = spaces?.pages.flatMap(page => page.results) ?? []
@@ -84,5 +85,6 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
     animatedStyle,
     handleBottomSheetClose,
     router,
+    colors,
   }
 }

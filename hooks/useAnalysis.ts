@@ -29,7 +29,9 @@ export function useAnalysis() {
   const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType>("other")
   const [showTextInput, setShowTextInput] = useState(false)
   const [isSideBarOpen, setIsSideBarOpen] = useState(false)
-  const { selectedSpace, setSelectedSpace } = useSpaceStore()
+
+  const selectedSpace = useSpaceStore(s => s.selectedSpace)
+  const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
 
   const { data, isLoading: isRecentDocumentsLoading } = useDocuments()
   const recentDocuments = data?.pages.flatMap(page => page.results) ?? []

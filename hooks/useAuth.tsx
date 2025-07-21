@@ -49,8 +49,11 @@ const redirectURI = makeRedirectUri({
 })
 */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user, setUser, clearUser } = useUserStore()
   const [isLoading, setIsLoading] = useState(true)
+
+  const user = useUserStore(s => s.user)
+  const setUser = useUserStore(s => s.setUser)
+  const clearUser = useUserStore(s => s.clearUser)
 
   /* 
    * const [_, response, promptAsync] = useAuthRequest({

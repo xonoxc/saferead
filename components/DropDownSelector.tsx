@@ -10,15 +10,15 @@ import {
   TextStyle,
   ActivityIndicator,
 } from "react-native"
-import { ChevronDown, Check, LucideIcon, Dot } from "lucide-react-native"
+import { ChevronDown, Check, LucideIcon, Dot, Icom } from "lucide-react-native"
 import Animated from "react-native-reanimated"
-import { useTheme } from "@/hooks/useTheme"
+import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { FontSizes, Fonts } from "@/constants"
 
 export interface DropdownOption<T> {
   label: string
   value: T
-  icon?: LucideIcon
+  icon?: LucideIcon | React.ReactNode
 }
 
 interface DropdownSelectorProps<T> {
@@ -39,7 +39,7 @@ interface DropdownSelectorProps<T> {
   labelStyle?: TextStyle
 }
 
-export function DropdownSelector<T>({
+export default function DropdownSelector<T>({
   label,
   selected,
   options,
@@ -60,8 +60,6 @@ export function DropdownSelector<T>({
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
 
-  const SelectedIcon = selectedOption?.icon || Check
-
   return (
     <View style={[{ marginBottom: 20 }, containerStyle]}>
       {label && (
@@ -76,7 +74,7 @@ export function DropdownSelector<T>({
           onPress={handleOpen}
         >
           <View style={styles.row}>
-            <SelectedIcon />
+            {renderIcon(selectedOption?.icon, colors)}
             <Text style={[styles.selectedText, { color: colors.text }]}>
               {selectedOption?.label || "Select..."}
             </Text>
@@ -102,14 +100,12 @@ export function DropdownSelector<T>({
                     handleClose()
                   }
 
-                  const ItemIcon = item.icon || Dot
-
                   if (renderOption) {
                     const result = renderOption(
                       item,
                       isSelected,
                       onItemSelect
-                    ) as React.ReactElement | null
+                    ) as React.ReactElement
                     return result ?? null
                   }
 
@@ -123,7 +119,7 @@ export function DropdownSelector<T>({
                       onPress={onItemSelect}
                     >
                       <View style={styles.row}>
-                        <ItemIcon size={20} color={colors.text} style={{ marginRight: 8 }} />
+                        {renderIcon(item.icon, colors)}
                         <Text style={[styles.optionText, { color: colors.text }]}>
                           {item.label}
                         </Text>
@@ -139,6 +135,16 @@ export function DropdownSelector<T>({
       </Modal>
     </View>
   )
+}
+
+/*
+ *
+ * function to detect if the passed icon is already a JSX element for correct rendering
+ * **/
+function renderIcon(icon: LucideIcon | React.ReactNode, colors: ColorsType) {
+  if (React.isValidElement(icon)) return icon
+  const IconComponent = (icon ?? Dot) as LucideIcon
+  return <IconComponent size={20} color={colors.text} style={{ marginRight: 8 }} />
 }
 
 const styles = StyleSheet.create({

@@ -8,6 +8,7 @@ import SettingsGroup from "@/components/settings/SettingsGroup"
 import useSettingsGroups from "@/hooks/screens/useSettingsGroup"
 import SettingsThemeDropdown from "@/components/settings/SettingsThemeDropDown"
 import { Fonts, FontSizes } from "@/constants"
+import { LucideIcon } from "lucide-react-native"
 
 export default function SettingsScreen() {
   const { colors, mode, setTheme } = useTheme()

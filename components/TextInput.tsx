@@ -13,87 +13,75 @@ import {
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 
-interface TextInputProps {
+interface TextInputProps extends React.ComponentProps<typeof RNTextInput> {
   label?: string
-  value: string
-  onChangeText: (text: string) => void
-  placeholder?: string
-  secureTextEntry?: boolean
   error?: string
-  multiline?: boolean
-  numberOfLines?: number
-  keyboardType?: "default" | "email-address" | "numeric" | "phone-pad"
-  autoCapitalize?: "none" | "sentences" | "words" | "characters"
-  autoCorrect?: boolean
-  editable?: boolean
-  onBlur?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void
-
   containerStyle?: StyleProp<ViewStyle>
   labelStyle?: StyleProp<TextStyle>
-  inputStyle?: StyleProp<TextStyle>
   errorStyle?: StyleProp<TextStyle>
+  leftAccessory?: React.ReactNode
+  rightAccessory?: React.ReactNode
 }
 
 export const TextInput: React.FC<TextInputProps> = ({
   label,
-  value,
-  onChangeText,
-  placeholder,
-  secureTextEntry,
   error,
-  multiline,
-  numberOfLines,
-  keyboardType = "default",
-  autoCapitalize = "none",
-  autoCorrect = true,
-  editable = true,
-  onBlur,
   containerStyle,
   labelStyle,
-  inputStyle,
   errorStyle,
+  leftAccessory,
+  rightAccessory,
+  ...rest
 }) => {
   const { colors } = useTheme()
   const [isFocused, setIsFocused] = useState(false)
 
-  const combinedInputStyle: StyleProp<TextStyle> = [
-    styles.input,
-    {
-      backgroundColor: colors.surface,
-      borderColor: error ? colors.error : isFocused ? colors.primary : colors.border,
-      color: colors.text,
-    },
-    multiline && { textAlignVertical: "top" },
-    !editable && { opacity: 0.5 },
-    inputStyle, // ⬅️ custom style gets merged
-  ]
-
   const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setIsFocused(false)
-    if (onBlur) {
-      onBlur(e)
-    }
+    rest.onBlur?.(e)
   }
+
+  const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    setIsFocused(true)
+    rest.onFocus?.(e)
+  }
+
+  const borderColor = error ? colors.error : isFocused ? colors.primary : colors.border
 
   return (
     <View style={[styles.container, containerStyle]}>
       {label && <Text style={[styles.label, { color: colors.text }, labelStyle]}>{label}</Text>}
-      <RNTextInput
-        style={combinedInputStyle}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={colors.textMuted}
-        secureTextEntry={secureTextEntry}
-        multiline={multiline}
-        numberOfLines={numberOfLines}
-        keyboardType={keyboardType}
-        autoCapitalize={autoCapitalize}
-        autoCorrect={autoCorrect}
-        editable={editable}
-        onFocus={() => setIsFocused(true)}
-        onBlur={handleBlur}
-      />
+
+      <View
+        style={[
+          styles.inputWrapper,
+          {
+            backgroundColor: colors.surface,
+            borderColor,
+          },
+        ]}
+      >
+        {leftAccessory && <View style={styles.leftIcon}>{leftAccessory}</View>}
+
+        <RNTextInput
+          {...rest}
+          style={[
+            styles.input,
+            {
+              color: colors.text,
+            },
+            rest.multiline && { textAlignVertical: "top" },
+            !rest.editable && { opacity: 0.5 },
+            rest.style,
+          ]}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          placeholderTextColor={colors.textMuted}
+        />
+
+        {rightAccessory && <View style={styles.rightIcon}>{rightAccessory}</View>}
+      </View>
+
       {error && <Text style={[styles.error, { color: colors.error }, errorStyle]}>{error}</Text>}
     </View>
   )
@@ -109,15 +97,27 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     marginBottom: 4,
   },
-  input: {
+  inputWrapper: {
     borderWidth: 2,
     borderRadius: 15,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 52,
+  },
+  input: {
     flex: 1,
     fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
-    minHeight: 52,
+    paddingHorizontal: 8,
+    paddingVertical: 10,
+  },
+  leftIcon: {
+    marginRight: 4,
+  },
+  rightIcon: {
+    marginLeft: 4,
   },
   error: {
     fontSize: FontSizes.sm,

@@ -13,7 +13,9 @@ import { attempt } from "@/utils/attempt"
 import { useAnalysisStore } from "@/store/useAnalysisStore"
 
 export function useDocumentScreen(spaceId?: string, spaceName?: string) {
-  const { init, currentFilters, applyFilters } = useDocumentsStore()
+  const init = useDocumentsStore(s => s.init)
+  const applyFilters = useDocumentsStore(s => s.applyFilters)
+  const currentFilters = useDocumentsStore(s => s.currentFilters)
 
   const [searchQuery, setSearchQuery] = useState("")
   const [showFilter, setShowFilter] = useState(false)

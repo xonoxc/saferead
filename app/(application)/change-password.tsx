@@ -1,5 +1,5 @@
 import React from "react"
-import { View, StyleSheet, ScrollView } from "react-native"
+import { View, StyleSheet, ScrollView, Text } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Controller } from "react-hook-form"
 import { TextInput, Button, ModalLoadingSpinner } from "@/components"
@@ -16,6 +16,20 @@ export default function ChangePasswordScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <ModalLoadingSpinner visible={isSubmitting} message="Changing password..." />
+
+      <View style={styles.header}>
+        <View
+          style={{
+            backgroundColor: colors.surface,
+            padding: 16,
+            borderRadius: 999,
+            marginBottom: 12,
+          }}
+        >
+          <Lock size={36} color={colors.primary} />
+        </View>
+        <Text style={[styles.title, { color: colors.text }]}>Change Password</Text>
+      </View>
       <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.content}>
           <View style={styles.form}>
@@ -81,7 +95,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: FontSizes.xxxl,
+    fontSize: FontSizes.xxl,
     fontFamily: Fonts.bold,
     textAlign: "center",
   },

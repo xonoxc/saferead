@@ -17,7 +17,7 @@ export default function ApplicationLayout() {
           <Stack.Screen
             name="change-password"
             options={{
-              headerTitle: "Change Password",
+              headerTitle: "",
               headerTitleStyle: {
                 color: colors.text,
                 fontFamily: "Inter-Medium",

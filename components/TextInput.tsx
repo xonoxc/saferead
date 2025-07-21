@@ -9,9 +9,11 @@ import {
   ViewStyle,
   NativeSyntheticEvent,
   TextInputFocusEventData,
+  Pressable,
 } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
+import { Eye, EyeOff } from "lucide-react-native"
 
 interface TextInputProps extends React.ComponentProps<typeof RNTextInput> {
   label?: string
@@ -35,6 +37,9 @@ export const TextInput: React.FC<TextInputProps> = ({
 }) => {
   const { colors } = useTheme()
   const [isFocused, setIsFocused] = useState(false)
+  const [hide, setHide] = useState(false)
+
+  const showToggle = rest.secureTextEntry && !rest.multiline
 
   const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setIsFocused(false)
@@ -74,10 +79,21 @@ export const TextInput: React.FC<TextInputProps> = ({
             !rest.editable && { opacity: 0.5 },
             rest.style,
           ]}
+          secureTextEntry={showToggle && hide}
           onFocus={handleFocus}
           onBlur={handleBlur}
           placeholderTextColor={colors.textMuted}
         />
+
+        {showToggle && (
+          <Pressable style={styles.eyeIcon} onPress={() => setHide(prev => !prev)} hitSlop={8}>
+            {hide ? (
+              <EyeOff color={colors.textSecondary} size={20} />
+            ) : (
+              <Eye color={colors.textSecondary} size={20} />
+            )}
+          </Pressable>
+        )}
 
         {rightAccessory && <View style={styles.rightIcon}>{rightAccessory}</View>}
       </View>
@@ -118,6 +134,9 @@ const styles = StyleSheet.create({
   },
   rightIcon: {
     marginLeft: 4,
+  },
+  eyeIcon: {
+    marginLeft: 8,
   },
   error: {
     fontSize: FontSizes.sm,

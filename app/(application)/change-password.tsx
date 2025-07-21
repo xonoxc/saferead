@@ -2,10 +2,12 @@ import React from "react"
 import { View, StyleSheet, ScrollView } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Controller } from "react-hook-form"
-import { TextInput, Button, ModalLoadingSpinner } from "@/components/"
+import { TextInput, Button, ModalLoadingSpinner } from "@/components"
 import { Fonts, FontSizes } from "@/constants"
 import { SafeAreaView } from "react-native-safe-area-context"
 import useChangePassScreen from "@/hooks/screens/useChangePassScreen"
+
+import { Lock } from "lucide-react-native"
 
 export default function ChangePasswordScreen() {
   const { colors } = useTheme()
@@ -24,6 +26,7 @@ export default function ChangePasswordScreen() {
                 <TextInput
                   label="New Password"
                   value={value}
+                  leftAccessory={<Lock size={15} color={colors.accent} />}
                   onChangeText={onChange}
                   placeholder="Enter your new password"
                   secureTextEntry
@@ -39,6 +42,7 @@ export default function ChangePasswordScreen() {
                 <TextInput
                   label="Confirm New Password"
                   value={value}
+                  leftAccessory={<Lock size={15} color={colors.accent} />}
                   onChangeText={onChange}
                   placeholder="Confirm your new password"
                   secureTextEntry

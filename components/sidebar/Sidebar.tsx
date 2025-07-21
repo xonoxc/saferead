@@ -7,13 +7,11 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
-import { TouchableOpacity, View, StyleSheet, Text } from "react-native"
-import { CustomBackBtn } from "../CustomBackBtn"
+import { View, StyleSheet } from "react-native"
 import SideBarDocumentContent from "./SidebarContent"
 import { useLocalSearchParams } from "expo-router"
-import { Folder, Plus } from "lucide-react-native"
 import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
-import { Fonts, FontSizes } from "@/constants"
+import SideBarDocumentSpaceHeader from "./SiderBarDocumentSpaceHeader"
 
 const SCREEN_WIDTH = getScreenWidth()
 
@@ -68,24 +66,15 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
 
   return (
     <Animated.View style={[styles.sidebar, { backgroundColor: colors.background }, animatedStyle]}>
-      <View style={styles.header}>
-        <CustomBackBtn onPress={onClose} />
-        {spaceName ? (
-          <View style={styles.sideBarTitle}>
-            <Folder size={24} color={spaceColor || colors.primary} />
-            <Text style={[styles.title, { color: spaceColor || colors.text }]}>{spaceName}</Text>
-          </View>
-        ) : (
-          <Text style={[styles.title, { color: colors.text }]}>Your Documents</Text>
-        )}
-        <TouchableOpacity
-          style={[styles.addDocumentButton, { backgroundColor: colors.background }]}
-          onPress={handleAddDocument}
-        >
-          <Plus size={24} color={colors.primary} />
-        </TouchableOpacity>
-      </View>
+      {/*Space documents sidebar header*/}
+      <SideBarDocumentSpaceHeader
+        spaceName={spaceName}
+        spaceColor={spaceColor}
+        onClose={onClose}
+        handleAddDocument={handleAddDocument}
+      />
 
+      {/* the actual sidebar content */}
       <View style={{ flex: 1 }}>
         <SideBarDocumentContent
           spaceId={spaceId}
@@ -127,30 +116,6 @@ const styles = StyleSheet.create({
     shadowRadius: 0,
     shadowOffset: { width: 2, height: 0 },
     elevation: 10,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingHorizontal: 24,
-    gap: 50,
-    marginBottom: 24,
-  },
-  addDocumentButton: {
-    alignItems: "center",
-    padding: 5,
-    justifyContent: "center",
-    borderRadius: 100,
-  },
-  sideBarTitle: {
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: FontSizes.lg,
-    fontFamily: Fonts.medium,
-  },
-  title: {
-    fontSize: FontSizes.lg,
-    fontFamily: Fonts.bold,
   },
   item: {
     paddingVertical: 12,

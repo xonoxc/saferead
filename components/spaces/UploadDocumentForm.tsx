@@ -24,18 +24,9 @@ import {
   ChevronDown,
   FileType,
   LucideIcon,
-  Upload,
-  CloudUpload,
   FileUpIcon,
 } from "lucide-react-native"
-
-const schema = z.object({
-  displayName: z.string().min(1, "Name is required"),
-  documentType: z.string().min(1, "Please select a type"),
-  file: z.custom<DocumentPickerAsset>().refine(f => f?.size && f.size <= 10 * 1024 * 1024, {
-    message: "File must be smaller than 10MB",
-  }),
-})
+import { uploadDocumentFormSchema as schema } from "@/utils/validation/docs"
 
 type FormData = z.infer<typeof schema>
 
@@ -46,7 +37,7 @@ interface Props {
 }
 
 export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props) => {
-  const { colors, isDark } = useTheme()
+  const { colors } = useTheme()
   const queryClient = useQueryClient()
 
   const {

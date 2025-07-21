@@ -4,7 +4,8 @@ import { useForm, Controller } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as DocumentPicker from "expo-document-picker"
-import { Button, TextInput, DropdownSelector } from "@/components"
+import { Button, TextInput } from "@/components"
+import DropdownSelector, { renderIcon } from "../DropDownSelector"
 import { DocumentPickerAsset } from "expo-document-picker"
 import { attempt } from "@/utils/attempt"
 import { addDocumentToSpace } from "@/services/api"
@@ -13,7 +14,20 @@ import { FontSizes, Fonts } from "@/constants/Fonts"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { Drawer } from "../Drawer"
 import { useQueryClient } from "@tanstack/react-query"
-import { SquarePen } from "lucide-react-native"
+import {
+  FileText,
+  FileImage,
+  File,
+  SquarePen,
+  Presentation,
+  FileDiff,
+  ChevronDown,
+  FileType,
+  LucideIcon,
+  Upload,
+  CloudUpload,
+  FileUpIcon,
+} from "lucide-react-native"
 
 const schema = z.object({
   displayName: z.string().min(1, "Name is required"),
@@ -32,7 +46,7 @@ interface Props {
 }
 
 export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props) => {
-  const { colors } = useTheme()
+  const { colors, isDark } = useTheme()
   const queryClient = useQueryClient()
 
   const {
@@ -132,9 +146,12 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
               control={control}
               name="file"
               render={({ field }) => (
-                <Text style={[styles.pickerText, { color: colors.textMuted }]}>
-                  {field.value?.name ?? "Select a document"}
-                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <FileUpIcon color={colors.textMuted} size={18} />
+                  <Text style={[styles.pickerText, { color: colors.textMuted }]}>
+                    {field.value?.name ?? "Select a document"}
+                  </Text>
+                </View>
               )}
             />
           </TouchableOpacity>
@@ -163,12 +180,65 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
                 label="Document Type"
                 selected={field.value}
                 onSelect={field.onChange}
+                renderTrigger={(open, selectedOption) => {
+                  const Icon = (selectedOption?.icon ?? FileType) as LucideIcon
+
+                  return (
+                    <TouchableOpacity
+                      onPress={open}
+                      style={[
+                        styles.picker,
+                        {
+                          flex: 1,
+                          flexDirection: "row",
+                          borderColor: colors.border,
+                          backgroundColor: colors.card,
+                        },
+                      ]}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        }}
+                      >
+                        {renderIcon(Icon, colors)}
+                        <Text style={[styles.pickerText, { color: colors.textMuted }]}>
+                          {field.value || "Select a type"}
+                        </Text>
+                        <ChevronDown color={colors.accent} size={18} />
+                      </View>
+                    </TouchableOpacity>
+                  )
+                }}
                 options={[
-                  { label: "PDF", value: "pdf" },
-                  { label: "Word Document", value: "docx" },
-                  { label: "Text", value: "txt" },
-                  { label: "Image", value: "image" },
-                  { label: "Other", value: "other" },
+                  {
+                    label: "PDF",
+                    value: "pdf",
+                    icon: <FileDiff size={18} color={colors.accent} />,
+                  },
+                  {
+                    label: "Word Document",
+                    value: "docx",
+                    icon: <Presentation size={18} color={colors.accent} />,
+                  },
+                  {
+                    label: "Text",
+                    value: "txt",
+                    icon: <FileText size={18} color={colors.accent} />,
+                  },
+                  {
+                    label: "Image",
+                    value: "image",
+                    icon: <FileImage size={18} color={colors.accent} />,
+                  },
+                  {
+                    label: "Other",
+                    value: "other",
+                    icon: <File size={18} color={colors.accent} />,
+                  },
                 ]}
               />
             )}

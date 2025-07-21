@@ -10,7 +10,7 @@ import {
   TextStyle,
   ActivityIndicator,
 } from "react-native"
-import { ChevronDown, Check, LucideIcon, Dot, Icom } from "lucide-react-native"
+import { ChevronDown, Check, LucideIcon, Dot } from "lucide-react-native"
 import Animated from "react-native-reanimated"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { FontSizes, Fonts } from "@/constants"
@@ -57,8 +57,12 @@ export default function DropdownSelector<T>({
 
   const selectedOption = options.find(opt => opt.value === selected)
 
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  const handleOpen = () => {
+    setOpen(true)
+  }
+  const handleClose = () => {
+    setOpen(false)
+  }
 
   return (
     <View style={[{ marginBottom: 20 }, containerStyle]}>
@@ -141,10 +145,10 @@ export default function DropdownSelector<T>({
  *
  * function to detect if the passed icon is already a JSX element for correct rendering
  * **/
-function renderIcon(icon: LucideIcon | React.ReactNode, colors: ColorsType) {
+export function renderIcon(icon: LucideIcon | React.ReactNode, colors: ColorsType) {
   if (React.isValidElement(icon)) return icon
   const IconComponent = (icon ?? Dot) as LucideIcon
-  return <IconComponent size={20} color={colors.text} style={{ marginRight: 8 }} />
+  return <IconComponent size={20} color={colors.accent} style={{ marginRight: 8 }} />
 }
 
 const styles = StyleSheet.create({

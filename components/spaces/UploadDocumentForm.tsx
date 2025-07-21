@@ -85,21 +85,12 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
                       style={[
                         styles.picker,
                         {
-                          flex: 1,
-                          flexDirection: "row",
                           borderColor: colors.border,
                           backgroundColor: colors.card,
                         },
                       ]}
                     >
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          width: "100%",
-                        }}
-                      >
+                      <View style={styles.pickerContent}>
                         {renderIcon(Icon, colors)}
                         <Text
                           style={[
@@ -107,7 +98,7 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
                             { color: field.value ? colors.text : colors.textMuted },
                           ]}
                         >
-                          {field.value || "Select a type"}
+                          {field.value || "Select Document type"}
                         </Text>
                         <ChevronDown color={colors.accent} size={18} />
                       </View>
@@ -185,12 +176,20 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   picker: {
+    flex: 1,
+    flexDirection: "row",
     borderWidth: 1,
     borderRadius: 12,
     borderColor: "#D1D5DB",
     padding: 14,
     marginBottom: 10,
     justifyContent: "center",
+  },
+  pickerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
   },
   pickerText: {
     fontSize: FontSizes.md,

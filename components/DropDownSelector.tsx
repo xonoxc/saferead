@@ -35,6 +35,8 @@ interface DropdownSelectorProps<T> {
     onSelect: () => void
   ) => React.ReactNode | null
 
+  triggerText?: string
+
   containerStyle?: ViewStyle
   labelStyle?: TextStyle
 }
@@ -43,8 +45,9 @@ export default function DropdownSelector<T>({
   label,
   selected,
   options,
-  onSelect,
+  triggerText,
 
+  onSelect,
   loading = false,
   renderTrigger,
   renderOption,
@@ -80,7 +83,7 @@ export default function DropdownSelector<T>({
           <View style={styles.row}>
             {renderIcon(selectedOption?.icon, colors)}
             <Text style={[styles.selectedText, { color: colors.text }]}>
-              {selectedOption?.label || "Select..."}
+              {selectedOption?.label || triggerText || "Select an option"}
             </Text>
           </View>
           <ChevronDown size={20} color={colors.textSecondary} />
@@ -145,10 +148,17 @@ export default function DropdownSelector<T>({
  *
  * function to detect if the passed icon is already a JSX element for correct rendering
  * **/
-export function renderIcon(icon: LucideIcon | React.ReactNode, colors: ColorsType) {
+export function renderIcon(
+  icon: LucideIcon | React.ReactNode,
+  colors: ColorsType,
+  fallbackColor?: string
+) {
   if (React.isValidElement(icon)) return icon
+
   const IconComponent = (icon ?? Dot) as LucideIcon
-  return <IconComponent size={20} color={colors.accent} style={{ marginRight: 8 }} />
+  const iconColor = fallbackColor ?? colors.accent
+
+  return <IconComponent size={20} color={iconColor} style={{ marginRight: 8 }} />
 }
 
 const styles = StyleSheet.create({

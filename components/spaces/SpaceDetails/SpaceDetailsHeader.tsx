@@ -1,6 +1,6 @@
 import React from "react"
 import { View, TouchableOpacity, StyleSheet, Text } from "react-native"
-import { Star, Settings, Plus } from "lucide-react-native"
+import { Star, Settings, Plus, Heart } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { CustomBackBtn } from "@/components"
 import { useTheme } from "@/hooks/useTheme"
@@ -53,7 +53,7 @@ export default function SpaceDetailHeader({
               ]}
               onPress={onFavoritePress}
             >
-              <Star
+              <Heart
                 size={20}
                 color={space.color}
                 fill={space.is_favorite ? space.color : "transparent"}

@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native"
-import { Star, FileText, Trash2 } from "lucide-react-native"
+import { Star, FileText, Trash2, Heart } from "lucide-react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
@@ -30,10 +30,7 @@ export const SpaceList: React.FC<SpaceListProps> = ({
     return (
       <Animated.View entering={FadeIn.duration(500)}>
         <TouchableOpacity
-          style={[
-            styles.gridItem,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
+          style={[styles.gridItem, { backgroundColor: colors.card, borderColor: colors.border }]}
           onPress={() => onSpaceSelect(space)}
           activeOpacity={0.8}
         >
@@ -41,9 +38,7 @@ export const SpaceList: React.FC<SpaceListProps> = ({
             <View style={[styles.gridIconContainer, { backgroundColor: `${space.color}20` }]}>
               <SpaceIcon name={space.icon as SpaceIconName} size={24} color={space.color} />
             </View>
-            {space.is_favorite && (
-              <Star size={16} color={colors.warning} fill={colors.warning} />
-            )}
+            {space.is_favorite && <Heart size={16} color={colors.warning} fill={colors.warning} />}
           </View>
           <Text style={[styles.gridTitle, { color: colors.text }]} numberOfLines={2}>
             {space.title}
@@ -86,7 +81,7 @@ export const SpaceList: React.FC<SpaceListProps> = ({
           </Text>
         </View>
         <View style={styles.listItemActions}>
-          {space.is_favorite && <Star size={18} color={colors.warning} fill={colors.warning} />}
+          {space.is_favorite && <Heart size={18} color={colors.warning} fill={colors.warning} />}
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={() => onDelete(space.id, space.title)}

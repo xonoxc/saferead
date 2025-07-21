@@ -1,12 +1,14 @@
 import React from "react"
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native"
-import { useTheme } from "@/hooks/useTheme"
+import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 
 import type { LucideIcon } from "lucide-react-native"
 
 const { width: screenWidth } = Dimensions.get("window")
+
+export type EmptyStateVariant = "default" | "search" | "error"
 
 interface EmptyStateProps {
   icon: LucideIcon
@@ -17,7 +19,7 @@ interface EmptyStateProps {
   secondaryActionTitle?: string
   onSecondaryAction?: () => void
   showFloatingElements?: boolean
-  variant?: "default" | "search" | "error"
+  variant?: EmptyStateVariant
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
@@ -33,27 +35,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   const { colors } = useTheme()
 
-  const getVariantColors = () => {
-    switch (variant) {
-      case "search":
-        return {
-          primary: colors.secondary,
-          background: colors.secondary + "15",
-        }
-      case "error":
-        return {
-          primary: colors.error,
-          background: colors.error + "15",
-        }
-      default:
-        return {
-          primary: colors.primary,
-          background: colors.primary + "15",
-        }
-    }
-  }
-
-  const variantColors = getVariantColors()
+  const variantColors = getVariantColors(variant, colors)
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -125,6 +107,26 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       </View>
     </View>
   )
+}
+
+const getVariantColors = (variant: EmptyStateVariant, colors: ColorsType) => {
+  switch (variant) {
+    case "search":
+      return {
+        primary: colors.secondary,
+        background: colors.secondary + "15",
+      }
+    case "error":
+      return {
+        primary: colors.error,
+        background: colors.error + "15",
+      }
+    default:
+      return {
+        primary: colors.primary,
+        background: colors.primary + "15",
+      }
+  }
 }
 
 const styles = StyleSheet.create({

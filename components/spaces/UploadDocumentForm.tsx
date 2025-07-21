@@ -12,6 +12,7 @@ import { useTheme } from "@/hooks/useTheme"
 import { FontSizes, Fonts } from "@/constants/Fonts"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { Drawer } from "../Drawer"
+import { useQueryClient } from "@tanstack/react-query"
 
 const schema = z.object({
   displayName: z.string().min(1, "Name is required"),
@@ -31,6 +32,7 @@ interface Props {
 
 export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props) => {
   const { colors } = useTheme()
+  const queryClient = useQueryClient()
 
   const {
     control,
@@ -88,6 +90,18 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
       Alert.alert("Error", errorMessage)
       return
     }
+
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: ["spaces", spaceId, "documents"],
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ["spaces", spaceId, "stats"],
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ["spaces"],
+      }),
+    ])
 
     onUploadSuccess()
     Alert.alert("Success", "Document uploaded successfully")

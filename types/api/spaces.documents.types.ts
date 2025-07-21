@@ -25,4 +25,3 @@ export interface SpaceWithDocuments extends Space {
 }
 
 export type PaginatedSpaceDocuments = PaginatedResponse<UserSpaceDocument>
-

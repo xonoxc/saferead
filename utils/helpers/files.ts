@@ -65,7 +65,9 @@ export function buildFileUploadFormData(
   return formData
 }
 
-export function getFileIcon(extension: string) {
+export function getFileIcon(extension?: string) {
+  if (!extension) return FileQuestion
+
   switch (extension.toLowerCase()) {
     case ".pdf":
       return FileText

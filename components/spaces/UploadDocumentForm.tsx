@@ -1,34 +1,25 @@
 import React from "react"
-import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView } from "react-native"
-import { useForm, Controller } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as DocumentPicker from "expo-document-picker"
-import { Button, TextInput } from "@/components"
-import DropdownSelector, { renderIcon } from "../DropDownSelector"
-import { DocumentPickerAsset } from "expo-document-picker"
-import { attempt } from "@/utils/attempt"
-import { addDocumentToSpace } from "@/services/api"
-import { useTheme } from "@/hooks/useTheme"
-import { FontSizes, Fonts } from "@/constants/Fonts"
-import { getErrorMessage } from "@/utils/helpers/respErrors"
-import { Drawer } from "../Drawer"
-import { useQueryClient } from "@tanstack/react-query"
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native"
+import { Controller } from "react-hook-form"
 import {
-  FileText,
-  FileImage,
-  File,
   SquarePen,
   Presentation,
   FileDiff,
   ChevronDown,
   FileType,
   LucideIcon,
-  FileUpIcon,
+  FileText,
+  FileImage,
+  File,
 } from "lucide-react-native"
-import { uploadDocumentFormSchema as schema } from "@/utils/validation/docs"
 
-type FormData = z.infer<typeof schema>
+import { Button, TextInput } from "@/components"
+import { Drawer } from "../Drawer"
+import DropdownSelector, { renderIcon } from "../DropDownSelector"
+import { useTheme } from "@/hooks/useTheme"
+import { FontSizes, Fonts } from "@/constants/Fonts"
+import { useUploadDocumentForm } from "@/hooks/screens/useUploadDocumentForm"
+import { DocumentPicker } from "./DocumentPicker"
 
 interface Props {
   spaceId: string
@@ -38,80 +29,10 @@ interface Props {
 
 export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props) => {
   const { colors } = useTheme()
-  const queryClient = useQueryClient()
-
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      displayName: "",
-      documentType: "",
-      file: undefined,
-    },
+  const { control, errors, isSubmitting, pickDocument, handleSubmit } = useUploadDocumentForm({
+    spaceId,
+    onUploadSuccess,
   })
-
-  const pickDocument = async () => {
-    const result = await attempt(
-      DocumentPicker.getDocumentAsync({
-        type: "*/*",
-        copyToCacheDirectory: true,
-      })
-    )
-    if (!result.ok || !result.data?.assets?.length) {
-      return
-    }
-
-    const file = result.data.assets[0]
-
-    if (file.size && file.size > 10 * 1024 * 1024) {
-      Alert.alert("File too large", "Please select a file smaller than 10 MB.")
-      return
-    }
-
-    setValue("file", file)
-    setValue("displayName", file.name ?? "")
-  }
-
-  const onSubmit = async (data: FormData) => {
-    const file = {
-      uri: data.file.uri,
-      name: data.file.name,
-      type: data.file.mimeType || "application/octet-stream",
-    }
-    const resp = await attempt(
-      addDocumentToSpace({
-        space: spaceId,
-        document_file: file,
-        display_name: data.displayName,
-        document_type: data.documentType,
-      })
-    )
-
-    if (!resp.ok) {
-      const errorMessage = getErrorMessage(resp.error)
-      Alert.alert("Error", errorMessage)
-      return
-    }
-
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: ["spaces", spaceId, "documents"],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["spaces", spaceId, "stats"],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["spaces"],
-      }),
-    ])
-
-    onUploadSuccess()
-    Alert.alert("Success", "Document uploaded successfully")
-  }
 
   return (
     <Drawer>
@@ -129,24 +50,7 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
           contentContainerStyle={{ paddingBottom: 10 }}
           keyboardShouldPersistTaps="handled"
         >
-          <TouchableOpacity
-            onPress={pickDocument}
-            style={[styles.picker, { borderColor: colors.border }]}
-          >
-            <Controller
-              control={control}
-              name="file"
-              render={({ field }) => (
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                  <FileUpIcon color={colors.textMuted} size={18} />
-                  <Text style={[styles.pickerText, { color: colors.textMuted }]}>
-                    {field.value?.name ?? "Select a document"}
-                  </Text>
-                </View>
-              )}
-            />
-          </TouchableOpacity>
-          {errors.file && <Text style={styles.error}>{errors.file.message}</Text>}
+          <DocumentPicker control={control} errors={errors} onPress={pickDocument} />
 
           <Controller
             control={control}
@@ -159,6 +63,7 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
                 value={field.value}
                 onChangeText={field.onChange}
                 error={errors.displayName?.message}
+                style={{ color: colors.text }}
               />
             )}
           />
@@ -196,7 +101,12 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
                         }}
                       >
                         {renderIcon(Icon, colors)}
-                        <Text style={[styles.pickerText, { color: colors.textMuted }]}>
+                        <Text
+                          style={[
+                            styles.pickerText,
+                            { color: field.value ? colors.text : colors.textMuted },
+                          ]}
+                        >
                           {field.value || "Select a type"}
                         </Text>
                         <ChevronDown color={colors.accent} size={18} />
@@ -240,7 +150,7 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
         <View style={styles.footer}>
           <Button
             title={isSubmitting ? "Uploading..." : "Upload Document"}
-            onPress={handleSubmit(onSubmit)}
+            onPress={handleSubmit}
             disabled={isSubmitting}
             fullWidth
           />

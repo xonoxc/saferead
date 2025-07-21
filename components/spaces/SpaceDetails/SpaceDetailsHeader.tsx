@@ -1,6 +1,6 @@
 import React from "react"
 import { View, TouchableOpacity, StyleSheet, Text } from "react-native"
-import { Star, Settings, Plus, Heart } from "lucide-react-native"
+import { Settings, Plus, Heart } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { CustomBackBtn } from "@/components"
 import { useTheme } from "@/hooks/useTheme"

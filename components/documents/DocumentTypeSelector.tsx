@@ -1,16 +1,7 @@
-import {
-  ChevronDown,
-  FileLock2,
-  FileText,
-  FileType,
-  LucideIcon,
-  Scale,
-  ShieldCheck,
-} from "lucide-react-native"
-import DropdownSelector, { renderIcon, type DropdownOption } from "../DropDownSelector"
-import { StyleSheet, TouchableOpacity, Text, View } from "react-native"
-import { useTheme } from "@/hooks/useTheme"
-import { Fonts, FontSizes } from "@/constants"
+import { FileLock2, FileText, Scale, ShieldCheck } from "lucide-react-native"
+import DropdownSelector, { type DropdownOption } from "../DropDownSelector"
+//import { StyleSheet } from "react-native"
+//import { Fonts, FontSizes } from "@/constants"
 
 export type DocumentType = "terms" | "privacy" | "legal" | "other"
 
@@ -46,8 +37,6 @@ export const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
   selectedType,
   onSelect,
 }) => {
-  const { colors } = useTheme()
-
   return (
     <DropdownSelector
       selected={selectedType}
@@ -80,7 +69,7 @@ export const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
   )
 }
 
-const styles = StyleSheet.create({
+/* const styles = StyleSheet.create({
   picker: {
     flex: 1,
     flexDirection: "row",
@@ -101,4 +90,4 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.md,
     fontFamily: Fonts.medium,
   },
-})
+}) */

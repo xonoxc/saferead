@@ -41,19 +41,33 @@ export default function useSettingsGroups({
     {
       title: "Account",
       items: [
-        { icon: UserIcon, title: "Profile", value: `${user?.username}`, onPress: () => {} },
+        {
+          icon: UserIcon,
+          title: "Profile",
+          value: `${user?.username}`,
+          onPress: () => {
+            router.push("/profile")
+          },
+        },
         {
           icon: KeyRound,
           title: "Change Password",
           onPress: () => router.push("/(application)/change-password"),
         },
-        { icon: Shield, title: "Privacy & Security", onPress: () => {} },
+        { icon: Shield, title: "Privacy & Security", onPress: () => router.push("/privacy") },
       ],
     },
     {
       title: "Preferences",
       items: [
-        { icon: Globe, title: "Language", value: "English", onPress: () => {} },
+        {
+          icon: Globe,
+          title: "Language",
+          value: "English",
+          onPress: () => {
+            router.push("/language")
+          },
+        },
         {
           icon: Volume2,
           title: "Text-to-Speech",
@@ -72,7 +86,7 @@ export default function useSettingsGroups({
     },
     {
       title: "Support",
-      items: [{ icon: HelpCircle, title: "Help & Support", onPress: () => {} }],
+      items: [{ icon: HelpCircle, title: "Help & Support", onPress: () => router.push("/help") }],
     },
     {
       title: "Account Actions",

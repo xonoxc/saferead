@@ -44,6 +44,33 @@ export default function ApplicationLayout() {
               headerShown: false,
             }}
           />
+
+          <Stack.Screen
+            name="help"
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="profile"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="privacy"
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="language"
+            options={{
+              headerShown: false,
+            }}
+          />
         </Stack>
       </SafeAreaView>
     </QueryClientProvider>

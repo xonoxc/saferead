@@ -1,6 +1,16 @@
 import React, { useState } from "react"
-import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList } from "react-native"
-import { ChevronDown, Check } from "lucide-react-native"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  FlatList,
+  ViewStyle,
+  TextStyle,
+  ActivityIndicator,
+} from "react-native"
+import { ChevronDown, Check, LucideIcon, Dot } from "lucide-react-native"
 import Animated from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { FontSizes, Fonts } from "@/constants"
@@ -8,14 +18,25 @@ import { FontSizes, Fonts } from "@/constants"
 export interface DropdownOption<T> {
   label: string
   value: T
-  icon?: React.ReactNode
+  icon?: LucideIcon
 }
 
 interface DropdownSelectorProps<T> {
   label?: string
   selected: T
   options: DropdownOption<T>[]
-  onSelect: (value: any) => void
+  onSelect: (value: T) => void
+
+  loading?: boolean
+  renderTrigger?: (open: () => void, selectedOption?: DropdownOption<T>) => React.ReactNode
+  renderOption?: (
+    option: DropdownOption<T>,
+    isSelected: boolean,
+    onSelect: () => void
+  ) => React.ReactNode | null
+
+  containerStyle?: ViewStyle
+  labelStyle?: TextStyle
 }
 
 export function DropdownSelector<T>({
@@ -23,59 +44,96 @@ export function DropdownSelector<T>({
   selected,
   options,
   onSelect,
+
+  loading = false,
+  renderTrigger,
+  renderOption,
+
+  containerStyle,
+  labelStyle,
 }: DropdownSelectorProps<T>) {
   const { colors } = useTheme()
   const [open, setOpen] = useState(false)
 
   const selectedOption = options.find(opt => opt.value === selected)
 
+  const handleOpen = () => setOpen(true)
+  const handleClose = () => setOpen(false)
+
+  const SelectedIcon = selectedOption?.icon || Check
+
   return (
-    <View style={{ marginBottom: 20 }}>
-      {label && <Text style={[styles.label, { color: colors.textMuted }]}>{label}</Text>}
+    <View style={[{ marginBottom: 20 }, containerStyle]}>
+      {label && (
+        <Text style={[styles.label, { color: colors.textMuted }, labelStyle]}>{label}</Text>
+      )}
 
-      <TouchableOpacity
-        style={[styles.selector, { borderColor: colors.border, backgroundColor: colors.card }]}
-        onPress={() => setOpen(true)}
-      >
-        <View style={styles.row}>
-          {selectedOption?.icon}
-          <Text style={[styles.selectedText, { color: colors.text }]}>
-            {selectedOption?.label || "Select..."}
-          </Text>
-        </View>
-        <ChevronDown size={20} color={colors.textSecondary} />
-      </TouchableOpacity>
+      {renderTrigger ? (
+        renderTrigger(handleOpen, selectedOption)
+      ) : (
+        <TouchableOpacity
+          style={[styles.selector, { borderColor: colors.border, backgroundColor: colors.card }]}
+          onPress={handleOpen}
+        >
+          <View style={styles.row}>
+            <SelectedIcon />
+            <Text style={[styles.selectedText, { color: colors.text }]}>
+              {selectedOption?.label || "Select..."}
+            </Text>
+          </View>
+          <ChevronDown size={20} color={colors.textSecondary} />
+        </TouchableOpacity>
+      )}
 
-      <Modal transparent visible={open} animationType="fade" onRequestClose={() => setOpen(false)}>
-        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setOpen(false)}>
+      <Modal transparent visible={open} animationType="fade" onRequestClose={handleClose}>
+        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={handleClose}>
           <Animated.View style={[styles.modal, { backgroundColor: colors.card }]}>
-            <FlatList
-              data={options}
-              bounces={true}
-              keyExtractor={item => `${item.value}`}
-              renderItem={({ item, index }) => {
-                const isLast = index === options.length - 1
+            {loading ? (
+              <ActivityIndicator color={colors.primary} size="large" />
+            ) : (
+              <FlatList
+                data={options}
+                keyExtractor={item => `${item.value}`}
+                bounces
+                renderItem={({ item, index }): React.ReactElement | null => {
+                  const isSelected = item.value === selected
+                  const onItemSelect = () => {
+                    onSelect(item.value)
+                    handleClose()
+                  }
 
-                return (
-                  <TouchableOpacity
-                    style={[
-                      styles.option,
-                      !isLast ? { borderBottomColor: colors.border } : { borderBottomWidth: 0 },
-                    ]}
-                    onPress={() => {
-                      onSelect(item.value)
-                      setOpen(false)
-                    }}
-                  >
-                    <View style={styles.row}>
-                      {item.icon}
-                      <Text style={[styles.optionText, { color: colors.text }]}>{item.label}</Text>
-                    </View>
-                    {selected === item.value && <Check size={20} color={colors.primary} />}
-                  </TouchableOpacity>
-                )
-              }}
-            />
+                  const ItemIcon = item.icon || Dot
+
+                  if (renderOption) {
+                    const result = renderOption(
+                      item,
+                      isSelected,
+                      onItemSelect
+                    ) as React.ReactElement | null
+                    return result ?? null
+                  }
+
+                  const isLast = index === options.length - 1
+                  return (
+                    <TouchableOpacity
+                      style={[
+                        styles.option,
+                        !isLast ? { borderBottomColor: colors.border } : { borderBottomWidth: 0 },
+                      ]}
+                      onPress={onItemSelect}
+                    >
+                      <View style={styles.row}>
+                        <ItemIcon size={20} color={colors.text} style={{ marginRight: 8 }} />
+                        <Text style={[styles.optionText, { color: colors.text }]}>
+                          {item.label}
+                        </Text>
+                      </View>
+                      {isSelected && <Check size={20} color={colors.primary} />}
+                    </TouchableOpacity>
+                  )
+                }}
+              />
+            )}
           </Animated.View>
         </TouchableOpacity>
       </Modal>

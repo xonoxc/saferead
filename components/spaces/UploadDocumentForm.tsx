@@ -13,6 +13,7 @@ import { FontSizes, Fonts } from "@/constants/Fonts"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { Drawer } from "../Drawer"
 import { useQueryClient } from "@tanstack/react-query"
+import { SquarePen } from "lucide-react-native"
 
 const schema = z.object({
   displayName: z.string().min(1, "Name is required"),
@@ -146,6 +147,7 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
               <TextInput
                 label="Display Name"
                 placeholder="Document display name"
+                leftAccessory={<SquarePen size={18} color={colors.accent} />}
                 value={field.value}
                 onChangeText={field.onChange}
                 error={errors.displayName?.message}

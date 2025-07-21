@@ -5,8 +5,8 @@ import { router } from "expo-router"
 import { View, Text, SafeAreaView } from "react-native"
 
 export default function DocumentAnalyisResultScreen() {
-  const { analysisResult } = useAnalysisStore()
   const { colors } = useTheme()
+  const analysisResult = useAnalysisStore(s => s.analysisResult)
 
   const handleBackPress = () => router.back()
 

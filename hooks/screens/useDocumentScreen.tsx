@@ -19,7 +19,7 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
 
   const [searchQuery, setSearchQuery] = useState("")
   const [showFilter, setShowFilter] = useState(false)
-  const { setAnalysisResult } = useAnalysisStore()
+  const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
 
   useEffect(() => {
     if (spaceId) init(spaceId)

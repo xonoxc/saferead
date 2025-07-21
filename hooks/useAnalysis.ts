@@ -22,7 +22,9 @@ export function useAnalysis() {
 
   const queryClient = useQueryClient()
 
-  const { analysisResult, setAnalysisResult } = useAnalysisStore()
+  const analysisResult = useAnalysisStore(s => s.analysisResult)
+  const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
+
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType>("other")
   const [showTextInput, setShowTextInput] = useState(false)

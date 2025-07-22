@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { CustomBackBtn } from "../CustomBackBtn"
-import { Folder, Plus } from "lucide-react-native"
+import { Box, FilePlus, Folder, Plus } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 import { useTheme } from "@/hooks/useTheme"
 
@@ -22,21 +22,24 @@ export default function SideBarDocumentSpaceHeader({
 
   return (
     <View style={styles.header}>
-      <CustomBackBtn onPress={onClose} />
+      {spaceName && (
+        <TouchableOpacity
+          style={[styles.addDocumentButton, { backgroundColor: colors.background }]}
+          onPress={handleAddDocument}
+        >
+          <FilePlus size={24} color={colors.text} />
+        </TouchableOpacity>
+      )}
       {spaceName ? (
         <View style={styles.sideBarTitle}>
-          <Folder size={24} color={spaceColor || colors.primary} />
+          <Box size={24} color={spaceColor || colors.primary} />
           <Text style={[styles.title, { color: spaceColor || colors.text }]}>{spaceName}</Text>
         </View>
       ) : (
         <Text style={[styles.title, { color: colors.text }]}>Your Documents</Text>
       )}
-      <TouchableOpacity
-        style={[styles.addDocumentButton, { backgroundColor: colors.background }]}
-        onPress={handleAddDocument}
-      >
-        <Plus size={24} color={colors.primary} />
-      </TouchableOpacity>
+
+      <CustomBackBtn onPress={onClose} direction="right" />
     </View>
   )
 }
@@ -52,6 +55,8 @@ const styles = StyleSheet.create({
   },
   sideBarTitle: {
     alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
     justifyContent: "center",
     fontSize: FontSizes.lg,
     fontFamily: Fonts.medium,

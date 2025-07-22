@@ -1,7 +1,7 @@
 import { useDocumentsStore } from "@/store/useDocumentStore"
 import { AnalysisResponse } from "@/types/api/documents.types"
 import { router } from "expo-router"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { View, Text, Alert, StyleSheet } from "react-native"
 import { useDebouncedCallback } from "../useDebouncCallback"
 import { Button } from "@/components/Button"
@@ -11,9 +11,9 @@ import { Fonts, FontSizes } from "@/constants"
 import { useDocuments, useDeleteDocument } from "@/hooks/queries/docs"
 import { attempt } from "@/utils/attempt"
 import { useAnalysisStore } from "@/store/useAnalysisStore"
+import { useSpaceStore } from "@/store/useSpaceStore"
 
-export function useDocumentScreen(spaceId?: string, spaceName?: string) {
-  const init = useDocumentsStore(s => s.init)
+export function useDocumentScreen() {
   const applyFilters = useDocumentsStore(s => s.applyFilters)
   const currentFilters = useDocumentsStore(s => s.currentFilters)
 
@@ -21,9 +21,7 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
   const [showFilter, setShowFilter] = useState(false)
   const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
 
-  useEffect(() => {
-    if (spaceId) init(spaceId)
-  }, [spaceId])
+  const selectedSpace = useSpaceStore(s => s.selectedSpace)
 
   const {
     data,
@@ -41,7 +39,8 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
   const { mutateAsync: deleteDocument, isPending: isDeleting } = useDeleteDocument()
 
   const handleAddDocument = () => {
-    router.push("/(application)/(tabs)/analyize")
+    if (!selectedSpace?.id) return
+    router.push(`/spaces/${selectedSpace.id}`)
   }
 
   const handleDeleteDocument = async (documentId: string) => {
@@ -75,12 +74,15 @@ export function useDocumentScreen(spaceId?: string, spaceName?: string) {
     <FallBackState
       searchQuery={searchQuery}
       handleAddDocument={handleAddDocument}
-      spaceName={spaceName}
+      spaceName={selectedSpace?.title}
     />
   )
 
   return {
     documents,
+    spaceName: selectedSpace?.title,
+    spaceColor: selectedSpace?.color,
+    spaceId: selectedSpace?.id,
     error,
     isLoading,
     isFetchingNextPage,

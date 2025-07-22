@@ -1,6 +1,5 @@
 import React from "react"
 import { View, StyleSheet } from "react-native"
-import { useLocalSearchParams } from "expo-router"
 
 import SideBarDocumentContent from "./SidebarContent"
 import SideBarDocumentSpaceHeader from "./SiderBarDocumentSpaceHeader"
@@ -10,17 +9,14 @@ import { useSidebarStore } from "@/store/sidebar/useSidebarStore"
 
 export const SideBar = () => {
   const { colors } = useTheme()
-  const { spaceId, spaceName, spaceColor } = useLocalSearchParams<{
-    spaceId?: string
-    spaceName?: string
-    spaceColor?: string
-  }>()
-
   const setIsOpen = useSidebarStore(s => s.setIsOpen)
 
   const {
     documents,
     error,
+    spaceName,
+    spaceColor,
+    spaceId,
     isLoading,
     hasMore,
     currentFilters,
@@ -38,7 +34,7 @@ export const SideBar = () => {
     loadMoreDocuments,
     applyFilters,
     FallbackStateWrapper,
-  } = useDocumentScreen(spaceId, spaceName)
+  } = useDocumentScreen()
 
   return (
     <View style={[styles.sidebar, { backgroundColor: colors.background }]}>

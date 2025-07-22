@@ -1,10 +1,19 @@
 import { useTheme } from "@/hooks/useTheme"
 import { router } from "expo-router"
-import { ChevronLeft } from "lucide-react-native"
+import { ChevronLeft, ChevronRight } from "lucide-react-native"
 import { TouchableOpacity, StyleSheet, ViewStyle } from "react-native"
 
-export function CustomBackBtn({ onPress, style }: { onPress?: () => void; style?: ViewStyle }) {
+export type BackBtnDirection = "left" | "right"
+
+interface CustomBackBtnProps {
+  onPress?: () => void
+  style?: ViewStyle
+  direction?: BackBtnDirection
+}
+
+export function CustomBackBtn({ onPress, style, direction = "left" }: CustomBackBtnProps) {
   const { colors } = useTheme()
+
   const handlePress = () => {
     if (onPress) {
       onPress()
@@ -12,12 +21,17 @@ export function CustomBackBtn({ onPress, style }: { onPress?: () => void; style?
       if (router.canGoBack()) router.back()
     }
   }
+
   return (
     <TouchableOpacity
       onPress={handlePress}
       style={[styles.button, { borderColor: colors.border }, style]}
     >
-      <ChevronLeft size={24} color={colors.text} />
+      {direction === "left" ? (
+        <ChevronLeft size={24} color={colors.text} />
+      ) : (
+        <ChevronRight size={24} color={colors.text} />
+      )}
     </TouchableOpacity>
   )
 }

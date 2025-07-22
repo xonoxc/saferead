@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingHorizontal: 24,
-    gap: 50,
+    paddingHorizontal: 10,
+    gap: 30,
     marginBottom: 24,
   },
   sideBarTitle: {

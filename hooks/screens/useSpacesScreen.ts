@@ -16,7 +16,7 @@ export default function useSpaceScreen() {
   const { mutate: deleteSpace } = useDeleteSpace()
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [viewMode, setViewMode] = useState<ViewType>("list")
+  const [viewMode, setViewMode] = useState<ViewType>("grid")
 
   const queryClient = useQueryClient()
 

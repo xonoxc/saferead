@@ -1,32 +1,22 @@
 import React from "react"
-import { getScreenWidth } from "@/utils/helpers/screens"
-import { useTheme } from "@/hooks/useTheme"
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated"
 import { View, StyleSheet } from "react-native"
-import SideBarDocumentContent from "./SidebarContent"
 import { useLocalSearchParams } from "expo-router"
-import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
+
+import SideBarDocumentContent from "./SidebarContent"
 import SideBarDocumentSpaceHeader from "./SiderBarDocumentSpaceHeader"
+import { useTheme } from "@/hooks/useTheme"
+import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
+import { useSidebarStore } from "@/store/sidebar/useSidebarStore"
 
-const SCREEN_WIDTH = getScreenWidth()
-
-interface SidebarProps {
-  isOpen: boolean
-  onClose: () => void
-}
-
-export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
+export const SideBar = () => {
   const { colors } = useTheme()
   const { spaceId, spaceName, spaceColor } = useLocalSearchParams<{
     spaceId?: string
     spaceName?: string
     spaceColor?: string
   }>()
+
+  const setIsOpen = useSidebarStore(s => s.setIsOpen)
 
   const {
     documents,
@@ -40,7 +30,6 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
     setShowFilter,
     handleAddDocument,
     handleDocumentSelectPress,
-
     isDeleting,
     setSearchQuery,
     handleDeleteDocument,
@@ -51,30 +40,15 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
     FallbackStateWrapper,
   } = useDocumentScreen(spaceId, spaceName)
 
-  const translateX = useSharedValue(SCREEN_WIDTH)
-
-  React.useEffect(() => {
-    translateX.value = withTiming(isOpen ? 0 : SCREEN_WIDTH, {
-      duration: 300,
-      easing: Easing.out(Easing.exp),
-    })
-  }, [isOpen])
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-  }))
-
   return (
-    <Animated.View style={[styles.sidebar, { backgroundColor: colors.background }, animatedStyle]}>
-      {/*Space documents sidebar header*/}
+    <View style={[styles.sidebar, { backgroundColor: colors.background }]}>
       <SideBarDocumentSpaceHeader
         spaceName={spaceName}
         spaceColor={spaceColor}
-        onClose={onClose}
+        onClose={() => setIsOpen(false)}
         handleAddDocument={handleAddDocument}
       />
 
-      {/* the actual sidebar content */}
       <View style={{ flex: 1 }}>
         <SideBarDocumentContent
           spaceId={spaceId}
@@ -100,27 +74,13 @@ export const SideBar = ({ isOpen, onClose }: SidebarProps) => {
           FallbackStateWrapper={FallbackStateWrapper}
         />
       </View>
-    </Animated.View>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   sidebar: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    width: "100%",
-    zIndex: 999,
-    shadowOpacity: 0.3,
-    shadowRadius: 0,
-    shadowOffset: { width: 2, height: 0 },
-    elevation: 10,
-  },
-  item: {
-    paddingVertical: 12,
-  },
-  itemText: {
-    fontSize: 16,
+    flex: 1,
+    paddingTop: 15,
   },
 })

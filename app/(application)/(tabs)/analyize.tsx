@@ -42,7 +42,7 @@ export default function AnalyzeScreen() {
 
   React.useEffect(() => {
     translateX.value = withTiming(isSideBarOpen ? 0 : -SCREEN_WIDTH, {
-      duration: 300,
+      duration: 200,
     })
   }, [isSideBarOpen, translateX])
 
@@ -109,7 +109,6 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: SCREEN_WIDTH,
-    borderRightWidth: 1,
   },
   main: {
     flex: 1,

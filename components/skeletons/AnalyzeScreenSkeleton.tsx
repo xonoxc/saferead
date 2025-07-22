@@ -1,9 +1,8 @@
 import React from "react"
-import { View, Text, StyleSheet, ScrollView } from "react-native"
+import { View, Text, StyleSheet, ScrollView , useWindowDimensions } from "react-native"
 import Skeleton from "./Skeleton"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
-import { useWindowDimensions } from "react-native"
 
 interface AnalyzeScreenSkeletonProps {
   isAnalizing?: boolean

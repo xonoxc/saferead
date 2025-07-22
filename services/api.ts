@@ -5,15 +5,7 @@ import { buildFileUploadFormData } from "@/utils/helpers/files"
 import type { FilterOptions } from "@/types/docs"
 import type { UploadDocumentRequest } from "@/types/api/documents.types"
 import type { ReactNativeFile } from "@/types/file"
-
-type SpaceDataParam = {
-  title: string
-  description: string
-  color: string
-  icon: string
-  privacy: "private" | "public"
-  is_favorite?: boolean
-}
+import type { SpaceDataParam } from "@/utils/validation/space"
 
 export async function uploadDocument(data: UploadDocumentRequest) {
   const formData = buildFileUploadFormData("document_file", data.document_file, {

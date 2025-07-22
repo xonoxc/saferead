@@ -9,7 +9,6 @@ import {
   BarChart,
   Briefcase,
   Pencil,
-  LucideIcon,
 } from "lucide-react-native"
 
 export const colors_palette = [

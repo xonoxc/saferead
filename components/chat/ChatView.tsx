@@ -17,7 +17,7 @@ export function ChatView({ space }: ChatViewProps) {
   const { colors } = useTheme()
   const [message, setMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
-  const [chatHistory, setChatHistory] = useState<Array<{ text: string; sender: "user" | "bot" }>>(
+  const [chatHistory, setChatHistory] = useState<{ text: string; sender: "user" | "bot" }[]>(
     []
   )
 

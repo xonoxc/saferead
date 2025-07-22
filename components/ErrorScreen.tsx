@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, TouchableOpacity , useWindowDimensions } from "react-native"
 import { ServerCrash, MessageCircle, TriangleAlert as AlertTriangle } from "lucide-react-native"
 import Animated, {
   FadeInDown,
@@ -16,7 +16,6 @@ import { useTheme } from "@/hooks/useTheme"
 import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { router } from "expo-router"
-import { useWindowDimensions } from "react-native"
 
 interface ServerErrorScreenProps {
   onRetry?: () => void

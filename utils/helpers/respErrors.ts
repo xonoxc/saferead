@@ -56,8 +56,14 @@ export function extractValidationErrorMessage(message: string | object): string 
   if (typeof firstValue === "object" && firstValue !== null) {
     const nestedKey = Object.keys(firstValue)[0]
     const nestedVal = firstValue[nestedKey]
-    if (Array.isArray(nestedVal)) return nestedVal[0]
+    if (Array.isArray(nestedVal)) {
+      return `${formatFieldName(firstKey)}.${nestedKey}: ${nestedVal[0]}`
+    }
   }
 
   return "Unknown validation error. Please try again~ 🥺"
+}
+
+function formatFieldName(field: string): string {
+  return field.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
 }

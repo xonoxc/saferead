@@ -1,13 +1,14 @@
 import React from "react"
 import { View, StyleSheet } from "react-native"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
-import { UploadDocumentForm } from "@/components/spaces/UploadDocumentForm"
 import { useSpaceDetailsScreen } from "@/hooks/screens/useSpaceDetailScreen"
 import { useTheme } from "@/hooks/useTheme"
 import SpaceDetailHeader from "@/components/spaces/SpaceDetails/SpaceDetailsHeader"
 import SpaceDetailsStats from "@/components/spaces/SpaceDetails/SpaceDetailsStats"
 import SpaceRecentDocumentList from "@/components/spaces/SpaceDetails/SpaceRecentDocumentList"
 import SpaceDetailsOpenChatBtn from "@/components/spaces/SpaceDetails/SpaceDetailsOpenChatBtn"
+import { SpaceForm } from "@/components/spaces/SpaceForm"
+import { UploadDocumentForm } from "@/components/spaces/UploadDocumentForm"
 
 export default function SpaceDetailScreen() {
   const { colors } = useTheme()
@@ -17,10 +18,12 @@ export default function SpaceDetailScreen() {
     stats,
     animatedStyle,
     isSheetVisible,
-    setSheetVisible,
-    handleBottomSheetClose,
+    isUploadDocFormVisible,
+    toggleSheetVisiblity,
+    toggleUploadFormVisibilty,
     handleOpenChat,
     handleFavoritePress,
+    handleUpdateSpace,
   } = useSpaceDetailsScreen({ colors })
 
   if (!space) {
@@ -38,7 +41,8 @@ export default function SpaceDetailScreen() {
         animatedStyle={animatedStyle}
         space={space}
         onFavoritePress={handleFavoritePress}
-        onCreateBtnPress={() => setSheetVisible(true)}
+        onCreateBtnPress={toggleUploadFormVisibilty}
+        onSettingsPress={toggleSheetVisiblity}
       />
 
       {/* Stats */}
@@ -54,14 +58,18 @@ export default function SpaceDetailScreen() {
       {/* Open Chat Button */}
       <SpaceDetailsOpenChatBtn onPress={handleOpenChat} color={space.color} />
 
-      {/* Upload Document Button */}
+      {isUploadDocFormVisible && (
+        <UploadDocumentForm
+          onCancel={toggleUploadFormVisibilty}
+          spaceId={space.id}
+          onUploadSuccess={toggleUploadFormVisibilty}
+        />
+      )}
+
+      {/* Update Space Form */}
       {isSheetVisible && (
         <View style={styles.modalOverlay}>
-          <UploadDocumentForm
-            spaceId={space.id}
-            onCancel={handleBottomSheetClose}
-            onUploadSuccess={handleBottomSheetClose}
-          />
+          <SpaceForm space={space} onCancel={toggleSheetVisiblity} onCreate={handleUpdateSpace} />
         </View>
       )}
     </View>

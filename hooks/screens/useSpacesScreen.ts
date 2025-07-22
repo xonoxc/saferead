@@ -8,9 +8,8 @@ import { Alert } from "react-native"
 import { router, type RelativePathString } from "expo-router"
 
 import type { ViewType } from "@/types/view"
-import type { SpaceIconName } from "@/constants/spaceform"
-import type { SpacePrivarcy } from "@/types/spaces"
 import type { Space } from "@/types"
+import { CreateSpaceForm, SpaceFormData } from "../forms/useSpaceHookForm"
 
 export default function useSpaceScreen() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useSpaces()
@@ -29,17 +28,8 @@ export default function useSpaceScreen() {
       space.description.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const handleCreateSpace = async (
-    title: string,
-    description: string,
-    color: string,
-    icon: SpaceIconName,
-    privacy: SpacePrivarcy,
-    is_favorite: boolean
-  ) => {
-    const result = await attempt(
-      createSpace({ title, description, color, icon, privacy, is_favorite })
-    )
+  const handleCreateSpace = async (data: SpaceFormData) => {
+    const result = await attempt(createSpace(data as CreateSpaceForm))
     if (!result.ok) {
       const errorMessage = getErrorMessage(result.error)
       Alert.alert("Error", errorMessage || "Failed to create space")

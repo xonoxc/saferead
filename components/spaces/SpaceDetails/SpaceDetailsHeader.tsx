@@ -16,6 +16,7 @@ export default function SpaceDetailHeader({
   onCreateBtnPress,
   animatedStyle,
   onFavoritePress,
+  onSettingsPress,
 }: {
   space: Space
   onCreateBtnPress: () => void
@@ -25,6 +26,7 @@ export default function SpaceDetailHeader({
     }[]
   }
   onFavoritePress: () => void
+  onSettingsPress: () => void
 }) {
   const { colors } = useTheme()
 
@@ -61,7 +63,10 @@ export default function SpaceDetailHeader({
             </TouchableOpacity>
           </Animated.View>
 
-          <TouchableOpacity style={[styles.settingsButton, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity
+            style={[styles.settingsButton, { backgroundColor: colors.surface }]}
+            onPress={onSettingsPress}
+          >
             <Settings size={20} color={space.color} />
           </TouchableOpacity>
         </View>

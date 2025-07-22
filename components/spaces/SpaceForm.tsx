@@ -4,39 +4,51 @@ import { TextInput } from "@/components/TextInput"
 import { Button } from "@/components/Button"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { useSharedValue } from "react-native-reanimated"
-import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated"
-import { colors_palette, iconMap, type SpaceIconName } from "@/constants/spaceform"
-import useCreateSpaceForm from "@/hooks/screens/useCreateSpaceForm"
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated"
+import { colors_palette, iconMap } from "@/constants/spaceform"
 import { Controller, ControllerRenderProps, useWatch } from "react-hook-form"
 import { Globe, LockIcon } from "lucide-react-native"
 import { Drawer } from "../Drawer"
+import { Space } from "@/types"
+import { useSpaceHookForm, SpaceFormData } from "@/hooks/forms/useSpaceHookForm"
 
-export const CreateSpaceForm = ({
+export const SpaceForm = ({
   onCreate,
   onCancel,
+  space,
 }: {
-  onCreate: (
-    title: string,
-    desc: string,
-    color: string,
-    icon: SpaceIconName,
-    privacy: "private" | "public",
-    is_favorite: boolean
-  ) => Promise<void>
+  onCreate: (data: SpaceFormData) => Promise<void>
   onCancel: () => void
+  space?: Space
 }) => {
   const { colors } = useTheme()
-  const { control, handleFormSubmit, handleSubmit, formState } = useCreateSpaceForm({
-    onCreate,
+
+  const isUpdateMode = !!space
+
+  const { control, handleSubmit, formState } = useSpaceHookForm({
+    mode: isUpdateMode ? "update" : "create",
+    onSubmit: async (data: SpaceFormData) => {
+      await onCreate(data)
+    },
+    defaultValues: {
+      title: space?.title ?? "",
+      description: space?.description ?? "",
+      color: space?.color ?? colors_palette[0],
+      icon: space?.icon ?? "space",
+      privacy: space?.privacy ?? "private",
+      is_favorite: space?.is_favorite ?? false,
+    },
   })
+
   const selectedColor = useWatch({ control, name: "color" }) ?? colors.text
 
   return (
     <Drawer>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>Create New Space</Text>
+          <Text style={[styles.title, { color: colors.text }]}>
+            {isUpdateMode ? "Update Space" : "Create New Space"}
+          </Text>
           <TouchableOpacity onPress={onCancel}>
             <Text style={[styles.cancel, { color: colors.primary }]}>Cancel</Text>
           </TouchableOpacity>
@@ -64,7 +76,7 @@ export const CreateSpaceForm = ({
           />
           <Controller
             control={control}
-            name="desc"
+            name="description"
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 label="Description"
@@ -74,7 +86,7 @@ export const CreateSpaceForm = ({
                 placeholder="Enter description"
                 multiline
                 numberOfLines={3}
-                error={formState.errors.desc?.message}
+                error={formState.errors.description?.message}
               />
             )}
           />
@@ -132,8 +144,16 @@ export const CreateSpaceForm = ({
 
         <View style={styles.footer}>
           <Button
-            title={formState.isSubmitting ? "Creating..." : "Create Space"}
-            onPress={handleFormSubmit(handleSubmit)}
+            title={
+              formState.isSubmitting
+                ? isUpdateMode
+                  ? "Updating..."
+                  : "Creating..."
+                : isUpdateMode
+                  ? "Update Space"
+                  : "Create Space"
+            }
+            onPress={handleSubmit}
             disabled={formState.isSubmitting}
             variant="primary"
             fullWidth

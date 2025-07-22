@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react"
 import { StyleSheet } from "react-native"
-import { Easing, SlideInDown, SlideOutDown } from "react-native-reanimated"
-import Animated from "react-native-reanimated"
+import Animated, { Easing, SlideInDown, SlideOutDown } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 
 interface DrawerProps {

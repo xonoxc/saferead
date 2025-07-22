@@ -3,7 +3,7 @@ import { View, StyleSheet, FlatList } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { SpaceList } from "@/components/spaces/SpaceList"
-import { CreateSpaceForm } from "@/components/spaces/CreateSpaceForm"
+import { SpaceForm } from "@/components/spaces/SpaceForm"
 import useSpaceScreen from "@/hooks/screens/useSpacesScreen"
 import SpacesFallback from "@/components/spaces/MainScreen/SpaceFallback"
 import { renderHeader } from "@/components/spaces/MainScreen/RenderHeaderFunc"
@@ -74,10 +74,7 @@ export default function SpacesScreen() {
 
       {createModalVisible && (
         <View style={[StyleSheet.absoluteFillObject, styles.modalOverlay]}>
-          <CreateSpaceForm
-            onCreate={handleCreateSpace}
-            onCancel={() => setCreateModalVisible(false)}
-          />
+          <SpaceForm onCreate={handleCreateSpace} onCancel={() => setCreateModalVisible(false)} />
         </View>
       )}
     </View>

@@ -1,58 +1,62 @@
 import { StyleSheet, View, Text, TouchableOpacity, TextInput } from "react-native"
+import { LayoutGrid, List, Plus, Search } from "lucide-react-native"
+import { Fonts, FontSizes } from "@/constants"
 
 import type { ColorsType } from "@/hooks/useTheme"
 import type { SetStateFunction } from "@/types/state"
 import type { ViewType } from "@/types/view"
-import { LayoutGrid, List, Plus, Search } from "lucide-react-native"
-import { Fonts, FontSizes } from "@/constants"
 
-export const renderHeader = ({
-  colors,
-  viewMode,
-  setViewMode,
-  setSearchQuery,
-  searchQuery,
-  setCreateModalVisible,
-}: {
+interface SpaceScreenHeaderProps {
   colors: ColorsType
   viewMode: ViewType
   setViewMode: SetStateFunction<ViewType>
   searchQuery: string
   setSearchQuery: SetStateFunction<string>
   setCreateModalVisible: (visible: boolean) => void
-}) => (
-  <View style={styles.headerContainer}>
-    <View style={styles.header}>
-      <View style={{ width: "auto" }}>
-        <Text style={[styles.titleText, { color: colors.text }]}>Spaces</Text>
+}
+
+export default function SpaceScreenHeader({
+  colors,
+  viewMode,
+  setViewMode,
+  setSearchQuery,
+  searchQuery,
+  setCreateModalVisible,
+}: SpaceScreenHeaderProps) {
+  return (
+    <View style={styles.headerContainer}>
+      <View style={styles.header}>
+        <View style={{ width: "auto" }}>
+          <Text style={[styles.titleText, { color: colors.text }]}>Spaces</Text>
+        </View>
+        <View style={styles.headerIcons}>
+          <TouchableOpacity onPress={() => setViewMode("list")} style={styles.iconButton}>
+            <List size={24} color={viewMode === "list" ? colors.primary : colors.textMuted} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setViewMode("grid")} style={styles.iconButton}>
+            <LayoutGrid size={24} color={viewMode === "grid" ? colors.primary : colors.textMuted} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setCreateModalVisible(true)}
+            style={[styles.createButton, { backgroundColor: colors.primary }]}
+          >
+            <Plus size={20} color={colors.background} />
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={styles.headerIcons}>
-        <TouchableOpacity onPress={() => setViewMode("list")} style={styles.iconButton}>
-          <List size={24} color={viewMode === "list" ? colors.primary : colors.textMuted} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setViewMode("grid")} style={styles.iconButton}>
-          <LayoutGrid size={24} color={viewMode === "grid" ? colors.primary : colors.textMuted} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setCreateModalVisible(true)}
-          style={[styles.createButton, { backgroundColor: colors.primary }]}
-        >
-          <Plus size={20} color={colors.background} />
-        </TouchableOpacity>
+      <View style={styles.searchContainer}>
+        <View style={[styles.searchInputContainer, { borderColor: colors.border }]}>
+          <Search size={20} color={colors.textMuted} />
+          <TextInput
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search spaces..."
+          />
+        </View>
       </View>
     </View>
-    <View style={styles.searchContainer}>
-      <View style={[styles.searchInputContainer, { borderColor: colors.border }]}>
-        <Search size={20} color={colors.textMuted} />
-        <TextInput
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Search spaces..."
-        />
-      </View>
-    </View>
-  </View>
-)
+  )
+}
 
 const styles = StyleSheet.create({
   headerContainer: {

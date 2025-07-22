@@ -9,7 +9,8 @@ import SpaceIcon from "./Icon"
 import { SpaceIconName } from "@/constants/spaceform"
 
 const { width } = Dimensions.get("window")
-const GRID_ITEM_WIDTH = (width - 60) / 2
+
+const GRID_ITEM_WIDTH = (width - 40) / 2
 
 interface SpaceListProps {
   space: Space

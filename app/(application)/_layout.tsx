@@ -13,7 +13,12 @@ export default function ApplicationLayout() {
     <QueryClientProvider client={queryClient}>
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
         <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+            }}
+          />
           <Stack.Screen
             name="change-password"
             options={{

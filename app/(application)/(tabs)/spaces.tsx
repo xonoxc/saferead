@@ -6,7 +6,7 @@ import { SpaceList } from "@/components/spaces/SpaceList"
 import { SpaceForm } from "@/components/spaces/SpaceForm"
 import useSpaceScreen from "@/hooks/screens/useSpacesScreen"
 import SpacesFallback from "@/components/spaces/MainScreen/SpaceFallback"
-import { renderHeader } from "@/components/spaces/MainScreen/RenderHeaderFunc"
+import SpaceScreenHeader from "@/components/spaces/MainScreen/RenderHeaderFunc"
 
 export default function SpacesScreen() {
   const { colors } = useTheme()
@@ -32,10 +32,21 @@ export default function SpacesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <SpaceScreenHeader
+        colors={colors}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        setCreateModalVisible={setCreateModalVisible}
+      />
+
       <FlatList
         data={spaces}
         key={viewMode}
         numColumns={viewMode === "grid" ? 2 : 1}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
         renderItem={({ item }) => (
           <SpaceList
             space={item}
@@ -45,16 +56,6 @@ export default function SpacesScreen() {
           />
         )}
         keyExtractor={item => item.id}
-        ListHeaderComponent={() =>
-          renderHeader({
-            colors,
-            viewMode,
-            setViewMode,
-            searchQuery,
-            setSearchQuery,
-            setCreateModalVisible,
-          })
-        }
         ListEmptyComponent={
           <SpacesFallback
             searchQuery={searchQuery}
@@ -69,7 +70,6 @@ export default function SpacesScreen() {
         }}
         onEndReachedThreshold={0.5}
         ListFooterComponent={isFetchingNextPage ? <LoadingSpinner /> : null}
-        contentContainerStyle={{ flexGrow: 1 }}
       />
 
       {createModalVisible && (

@@ -1,96 +1,129 @@
 import { apiClient } from "@/utils/apiclient"
-import { FilterOptions } from "@/components/DocumentFilter"
+import { attempt } from "@/utils/attempt"
+import { buildFileUploadFormData } from "@/utils/helpers/files"
 
-export interface UploadDocumentRequest {
-  document_file: any
-  original_filename: string
-  document_type: 'terms' | 'privacy' | 'legal' | 'other'
-}
+import type { FilterOptions } from "@/types/docs"
+import type { UploadDocumentRequest } from "@/types/api/documents.types"
+import type { ReactNativeFile } from "@/types/file"
+import type { SpaceDataParam } from "@/utils/validation/space"
 
-export interface AnalysisResponse {
-  id: string
-  document_file: string
-  original_filename: string
-  document_type: string
-  status: string
-  summary_text: string
-  risky_points: string[]
-  favourable_points: string[]
-  created_at: string
-  updated_at: string
-  processed_at: string
-  error_message: string
-  confidence_score: number
-}
-
-export interface DocumentsListResponse {
-  count: number
-  next: string | null
-  previous: string | null
-  results: AnalysisResponse[]
-}
-
-export const uploadDocument = async (data: UploadDocumentRequest): Promise<AnalysisResponse> => {
-  const formData = new FormData()
-  
-  formData.append('original_filename', data.original_filename)
-  formData.append('document_type', data.document_type)
-  
-  // Handle different file types
-  if (data.document_file.uri) {
-    // React Native file object (from image picker)
-    formData.append('document_file', {
-      uri: data.document_file.uri,
-      type: data.document_file.type || 'image/jpeg',
-      name: data.document_file.name || data.original_filename,
-    } as any)
-  } else if (data.document_file instanceof File) {
-    // Web File object
-    formData.append('document_file', data.document_file)
-  } else if (data.document_file instanceof Blob) {
-    // Blob object
-    formData.append('document_file', data.document_file, data.original_filename)
-  } else {
-    // Fallback for other types
-    formData.append('document_file', data.document_file)
-  }
-
-  const response = await apiClient.post('/scanner/documents/', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
+export async function uploadDocument(data: UploadDocumentRequest) {
+  const formData = buildFileUploadFormData("document_file", data.document_file, {
+    originalFilename: data.original_filename,
+    extras: {
+      original_filename: data.original_filename,
+      document_type: data.document_type,
     },
   })
 
-  return response.data
+  return apiClient.post("/scanner/documents/", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
 }
 
-export const getDocuments = async (page?: number, filters?: FilterOptions): Promise<DocumentsListResponse> => {
-  const params: any = {}
-  
-  if (page) params.page = page
-  
-  if (filters) {
-    // Add filtering parameters
-    if (filters.status) params.status = filters.status
-    if (filters.document_type) params.document_type = filters.document_type
-    if (filters.confidence_score_gte) params.confidence_score__gte = filters.confidence_score_gte
-    if (filters.confidence_score_lte) params.confidence_score__lte = filters.confidence_score_lte
-    if (filters.created_at_gte) params.created_at__gte = filters.created_at_gte
-    if (filters.created_at_lte) params.created_at__lte = filters.created_at_lte
-    if (filters.ordering) params.ordering = filters.ordering
-    if (filters.search) params.search = filters.search
-    if (filters.space_id) params.space_id = filters.space_id
+export async function getDocuments(page?: number, filters?: FilterOptions) {
+  const params = prepareGetDocumentParams(page, filters)
+  const resp = await apiClient.get("/scanner/documents/", { params })
+  return resp.data
+}
+
+/*
+ * Helper function to prepare parameters for the GET documents API call with existing filters
+ * **/
+function prepareGetDocumentParams(page?: number, filters?: FilterOptions) {
+  return {
+    ...(page && { page }),
+    ...(filters?.status && { status: filters.status }),
+    ...(filters?.document_type && { document_type: filters.document_type }),
+    ...(filters?.confidence_score_gte && { confidence_score__gte: filters.confidence_score_gte }),
+    ...(filters?.confidence_score_lte && { confidence_score__lte: filters.confidence_score_lte }),
+    ...(filters?.created_at_gte && { created_at__gte: filters.created_at_gte }),
+    ...(filters?.created_at_lte && { created_at__lte: filters.created_at_lte }),
+    ...(filters?.ordering && { ordering: filters.ordering }),
+    ...(filters?.search && { search: filters.search }),
+    ...(filters?.space_id && { space_id: filters.space_id }),
   }
+}
 
-  const response = await apiClient.get('/scanner/documents/', { params })
+export async function getDocumentById(documentId: string) {
+  return apiClient.get(`/scanner/documents/${documentId}/`)
+}
+
+export async function deleteDocument(documentId: string) {
+  return attempt(apiClient.delete(`/scanner/documents/${documentId}/`))
+}
+
+export async function getDocumentStats() {
+  const response = await apiClient.get("/scanner/documents/stats/")
   return response.data
 }
 
-export const getDocumentById = async (documentId: string): Promise<AnalysisResponse> => {
-  const response = await apiClient.get(`/scanner/documents/${documentId}/`)
-  return response.data
+/*
+ * User Space API Functions
+ * **/
+export async function getSpaces(page?: number) {
+  const params = {
+    ...(page && { page }),
+  }
+  const resp = await apiClient.get("/user_space/spaces/", { params })
+  return resp.data
 }
 
-export const deleteDocument = async (documentId: string): Promise<void> => {
-  await apiClient.delete(`/scanner/documents/${documentId}/`)
+export async function createSpace(data: SpaceDataParam) {
+  return apiClient.post("/user_space/spaces/", data)
+}
+
+export async function deleteSpace(spaceId: string) {
+  return apiClient.delete(`/user_space/spaces/${spaceId}/`)
+}
+
+export async function updateSpace(spaceId: string, data: Partial<SpaceDataParam>) {
+  return apiClient.put(`/user_space/spaces/${spaceId}/`, data)
+}
+
+export async function getSpaceDocuments(spaceId: string, page?: number) {
+  const params = {
+    ...(page && { page }),
+  }
+  const resp = await apiClient.get(`/user_space/spaces/${spaceId}/documents/`, { params })
+  return resp.data
+}
+
+export async function getSpaceStats(spaceId: string) {
+  const resp = await apiClient.get(`/user_space/spaces/${spaceId}/stats/`)
+  return resp.data
+}
+
+export async function toggleFavoriteSpace(spaceId: string, data: { is_favorite: boolean }) {
+  return apiClient.post(`/user_space/spaces/${spaceId}/toggle_favorite/`, data)
+}
+
+export async function addDocumentToSpace(data: {
+  space: string
+  document_file: ReactNativeFile | File | Blob
+  document_type: string
+  display_name?: string
+  is_pinned?: boolean
+  notes?: string
+  tags?: string[]
+}) {
+  const formData = buildFileUploadFormData("document_file", data.document_file, {
+    originalFilename: data.display_name,
+    extras: {
+      space: data.space,
+      document_type: data.document_type,
+      display_name: data.display_name,
+      is_pinned: data.is_pinned,
+      notes: data.notes,
+      tags: data.tags?.join(","),
+    },
+  })
+
+  return apiClient.post("/user_space/documents/", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
 }

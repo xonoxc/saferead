@@ -1,0 +1,76 @@
+import { Globe, LockIcon } from "lucide-react-native"
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { useSlidingSelector } from "@/hooks/animation/useSlidingSelector"
+import type { ControllerRenderProps } from "react-hook-form"
+import { useTheme } from "@react-navigation/native"
+import Animated from "react-native-reanimated"
+import { Fonts } from "@/constants"
+
+interface PrivacySelectorProps {
+  field: ControllerRenderProps<any, "privacy">
+}
+
+export default function SpacePrivacySelector({ field: { value, onChange } }: PrivacySelectorProps) {
+  const { colors } = useTheme()
+  const options = ["private", "public"]
+  const index = options.indexOf(value)
+  const bgStyle = useSlidingSelector(index, index * 160)
+
+  return (
+    <View style={[styles.privacyContainer, { backgroundColor: colors.background }]}>
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            width: "50%",
+            height: "100%",
+            backgroundColor: colors.primary,
+          },
+          bgStyle,
+        ]}
+      />
+      {options.map(option => {
+        const Icon = option === "private" ? LockIcon : Globe
+        const isSelected = value === option
+        const iconColor = isSelected ? colors.background : colors.text
+        const textColor = isSelected ? colors.card : colors.text
+
+        return (
+          <TouchableOpacity
+            key={option}
+            style={[styles.privacyOption]}
+            onPress={() => onChange(option)}
+          >
+            <Icon size={14} color={iconColor} />
+            <Text
+              style={{
+                color: textColor,
+                fontFamily: Fonts.medium,
+                marginLeft: 6,
+              }}
+            >
+              {option.charAt(0).toUpperCase() + option.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        )
+      })}
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  privacyContainer: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 20,
+  },
+  privacyOption: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
+    padding: 12,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+})

@@ -1,31 +1,42 @@
 import React, { useState, useEffect } from "react"
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native"
-import { Send, Box } from "lucide-react-native"
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+} from "react-native"
+import { Send } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { Space } from "@/types"
+import { useSpaceStore } from "@/store/useSpaceStore"
+import { SpaceIndicator } from "./spaceindicator/SpaceIndicator"
 
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import { KeyboardAwareScrollView, KeyboardController } from "react-native-keyboard-controller"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { isIOS } from "@/utils/helpers/platform"
 
-interface ChatViewProps {
-  space: Space
-}
-
-export function ChatView({ space }: ChatViewProps) {
+export function ChatView() {
   const { colors } = useTheme()
+  const { selectedSpace } = useSpaceStore()
   const [message, setMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
-  const [chatHistory, setChatHistory] = useState<Array<{ text: string; sender: "user" | "bot" }>>(
-    []
-  )
+  const [chatHistory, setChatHistory] = useState<{ text: string; sender: "user" | "bot" }[]>([])
+
+  const isKeyboardVisible = KeyboardController.isVisible()
 
   useEffect(() => {
-    setChatHistory([{ text: `Welcome to ${space.name}! How can I help you?`, sender: "bot" }])
-  }, [space])
+    if (selectedSpace) {
+      setChatHistory([
+        { text: `Welcome to ${selectedSpace.title}! How can I help you?`, sender: "bot" },
+      ])
+    }
+  }, [selectedSpace])
 
   const handleSend = () => {
+    KeyboardController.dismiss()
     if (message.trim()) {
       const newMessage = { text: message, sender: "user" as const }
       setChatHistory(prev => [...prev, newMessage])
@@ -45,86 +56,86 @@ export function ChatView({ space }: ChatViewProps) {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <View style={[styles.header, { backgroundColor: colors.background }]}>
-        <View style={styles.headerContent}>
-          <View
-            style={[
-              styles.badgeContainer,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderStyle: "dashed",
-                paddingHorizontal: 10,
-              },
-            ]}
-          >
-            <Box color={colors.text} size={18} />
-            <Text style={[styles.spaceBadge, { color: colors.text }]}>{space.name}</Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={isIOS() ? "padding" : "height"}
+        keyboardVerticalOffset={isKeyboardVisible ? 0 : 90}
+      >
+        <View style={[styles.header, { backgroundColor: colors.background }]}>
+          <View style={styles.headerContent}>
+            <SpaceIndicator />
           </View>
         </View>
-      </View>
 
-      <KeyboardAwareScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 100 }}
-        keyboardShouldPersistTaps="handled"
-        extraScrollHeight={80}
-        enableOnAndroid
-      >
-        {chatHistory.map((chat, index) => (
-          <Animated.View
-            key={index}
-            entering={FadeInDown.delay(100 * index).springify()}
-            style={[
-              styles.chatBubble,
-              chat.sender === "user" ? styles.userBubble : styles.botBubble,
-              {
-                backgroundColor: chat.sender === "user" ? colors.primary : colors.card,
-              },
-            ]}
-          >
-            <Text
-              style={{
-                color: chat.sender === "user" ? colors.background : colors.text,
-                fontFamily: Fonts.regular,
-              }}
+        <KeyboardAwareScrollView
+          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 6 }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+        >
+          {chatHistory.map((chat, index) => (
+            <Animated.View
+              key={index}
+              entering={FadeInDown.delay(100 * index).springify()}
+              style={[
+                styles.chatBubble,
+                chat.sender === "user" ? styles.userBubble : styles.botBubble,
+                {
+                  backgroundColor: chat.sender === "user" ? colors.primary : colors.card,
+                },
+              ]}
             >
-              {chat.text}
-            </Text>
-          </Animated.View>
-        ))}
-        {isTyping && (
-          <Animated.View
-            entering={FadeIn}
-            style={[styles.chatBubble, styles.botBubble, { backgroundColor: colors.card }]}
-          >
-            <Text style={{ color: colors.text, fontFamily: Fonts.regular }}>Typing...</Text>
-          </Animated.View>
-        )}
-      </KeyboardAwareScrollView>
+              <Text
+                style={{
+                  color: chat.sender === "user" ? colors.background : colors.text,
+                  fontFamily: Fonts.regular,
+                }}
+              >
+                {chat.text}
+              </Text>
+            </Animated.View>
+          ))}
+          {isTyping && (
+            <Animated.View
+              entering={FadeIn}
+              style={[styles.chatBubble, styles.botBubble, { backgroundColor: colors.card }]}
+            >
+              <Text style={{ color: colors.text, fontFamily: Fonts.regular }}>Typing...</Text>
+            </Animated.View>
+          )}
+        </KeyboardAwareScrollView>
 
-      <View style={[styles.inputContainer, { backgroundColor: colors.background }]}>
-        <TextInput
+        <View
           style={[
-            styles.input,
+            styles.inputContainer,
             {
-              color: colors.text,
-              borderColor: colors.border,
-              backgroundColor: colors.surface,
+              backgroundColor: colors.background,
+              borderTopColor: colors.border,
             },
           ]}
-          value={message}
-          onChangeText={setMessage}
-          placeholder="Ask a question..."
-          placeholderTextColor={colors.textMuted}
-        />
-        <TouchableOpacity
-          style={[styles.sendButton, { backgroundColor: colors.primary }]}
-          onPress={handleSend}
-          disabled={!message.trim()}
         >
-          <Send size={24} color={colors.background} />
-        </TouchableOpacity>
-      </View>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                color: colors.text,
+                borderColor: colors.border,
+                backgroundColor: colors.surface,
+              },
+            ]}
+            value={message}
+            onChangeText={setMessage}
+            placeholder="Ask a question..."
+            placeholderTextColor={colors.textMuted}
+          />
+          <TouchableOpacity
+            style={[styles.sendButton, { backgroundColor: colors.primary }]}
+            onPress={handleSend}
+            disabled={!message.trim()}
+          >
+            <Send size={24} color={colors.background} />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }
@@ -134,11 +145,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: 14,
+    paddingTop: 20,
     borderBottomWidth: 1,
   },
   headerContent: {
+    paddingLeft: 11,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -183,7 +195,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
-    borderTopWidth: 1,
   },
   input: {
     flex: 1,
@@ -198,7 +209,7 @@ const styles = StyleSheet.create({
   sendButton: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },

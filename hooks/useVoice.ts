@@ -98,7 +98,7 @@ export const useVoice = () => {
     player.seekTo(0)
   }
 
-  const transcribeAudio = async (_audioUri: string): Promise<string> => {
+  /* const transcribeAudio = async (_audioUri: string): Promise<string> => {
     return new Promise(resolve => {
       setTimeout(() => {
         resolve(
@@ -106,7 +106,7 @@ export const useVoice = () => {
         )
       }, 2000)
     })
-  }
+  } */
 
   const speakText = async (text: string) => {
     const resp = attemptSync(
@@ -146,7 +146,6 @@ export const useVoice = () => {
     startRecording,
     stopRecording,
     playSound,
-    transcribeAudio,
     speakText,
     saveVoiceNote,
     recorderState,

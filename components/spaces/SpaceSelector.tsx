@@ -1,6 +1,7 @@
 import React from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
+
 import { type DropdownOption, DropdownSelector } from "@/components/DropDownSelector"
 import type { Space } from "@/types"
 
@@ -14,7 +15,7 @@ export function SpaceSelector({ spaces, selectedSpace, onSelectSpace }: SpaceSel
   const { colors } = useTheme()
 
   const spaceItems: DropdownOption<string>[] = spaces.map(space => ({
-    label: space.name,
+    label: space.title,
     value: space.id,
   }))
 

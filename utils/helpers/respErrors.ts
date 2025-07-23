@@ -1,14 +1,13 @@
-import { attemptSync, ExpectedError } from "../attempt"
+import { attemptSync } from "../attempt"
 
 /*
  *
  * Get error message wrapper
  * **/
 export function getErrorMessage(error: any): string {
-  if (error.status === 400) {
+  if (error.status >= 400 && error.status < 500) {
     return extractValidationErrorMessage(error.message)
-  }
-  if (error.status === 500) {
+  } else if (error.status === 500) {
     return "Internal server error, try again later~ 🥺"
   }
 
@@ -28,6 +27,7 @@ export function extractValidationErrorMessage(message: string | object): string 
     if (!res.ok) {
       return message
     }
+    data = res.data
   }
 
   if (typeof data !== "object" || data === null) {
@@ -56,8 +56,14 @@ export function extractValidationErrorMessage(message: string | object): string 
   if (typeof firstValue === "object" && firstValue !== null) {
     const nestedKey = Object.keys(firstValue)[0]
     const nestedVal = firstValue[nestedKey]
-    if (Array.isArray(nestedVal)) return nestedVal[0]
+    if (Array.isArray(nestedVal)) {
+      return `${formatFieldName(firstKey)}.${nestedKey}: ${nestedVal[0]}`
+    }
   }
 
   return "Unknown validation error. Please try again~ 🥺"
+}
+
+function formatFieldName(field: string): string {
+  return field.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
 }

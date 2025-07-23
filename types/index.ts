@@ -108,13 +108,19 @@ export interface SubscriptionPlan {
 
 export interface Space {
   id: string
-  name: string
+  title: string
   description: string
-  documentCount: number
   color: string
   icon: string
-  createdAt: string
-  updatedAt: string
+  privacy: "private" | "public"
+  is_active: boolean
+  is_favorite: boolean
+  document_count: number
+  recent_documents: any[]
+  user_username: string
+  created_at: string
+  updated_at: string
+  last_accessed: string
 }
 
 export interface VoiceNote {

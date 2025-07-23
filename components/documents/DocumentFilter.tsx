@@ -3,12 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from "rea
 import { Filter, X, Calendar, TrendingUp, FileText, Clock } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { TextInput } from "@/components/TextInput"
-import { Fonts, FontSizes } from "@/constants/Fonts"
 import {
+  Fonts,
+  FontSizes,
   DOCUMENT_TYPE_OPTIONS,
   DOCUMENT_FILTER_STATUS_OPTIONS,
   DOCUMENTS_ORDERING_OPTIONS,
-} from "@/constants/Document"
+} from "@/constants"
 import { FilterOptions } from "@/types/docs"
 
 interface DocumentFilterProps {
@@ -69,11 +70,17 @@ export const DocumentFilter = ({
         </ScrollView>
 
         <View style={styles.actions}>
-          <TouchableOpacity onPress={handleReset} style={styles.actionButton}>
-            Reset
+          <TouchableOpacity
+            onPress={handleReset}
+            style={[styles.actionButton, { backgroundColor: colors.primary }]}
+          >
+            <Text style={[styles.actionBtnText, { color: colors.background }]}>Reset</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleApply} style={styles.actionButton}>
-            Apply Filters
+          <TouchableOpacity
+            onPress={handleApply}
+            style={[styles.actionButton, { backgroundColor: colors.primary }]}
+          >
+            <Text style={[styles.actionBtnText, { color: colors.background }]}>Apply Filters</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -113,7 +120,7 @@ function DocumentTypeFilter({
               style={[
                 styles.optionText,
                 {
-                  color: filters.document_type === option.value ? "#FFFFFF" : colors.text,
+                  color: filters.document_type === option.value ? colors.background : colors.text,
                 },
               ]}
             >
@@ -157,7 +164,7 @@ function StatusFilter({
               style={[
                 styles.optionText,
                 {
-                  color: filters.status === option.value ? "#FFFFFF" : colors.text,
+                  color: filters.status === option.value ? colors.background : colors.text,
                 },
               ]}
             >
@@ -288,7 +295,7 @@ function SortOrder({
               style={[
                 styles.optionText,
                 {
-                  color: filters.ordering === option.value ? "#FFFFFF" : colors.text,
+                  color: filters.ordering === option.value ? colors.background : colors.text,
                 },
               ]}
             >
@@ -310,7 +317,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 20,
   },
   title: {
     fontSize: FontSizes.xl,
@@ -367,5 +374,13 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actionBtnText: {
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xs,
   },
 })

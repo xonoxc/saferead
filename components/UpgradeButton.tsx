@@ -3,6 +3,7 @@ import { Star } from "lucide-react-native"
 import { TouchableOpacity, Text, StyleSheet } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
+import { Fonts, FontSizes } from "@/constants"
 
 const UpgradeButton = () => {
   const router = useRouter()
@@ -55,8 +56,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   text: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: FontSizes.xs,
+    fontFamily: Fonts.bold,
     letterSpacing: 0.5,
   },
 })

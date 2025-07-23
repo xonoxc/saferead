@@ -1,103 +1,157 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import { Trash2, ChevronRight } from "lucide-react-native"
-import Animated, { FadeInRight } from "react-native-reanimated"
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native"
+import { FileText, Trash2, Heart } from "lucide-react-native"
+import Animated, { FadeIn } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { useRouter } from "expo-router"
 import type { Space } from "@/types"
+import SpaceIcon from "./Icon"
+import { SpaceIconName } from "@/constants/spaceform"
 
-export const SpaceList = ({
-  spaces,
-  onDelete,
-  onSpaceSelect,
-}: {
-  spaces: Space[]
+const { width } = Dimensions.get("window")
+
+const GRID_ITEM_WIDTH = (width - 40) / 2
+
+interface SpaceListProps {
+  space: Space
+  viewMode: "list" | "grid"
   onDelete: (id: string, name: string) => void
   onSpaceSelect: (space: Space) => void
+}
+
+export const SpaceList: React.FC<SpaceListProps> = ({
+  space,
+  viewMode,
+  onDelete,
+  onSpaceSelect,
 }) => {
   const { colors } = useTheme()
 
-  return (
-    <>
-      {spaces.map(space => (
-        <Animated.View
-          key={space.id}
-          entering={FadeInRight.duration(400).springify()}
-          style={[
-            styles.card,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              shadowColor: colors.shadow ?? "#000",
-            },
-          ]}
+  if (viewMode === "grid") {
+    return (
+      <Animated.View entering={FadeIn.duration(500)}>
+        <TouchableOpacity
+          style={[styles.gridItem, { backgroundColor: colors.card, borderColor: colors.border }]}
+          onPress={() => onSpaceSelect(space)}
+          activeOpacity={0.8}
         >
-          <TouchableOpacity
-            activeOpacity={0.9}
-            style={styles.touchWrap}
-            onPress={() => onSpaceSelect(space)}
-          >
-            <View style={styles.content}>
-              {/* Left */}
-              <View style={styles.left}>
-                <View style={[styles.iconWrap, { backgroundColor: `${space.color}20` }]}>
-                  <Text style={styles.emoji}>{space.icon}</Text>
-                </View>
-                <View style={styles.info}>
-                  <Text style={[styles.name, { color: colors.text }]}>{space.name}</Text>
-                  <Text style={[styles.desc, { color: colors.textSecondary }]}>
-                    <Text style={{ color: colors.primary, fontWeight: "600" }}>
-                      {space.documentCount}
-                    </Text>{" "}
-                    documents
-                  </Text>
-                </View>
-              </View>
-
-              {/* Right */}
-              <View style={styles.right}>
-                <TouchableOpacity
-                  onPress={() => onDelete(space.id, space.name)}
-                  style={[styles.moreBtn, { backgroundColor: colors.error + "10" }]}
-                >
-                  <Trash2 size={18} color={colors.error} />
-                </TouchableOpacity>
-                <ChevronRight size={24} color={colors.textSecondary} />
-              </View>
+          <View style={styles.gridHeader}>
+            <View style={[styles.gridIconContainer, { backgroundColor: `${space.color}20` }]}>
+              <SpaceIcon name={space.icon as SpaceIconName} size={24} color={space.color} />
             </View>
+            {space.is_favorite && <Heart size={16} color={colors.warning} fill={colors.warning} />}
+          </View>
+          <Text style={[styles.gridTitle, { color: colors.text }]} numberOfLines={2}>
+            {space.title}
+          </Text>
+          <View style={styles.gridFooter}>
+            <View style={styles.gridStat}>
+              <FileText size={14} color={colors.textMuted} />
+              <Text style={[styles.gridStatText, { color: colors.textMuted }]}>
+                {space.document_count}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => onDelete(space.id, space.title)}
+            >
+              <Trash2 size={16} color={colors.error} />
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+    )
+  }
+
+  return (
+    <Animated.View entering={FadeIn.duration(500)} style={styles.listItemContainer}>
+      <TouchableOpacity
+        style={[styles.listItem, { backgroundColor: colors.card, borderColor: colors.border }]}
+        onPress={() => onSpaceSelect(space)}
+        activeOpacity={0.8}
+      >
+        <View style={[styles.listIconContainer, { backgroundColor: `${space.color}20` }]}>
+          <SpaceIcon name={space.icon as SpaceIconName} size={22} color={space.color} />
+        </View>
+        <View style={styles.listItemContent}>
+          <Text style={[styles.listTitle, { color: colors.text }]} numberOfLines={1}>
+            {space.title}
+          </Text>
+          <Text style={[styles.listSubtitle, { color: colors.textMuted }]}>
+            {space.document_count} documents
+          </Text>
+        </View>
+        <View style={styles.listItemActions}>
+          {space.is_favorite && <Heart size={18} color={colors.warning} fill={colors.warning} />}
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => onDelete(space.id, space.title)}
+          >
+            <Trash2 size={18} color={colors.error} />
           </TouchableOpacity>
-        </Animated.View>
-      ))}
-    </>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
-  card: {
+  // Grid Styles
+  gridItem: {
+    width: GRID_ITEM_WIDTH,
     borderRadius: 16,
-    padding: 12,
-    marginBottom: 12,
+    padding: 16,
+    margin: 10,
     borderWidth: 1,
-    elevation: 4,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-  },
-  touchWrap: {
-    borderRadius: 16,
-  },
-  content: {
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    height: 150,
   },
-  left: {
+  gridHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  gridIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  gridTitle: {
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.md,
+    marginTop: 12,
+  },
+  gridFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 12,
+  },
+  gridStat: {
     flexDirection: "row",
     alignItems: "center",
-    flex: 1,
+    gap: 4,
   },
-  iconWrap: {
+  gridStatText: {
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+  },
+
+  // List Styles
+  listItemContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  listItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  listIconContainer: {
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -105,30 +159,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
-  emoji: {
-    fontSize: 24,
-  },
-  info: {
+  listItemContent: {
     flex: 1,
   },
-  name: {
+  listTitle: {
+    fontFamily: Fonts.bold,
     fontSize: FontSizes.lg,
-    fontFamily: Fonts.semiBold,
     marginBottom: 2,
   },
-  desc: {
-    fontSize: FontSizes.sm,
+  listSubtitle: {
     fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
   },
-  right: {
+  listItemActions: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 16,
   },
-  moreBtn: {
-    padding: 6,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 8,
+
+  // Common
+  deleteButton: {
+    padding: 4,
   },
 })

@@ -3,11 +3,10 @@ import { TouchableOpacity, View, StyleSheet } from "react-native"
 import { Plus } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { router } from "expo-router"
-import { useDocumentStore } from "@/store/useDocumentStore"
+import { scanDocument } from "@/hooks/useAnalysis"
 
 export function ScanButton() {
   const { colors } = useTheme()
-  const { scanDocument } = useDocumentStore()
 
   const handlePress = async () => {
     await scanDocument()

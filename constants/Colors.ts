@@ -17,6 +17,8 @@ const Colors = {
     borderLight: "#F3F4F6",
     shadow: "#000000",
     forgotPassword: "#2563EB",
+    skeletonBackground: "#E5E7EB",
+    skeletonShimmer: "#F3F4F6",
   },
   dark: {
     primary: "#FFFFFF",
@@ -36,6 +38,8 @@ const Colors = {
     borderLight: "#1A1A1A",
     shadow: "#000000",
     forgotPassword: "#38BDF8",
+    skeletonBackground: "#333333",
+    skeletonShimmer: "#444444",
   },
 }
 

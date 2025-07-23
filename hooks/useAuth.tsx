@@ -1,16 +1,12 @@
-//import { useAuthRequest } from "expo-auth-session"
-//import { makeRedirectUri } from "expo-auth-session"
 import { useState, useEffect, createContext, use } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
 import { User } from "@/types"
-//import * as WebBrowser from "expo-web-browser"
 import { attempt, attemptSync } from "@/utils/attempt"
 import { isWeb } from "@/utils/helpers/platform"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { apiClient } from "@/utils/apiclient"
-
-//import { discovery } from "expo-auth-session/build/providers/Google"
+import { useUserStore } from "@/store/useUserStore"
 
 interface AuthContextType {
   user: User | null
@@ -30,7 +26,11 @@ interface AuthContextType {
     success: boolean
     message: string
   }>
-  logout: () => Promise<void>
+  logout: () => Promise<{
+    success: boolean
+    message?: string
+    error?: string
+  }>
   // refreshToken: () => Promise<void>
   updateUser: (user: Partial<User>) => Promise<void>
 }
@@ -49,8 +49,11 @@ const redirectURI = makeRedirectUri({
 })
 */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+
+  const user = useUserStore(s => s.user)
+  const setUser = useUserStore(s => s.setUser)
+  const clearUser = useUserStore(s => s.clearUser)
 
   /* 
    * const [_, response, promptAsync] = useAuthRequest({
@@ -94,13 +97,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   } */
 
-  const deleteSecureItem = async (key: string) => {
+  /* const deleteSecureItem = async (key: string) => {
     if (isWeb()) {
       await AsyncStorage.removeItem(key)
     } else {
       await SecureStore.deleteItemAsync(key)
     }
-  }
+  } */
 
   const loadStoredAuth = async () => {
     setIsLoading(true)
@@ -114,9 +117,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(parsedUserData.data)
         }
       } else {
-        const resp = await attempt(apiClient.get("/auth/user/"))
+        const resp = await attempt<User>(apiClient.get("/auth/user/"))
         if (resp.ok) {
-          const userData = resp.data.data as User
+          const userData = resp.data
           await setSecureItem("user_data", JSON.stringify(userData))
           setUser(userData)
         } else {
@@ -134,28 +137,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     success: boolean
     message: string
   }> => {
-    const result = await attempt(apiClient.post("/auth/login/", data))
+    const result = await attempt<{ key: string }>(apiClient.post("/auth/login/", data))
     if (!result.ok) {
       return {
         success: false,
         message: getErrorMessage(result.error),
       }
     }
+    const token = result.data.key
 
-    const token = result.data.data as { key: string }
+    const accessTokenSetAttempt = await attempt(setSecureItem("access_token", token))
+    if (!accessTokenSetAttempt.ok) {
+      return {
+        success: false,
+        message: "Failed to store access token",
+      }
+    }
 
-    await setSecureItem("access_token", token.key)
-
-    const resp = await attempt(apiClient.get("/auth/user/"))
+    const resp = await attempt<User>(
+      apiClient.get("/auth/user/", {
+        headers: {
+          Authorization: `token ${token}`,
+        },
+      })
+    )
     if (!resp.ok) {
-      await logout()
+      const logoutResp = await logout()
+      if (!logoutResp.success) {
+        return {
+          success: false,
+          message: "Failed to logout after login error",
+        }
+      }
       return {
         success: false,
         message: "Failed to fetch user data",
       }
     }
 
-    const userData = resp.data.data as User
+    const userData = resp.data
     await setSecureItem("user_data", JSON.stringify(userData))
     setUser(userData)
 
@@ -166,9 +186,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const logout = async () => {
-    await deleteSecureItem("access_token")
-    await deleteSecureItem("user_data")
-    setUser(null)
+    await clearUser()
+
+    return {
+      success: true,
+      message: "Logout successful",
+    }
   }
   /*
   const loginWithGoogle = async () => {

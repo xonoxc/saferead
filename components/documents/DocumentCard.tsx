@@ -1,15 +1,9 @@
-import React, { useState } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native"
-import {
-  FileText,
-  Calendar,
-  TriangleAlert as AlertTriangle,
-  MoreVertical,
-} from "lucide-react-native"
+import React from "react"
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { FileText, Calendar, TriangleAlert as AlertTriangle, Shield } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Document } from "@/types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { useDocumentStore } from "@/store/useDocumentStore"
 
 interface DocumentCardProps {
   document: Document
@@ -19,8 +13,6 @@ interface DocumentCardProps {
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, onAnalyze }) => {
   const { colors } = useTheme()
-  const { deleteDocument } = useDocumentStore()
-  const [showMenu, setShowMenu] = useState(false)
 
   const getRiskColor = (risk: string | undefined) => {
     switch (risk) {
@@ -42,18 +34,6 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, o
     return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + " " + sizes[i]
   }
 
-  const handleDelete = () => {
-    Alert.alert("Delete Document", "Are you sure you want to delete this document?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => deleteDocument(document.id),
-      },
-    ])
-    setShowMenu(false)
-  }
-
   return (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
@@ -72,18 +52,8 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, o
             {document.type} • {formatFileSize(document.fileSize)}
           </Text>
         </View>
-        <TouchableOpacity onPress={() => setShowMenu(!showMenu)}>
-          <MoreVertical size={20} color={colors.textSecondary} />
-        </TouchableOpacity>
+        {document.isEncrypted && <Shield size={16} color={colors.success} />}
       </View>
-
-      {showMenu && (
-        <View style={styles.menu}>
-          <TouchableOpacity style={styles.menuItem} onPress={handleDelete}>
-            <Text style={[styles.menuItemText, { color: colors.error }]}>Delete</Text>
-          </TouchableOpacity>
-        </View>
-      )}
 
       <View style={styles.content}>
         <View style={styles.dateContainer}>
@@ -246,21 +216,5 @@ const styles = StyleSheet.create({
   moreTagsText: {
     fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
-  },
-  menu: {
-    position: "absolute",
-    top: 50,
-    right: 20,
-    backgroundColor: "#2F2F2F",
-    borderRadius: 8,
-    padding: 8,
-    zIndex: 1,
-  },
-  menuItem: {
-    padding: 8,
-  },
-  menuItemText: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.medium,
   },
 })

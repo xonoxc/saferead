@@ -35,6 +35,7 @@ export default function LoginScreen() {
       setErrorMessage(result.message)
       return
     }
+    console.log("redirecting to application tabs")
     router.replace("/(application)/(tabs)")
   }
 
@@ -156,7 +157,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    fontWeight: "900",
     fontSize: FontSizes.xxxl,
     fontFamily: Fonts.regular,
     textAlign: "center",

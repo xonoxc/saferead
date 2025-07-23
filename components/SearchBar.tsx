@@ -10,10 +10,20 @@ interface SearchBarProps {
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({ value, onChangeText }) => {
-  const { colors } = useTheme()
+  const { colors, isDark } = useTheme()
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+          borderWidth: isDark ? 0 : 1,
+          borderColor: colors.border,
+          shadowOpacity: isDark ? 0 : 0.1,
+        },
+      ]}
+    >
       <Search size={18} color={colors.textMuted} style={{ marginRight: 8 }} />
       <TextInput value={value} onChangeText={onChangeText} placeholder="Search documents..." />
     </View>

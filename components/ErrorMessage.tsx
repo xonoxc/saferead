@@ -1,7 +1,7 @@
 import React from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { Fonts, FontSizes } from "@/constants/Fonts"
+import { Fonts, FontSizes } from "@/constants"
 
 interface ErrorMessageProps {
   message: string | undefined

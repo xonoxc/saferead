@@ -1,44 +1,45 @@
 import { useTheme } from "@/hooks/useTheme"
-import { useRouter } from "expo-router"
-import { ChevronLeft } from "lucide-react-native"
-import { TouchableOpacity, StyleSheet } from "react-native"
+import { router } from "expo-router"
+import { ChevronLeft, ChevronRight } from "lucide-react-native"
+import { TouchableOpacity, StyleSheet, ViewStyle } from "react-native"
 
-export default function CustomBackBtn({
-  containerWidth,
-  onBack,
-}: {
-  containerWidth?: number
+export type BackBtnDirection = "left" | "right"
 
-  onBack?: () => void
-}) {
+interface CustomBackBtnProps {
+  onPress?: () => void
+  style?: ViewStyle
+  direction?: BackBtnDirection
+}
+
+export function CustomBackBtn({ onPress, style, direction = "left" }: CustomBackBtnProps) {
   const { colors } = useTheme()
-  const router = useRouter()
 
-  const width = containerWidth ?? 50
-
-  const handleBackPress = () => {
-    if (onBack) {
-      onBack()
-      return
+  const handlePress = () => {
+    if (onPress) {
+      onPress()
+    } else {
+      if (router.canGoBack()) router.back()
     }
-    router.back()
   }
 
   return (
     <TouchableOpacity
-      style={[styles.container, { borderColor: colors.border, width }]}
-      onPress={handleBackPress}
+      onPress={handlePress}
+      style={[styles.button, { borderColor: colors.border }, style]}
     >
-      <ChevronLeft color={colors.text} />
+      {direction === "left" ? (
+        <ChevronLeft size={24} color={colors.text} />
+      ) : (
+        <ChevronRight size={24} color={colors.text} />
+      )}
     </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  button: {
     padding: 8,
+    borderRadius: 12,
     borderWidth: 2,
-    borderRadius: 13,
-    boxShadow: "none",
   },
 })

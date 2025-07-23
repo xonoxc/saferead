@@ -6,6 +6,7 @@ import { Menu, LogOut, AlignLeft, PanelRightClose, LayoutPanelLeft } from "lucid
 
 import type { Space } from "@/types"
 import type { ColorsType } from "@/hooks/useTheme"
+import { MinimalHamburgerIcon } from "../icon/Hamburger"
 
 interface AnalyzeHeaderProps {
   setIsSideBarOpen: (open: boolean) => void
@@ -25,17 +26,7 @@ export default function AnalyzeHeader({
       <View style={styles.innerHeader}>
         {/* Left: Menu */}
         <TouchableOpacity onPress={() => setIsSideBarOpen(true)}>
-          <Menu
-            color={colors.textMuted}
-            size={28}
-            style={{
-              width: 34,
-              height: 34,
-              padding: 10,
-              borderRadius: 12,
-              backgroundColor: colors.card + "20",
-            }}
-          />
+          <MinimalHamburgerIcon color={colors.textMuted} size={38} />
         </TouchableOpacity>
 
         {/* Center: Upgrade */}

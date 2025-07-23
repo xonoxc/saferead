@@ -6,7 +6,6 @@ import { useTheme } from "@/hooks/useTheme"
 import { DocumentFilter } from "../documents/DocumentFilter"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { AnalysisResponse } from "@/types/api/documents.types"
-import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 
 import { EmptyState } from "../EmptyState"
 
@@ -67,8 +66,6 @@ export default function SideBarDocumentContent({
   FallbackStateWrapper,
 }: SideBarDocumentContentProps) {
   const { colors } = useTheme()
-
-  useTabBarVisibility(!isLoading)
 
   const renderDocument = ({ item, index }: { item: AnalysisResponse; index: number }) => (
     <Animated.View entering={FadeInDown.delay(index * 50 + 300).springify()}>

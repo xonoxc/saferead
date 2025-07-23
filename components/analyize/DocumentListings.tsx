@@ -1,4 +1,4 @@
-import { FlatList, ScrollView, Text, TouchableOpacity, View, StyleSheet } from "react-native"
+import { FlatList, ScrollView, Text, View, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { RecentDocumentItem } from "../documents/RecentDocumentCard"
 

@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { Alert } from "react-native"
-import { useTabBarVisibility } from "@/hooks/useTabBarVisiblitiy"
 import { attempt } from "@/utils/attempt"
 import { useAuth } from "@/hooks/useAuth"
 import { DocumentType } from "@/components/documents/DocumentTypeSelector"
@@ -17,6 +16,7 @@ import { useAnalysisStore } from "@/store/useAnalysisStore"
 import { router } from "expo-router"
 import { useQueryClient } from "@tanstack/react-query"
 import { useSidebarStore } from "@/store/sidebar/useSidebarStore"
+import { useTabBarVisibility } from "./useTabBarVisiblitiy"
 
 export function useAnalysis() {
   const { user } = useAuth()
@@ -25,7 +25,8 @@ export function useAnalysis() {
 
   const analysisResult = useAnalysisStore(s => s.analysisResult)
   const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
-
+  const selectedSpace = useSpaceStore(s => s.selectedSpace)
+  const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
   const isSideBarOpen = useSidebarStore(s => s.isOpen)
   const setIsSideBarOpen = useSidebarStore(s => s.setIsOpen)
 
@@ -33,13 +34,10 @@ export function useAnalysis() {
   const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType>("other")
   const [showTextInput, setShowTextInput] = useState(false)
 
-  const selectedSpace = useSpaceStore(s => s.selectedSpace)
-  const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
-
   const { data, isLoading: isRecentDocumentsLoading } = useDocuments()
   const recentDocuments = data?.pages.flatMap(page => page.results) ?? []
 
-  useTabBarVisibility(!(isSideBarOpen || !!selectedSpace))
+  useTabBarVisibility(!(isSideBarOpen || !!selectedSpace?.id))
 
   const handleItemPress = (item: string) => {
     setIsSideBarOpen(false)

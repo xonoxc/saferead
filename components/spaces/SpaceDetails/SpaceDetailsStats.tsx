@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native"
 import { Fonts, FontSizes } from "@/constants"
-import Animated, { FadeInDown, FadeInRight } from "react-native-reanimated"
+import Animated, { FadeInDown } from "react-native-reanimated"
 
 import type { LucideIcon } from "lucide-react-native"
 import type { ColorsType } from "@/hooks/useTheme"

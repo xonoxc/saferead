@@ -12,12 +12,9 @@ import { useTheme } from "@/hooks/useTheme"
 import { useSpaceStore } from "@/store/useSpaceStore"
 import { SpaceIndicator } from "./spaceindicator/SpaceIndicator"
 
-import { Keyboard } from "react-native"
-import { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated"
-
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import { KeyboardAwareScrollView, KeyboardController } from "react-native-keyboard-controller"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { isIOS } from "@/utils/helpers/platform"
 
@@ -28,6 +25,8 @@ export function ChatView() {
   const [isTyping, setIsTyping] = useState(false)
   const [chatHistory, setChatHistory] = useState<{ text: string; sender: "user" | "bot" }[]>([])
 
+  const isKeyboardVisible = KeyboardController.isVisible()
+
   useEffect(() => {
     if (selectedSpace) {
       setChatHistory([
@@ -37,6 +36,7 @@ export function ChatView() {
   }, [selectedSpace])
 
   const handleSend = () => {
+    KeyboardController.dismiss()
     if (message.trim()) {
       const newMessage = { text: message, sender: "user" as const }
       setChatHistory(prev => [...prev, newMessage])
@@ -54,33 +54,12 @@ export function ChatView() {
     }
   }
 
-  const keyboardOffset = useSharedValue(0)
-
-  useEffect(() => {
-    const showSub = Keyboard.addListener("keyboardWillShow", e => {
-      keyboardOffset.value = withTiming(e.endCoordinates.height, { duration: 250 })
-    })
-
-    const hideSub = Keyboard.addListener("keyboardWillHide", () => {
-      keyboardOffset.value = withTiming(0, { duration: 250 })
-    })
-
-    return () => {
-      showSub.remove()
-      hideSub.remove()
-    }
-  }, [])
-
-  const animatedInputStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: -keyboardOffset.value }],
-  }))
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={isIOS() ? "padding" : "height"}
-        keyboardVerticalOffset={90}
+        keyboardVerticalOffset={isKeyboardVisible ? 0 : 90}
       >
         <View style={[styles.header, { backgroundColor: colors.background }]}>
           <View style={styles.headerContent}>
@@ -89,9 +68,9 @@ export function ChatView() {
         </View>
 
         <KeyboardAwareScrollView
-          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 100 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 6 }}
           keyboardShouldPersistTaps="handled"
-          enableOnAndroid
+          keyboardDismissMode="interactive"
         >
           {chatHistory.map((chat, index) => (
             <Animated.View
@@ -125,11 +104,13 @@ export function ChatView() {
           )}
         </KeyboardAwareScrollView>
 
-        <Animated.View
+        <View
           style={[
             styles.inputContainer,
-            { backgroundColor: colors.background, borderTopColor: colors.border },
-            animatedInputStyle,
+            {
+              backgroundColor: colors.background,
+              borderTopColor: colors.border,
+            },
           ]}
         >
           <TextInput
@@ -153,7 +134,7 @@ export function ChatView() {
           >
             <Send size={24} color={colors.background} />
           </TouchableOpacity>
-        </Animated.View>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
@@ -164,11 +145,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: 14,
+    paddingTop: 20,
     borderBottomWidth: 1,
   },
   headerContent: {
+    paddingLeft: 11,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -227,7 +209,7 @@ const styles = StyleSheet.create({
   sendButton: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },

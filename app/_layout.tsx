@@ -16,6 +16,7 @@ import * as SystemUI from "expo-system-ui"
 import React, { useEffect, useState } from "react"
 import { View } from "react-native"
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
+import { KeyboardProvider } from "react-native-keyboard-controller"
 
 import { ErrorBoundary } from "@/components/ErrorBoundry"
 
@@ -51,18 +52,20 @@ const AppContent = () => {
   if (!appReady) return null
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={onLayout}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(application)" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style={isDark ? "light" : "dark"} />
-    </View>
+    <KeyboardProvider>
+      <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={onLayout}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(application)" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style={isDark ? "light" : "dark"} />
+      </View>
+    </KeyboardProvider>
   )
 }
 

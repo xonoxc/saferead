@@ -1,17 +1,16 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Switch } from "react-native"
 import { TextInput } from "@/components/TextInput"
 import { Button } from "@/components/Button"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated"
-import { colors_palette, iconMap } from "@/constants/spaceform"
-import { Controller, ControllerRenderProps, useWatch } from "react-hook-form"
-import { Globe, LockIcon } from "lucide-react-native"
+import { colors_palette } from "@/constants/spaceform"
+import SpaceIconSelector from "./SpaceIconSelector"
+import { Controller, useWatch } from "react-hook-form"
 import { Drawer } from "../Drawer"
 import { Space } from "@/types"
 import { useSpaceHookForm, SpaceFormData } from "@/hooks/forms/useSpaceHookForm"
-import { useSlidingSelector } from "@/hooks/animation/useSlidingSelector"
+import SpacePrivacySelector from "./SpacePrivacySelector"
 
 export const SpaceForm = ({
   onCreate,
@@ -114,14 +113,16 @@ export const SpaceForm = ({
           <Controller
             control={control}
             name="icon"
-            render={({ field }) => <IconSelector field={field} selectedColor={selectedColor} />}
+            render={({ field }) => (
+              <SpaceIconSelector field={field} selectedColor={selectedColor} />
+            )}
           />
 
           <Text style={[styles.label, { color: colors.text }]}>Privacy</Text>
           <Controller
             control={control}
             name="privacy"
-            render={({ field }) => <PrivacySelector field={field} />}
+            render={({ field }) => <SpacePrivacySelector field={field} />}
           />
 
           <Controller
@@ -162,97 +163,6 @@ export const SpaceForm = ({
         </View>
       </View>
     </Drawer>
-  )
-}
-
-interface IConSelectorProps {
-  field: ControllerRenderProps<any, "icon">
-  selectedColor: string
-}
-
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
-
-const IconSelector = ({ selectedColor, field: { onChange, value } }: IConSelectorProps) => {
-  const { colors } = useTheme()
-
-  return (
-    <View style={styles.grid}>
-      {Object.entries(iconMap).map(([IconName, Icon]) => {
-        const isSelected = value === IconName
-
-        return (
-          <AnimatedTouchableOpacity
-            key={IconName}
-            style={[
-              styles.icon,
-              {
-                backgroundColor: isSelected ? colors.primary : colors.surface,
-                borderRadius: isSelected ? 35 : 16,
-                borderColor: isSelected ? colors.card : "transparent",
-                borderWidth: 2,
-              },
-            ]}
-            onPress={() => {
-              onChange(IconName)
-            }}
-          >
-            <Icon size={24} color={isSelected ? colors.background : selectedColor} />
-          </AnimatedTouchableOpacity>
-        )
-      })}
-    </View>
-  )
-}
-
-interface PrivacySelectorProps {
-  field: ControllerRenderProps<any, "privacy">
-}
-
-const PrivacySelector: React.FC<PrivacySelectorProps> = ({ field: { value, onChange } }) => {
-  const { colors } = useTheme()
-  const options = ["private", "public"]
-  const index = options.indexOf(value)
-  const bgStyle = useSlidingSelector(index, index * 160)
-
-  return (
-    <View style={[styles.privacyContainer, { backgroundColor: colors.background }]}>
-      <Animated.View
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            width: "50%",
-            height: "100%",
-            backgroundColor: colors.primary,
-          },
-          bgStyle,
-        ]}
-      />
-      {options.map(option => {
-        const Icon = option === "private" ? LockIcon : Globe
-        const isSelected = value === option
-        const iconColor = isSelected ? colors.background : colors.text
-        const textColor = isSelected ? colors.card : colors.text
-
-        return (
-          <TouchableOpacity
-            key={option}
-            style={[styles.privacyOption]}
-            onPress={() => onChange(option)}
-          >
-            <Icon size={14} color={iconColor} />
-            <Text
-              style={{
-                color: textColor,
-                fontFamily: Fonts.medium,
-                marginLeft: 6,
-              }}
-            >
-              {option.charAt(0).toUpperCase() + option.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        )
-      })}
-    </View>
   )
 }
 

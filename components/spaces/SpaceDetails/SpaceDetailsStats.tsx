@@ -19,9 +19,8 @@ export default function SpaceDetailsStats({ stats, colors }: SpaceDetailsStatsPr
   return (
     <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.statsContainer}>
       {stats.map((stat, index) => (
-        <Animated.View
+        <View
           key={index}
-          entering={FadeInRight.delay(300 + index * 100).springify()}
           style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}
         >
           <View style={[styles.statIcon, { backgroundColor: stat.color + "15" }]}>
@@ -29,7 +28,7 @@ export default function SpaceDetailsStats({ stats, colors }: SpaceDetailsStatsPr
           </View>
           <Text style={[styles.statValue, { color: colors.text }]}>{stat.value}</Text>
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{stat.label}</Text>
-        </Animated.View>
+        </View>
       ))}
     </Animated.View>
   )

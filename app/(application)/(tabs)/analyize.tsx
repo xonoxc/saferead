@@ -53,7 +53,6 @@ export default function AnalyzeScreen() {
   const sidebarStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
   }))
-
   const mainContentStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value + SCREEN_WIDTH }],
   }))

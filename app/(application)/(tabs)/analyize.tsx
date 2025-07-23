@@ -4,8 +4,10 @@ import { useAnalysis } from "@/hooks/useAnalysis"
 import { ChatView } from "@/components/chat"
 import { Dimensions, View, StyleSheet } from "react-native"
 import Animated, {
+  Easing,
   FadeIn,
   FadeOut,
+  ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -42,7 +44,9 @@ export default function AnalyzeScreen() {
 
   React.useEffect(() => {
     translateX.value = withTiming(isSideBarOpen ? 0 : -SCREEN_WIDTH, {
-      duration: 200,
+      duration: 400,
+      easing: Easing.out(Easing.ease),
+      reduceMotion: ReduceMotion.System,
     })
   }, [isSideBarOpen, translateX])
 

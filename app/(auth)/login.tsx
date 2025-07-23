@@ -35,7 +35,6 @@ export default function LoginScreen() {
       setErrorMessage(result.message)
       return
     }
-    console.log("redirecting to application tabs")
     router.replace("/(application)/(tabs)")
   }
 

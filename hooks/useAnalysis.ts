@@ -41,13 +41,7 @@ export function useAnalysis() {
 
   const handleItemPress = (item: string) => {
     setIsSideBarOpen(false)
-    if (item === "logout") {
-      console.log("Logging out...")
-    } else if (item === "settings") {
-      console.log("Go to settings")
-    } else {
-      console.log(`You tapped on ${item}`)
-    }
+    console.log(`You tapped on ${item}`)
   }
 
   const handleAnalyzeDocument = async (document: any, docType: DocumentType) => {

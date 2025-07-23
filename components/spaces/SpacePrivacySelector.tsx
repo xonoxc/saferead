@@ -2,7 +2,7 @@ import { Globe, LockIcon } from "lucide-react-native"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import { useSlidingSelector } from "@/hooks/animation/useSlidingSelector"
 import type { ControllerRenderProps } from "react-hook-form"
-import { useTheme } from "@react-navigation/native"
+import { useTheme } from "@/hooks/useTheme"
 import Animated from "react-native-reanimated"
 import { Fonts } from "@/constants"
 
@@ -10,9 +10,11 @@ interface PrivacySelectorProps {
   field: ControllerRenderProps<any, "privacy">
 }
 
+const options = ["private", "public"]
+
 export default function SpacePrivacySelector({ field: { value, onChange } }: PrivacySelectorProps) {
   const { colors } = useTheme()
-  const options = ["private", "public"]
+
   const index = options.indexOf(value)
   const bgStyle = useSlidingSelector(index, index * 160)
 

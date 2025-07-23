@@ -98,7 +98,12 @@ export default function DropdownSelector<T>({
             ) : (
               <FlatList
                 data={options}
-                keyExtractor={item => `${item.value}`}
+                keyExtractor={item => {
+                  if (typeof item.value === "object" && item.value && "id" in item.value) {
+                    return String((item.value as { id: any }).id)
+                  }
+                  return String(item.value)
+                }}
                 bounces
                 renderItem={({ item, index }): React.ReactElement | null => {
                   const isSelected = item.value === selected

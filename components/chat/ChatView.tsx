@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from "react"
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native"
-import { Send, Box } from "lucide-react-native"
+import { Send } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { Space } from "@/types"
+import { useSpaceStore } from "@/store/useSpaceStore"
+import { SpaceIndicator } from "./spaceindicator/SpaceIndicator"
 
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { SafeAreaView } from "react-native-safe-area-context"
 
-interface ChatViewProps {
-  space: Space
-}
-
-export function ChatView({ space }: ChatViewProps) {
+export function ChatView() {
   const { colors } = useTheme()
+  const { selectedSpace } = useSpaceStore()
   const [message, setMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
-  const [chatHistory, setChatHistory] = useState<{ text: string; sender: "user" | "bot" }[]>(
-    []
-  )
+  const [chatHistory, setChatHistory] = useState<{ text: string; sender: "user" | "bot" }[]>([])
 
   useEffect(() => {
-    setChatHistory([{ text: `Welcome to ${space.title}! How can I help you?`, sender: "bot" }])
-  }, [space])
+    if (selectedSpace) {
+      setChatHistory([
+        { text: `Welcome to ${selectedSpace.title}! How can I help you?`, sender: "bot" },
+      ])
+    }
+  }, [selectedSpace])
 
   const handleSend = () => {
     if (message.trim()) {
@@ -47,20 +47,7 @@ export function ChatView({ space }: ChatViewProps) {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={[styles.header, { backgroundColor: colors.background }]}>
         <View style={styles.headerContent}>
-          <View
-            style={[
-              styles.badgeContainer,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderStyle: "dashed",
-                paddingHorizontal: 10,
-              },
-            ]}
-          >
-            <Box color={colors.text} size={18} />
-            <Text style={[styles.spaceBadge, { color: colors.text }]}>{space.title}</Text>
-          </View>
+          <SpaceIndicator />
         </View>
       </View>
 
@@ -102,7 +89,12 @@ export function ChatView({ space }: ChatViewProps) {
         )}
       </KeyboardAwareScrollView>
 
-      <View style={[styles.inputContainer, { backgroundColor: colors.background }]}>
+      <View
+        style={[
+          styles.inputContainer,
+          { backgroundColor: colors.background, borderTopColor: colors.border },
+        ]}
+      >
         <TextInput
           style={[
             styles.input,

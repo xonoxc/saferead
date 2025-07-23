@@ -37,7 +37,7 @@ export default function AnalyzeHeader({
         {/* Right: Exit only if inside Chat */}
         {selectedSpace ? (
           <TouchableOpacity onPress={onSpaceExitButtonPress}>
-            <LogOut size={18} color={colors.text} />
+            <LogOut size={22} color={colors.text} />
           </TouchableOpacity>
         ) : (
           <View style={{ width: 24 }} />

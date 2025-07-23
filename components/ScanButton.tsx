@@ -10,7 +10,7 @@ export function ScanButton() {
 
   const handlePress = async () => {
     await scanDocument()
-    router.push("/(application)/(tabs)/documents")
+    router.push("/analysisres")
   }
 
   return (

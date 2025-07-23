@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TouchableOpacity, TextInput } from "react-native"
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
 import { Plus, Search } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 
@@ -6,6 +6,7 @@ import type { ColorsType } from "@/hooks/useTheme"
 import type { SetStateFunction } from "@/types/state"
 import type { ViewType } from "@/types/view"
 import ViewMode from "../ViewModeSetter"
+import { TextInput } from "@/components/TextInput"
 
 interface SpaceScreenHeaderProps {
   colors: ColorsType
@@ -42,11 +43,12 @@ export default function SpaceScreenHeader({
       </View>
       <View style={styles.searchContainer}>
         <View style={[styles.searchInputContainer, { borderColor: colors.border }]}>
-          <Search size={20} color={colors.textMuted} />
           <TextInput
             value={searchQuery}
+            leftAccessory={<Search size={20} color={colors.textMuted} />}
             onChangeText={setSearchQuery}
             placeholder="Search spaces..."
+            placeholderTextColor={colors.textMuted}
           />
         </View>
       </View>
@@ -87,7 +89,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingLeft: 12,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
   },
 })

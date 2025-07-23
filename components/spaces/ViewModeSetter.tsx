@@ -44,10 +44,10 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: 16,
     overflow: "hidden",
-    width: 100,
-    height: 44,
+    width: 98,
+    height: 40,
     alignItems: "center",
     justifyContent: "space-between",
     position: "relative",

@@ -1,4 +1,3 @@
-// DropdownSelector.tsx
 import React, { useState } from "react"
 import {
   View,
@@ -138,17 +137,31 @@ function DropdownSheet<T>({
 }) {
   const { colors } = useTheme()
 
+  const lastOptionIndex = options.length - 1
+
   return (
     <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1}>
-      <TouchableOpacity style={[styles.sheet, { backgroundColor: colors.card }]} activeOpacity={1}>
+      <TouchableOpacity
+        style={[
+          styles.sheet,
+          {
+            backgroundColor: colors.card,
+            borderTopColor: colors.border,
+            shadowColor: colors.shadow,
+          },
+        ]}
+        activeOpacity={1}
+      >
         {loading ? (
           <ActivityIndicator color={colors.primary} />
         ) : (
           <FlatList
             data={options}
             keyExtractor={(item, i) => `${item.label}-${i}`}
-            renderItem={({ item }) => {
+            renderItem={({ item, index }) => {
               const isSelected = item.value === selected
+              const isLast = index === lastOptionIndex
+
               const handleSelect = () => {
                 onSelect(item.value)
                 onClose()
@@ -164,7 +177,7 @@ function DropdownSheet<T>({
                   style={[
                     styles.option,
                     {
-                      borderColor: colors.border,
+                      borderColor: !isLast ? colors.border : "transparent",
                     },
                   ]}
                 >
@@ -225,13 +238,17 @@ const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.2)",
+    backgroundColor: "transparent",
   },
   sheet: {
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: "50%",
+    elevation: 10,
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
   },
   option: {
     paddingVertical: 16,

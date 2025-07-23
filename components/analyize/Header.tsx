@@ -2,7 +2,7 @@ import { TouchableOpacity, View, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import UpgradeButton from "@/components/UpgradeButton"
 
-import { Menu, LogOut, AlignLeft, PanelRightClose, LayoutPanelLeft } from "lucide-react-native"
+import { LogOut } from "lucide-react-native"
 
 import type { Space } from "@/types"
 import type { ColorsType } from "@/hooks/useTheme"

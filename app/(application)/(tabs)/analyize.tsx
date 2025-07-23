@@ -86,7 +86,7 @@ export default function AnalyzeScreen() {
         {selectedSpace ? (
           <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>
             {/* Chat View */}
-            <ChatView space={selectedSpace} />
+            <ChatView />
           </Animated.View>
         ) : (
           <AnalyizeDefaultContent

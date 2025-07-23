@@ -24,10 +24,10 @@ export default function SideBarDocumentSpaceHeader({
     <View style={styles.header}>
       {spaceName && (
         <TouchableOpacity
-          style={[styles.addDocumentButton, { backgroundColor: colors.background }]}
+          style={[styles.addDocumentButton, { backgroundColor: colors.primary }]}
           onPress={handleAddDocument}
         >
-          <FilePlus size={24} color={colors.text} />
+          <FilePlus size={24} color={colors.background} />
         </TouchableOpacity>
       )}
       {spaceName ? (
@@ -66,8 +66,8 @@ const styles = StyleSheet.create({
   },
   addDocumentButton: {
     alignItems: "center",
-    padding: 5,
+    padding: 8,
     justifyContent: "center",
-    borderRadius: 100,
+    borderRadius: 12,
   },
 })

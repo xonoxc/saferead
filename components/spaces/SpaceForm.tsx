@@ -44,126 +44,128 @@ export const SpaceForm = ({
 
   const selectedColor = useWatch({ control, name: "color" }) ?? colors.text
 
-  const renderform = () => (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          {isUpdateMode ? "Update Space" : "Create New Space"}
-        </Text>
-        <TouchableOpacity onPress={onCancel}>
-          <Text style={[styles.cancel, { color: colors.primary }]}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
+  return (
+    <Drawer enableAbsolute={useDrawer}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.text }]}>
+            {isUpdateMode ? "Update Space" : "Create New Space"}
+          </Text>
+          <TouchableOpacity onPress={onCancel}>
+            <Text style={[styles.cancel, { color: colors.primary }]}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
 
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
-        bounces={true}
-      >
-        <Controller
-          control={control}
-          name="title"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              label="Space Name"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              placeholder="Enter name"
-              error={formState.errors.title?.message}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="description"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              label="Description"
-              value={value ?? ""}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              placeholder="Enter description"
-              multiline
-              numberOfLines={3}
-              error={formState.errors.description?.message}
-            />
-          )}
-        />
-
-        <Text style={[styles.label, { color: colors.text }]}>Choose Color</Text>
-        <Controller
-          control={control}
-          name="color"
-          render={({ field: { onChange, value } }) => (
-            <View style={styles.grid}>
-              {colors_palette.map(c => (
-                <TouchableOpacity
-                  key={c}
-                  style={[styles.color, { backgroundColor: c }, c === value && styles.selected]}
-                  onPress={() => onChange(c)}
-                />
-              ))}
-            </View>
-          )}
-        />
-
-        <Text style={[styles.label, { color: colors.text }]}>Choose Icon</Text>
-
-        <Controller
-          control={control}
-          name="icon"
-          render={({ field }) => <SpaceIconSelector field={field} selectedColor={selectedColor} />}
-        />
-
-        <Text style={[styles.label, { color: colors.text }]}>Privacy</Text>
-        <Controller
-          control={control}
-          name="privacy"
-          render={({ field }) => <SpacePrivacySelector field={field} />}
-        />
-
-        <Controller
-          control={control}
-          name="is_favorite"
-          render={({ field: { onChange, value } }) => (
-            <View style={styles.favoriteContainer}>
-              <Text style={[styles.label, { color: colors.text, marginTop: 0 }]}>
-                Faourite Space ?
-              </Text>
-              <Switch
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          bounces={true}
+        >
+          <Controller
+            control={control}
+            name="title"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                label="Space Name"
                 value={value}
-                onValueChange={onChange}
-                trackColor={{ false: colors.accent, true: colors.primary }}
-                thumbColor={value ? colors.surface : colors.text}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Enter name"
+                error={formState.errors.title?.message}
               />
-            </View>
-          )}
-        />
-      </ScrollView>
+            )}
+          />
+          <Controller
+            control={control}
+            name="description"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                label="Description"
+                value={value ?? ""}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Enter description"
+                multiline
+                numberOfLines={3}
+                error={formState.errors.description?.message}
+              />
+            )}
+          />
 
-      <View style={styles.footer}>
-        <Button
-          title={
-            formState.isSubmitting
-              ? isUpdateMode
-                ? "Updating..."
-                : "Creating..."
-              : isUpdateMode
-                ? "Update Space"
-                : "Create Space"
-          }
-          onPress={handleSubmit}
-          disabled={formState.isSubmitting}
-          variant="primary"
-          fullWidth
-        />
+          <Text style={[styles.label, { color: colors.text }]}>Choose Color</Text>
+          <Controller
+            control={control}
+            name="color"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.grid}>
+                {colors_palette.map(c => (
+                  <TouchableOpacity
+                    key={c}
+                    style={[styles.color, { backgroundColor: c }, c === value && styles.selected]}
+                    onPress={() => onChange(c)}
+                  />
+                ))}
+              </View>
+            )}
+          />
+
+          <Text style={[styles.label, { color: colors.text }]}>Choose Icon</Text>
+
+          <Controller
+            control={control}
+            name="icon"
+            render={({ field }) => (
+              <SpaceIconSelector field={field} selectedColor={selectedColor} />
+            )}
+          />
+
+          <Text style={[styles.label, { color: colors.text }]}>Privacy</Text>
+          <Controller
+            control={control}
+            name="privacy"
+            render={({ field }) => <SpacePrivacySelector field={field} />}
+          />
+
+          <Controller
+            control={control}
+            name="is_favorite"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.favoriteContainer}>
+                <Text style={[styles.label, { color: colors.text, marginTop: 0 }]}>
+                  Faourite Space ?
+                </Text>
+                <Switch
+                  value={value}
+                  onValueChange={onChange}
+                  trackColor={{ false: colors.accent, true: colors.primary }}
+                  thumbColor={value ? colors.surface : colors.text}
+                />
+              </View>
+            )}
+          />
+        </ScrollView>
+
+        <View style={styles.footer}>
+          <Button
+            title={
+              formState.isSubmitting
+                ? isUpdateMode
+                  ? "Updating..."
+                  : "Creating..."
+                : isUpdateMode
+                  ? "Update Space"
+                  : "Create Space"
+            }
+            onPress={handleSubmit}
+            disabled={formState.isSubmitting}
+            variant="primary"
+            fullWidth
+          />
+        </View>
       </View>
-    </View>
+    </Drawer>
   )
-
-  return useDrawer ? <Drawer>{renderform()}</Drawer> : renderform()
 }
 
 const styles = StyleSheet.create({

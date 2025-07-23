@@ -1,8 +1,9 @@
 import { Fonts, FontSizes } from "@/constants"
 import { useTheme } from "@/hooks/useTheme"
 import { Filter, Search } from "lucide-react-native"
-import { TextInput, TouchableOpacity, View, StyleSheet } from "react-native"
+import { TouchableOpacity, View, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
+import { TextInput } from "../TextInput"
 
 interface SidebarSearchProps {
   searchQuery: string
@@ -19,15 +20,10 @@ export default function SidebarSearch({
 
   return (
     <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.searchContainer}>
-      <View
-        style={[
-          styles.searchInputContainer,
-          { backgroundColor: colors.card, borderColor: colors.border },
-        ]}
-      >
-        <Search size={18} color={colors.textMuted} />
+      <View style={[styles.searchInputContainer, { borderColor: colors.border }]}>
         <TextInput
-          style={[styles.searchInput, { color: colors.text }]}
+          style={[styles.searchInput, { color: colors.text, gap: 8 }]}
+          leftAccessory={<Search size={18} color={colors.textMuted} />}
           value={searchQuery}
           onChangeText={text => handleSearch(text)}
           placeholder="Search documents..."
@@ -35,13 +31,17 @@ export default function SidebarSearch({
           returnKeyType="search"
           clearButtonMode="while-editing"
         />
+
+        <TouchableOpacity
+          style={[
+            styles.filterButton,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+          onPress={() => setShowFilter(true)}
+        >
+          <Filter size={18} color={colors.textSecondary} />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        style={[styles.filterButton, { backgroundColor: colors.card, borderColor: colors.border }]}
-        onPress={() => setShowFilter(true)}
-      >
-        <Filter size={18} color={colors.textSecondary} />
-      </TouchableOpacity>
     </Animated.View>
   )
 }
@@ -49,9 +49,11 @@ export default function SidebarSearch({
 const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
-    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
     paddingBottom: 20,
-    gap: 12,
+    paddingHorizontal: 8,
+    gap: 8,
   },
   searchInputContainer: {
     flex: 1,
@@ -65,17 +67,14 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
-    paddingVertical: 4,
-    paddingHorizontal: 0,
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.semiBold,
   },
   filterButton: {
-    width: 48,
-    height: 48,
     borderRadius: 12,
+    padding: 16,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 0,
+    borderWidth: 2,
   },
 })

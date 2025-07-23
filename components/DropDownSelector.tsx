@@ -1,19 +1,17 @@
+// DropdownSelector.tsx
 import React, { useState } from "react"
 import {
   View,
   Text,
-  TouchableOpacity,
   Modal,
-  StyleSheet,
+  TouchableOpacity,
   FlatList,
-  ViewStyle,
-  TextStyle,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native"
-import { ChevronDown, Check, LucideIcon, Dot } from "lucide-react-native"
-import Animated from "react-native-reanimated"
+import { ChevronDown, Check, Dot, LucideIcon } from "lucide-react-native"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
-import { FontSizes, Fonts } from "@/constants"
+import { Fonts, FontSizes } from "@/constants"
 
 export interface DropdownOption<T> {
   label: string
@@ -33,117 +31,47 @@ interface DropdownSelectorProps<T> {
     option: DropdownOption<T>,
     isSelected: boolean,
     onSelect: () => void
-  ) => React.ReactNode | null
+  ) => React.ReactElement | null
 
   triggerText?: string
-
-  containerStyle?: ViewStyle
-  labelStyle?: TextStyle
 }
 
 export default function DropdownSelector<T>({
   label,
   selected,
   options,
-  triggerText,
-
   onSelect,
-  loading = false,
   renderTrigger,
   renderOption,
-
-  containerStyle,
-  labelStyle,
+  loading = false,
+  triggerText,
 }: DropdownSelectorProps<T>) {
   const { colors } = useTheme()
   const [open, setOpen] = useState(false)
 
   const selectedOption = options.find(opt => opt.value === selected)
 
-  const handleOpen = () => {
-    setOpen(true)
-  }
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   return (
-    <View style={[{ marginBottom: 20 }, containerStyle]}>
-      {label && (
-        <Text style={[styles.label, { color: colors.textMuted }, labelStyle]}>{label}</Text>
-      )}
+    <View style={{ marginBottom: 20 }}>
+      {label && <Text style={[styles.label, { color: colors.textMuted }]}>{label}</Text>}
 
-      {renderTrigger ? (
-        renderTrigger(handleOpen, selectedOption)
-      ) : (
-        <TouchableOpacity
-          style={[styles.selector, { borderColor: colors.border, backgroundColor: colors.card }]}
-          onPress={handleOpen}
-        >
-          <View style={styles.row}>
-            {renderIcon(selectedOption?.icon, colors)}
-            <Text style={[styles.selectedText, { color: colors.text }]}>
-              {selectedOption?.label || triggerText || "Select an option"}
-            </Text>
-          </View>
-          <ChevronDown size={20} color={colors.textSecondary} />
-        </TouchableOpacity>
-      )}
+      <DropdownTrigger
+        selectedOption={selectedOption}
+        onOpen={() => setOpen(true)}
+        renderTrigger={renderTrigger}
+        triggerText={triggerText}
+      />
 
-      <Modal transparent visible={open} animationType="fade" onRequestClose={handleClose}>
-        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={handleClose}>
-          <Animated.View style={[styles.modal, { backgroundColor: colors.card }]}>
-            {loading ? (
-              <ActivityIndicator color={colors.primary} size="large" />
-            ) : (
-              <FlatList
-                data={options}
-                keyExtractor={item => {
-                  if (typeof item.value === "object" && item.value && "id" in item.value) {
-                    return String((item.value as { id: any }).id)
-                  }
-                  return String(item.value)
-                }}
-                bounces
-                renderItem={({ item, index }): React.ReactElement | null => {
-                  const isSelected = item.value === selected
-                  const onItemSelect = () => {
-                    onSelect(item.value)
-                    handleClose()
-                  }
-
-                  if (renderOption) {
-                    const result = renderOption(
-                      item,
-                      isSelected,
-                      onItemSelect
-                    ) as React.ReactElement
-                    return result ?? null
-                  }
-
-                  const isLast = index === options.length - 1
-                  return (
-                    <TouchableOpacity
-                      style={[
-                        styles.option,
-                        !isLast ? { borderBottomColor: colors.border } : { borderBottomWidth: 0 },
-                      ]}
-                      onPress={onItemSelect}
-                    >
-                      <View style={styles.row}>
-                        {renderIcon(item.icon, colors)}
-                        <Text style={[styles.optionText, { color: colors.text }]}>
-                          {item.label}
-                        </Text>
-                      </View>
-                      {isSelected && <Check size={20} color={colors.primary} />}
-                    </TouchableOpacity>
-                  )
-                }}
-              />
-            )}
-          </Animated.View>
-        </TouchableOpacity>
+      <Modal transparent visible={open} animationType="slide" onRequestClose={() => setOpen(false)}>
+        <DropdownSheet
+          open={open}
+          onClose={() => setOpen(false)}
+          options={options}
+          selected={selected}
+          onSelect={onSelect}
+          loading={loading}
+          renderOption={renderOption}
+        />
       </Modal>
     </View>
   )
@@ -151,9 +79,115 @@ export default function DropdownSelector<T>({
 
 /*
  *
- * function to detect if the passed icon is already a JSX element for correct rendering
+ * Dropdown Trigger Component
  * **/
-export function renderIcon(
+function DropdownTrigger<T>({
+  selectedOption,
+  onOpen,
+  renderTrigger,
+  triggerText,
+}: {
+  selectedOption?: DropdownOption<T>
+  onOpen: () => void
+  renderTrigger?: (open: () => void, selectedOption?: DropdownOption<T>) => React.ReactNode
+  triggerText?: string
+}) {
+  const { colors } = useTheme()
+
+  if (renderTrigger) return <>{renderTrigger(onOpen, selectedOption)}</>
+
+  return (
+    <TouchableOpacity
+      onPress={onOpen}
+      style={[styles.selector, { backgroundColor: colors.card, borderColor: colors.border }]}
+    >
+      <View style={styles.row}>
+        {renderIcon(selectedOption?.icon, colors)}
+        <Text style={[styles.selectedText, { color: colors.text }]}>
+          {selectedOption?.label || triggerText || "Select an option"}
+        </Text>
+      </View>
+      <ChevronDown size={20} color={colors.textSecondary} />
+    </TouchableOpacity>
+  )
+}
+
+/*
+ *
+ * The actual  sheet component
+ * **/
+function DropdownSheet<T>({
+  options,
+  selected,
+  onSelect,
+  renderOption,
+  onClose,
+  loading,
+}: {
+  options: DropdownOption<T>[]
+  selected: T
+  onSelect: (val: T) => void
+  renderOption?: (
+    option: DropdownOption<T>,
+    isSelected: boolean,
+    onSelect: () => void
+  ) => React.ReactElement | null
+  onClose: () => void
+  open: boolean
+  loading?: boolean
+}) {
+  const { colors } = useTheme()
+
+  return (
+    <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1}>
+      <TouchableOpacity style={[styles.sheet, { backgroundColor: colors.card }]} activeOpacity={1}>
+        {loading ? (
+          <ActivityIndicator color={colors.primary} />
+        ) : (
+          <FlatList
+            data={options}
+            keyExtractor={(item, i) => `${item.label}-${i}`}
+            renderItem={({ item }) => {
+              const isSelected = item.value === selected
+              const handleSelect = () => {
+                onSelect(item.value)
+                onClose()
+              }
+
+              if (renderOption) {
+                return renderOption(item, isSelected, handleSelect) as React.ReactElement
+              }
+
+              return (
+                <TouchableOpacity
+                  onPress={handleSelect}
+                  style={[
+                    styles.option,
+                    {
+                      borderColor: colors.border,
+                    },
+                  ]}
+                >
+                  <View style={styles.row}>
+                    {renderIcon(item.icon, colors)}
+                    <Text style={[styles.optionText, { color: colors.text }]}>{item.label}</Text>
+                  </View>
+                  {isSelected && <Check size={20} color={colors.primary} />}
+                </TouchableOpacity>
+              )
+            }}
+          />
+        )}
+      </TouchableOpacity>
+    </TouchableOpacity>
+  )
+}
+
+/*
+ *
+ * Utility function to render icons
+ * **/
+function renderIcon(
   icon: LucideIcon | React.ReactNode,
   colors: ColorsType,
   fallbackColor?: string
@@ -184,38 +218,31 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     marginLeft: 8,
   },
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
+  row: {
+    flexDirection: "row",
     alignItems: "center",
   },
-  modal: {
-    width: "90%",
-    borderRadius: 16,
-    padding: 20,
-    maxHeight: "60%",
+  backdrop: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.2)",
   },
-  modalTitle: {
-    fontSize: FontSizes.lg,
-    fontFamily: Fonts.semiBold,
-    marginBottom: 20,
-    textAlign: "center",
+  sheet: {
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "50%",
   },
   option: {
     paddingVertical: 16,
-    borderBottomWidth: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    borderBottomWidth: 1,
   },
   optionText: {
     fontSize: FontSizes.md,
     fontFamily: Fonts.regular,
     marginLeft: 8,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
   },
 })

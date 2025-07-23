@@ -69,7 +69,12 @@ export default function SpaceDetailScreen() {
       {/* Update Space Form */}
       {isSheetVisible && (
         <View style={styles.modalOverlay}>
-          <SpaceForm space={space} onCancel={toggleSheetVisiblity} onCreate={handleUpdateSpace} />
+          <SpaceForm
+            space={space}
+            onCancel={toggleSheetVisiblity}
+            onCreate={handleUpdateSpace}
+            useDrawer={true}
+          />
         </View>
       )}
     </View>
@@ -83,9 +88,8 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
-    zIndex: 100,
+    zIndex: 900,
   },
 })

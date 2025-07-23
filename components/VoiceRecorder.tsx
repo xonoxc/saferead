@@ -39,7 +39,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       pulse.start()
       return () => pulse.stop()
     }
-  }, [isRecording])
+  }, [isRecording, pulseAnim])
 
   return (
     <Modal visible={isVisible} transparent animationType="fade">

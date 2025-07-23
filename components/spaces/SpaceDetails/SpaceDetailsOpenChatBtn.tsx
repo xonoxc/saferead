@@ -1,5 +1,5 @@
 import React from "react"
-import { View, StyleSheet, TouchableOpacity } from "react-native"
+import { StyleSheet, TouchableOpacity } from "react-native"
 import { MessageSquare } from "lucide-react-native"
 import Animated, { FadeInUp, FadeOut } from "react-native-reanimated"
 
@@ -8,10 +8,7 @@ interface SpaceDetailsOpenChatBtnProps {
   color: string
 }
 
-export default function SpaceDetailsOpenChatBtn({
-  onPress,
-  color,
-}: SpaceDetailsOpenChatBtnProps) {
+export default function SpaceDetailsOpenChatBtn({ onPress, color }: SpaceDetailsOpenChatBtnProps) {
   return (
     <Animated.View
       style={[styles.chatButtonContainer]}

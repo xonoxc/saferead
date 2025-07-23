@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { Text, TouchableOpacity, StyleSheet } from "react-native"
 import { Box, ChevronsUpDown } from "lucide-react-native"
 import DropdownSelector, { DropdownOption } from "@/components/DropDownSelector"
 import { useSpaces } from "@/hooks/queries/spaces"

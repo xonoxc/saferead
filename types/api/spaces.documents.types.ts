@@ -6,6 +6,9 @@ export interface UserSpaceDocument {
   space: string
   document_file: string
   document_type: "pdf" | "docx" | "txt" | "image" | "other"
+  download_url?: string
+  file_extension: string
+  file_size: string
   display_name: string
   is_pinned: boolean
   notes: string

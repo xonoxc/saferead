@@ -4,12 +4,17 @@ import { Plus } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { router } from "expo-router"
 import { scanDocument } from "@/hooks/useAnalysis"
+import { attempt } from "@/utils/attempt"
 
 export function ScanButton() {
   const { colors } = useTheme()
 
   const handlePress = async () => {
-    await scanDocument()
+    const result = await attempt(scanDocument())
+    if (!result.ok) {
+      console.error("Scan failed:", result.error)
+      return
+    }
     router.push("/analysisres")
   }
 

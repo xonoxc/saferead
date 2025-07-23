@@ -164,7 +164,7 @@ export default function HelpSupportScreen() {
     React.useEffect(() => {
       rotateValue.value = withSpring(isExpanded ? 180 : 0)
       heightValue.value = withTiming(isExpanded ? 1 : 0, { duration: 300 })
-    }, [isExpanded])
+    }, [isExpanded, heightValue, rotateValue])
 
     const rotateStyle = useAnimatedStyle(() => ({
       transform: [{ rotate: `${rotateValue.value}deg` }],
@@ -220,7 +220,7 @@ export default function HelpSupportScreen() {
         <View style={styles.headerContent}>
           <Text style={[styles.title, { color: colors.text }]}>Help & Support</Text>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            We're here to help you succeed
+            We&apos;re here to help you succeed
           </Text>
         </View>
       </Animated.View>
@@ -348,7 +348,7 @@ export default function HelpSupportScreen() {
           {filteredFAQs.length === 0 && searchQuery && (
             <Animated.View entering={FadeInDown.springify()} style={styles.noResults}>
               <Text style={[styles.noResultsText, { color: colors.textMuted }]}>
-                No FAQs found for "{searchQuery}"
+                No FAQs found for &quot;{searchQuery}&quot;
               </Text>
               <Button
                 title="Clear Search"

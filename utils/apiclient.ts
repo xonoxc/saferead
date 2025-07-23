@@ -26,7 +26,7 @@ export async function getAccessToken(): Promise<string | null> {
 
 export const apiClient = axios.create({
   baseURL: serverURL,
-  timeout: 10_000,
+  timeout: 1200000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -52,6 +52,8 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   response => response,
   async error => {
+    console.log(JSON.stringify(error, null, 2))
+
     if (error?.response?.status === 401) {
       Alert.alert("Session Expired", "Your session has expired. logging you out...")
 

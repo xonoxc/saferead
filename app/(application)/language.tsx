@@ -278,7 +278,7 @@ export default function LanguageScreen() {
         {filteredLanguages.length === 0 && searchQuery && (
           <Animated.View entering={FadeInDown.springify()} style={styles.noResults}>
             <Text style={[styles.noResultsText, { color: colors.textMuted }]}>
-              No languages found for "{searchQuery}"
+              No languages found for &quot;{searchQuery}&quot;
             </Text>
           </Animated.View>
         )}

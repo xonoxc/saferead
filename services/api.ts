@@ -43,7 +43,7 @@ function prepareGetDocumentParams(page?: number, filters?: FilterOptions) {
     ...(filters?.created_at_lte && { created_at__lte: filters.created_at_lte }),
     ...(filters?.ordering && { ordering: filters.ordering }),
     ...(filters?.search && { search: filters.search }),
-    ...(filters?.space_id && { space_id: filters.space_id }),
+    ...(filters?.space && { space_id: filters.space }),
   }
 }
 

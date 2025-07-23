@@ -6,27 +6,26 @@ import { useTheme } from "@/hooks/useTheme"
 import { UserSpaceDocument } from "@/types/api/spaces.documents.types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { getFileIcon } from "@/utils/helpers/files"
+import { attempt } from "@/utils/attempt"
 
 interface UserSpaceDocumentCardProps {
   document: UserSpaceDocument
   spaceColor?: string
 }
 
-export const UserSpaceDocumentCard: React.FC<UserSpaceDocumentCardProps> = ({
-  document,
-  spaceColor,
-}) => {
+export function UserSpaceDocumentCard({ document, spaceColor }: UserSpaceDocumentCardProps) {
   const { colors } = useTheme()
+
   const FileIcon = getFileIcon(document.file_extension)
   const cardColor = spaceColor || colors.primary
 
   const handlePress = async () => {
-    if (document.download_url) {
-      try {
-        await WebBrowser.openBrowserAsync(document.download_url)
-      } catch (error) {
-        Alert.alert("Error", "Could not open the document.")
-      }
+    if (!document.download_url) return
+
+    const resp = await attempt(WebBrowser.openBrowserAsync(document.download_url))
+    if (!resp.ok) {
+      Alert.alert("Error", "Could not open the document.")
+      return
     }
   }
 

@@ -22,6 +22,8 @@ import { useAuth } from "@/hooks/useAuth"
 import { TextInput } from "@/components/TextInput"
 import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { attempt } from "@/utils/attempt"
+import { getErrorMessage } from "@/utils/helpers/respErrors"
 
 export default function ProfileScreen() {
   const { colors } = useTheme()
@@ -69,21 +71,21 @@ export default function ProfileScreen() {
     if (!validateForm()) return
 
     setIsLoading(true)
-    try {
-      await updateUser({
+    const resp = await attempt(
+      updateUser({
         first_name: formData.firstName,
         last_name: formData.lastName,
         email: formData.email,
         username: formData.username,
       })
-
-      setIsEditing(false)
-      Alert.alert("Success", "Profile updated successfully!")
-    } catch (error) {
-      Alert.alert("Error", "Failed to update profile. Please try again.")
-    } finally {
-      setIsLoading(false)
+    )
+    if (!resp.ok) {
+      Alert.alert("Error", getErrorMessage(resp.error))
+      return
     }
+
+    Alert.alert("Success", "Profile updated successfully!")
+    setIsEditing(false)
   }
 
   const handleCancel = () => {

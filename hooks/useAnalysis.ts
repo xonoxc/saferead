@@ -75,6 +75,8 @@ export function useAnalysis() {
       return
     }
 
+    console.log("Document File:", documentFile)
+
     const uploadResult = await attempt(
       uploadDocument({
         document_file: documentFile,
@@ -84,10 +86,10 @@ export function useAnalysis() {
     )
 
     if (!uploadResult.ok) {
+      console.error("Upload Error:", uploadResult.error.message)
       Alert.alert(uploadResult.error.message || "Failed to analyze document")
     } else {
       setAnalysisResult(uploadResult.data)
-
       router.push("/analysisres")
     }
 
@@ -137,6 +139,7 @@ export function useAnalysis() {
 
     const result = await scanDocument()
     if (!result.ok) {
+      console.log("Scan Error:", result.error)
       Alert.alert("Error", result.error?.message)
       return
     }

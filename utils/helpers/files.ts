@@ -17,7 +17,7 @@ export function normalizeFile(
   }
 
   if (file instanceof File || file instanceof Blob) {
-    return file
+    return file as File
   }
 
   return new Blob([file], { type: "application/octet-stream" })

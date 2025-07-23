@@ -200,7 +200,7 @@ function DropdownSheet<T>({
  *
  * Utility function to render icons
  * **/
-function renderIcon(
+export function renderIcon(
   icon: LucideIcon | React.ReactNode,
   colors: ColorsType,
   fallbackColor?: string

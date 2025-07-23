@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, TouchableOpacity , useWindowDimensions } from "react-native"
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from "react-native"
 import { ServerCrash, MessageCircle, TriangleAlert as AlertTriangle } from "lucide-react-native"
 import Animated, {
   FadeInDown,
@@ -81,7 +81,7 @@ export default function ServerErrorScreen({
       -1,
       false
     )
-  }, [])
+  }, [floatingY, glitchOffset, serverIconRotation, sparkleScale])
 
   const serverIconAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${serverIconRotation.value}deg` }, { translateX: glitchOffset.value }],
@@ -187,8 +187,8 @@ export default function ServerErrorScreen({
               <Text style={[styles.title, { color: colors.text }]}>Server Error</Text>
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{errorMessage}</Text>
               <Text style={[styles.description, { color: colors.textMuted }]}>
-                We're experiencing technical difficulties. Our team has been notified and is working
-                to fix this issue.
+                We&apos;re experiencing technical difficulties. Our team has been notified and is
+                working to fix this issue.
               </Text>
             </View>
           </Animated.View>

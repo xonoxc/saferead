@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { CustomBackBtn } from "../CustomBackBtn"
-import { Box, FilePlus, Folder, Plus } from "lucide-react-native"
+import { Box, FilePlus } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 import { useTheme } from "@/hooks/useTheme"
 

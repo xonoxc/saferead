@@ -11,6 +11,7 @@ import { Globe, LockIcon } from "lucide-react-native"
 import { Drawer } from "../Drawer"
 import { Space } from "@/types"
 import { useSpaceHookForm, SpaceFormData } from "@/hooks/forms/useSpaceHookForm"
+import { useSlidingSelector } from "@/hooks/animation/useSlidingSelector"
 
 export const SpaceForm = ({
   onCreate,
@@ -211,17 +212,7 @@ const PrivacySelector: React.FC<PrivacySelectorProps> = ({ field: { value, onCha
   const { colors } = useTheme()
   const options = ["private", "public"]
   const index = options.indexOf(value)
-
-  const translateX = useSharedValue(index * 100)
-
-  useEffect(() => {
-    translateX.value = withTiming(index * 160, { duration: 200 })
-  }, [index])
-
-  const bgStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-    borderRadius: 20,
-  }))
+  const bgStyle = useSlidingSelector(index, index * 160)
 
   return (
     <View style={[styles.privacyContainer, { backgroundColor: colors.background }]}>

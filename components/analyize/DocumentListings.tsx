@@ -5,8 +5,8 @@ import { RecentDocumentItem } from "../documents/RecentDocumentCard"
 import type { ColorsType } from "@/hooks/useTheme"
 import type { AnalysisResponse } from "@/types/api/documents.types"
 import type { ViewType } from "@/types/view"
-import { LayoutGrid, List } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
+import ViewMode from "../spaces/ViewModeSetter"
 
 interface RecentDocumentListingProps {
   colors: ColorsType
@@ -46,12 +46,7 @@ export default function RecentDocumentListings({
           <View style={styles.recentHeader}>
             <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Recent Analysis</Text>
             <View style={styles.viewToggle}>
-              <TouchableOpacity onPress={() => setViewType("list")}>
-                <List size={20} color={viewType === "list" ? colors.primary : colors.text} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setViewType("grid")}>
-                <LayoutGrid size={20} color={viewType === "grid" ? colors.primary : colors.text} />
-              </TouchableOpacity>
+              <ViewMode colors={colors} viewMode={viewType} setViewMode={setViewType} />
             </View>
           </View>
           <FlatList

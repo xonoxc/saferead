@@ -1,10 +1,11 @@
 import { StyleSheet, View, Text, TouchableOpacity, TextInput } from "react-native"
-import { LayoutGrid, List, Plus, Search } from "lucide-react-native"
+import { Plus, Search } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 
 import type { ColorsType } from "@/hooks/useTheme"
 import type { SetStateFunction } from "@/types/state"
 import type { ViewType } from "@/types/view"
+import ViewMode from "../ViewModeSetter"
 
 interface SpaceScreenHeaderProps {
   colors: ColorsType
@@ -30,12 +31,7 @@ export default function SpaceScreenHeader({
           <Text style={[styles.titleText, { color: colors.text }]}>Spaces</Text>
         </View>
         <View style={styles.headerIcons}>
-          <TouchableOpacity onPress={() => setViewMode("list")} style={styles.iconButton}>
-            <List size={24} color={viewMode === "list" ? colors.primary : colors.textMuted} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setViewMode("grid")} style={styles.iconButton}>
-            <LayoutGrid size={24} color={viewMode === "grid" ? colors.primary : colors.textMuted} />
-          </TouchableOpacity>
+          <ViewMode colors={colors} viewMode={viewMode} setViewMode={setViewMode} />
           <TouchableOpacity
             onPress={() => setCreateModalVisible(true)}
             style={[styles.createButton, { backgroundColor: colors.primary }]}
@@ -79,9 +75,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-  },
-  iconButton: {
-    padding: 4,
   },
   createButton: {
     padding: 8,

@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   sidebar: {
     position: "absolute",
     left: 0,
-    top: 0,
+    top: 5,
     bottom: 0,
     width: SCREEN_WIDTH,
   },

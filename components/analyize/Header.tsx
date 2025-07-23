@@ -2,7 +2,7 @@ import { TouchableOpacity, View, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import UpgradeButton from "@/components/UpgradeButton"
 
-import { Menu, LogOut } from "lucide-react-native"
+import { Menu, LogOut, AlignLeft, PanelRightClose, LayoutPanelLeft } from "lucide-react-native"
 
 import type { Space } from "@/types"
 import type { ColorsType } from "@/hooks/useTheme"
@@ -26,11 +26,12 @@ export default function AnalyzeHeader({
         {/* Left: Menu */}
         <TouchableOpacity onPress={() => setIsSideBarOpen(true)}>
           <Menu
-            color={colors.text}
+            color={colors.textMuted}
+            size={28}
             style={{
-              width: 24,
-              height: 24,
-              padding: 4,
+              width: 34,
+              height: 34,
+              padding: 10,
               borderRadius: 12,
               backgroundColor: colors.card + "20",
             }}

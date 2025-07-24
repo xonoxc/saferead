@@ -42,7 +42,7 @@ export default function RecentDocumentListings({
     >
       {/* Recent Documents */}
       {recentDocuments.length > 0 && (
-        <Animated.View entering={FadeInDown.delay(600).springify()} style={styles.recentSection}>
+        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.recentSection}>
           <View style={styles.recentHeader}>
             <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Recent Analysis</Text>
             <View style={styles.viewToggle}>

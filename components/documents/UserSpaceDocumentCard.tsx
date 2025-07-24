@@ -20,9 +20,9 @@ export function UserSpaceDocumentCard({ document, spaceColor }: UserSpaceDocumen
   const cardColor = spaceColor || colors.primary
 
   const handlePress = async () => {
-    if (!document.download_url) return
+    if (!document.document_file) return
 
-    const resp = await attempt(WebBrowser.openBrowserAsync(document.download_url))
+    const resp = await attempt(WebBrowser.openBrowserAsync(document.document_file))
     if (!resp.ok) {
       Alert.alert("Error", "Could not open the document.")
       return

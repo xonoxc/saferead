@@ -1,7 +1,7 @@
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { AnalysisResponse } from "@/types/api/documents.types"
-import { FileText, TrendingUp } from "lucide-react-native"
+import { ArrowDown, ArrowUp, FileText, TrendingUp } from "lucide-react-native"
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native"
 
 interface RecentDocumentItemProps {
@@ -82,9 +82,19 @@ export const RecentDocumentItem = ({
             </Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statText, { color: colors.textSecondary }]}>
-              {document.risky_points.length} risks • {document.favourable_points.length} favorable
-            </Text>
+            <View style={styles.statTextView}>
+              <ArrowDown color={colors.error} size={13} />
+              <Text style={[styles.statText, { color: colors.error }]}>
+                {document.risky_points.length}
+              </Text>
+            </View>
+
+            <View style={styles.statTextView}>
+              <ArrowUp color={colors.success} size={13} />
+              <Text style={[styles.statText, { color: colors.success }]}>
+                {document.favourable_points.length}
+              </Text>
+            </View>
           </View>
         </View>
       )}
@@ -135,10 +145,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
   },
+  statTextView: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 2,
+  },
   documentHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 2,
   },
   gridDocumentHeader: {
     flexDirection: "column",
@@ -150,7 +166,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   listItem: {
-    marginBottom: 12,
+    marginBottom: 2,
   },
   gridItem: {
     flex: 1,
@@ -191,9 +207,9 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
   },
   statusBadge: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 8,
     marginBottom: 4,
   },
 })

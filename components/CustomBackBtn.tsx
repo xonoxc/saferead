@@ -12,7 +12,7 @@ interface CustomBackBtnProps {
 }
 
 export function CustomBackBtn({ onPress, style, direction = "left" }: CustomBackBtnProps) {
-  const { colors } = useTheme()
+  const { colors, isDark } = useTheme()
 
   const handlePress = () => {
     if (onPress) {
@@ -25,7 +25,7 @@ export function CustomBackBtn({ onPress, style, direction = "left" }: CustomBack
   return (
     <TouchableOpacity
       onPress={handlePress}
-      style={[styles.button, { borderColor: colors.border }, style]}
+      style={[styles.button, { borderColor: isDark ? colors.border : colors.secondary }, style]}
     >
       {direction === "left" ? (
         <ChevronLeft size={24} color={colors.text} />

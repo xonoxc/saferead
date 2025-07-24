@@ -1,6 +1,8 @@
 import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
 import {
+  ArrowDown,
+  ArrowUp,
   Check,
   FileCheck,
   FileText,
@@ -44,10 +46,9 @@ export const SideBarDocumentCard = ({ document, onPress, onDelete }: DocumentCar
       style={[
         styles.documentCard,
         {
-          backgroundColor: colors.card,
+          backgroundColor: isDark ? colors.card : colors.card,
           borderColor: colors.border,
-          borderWidth: isDark ? 0 : 1,
-          shadowOpacity: isDark ? 0 : 0.1,
+          borderWidth: 1,
         },
       ]}
       onPress={onPress}
@@ -93,21 +94,27 @@ export const SideBarDocumentCard = ({ document, onPress, onDelete }: DocumentCar
         </View>
         {isDocumentComplete && (
           <View style={styles.confidenceContainer}>
-            {isDocumentComplete && (
-              <View style={styles.analysisStats}>
+            <View style={styles.analysisStats}>
+              <View style={styles.statTextView}>
+                <ArrowUp color={colors.error} size={13} />
                 <Text style={[styles.statText, { color: colors.error }]}>
-                  {document.risky_points.length} <FileWarning color={colors.error} size={15} />
-                </Text>
-                <Text style={[styles.statText, { color: colors.success }]}>
-                  {document.favourable_points.length} <FileCheck color={colors.success} size={13} />
+                  {document.risky_points.length}
                 </Text>
               </View>
-            )}
+              <View style={styles.statTextView}>
+                <ArrowDown color={colors.success} size={13} />
+                <Text style={[styles.statText, { color: colors.success }]}>
+                  {document.favourable_points.length}
+                </Text>
+              </View>
+            </View>
 
-            <TrendingUp size={12} color={colors.primary} />
-            <Text style={[styles.confidenceText, { color: colors.textSecondary }]}>
-              {(document.confidence_score * 100).toFixed(0)}%
-            </Text>
+            <View style={styles.confidenceScoreView}>
+              <TrendingUp size={13} color={colors.primary} style={{ marginRight: 4 }} />
+              <Text style={[styles.confidenceText, { color: colors.textSecondary }]}>
+                {(document.confidence_score * 100).toFixed(0)}%
+              </Text>
+            </View>
           </View>
         )}
       </View>
@@ -148,8 +155,9 @@ function isDocumentStatusCompleted(document: AnalysisResponse): boolean {
 const styles = StyleSheet.create({
   documentCard: {
     borderRadius: 20,
-    padding: 16,
-    marginBottom: 12,
+    padding: 9,
+    paddingVertical: 13,
+    marginBottom: 5,
     borderWidth: 0,
   },
   cardHeader: {
@@ -176,6 +184,7 @@ const styles = StyleSheet.create({
   documentType: {
     fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
+    borderRadius: 4,
     marginBottom: 2,
   },
   documentDate: {
@@ -189,7 +198,8 @@ const styles = StyleSheet.create({
   actionButton: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: 12,
+    marginTop: 26,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -202,7 +212,7 @@ const styles = StyleSheet.create({
   statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   statusText: {
     fontSize: FontSizes.xs,
@@ -210,8 +220,9 @@ const styles = StyleSheet.create({
   },
   confidenceContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    gap: 4,
+    gap: 8,
   },
   confidenceText: {
     fontSize: FontSizes.xs,
@@ -220,20 +231,24 @@ const styles = StyleSheet.create({
   analysisPreview: {
     paddingTop: 8,
   },
-  summaryText: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.regular,
-    lineHeight: 18,
-    marginBottom: 8,
-  },
   analysisStats: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 8,
+  },
+  statTextView: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   statText: {
     fontSize: FontSizes.xs,
-    paddingHorizontal: 10,
-
+    flexDirection: "row",
+    paddingHorizontal: 2,
     fontFamily: Fonts.medium,
+  },
+  confidenceScoreView: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 })

@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router"
-import { Star } from "lucide-react-native"
+import { Sparkle } from "lucide-react-native"
 import { TouchableOpacity, Text, StyleSheet } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
@@ -31,9 +31,9 @@ const UpgradeButton = () => {
           end={{ x: 1, y: 1 }}
           style={styles.gradientButton}
         >
-          <Star color="white" size={18} />
+          <Sparkle color="white" size={12} />
           <Text style={[styles.text, { color: "white" }]}>Upgrade</Text>
-          <Star color="white" size={18} />
+          <Sparkle color="white" size={12} />
         </LinearGradient>
       </Animated.View>
     </TouchableOpacity>

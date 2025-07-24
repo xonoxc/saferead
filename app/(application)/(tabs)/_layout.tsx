@@ -1,5 +1,5 @@
 import { Redirect, Tabs } from "expo-router"
-import { Home, Settings, TextSearch, Box } from "lucide-react-native"
+import { Home, Settings, Box, ScanSearch } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { getTabBarStyles } from "@/utils/helpers/tabs"
@@ -17,8 +17,7 @@ export default function TabLayout() {
       screenOptions={{
         sceneStyle: { backgroundColor: colors.background },
         headerShown: false,
-        tabBarActiveTintColor: "pink",
-        tabBarInactiveTintColor: colors.textMuted,
+        tabBarActiveTintColor: colors.text,
         tabBarShowLabel: false,
         tabBarHideOnKeyboard: true,
         tabBarStyle: getTabBarStyles(colors),
@@ -35,7 +34,7 @@ export default function TabLayout() {
         name="analyize"
         options={{
           title: "Analyze",
-          tabBarIcon: ({ size, color }) => <TextSearch size={size} color={color} />,
+          tabBarIcon: ({ size, color }) => <ScanSearch size={size} color={color} />,
         }}
       />
 

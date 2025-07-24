@@ -3,306 +3,269 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share } from "rea
 import {
   Share2,
   Download,
-  TriangleAlert as AlertTriangle,
+  TriangleAlert,
   CheckCircle,
   TrendingUp,
   Volume2,
 } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
-import { ColorsType, useTheme } from "@/hooks/useTheme"
+import { useTheme, ColorsType } from "@/hooks/useTheme"
 import { useVoice } from "@/hooks/useVoice"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { AnalysisResponse } from "@/types/api/documents.types"
 import { attempt } from "@/utils/attempt"
 import { CustomBackBtn } from "../CustomBackBtn"
 import { getDocumentShareContent } from "@/constants/share"
+import { LineDivider } from "../LineDivider"
 
-interface DocumentAnalysisViewProps {
+export const DocumentAnalysisView = ({
+  analysis,
+  onBack,
+}: {
   analysis: AnalysisResponse
   onBack: () => void
-}
-
-export const DocumentAnalysisView = ({ analysis, onBack }: DocumentAnalysisViewProps) => {
-  const { colors, isDark } = useTheme()
-  const { speakText } = useVoice()
-  const [showAllRisks, setShowAllRisks] = useState(false)
-  const [showAllFavorable, setShowAllFavorable] = useState(false)
-
-  const handleShare = async () => {
-    const shareContent = getDocumentShareContent(analysis)
-    const result = await attempt(
-      Share.share({
-        message: shareContent,
-        title: "Document Analysis Report",
-      })
-    )
-
-    if (!result.ok) {
-      console.error("Error sharing:", result.error)
-    }
-  }
-
-  const handleSpeak = (text: string) => {
-    speakText(text)
-  }
+}) => {
+  const { colors } = useTheme()
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <Animated.View
-        entering={FadeInDown.delay(100).springify()}
-        style={[
-          styles.header,
-          {
-            shadowColor: isDark ? "transparent" : colors.shadow,
-            shadowOffset: { width: 0, height: 2 },
-          },
-        ]}
-      >
-        <View>
-          <CustomBackBtn onPress={onBack} />
-        </View>
-        <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
-          {analysis.original_filename || "Document Analysis"}
-        </Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-            <Share2 size={20} color={colors.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <Download size={20} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
+      <Header onBack={onBack} analysis={analysis} />
 
       <ScrollView
         style={styles.content}
         contentContainerStyle={{ paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Status & Confidence */}
-        <Animated.View
-          entering={FadeInDown.delay(200).springify()}
-          style={[
-            styles.statusCard,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              borderWidth: isDark ? 0 : 1,
-              shadowOpacity: isDark ? 0 : 0.1,
-            },
-          ]}
-        >
-          <View style={styles.statusHeader}>
-            <View
-              style={[
-                styles.statusBadge,
-                {
-                  backgroundColor: getRiskColor(analysis, colors) + "20",
-                  borderWidth: isDark ? 0 : 1,
-                  borderColor: colors.border,
-                  shadowOpacity: isDark ? 0 : 0.1,
-                },
-              ]}
-            >
-              <Text style={[styles.statusText, { color: getRiskColor(analysis, colors) }]}>
-                {analysis.status.toUpperCase()}
-              </Text>
-            </View>
-            <View style={styles.confidenceContainer}>
-              <TrendingUp size={16} color={colors.primary} />
-              <Text style={[styles.confidenceText, { color: colors.text }]}>
-                {(analysis.confidence_score * 100).toFixed(0)}% Confidence
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.riskOverview}>
-            <View
-              style={[styles.riskBadge, { backgroundColor: getRiskColor(analysis, colors) + "20" }]}
-            >
-              <Text style={[styles.riskBadgeText, { color: getRiskColor(analysis, colors) }]}>
-                {getOverallRisk(analysis)} RISK
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.error }]}>
-                {analysis.risky_points.length}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Risks</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.success }]}>
-                {analysis.favourable_points.length}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Favorable</Text>
-            </View>
-          </View>
-        </Animated.View>
-
-        {/* Summary */}
-        <Animated.View
-          entering={FadeInDown.delay(300).springify()}
-          style={[
-            styles.section,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              borderWidth: isDark ? 0 : 1,
-              shadowOpacity: isDark ? 0 : 0.1,
-            },
-          ]}
-        >
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Executive Summary</Text>
-            <TouchableOpacity
-              onPress={() => handleSpeak(analysis.summary_text)}
-              style={styles.speakButton}
-            >
-              <Volume2 color={colors.accent} size={20} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.summaryTextContainer}>
-            <Text style={[styles.summaryText, { color: colors.textSecondary }]}>
-              {analysis.summary_text}
-            </Text>
-          </View>
-        </Animated.View>
-
-        {/* Risky Points */}
-        <Animated.View
-          entering={FadeInDown.delay(400).springify()}
-          style={[
-            styles.section,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              borderWidth: isDark ? 0 : 1,
-              shadowOpacity: isDark ? 0 : 0.1,
-            },
-          ]}
-        >
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Risky Points</Text>
-            <View style={[styles.countBadge, { backgroundColor: colors.error + "20" }]}>
-              <Text style={[styles.countText, { color: colors.error }]}>
-                {analysis.risky_points.length}
-              </Text>
-            </View>
-          </View>
-          {analysis.risky_points
-            .slice(0, showAllRisks ? analysis.risky_points.length : 3)
-            .map((point, index) => (
-              <View key={index} style={styles.pointItem}>
-                <AlertTriangle size={16} color={colors.error} />
-                <Text style={[styles.pointText, { color: colors.textSecondary }]}>{point}</Text>
-              </View>
-            ))}
-          {analysis.risky_points.length > 3 && (
-            <TouchableOpacity
-              style={styles.showMoreButton}
-              onPress={() => setShowAllRisks(!showAllRisks)}
-            >
-              <Text style={[styles.showMoreText, { color: colors.primary }]}>
-                {showAllRisks ? "Show Less" : `Show ${analysis.risky_points.length - 3} More`}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </Animated.View>
-
-        {/* Favorable Points */}
-        <Animated.View
-          entering={FadeInDown.delay(500).springify()}
-          style={[
-            styles.section,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              borderWidth: isDark ? 0 : 1,
-              shadowOpacity: isDark ? 0 : 0.1,
-            },
-          ]}
-        >
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Favorable Points</Text>
-            <View style={[styles.countBadge, { backgroundColor: colors.success + "20" }]}>
-              <Text style={[styles.countText, { color: colors.success }]}>
-                {analysis.favourable_points.length}
-              </Text>
-            </View>
-          </View>
-          {analysis.favourable_points
-            .slice(0, showAllFavorable ? analysis.favourable_points.length : 3)
-            .map((point, index) => (
-              <View key={index} style={styles.pointItem}>
-                <CheckCircle size={16} color={colors.success} />
-                <Text style={[styles.pointText, { color: colors.textSecondary }]}>{point}</Text>
-              </View>
-            ))}
-          {analysis.favourable_points.length > 3 && (
-            <TouchableOpacity
-              style={styles.showMoreButton}
-              onPress={() => setShowAllFavorable(!showAllFavorable)}
-            >
-              <Text style={[styles.showMoreText, { color: colors.primary }]}>
-                {showAllFavorable
-                  ? "Show Less"
-                  : `Show ${analysis.favourable_points.length - 3} More`}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </Animated.View>
-
-        {/* Document Info */}
-        <Animated.View
-          entering={FadeInDown.delay(600).springify()}
-          style={[
-            styles.section,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              borderWidth: isDark ? 0 : 1,
-              shadowOpacity: isDark ? 0 : 0.1,
-            },
-          ]}
-        >
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Document Information</Text>
-          <View style={styles.infoGrid}>
-            <View style={styles.infoItem}>
-              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Type</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>
-                {analysis.document_type.toUpperCase()}
-              </Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Processed</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>
-                {new Date(analysis.processed_at).toLocaleDateString()}
-              </Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Created</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>
-                {new Date(analysis.created_at).toLocaleDateString()}
-              </Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Status</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>{analysis.status}</Text>
-            </View>
-          </View>
-        </Animated.View>
+        <StatusCard analysis={analysis} />
+        <SummarySection analysis={analysis} />
+        <RiskyPointsSection points={analysis.risky_points} />
+        <FavorablePointsSection points={analysis.favourable_points} />
+        <DocumentInfoSection analysis={analysis} />
       </ScrollView>
     </View>
   )
 }
 
-/*
- * Helper Functions
- * **/
+/** ─── Internal Components ─────────────────────── **/
+
+const Header = ({ onBack, analysis }: { onBack: () => void; analysis: AnalysisResponse }) => {
+  const { colors, isDark } = useTheme()
+
+  const handleShare = async () => {
+    const result = await attempt(
+      Share.share({
+        message: getDocumentShareContent(analysis),
+        title: "Document Analysis Report",
+      })
+    )
+    if (!result.ok) console.error("Share error:", result.error)
+  }
+
+  return (
+    <Animated.View
+      entering={FadeInDown.delay(100).springify()}
+      style={[
+        styles.header,
+        {
+          shadowColor: isDark ? "transparent" : colors.shadow,
+          shadowOffset: { width: 0, height: 2 },
+        },
+      ]}
+    >
+      <CustomBackBtn onPress={onBack} />
+      <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
+        {analysis.original_filename || "Document Analysis"}
+      </Text>
+      <View style={styles.headerActions}>
+        <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
+          <Share2 size={20} color={colors.textSecondary} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Download size={20} color={colors.textSecondary} />
+        </TouchableOpacity>
+      </View>
+    </Animated.View>
+  )
+}
+
+const StatusCard = ({ analysis }: { analysis: AnalysisResponse }) => {
+  const { colors, isDark } = useTheme()
+  const riskColor = getRiskColor(analysis, colors)
+
+  return (
+    <Animated.View
+      entering={FadeInDown.delay(200).springify()}
+      style={[
+        styles.statusCard,
+        {
+          borderColor: colors.border,
+          borderWidth: isDark ? 0 : 1,
+        },
+      ]}
+    >
+      <View style={styles.statusHeader}>
+        <View
+          style={[
+            styles.statusBadge,
+            { backgroundColor: riskColor + "20", borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.statusText, { color: riskColor }]}>
+            {analysis.status.toUpperCase()}
+          </Text>
+        </View>
+        <View style={styles.confidenceContainer}>
+          <TrendingUp size={16} color={colors.primary} />
+          <Text style={[styles.confidenceText, { color: colors.text }]}>
+            {(analysis.confidence_score * 100).toFixed(0)}% Confidence
+          </Text>
+        </View>
+      </View>
+      <View style={styles.riskOverview}>
+        <View style={[styles.riskBadge, { backgroundColor: riskColor + "20" }]}>
+          <Text style={[styles.riskBadgeText, { color: riskColor }]}>
+            {getOverallRisk(analysis)} RISK
+          </Text>
+        </View>
+      </View>
+      <View style={styles.statsContainer}>
+        <Stat label="Risks" value={analysis.risky_points.length} color={colors.error} />
+        <Stat label="Favorable" value={analysis.favourable_points.length} color={colors.success} />
+      </View>
+    </Animated.View>
+  )
+}
+
+const Stat = ({ label, value, color }: { label: string; value: number; color: string }) => (
+  <View style={styles.statItem}>
+    <Text style={[styles.statValue, { color }]}>{value}</Text>
+    <Text style={[styles.statLabel, { color }]}>{label}</Text>
+  </View>
+)
+
+const SummarySection = ({ analysis }: { analysis: AnalysisResponse }) => {
+  const { colors } = useTheme()
+  const { speakText } = useVoice()
+
+  return (
+    <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <LineDivider
+          text="Executive Summary"
+          textStyle={{
+            color: colors.text,
+          }}
+        />
+        <View style={styles.speakBtnContainer}>
+          <TouchableOpacity
+            onPress={() => speakText(analysis.summary_text)}
+            style={[styles.speakButton, { backgroundColor: colors.accent }]}
+          >
+            <Volume2 size={20} color={colors.background} />
+            <Text
+              style={{ color: colors.background, fontFamily: Fonts.medium, fontSize: FontSizes.xs }}
+            >
+              Listen
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Text style={[styles.summaryText, { color: colors.textSecondary }]}>
+        {analysis.summary_text}
+      </Text>
+    </Animated.View>
+  )
+}
+
+const RiskyPointsSection = ({ points }: { points: string[] }) => {
+  const { colors } = useTheme()
+  const [showAll, setShowAll] = useState(false)
+
+  return (
+    <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.section}>
+      <SectionHeader title="Risky Points" count={points.length} color={colors.error} />
+      {points.slice(0, showAll ? points.length : 3).map((p, i) => (
+        <View key={i} style={styles.pointItem}>
+          <TriangleAlert size={16} color={colors.error} />
+          <Text style={[styles.pointText, { color: colors.textSecondary }]}>{p}</Text>
+        </View>
+      ))}
+      {points.length > 3 && (
+        <TouchableOpacity onPress={() => setShowAll(!showAll)} style={styles.showMoreButton}>
+          <Text style={[styles.showMoreText, { color: colors.primary }]}>
+            {showAll ? "Show Less" : `Show ${points.length - 3} More`}
+          </Text>
+        </TouchableOpacity>
+      )}
+    </Animated.View>
+  )
+}
+
+const FavorablePointsSection = ({ points }: { points: string[] }) => {
+  const { colors } = useTheme()
+  const [showAll, setShowAll] = useState(false)
+
+  return (
+    <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.section}>
+      <SectionHeader title="Favorable Points" count={points.length} color={colors.success} />
+      {points.slice(0, showAll ? points.length : 3).map((p, i) => (
+        <View key={i} style={styles.pointItem}>
+          <CheckCircle size={16} color={colors.success} />
+          <Text style={[styles.pointText, { color: colors.textSecondary }]}>{p}</Text>
+        </View>
+      ))}
+      {points.length > 3 && (
+        <TouchableOpacity onPress={() => setShowAll(!showAll)} style={styles.showMoreButton}>
+          <Text style={[styles.showMoreText, { color: colors.primary }]}>
+            {showAll ? "Show Less" : `Show ${points.length - 3} More`}
+          </Text>
+        </TouchableOpacity>
+      )}
+    </Animated.View>
+  )
+}
+
+const SectionHeader = ({
+  title,
+  count,
+  color,
+}: {
+  title: string
+  count: number
+  color: string
+}) => (
+  <View style={styles.sectionHeader}>
+    <LineDivider text={title} textStyle={{ color }} />
+    <View style={[styles.countBadge, { backgroundColor: color + "20" }]}>
+      <Text style={[styles.countText, { color }]}>{count}</Text>
+    </View>
+  </View>
+)
+
+const DocumentInfoSection = ({ analysis }: { analysis: AnalysisResponse }) => {
+  const { colors } = useTheme()
+  return (
+    <Animated.View entering={FadeInDown.delay(600).springify()} style={styles.section}>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>Document Information</Text>
+      <View style={styles.infoGrid}>
+        <Info label="Type" value={analysis.document_type.toUpperCase()} />
+        <Info label="Processed" value={new Date(analysis.processed_at).toLocaleDateString()} />
+        <Info label="Created" value={new Date(analysis.created_at).toLocaleDateString()} />
+        <Info label="Status" value={analysis.status} />
+      </View>
+    </Animated.View>
+  )
+}
+
+const Info = ({ label, value }: { label: string; value: string }) => {
+  const { colors } = useTheme()
+  return (
+    <View style={styles.infoItem}>
+      <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>{label}</Text>
+      <Text style={[styles.infoValue, { color: colors.text }]}>{value}</Text>
+    </View>
+  )
+}
 
 /*
  * Get the color based on the overall risk level
@@ -426,10 +389,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionHeader: {
-    flexDirection: "row",
+    flexDirection: "column",
+    gap: 9,
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
+  },
+  speakBtnContainer: {
+    width: "100%",
+    paddingTop: 8,
+    justifyContent: "flex-end",
+    alignItems: "flex-start",
   },
   sectionTitle: {
     fontSize: FontSizes.lg,
@@ -438,15 +408,16 @@ const styles = StyleSheet.create({
   speakButton: {
     fontSize: FontSizes.xs,
     fontFamily: Fonts.medium,
-    paddingVertical: 3,
+    alignItems: "center",
+    paddingVertical: 4,
     paddingHorizontal: 9,
     flexDirection: "row",
     gap: 4,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   countBadge: {
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 8,
     borderRadius: 12,
   },
   countText: {

@@ -8,6 +8,7 @@ export default function SettingsThemeDropdown() {
   return (
     <DropdownSelector
       label="THEME"
+      selectorStyles={{ borderRadius: 18 }}
       selected={mode}
       options={[
         { value: "light", label: "Light", icon: <Sun size={20} color={colors.textSecondary} /> },

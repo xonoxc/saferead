@@ -24,16 +24,12 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    this.setState({
-      hasError: true,
-      error,
-      errorInfo,
-    })
+    this.setState({ hasError: true, error, errorInfo })
 
     const { setError } = useGlobalErrorStore.getState()
     setError({
-      message: error.message,
-      code: "APP_ERROR",
+      message: error.message || "Unknown error occurred",
+      code: "UNHANDLED_EXCEPTION",
     })
   }
 
@@ -49,25 +45,29 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   handleContactSupport = () => {
-    console.log("Contact support requested")
+    console.log("Contact support triggered! 📞✨")
   }
 
   render() {
-    const { error } = useGlobalErrorStore.getState()
+    const storeError = useGlobalErrorStore.getState().error
+    const shouldShowErrorScreen = this.state.hasError || this.state.error || storeError
 
-    if (this.state.hasError || this.state.error || error) {
-      if (this.props.fallback) {
-        return this.props.fallback
-      }
+    if (shouldShowErrorScreen) {
+      if (this.props.fallback) return this.props.fallback
+
+      const errorMessage =
+        storeError?.message ??
+        this.state.error?.message ??
+        "Something went wrong. Please try again.!"
+
+      const errorCode = storeError?.code ?? "UNHANDLED_EXCEPTION"
 
       return (
         <ServerErrorScreen
           onRetry={this.handleRetry}
           onContactSupport={this.handleContactSupport}
-          errorCode={error?.code ?? "APP_ERROR"}
-          errorMessage={
-            error?.message ?? this.state.error?.message ?? "An unexpected error occurred"
-          }
+          errorCode={errorCode}
+          errorMessage={errorMessage}
         />
       )
     }

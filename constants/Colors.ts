@@ -9,7 +9,7 @@ const Colors = {
     errorBackground: "#FEE2E2",
     background: "#e4e7eb",
     surface: "#F8F9FA",
-    card: "#FFFFFF",
+    card: "#FAF3F0",
     text: "#000000",
     textSecondary: "#333333",
     textMuted: "#666666",

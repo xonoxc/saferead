@@ -7,6 +7,8 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  StyleProp,
+  ViewStyle,
 } from "react-native"
 import { ChevronDown, Check, Dot, LucideIcon } from "lucide-react-native"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
@@ -33,6 +35,7 @@ interface DropdownSelectorProps<T> {
   ) => React.ReactElement | null
 
   triggerText?: string
+  selectorStyles?: StyleProp<ViewStyle>
 }
 
 export default function DropdownSelector<T>({
@@ -44,6 +47,7 @@ export default function DropdownSelector<T>({
   renderOption,
   loading = false,
   triggerText,
+  selectorStyles = {},
 }: DropdownSelectorProps<T>) {
   const { colors } = useTheme()
   const [open, setOpen] = useState(false)
@@ -58,6 +62,7 @@ export default function DropdownSelector<T>({
         selectedOption={selectedOption}
         onOpen={() => setOpen(true)}
         renderTrigger={renderTrigger}
+        selectorStyles={selectorStyles}
         triggerText={triggerText}
       />
 
@@ -85,11 +90,13 @@ function DropdownTrigger<T>({
   onOpen,
   renderTrigger,
   triggerText,
+  selectorStyles,
 }: {
   selectedOption?: DropdownOption<T>
   onOpen: () => void
   renderTrigger?: (open: () => void, selectedOption?: DropdownOption<T>) => React.ReactNode
   triggerText?: string
+  selectorStyles: StyleProp<ViewStyle>
 }) {
   const { colors } = useTheme()
 
@@ -98,7 +105,11 @@ function DropdownTrigger<T>({
   return (
     <TouchableOpacity
       onPress={onOpen}
-      style={[styles.selector, { backgroundColor: colors.card, borderColor: colors.border }]}
+      style={[
+        styles.selector,
+        { backgroundColor: colors.card, borderColor: colors.border },
+        selectorStyles,
+      ]}
     >
       <View style={styles.row}>
         {renderIcon(selectedOption?.icon, colors)}
@@ -224,7 +235,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 17,
     borderWidth: 1,
-    borderRadius: 20,
   },
   selectedText: {
     fontSize: FontSizes.md,

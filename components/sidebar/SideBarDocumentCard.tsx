@@ -1,6 +1,14 @@
 import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
-import { FileText, Trash2, TrendingUp } from "lucide-react-native"
+import {
+  Check,
+  FileCheck,
+  FileText,
+  FileWarning,
+  Skull,
+  Trash2,
+  TrendingUp,
+} from "lucide-react-native"
 
 import type { AnalysisResponse } from "@/types/api/documents.types"
 import { Fonts, FontSizes } from "@/constants"
@@ -85,6 +93,17 @@ export const SideBarDocumentCard = ({ document, onPress, onDelete }: DocumentCar
         </View>
         {isDocumentComplete && (
           <View style={styles.confidenceContainer}>
+            {isDocumentComplete && (
+              <View style={styles.analysisStats}>
+                <Text style={[styles.statText, { color: colors.error }]}>
+                  {document.risky_points.length} <FileWarning color={colors.error} size={15} />
+                </Text>
+                <Text style={[styles.statText, { color: colors.success }]}>
+                  {document.favourable_points.length} <FileCheck color={colors.success} size={13} />
+                </Text>
+              </View>
+            )}
+
             <TrendingUp size={12} color={colors.primary} />
             <Text style={[styles.confidenceText, { color: colors.textSecondary }]}>
               {(document.confidence_score * 100).toFixed(0)}%
@@ -92,22 +111,6 @@ export const SideBarDocumentCard = ({ document, onPress, onDelete }: DocumentCar
           </View>
         )}
       </View>
-
-      {isDocumentComplete && (
-        <View style={styles.analysisPreview}>
-          <Text style={[styles.summaryText, { color: colors.textSecondary }]} numberOfLines={2}>
-            {document.summary_text}
-          </Text>
-          <View style={styles.analysisStats}>
-            <Text style={[styles.statText, { color: colors.error }]}>
-              {document.risky_points.length} risks
-            </Text>
-            <Text style={[styles.statText, { color: colors.success }]}>
-              {document.favourable_points.length} favorable
-            </Text>
-          </View>
-        </View>
-      )}
     </TouchableOpacity>
   )
 }
@@ -216,8 +219,6 @@ const styles = StyleSheet.create({
   },
   analysisPreview: {
     paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.1)",
   },
   summaryText: {
     fontSize: FontSizes.sm,
@@ -231,6 +232,8 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: FontSizes.xs,
+    paddingHorizontal: 10,
+
     fontFamily: Fonts.medium,
   },
 })

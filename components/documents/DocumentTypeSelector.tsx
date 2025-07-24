@@ -17,6 +17,9 @@ export const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
   return (
     <DropdownSelector
       selected={selectedType}
+      selectorStyles={{
+        borderRadius: 18,
+      }}
       options={getSelectorOptions(colors)}
       onSelect={onSelect}
       triggerText="Select Document Type"

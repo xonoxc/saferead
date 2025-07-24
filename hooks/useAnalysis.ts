@@ -6,7 +6,7 @@ import { DocumentType } from "@/components/documents/DocumentTypeSelector"
 import { useSpaceStore } from "@/store/useSpaceStore"
 import { AnalysisResponse } from "@/types/api/documents.types"
 
-import { uploadDocument } from "@/services/api"
+import { uploadDocument } from "@/services/document.service"
 
 import * as DocumentPicker from "expo-document-picker"
 import * as ImagePicker from "expo-image-picker"

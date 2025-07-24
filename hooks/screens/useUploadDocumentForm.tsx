@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { Alert } from "react-native"
 import { z } from "zod"
 
-import { addDocumentToSpace } from "@/services/api"
+import { addDocumentToSpace } from "@/services/space.service"
 import { uploadDocumentFormSchema as schema } from "@/utils/validation/docs"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"

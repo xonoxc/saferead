@@ -4,7 +4,7 @@ import { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reani
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { useSpaces } from "@/hooks/queries/spaces"
 import { Alert } from "react-native"
-import { updateSpace } from "@/services/api"
+import { updateSpace } from "@/services/space.service"
 import { useSpaceStore } from "@/store/useSpaceStore"
 
 import { ColorsType } from "../useTheme"

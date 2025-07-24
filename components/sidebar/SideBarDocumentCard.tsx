@@ -1,16 +1,6 @@
 import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
-import {
-  ArrowDown,
-  ArrowUp,
-  Check,
-  FileCheck,
-  FileText,
-  FileWarning,
-  Skull,
-  Trash2,
-  TrendingUp,
-} from "lucide-react-native"
+import { ArrowDown, ArrowUp, FileText, Trash2, TrendingUp } from "lucide-react-native"
 
 import type { AnalysisResponse } from "@/types/api/documents.types"
 import { Fonts, FontSizes } from "@/constants"
@@ -157,7 +147,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 9,
     paddingVertical: 13,
-    marginBottom: 5,
+    marginBottom: 12,
     borderWidth: 0,
   },
   cardHeader: {

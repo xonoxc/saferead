@@ -5,7 +5,7 @@ import {
   getSpaceDocuments as getSpaceDocumentsApi,
   getSpaceStats as getSpaceStatsApi,
   toggleFavoriteSpace as toggleFavoriteSpaceApi,
-} from "@/services/api"
+} from "@/services/space.service"
 
 import type { PaginatedSpaceDocuments } from "@/types/api/spaces.documents.types"
 import type { PaginatedSpaces, Space } from "@/types/api/spaces.types"

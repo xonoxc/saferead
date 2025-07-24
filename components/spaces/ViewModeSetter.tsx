@@ -3,22 +3,23 @@ import Animated from "react-native-reanimated"
 import { LayoutGrid, List } from "lucide-react-native"
 import { useSlidingSelector } from "@/hooks/animation/useSlidingSelector"
 
-import type { ColorsType } from "@/hooks/useTheme"
+import { useTheme } from "@/hooks/useTheme"
 
 interface ViewModeProps {
-  colors: ColorsType
   viewMode: "list" | "grid"
   setViewMode: (mode: "list" | "grid") => void
 }
 
-export default function ViewMode({ colors, viewMode, setViewMode }: ViewModeProps) {
+export default function ViewMode({ viewMode, setViewMode }: ViewModeProps) {
+  const { colors, isDark } = useTheme()
+
   const options = ["list", "grid"] as const
   const index = options.indexOf(viewMode)
 
   const bgAnim = useSlidingSelector(index, 50, 200, 15)
 
   return (
-    <View style={[styles.container, { borderColor: colors.border }]}>
+    <View style={[styles.container, { borderColor: isDark ? colors.border : colors.textMuted }]}>
       <Animated.View style={[styles.selector, { backgroundColor: colors.primary }, bgAnim]} />
       {options.map(option => {
         const isSelected = option === viewMode

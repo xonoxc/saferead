@@ -32,7 +32,7 @@ export default function SpaceScreenHeader({
           <Text style={[styles.titleText, { color: colors.text }]}>Spaces</Text>
         </View>
         <View style={styles.headerIcons}>
-          <ViewMode colors={colors} viewMode={viewMode} setViewMode={setViewMode} />
+          <ViewMode viewMode={viewMode} setViewMode={setViewMode} />
           <TouchableOpacity
             onPress={() => setCreateModalVisible(true)}
             style={[styles.createButton, { backgroundColor: colors.primary }]}

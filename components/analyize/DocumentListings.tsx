@@ -46,7 +46,7 @@ export default function RecentDocumentListings({
           <View style={styles.recentHeader}>
             <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Recent Analysis</Text>
             <View style={styles.viewToggle}>
-              <ViewMode colors={colors} viewMode={viewType} setViewMode={setViewType} />
+              <ViewMode viewMode={viewType} setViewMode={setViewType} />
             </View>
           </View>
           <FlatList

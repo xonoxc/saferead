@@ -34,6 +34,8 @@ export default function SpaceDetailScreen() {
     )
   }
 
+  console.log("space", JSON.stringify(space, null, 2))
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
@@ -70,12 +72,7 @@ export default function SpaceDetailScreen() {
 
       {/* Update Space Form */}
       {isSheetVisible && (
-        <SpaceForm
-          space={space}
-          onCancel={toggleSheetVisiblity}
-          onCreate={handleUpdateSpace}
-          useDrawer
-        />
+        <SpaceForm space={space} onCancel={toggleSheetVisiblity} onCreate={handleUpdateSpace} />
       )}
     </View>
   )
@@ -88,7 +85,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "transparent",
     justifyContent: "center",
     alignItems: "center",
     zIndex: 900,

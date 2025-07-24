@@ -13,6 +13,7 @@ import HomeScreenStatsProcessingStatus from "@/components/home/HomeScreenStatsPr
 import HomeScreenHeader from "@/components/home/HomeScreenHeader"
 
 import type { StatsResponse } from "@/types/api/documents.types"
+import HomeScreenDocPendingStatus from "@/components/home/HomeScreenDocPendingStatus"
 
 export default function HomeScreen() {
   const { colors } = useTheme()
@@ -52,16 +53,16 @@ export default function HomeScreen() {
       <HomeScreenHeader colors={colors} user={user} />
 
       {/* Main Statistics */}
-      <HomeScreenMainStats stats={stats as StatsResponse} colors={colors} />
+      <HomeScreenMainStats stats={stats as StatsResponse} />
 
       {/* Document Types */}
-      <HomeScreenDocumentType stats={stats as StatsResponse} colors={colors} />
+      <HomeScreenDocumentType stats={stats as StatsResponse} />
 
       {/* Processing Status */}
-      <HomeScreenStatsProcessingStatus stats={stats as StatsResponse} colors={colors} />
+      <HomeScreenStatsProcessingStatus stats={stats as StatsResponse} />
 
       {/* Pending Documents */}
-      <HomeScreenStatsProcessingStatus stats={stats as StatsResponse} colors={colors} />
+      <HomeScreenDocPendingStatus stats={stats as StatsResponse} />
     </ScrollView>
   )
 }

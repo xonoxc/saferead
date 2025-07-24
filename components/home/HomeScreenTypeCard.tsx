@@ -36,12 +36,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     borderRadius: 16,
-    elevation: 2,
-    shadowColor: "#000",
     borderBottomWidth: 1,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
   },
   typeIcon: {
     width: 40,

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native"
 
-import type { ColorsType } from "@/hooks/useTheme"
+import { useTheme } from "@/hooks/useTheme"
 import type { StatsResponse } from "@/types/api/documents.types"
 
 import Animated, { FadeInDown } from "react-native-reanimated"
@@ -9,11 +9,11 @@ import { Fonts, FontSizes } from "@/constants"
 
 export default function HomeScreenDocPendingStatus({
   stats,
-  colors,
 }: {
   stats: StatsResponse | undefined
-  colors: ColorsType
 }) {
+  const { colors } = useTheme()
+
   return (
     <>
       {stats && stats.pending > 0 && (

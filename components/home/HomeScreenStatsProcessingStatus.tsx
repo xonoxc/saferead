@@ -3,17 +3,17 @@ import Animated, { FadeInDown } from "react-native-reanimated"
 import { View, Text, StyleSheet } from "react-native"
 
 import type { StatsResponse } from "@/types/api/documents.types"
-import type { ColorsType } from "@/hooks/useTheme"
+import { useTheme } from "@/hooks/useTheme"
 import { Loader } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 
 export default function HomeScreenStatsProcessingStatus({
   stats,
-  colors,
 }: {
   stats: StatsResponse | undefined
-  colors: ColorsType
 }) {
+  const { colors } = useTheme()
+
   return (
     <>
       {stats && stats.processing > 0 && (

@@ -5,17 +5,12 @@ import { View, Text, StyleSheet } from "react-native"
 import { FileText, Shield, Scale, FileCheck } from "lucide-react-native"
 
 import type { StatsResponse } from "@/types/api/documents.types"
-import type { ColorsType } from "@/hooks/useTheme"
+import { useTheme, type ColorsType } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 import TypeCard from "./HomeScreenTypeCard"
 
-export default function HomeScreenDocumentType({
-  stats,
-  colors,
-}: {
-  stats: StatsResponse | undefined
-  colors: ColorsType
-}) {
+export default function HomeScreenDocumentType({ stats }: { stats: StatsResponse | undefined }) {
+  const { colors } = useTheme()
   const typeStats = getTypeStats(stats, colors)
 
   return (
@@ -77,7 +72,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 4,
   },
   statIcon: {
     width: 48,
@@ -95,36 +89,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
     textAlign: "center",
-  },
-  confidenceCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 20,
-    borderRadius: 16,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  confidenceIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 16,
-  },
-  confidenceContent: {
-    flex: 1,
-  },
-  confidenceValue: {
-    fontSize: FontSizes.xxl,
-    fontFamily: Fonts.bold,
-  },
-  confidenceLabel: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
   },
   typeGrid: {
     gap: 12,

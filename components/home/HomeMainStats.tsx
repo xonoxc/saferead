@@ -1,19 +1,14 @@
 import Animated, { FadeInDown } from "react-native-reanimated"
 import HomeScreenStatCard from "@/components/home/HomeScreenStatCard"
 import { StatsResponse } from "@/types/api/documents.types"
-import { ColorsType } from "@/hooks/useTheme"
+import { ColorsType, useTheme } from "@/hooks/useTheme"
 
 import { View, StyleSheet } from "react-native"
 
 import { FileText, TrendingUp, CircleAlert as AlertCircle, CheckCircle } from "lucide-react-native"
 
-export function HomeScreenMainStats({
-  stats,
-  colors,
-}: {
-  stats: StatsResponse
-  colors: ColorsType
-}) {
+export function HomeScreenMainStats({ stats }: { stats: StatsResponse }) {
+  const { colors } = useTheme()
   const mainStats = getMainStats(stats as StatsResponse, colors)
 
   return (
@@ -25,26 +20,16 @@ export function HomeScreenMainStats({
           height: 130,
           marginBottom: 12,
         }}
-        colors={colors}
       />
       <View style={styles.row}>
         <View style={styles.leftColumn}>
           <HomeScreenStatCard
             stat={mainStats[1]}
             style={{ width: "100%", height: 130, marginBottom: 12 }}
-            colors={colors}
           />
-          <HomeScreenStatCard
-            colors={colors}
-            stat={mainStats[2]}
-            style={{ width: "100%", height: 120 }}
-          />
+          <HomeScreenStatCard stat={mainStats[2]} style={{ width: "100%", height: 120 }} />
         </View>
-        <HomeScreenStatCard
-          colors={colors}
-          stat={mainStats[3]}
-          style={{ width: "48%", height: 264 }}
-        />
+        <HomeScreenStatCard stat={mainStats[3]} style={{ width: "48%", height: 264 }} />
       </View>
     </Animated.View>
   )

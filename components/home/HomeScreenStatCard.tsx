@@ -1,4 +1,4 @@
-import { ColorsType } from "@/hooks/useTheme"
+import { useTheme } from "@/hooks/useTheme"
 import { LucideIcon } from "lucide-react-native"
 
 import { Fonts, FontSizes } from "@/constants/Fonts"
@@ -14,12 +14,18 @@ interface StatCardProps {
     isPercentage?: boolean
   }
   style?: object
-  colors: ColorsType
 }
 
-export default function HomeScreenStatCard({ stat, style, colors }: StatCardProps) {
+export default function HomeScreenStatCard({ stat, style }: StatCardProps) {
+  const { colors, isDark } = useTheme()
   return (
-    <View style={[styles.statCard, { backgroundColor: colors.card }, style]}>
+    <View
+      style={[
+        styles.statCard,
+        { backgroundColor: colors.card, borderColor: !isDark ? colors.border : "transparent" },
+        style,
+      ]}
+    >
       <View style={[styles.statIcon, { backgroundColor: `${stat.color}20` }]}>
         <stat.icon size={24} color={stat.color} />
       </View>
@@ -38,7 +44,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 4,
   },
   statIcon: {
     width: 48,

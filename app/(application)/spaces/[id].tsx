@@ -59,23 +59,23 @@ export default function SpaceDetailScreen() {
       <SpaceDetailsOpenChatBtn onPress={handleOpenChat} color={space.color} />
 
       {isUploadDocFormVisible && (
-        <UploadDocumentForm
-          onCancel={toggleUploadFormVisibilty}
-          spaceId={space.id}
-          onUploadSuccess={toggleUploadFormVisibilty}
-        />
+        <View style={styles.modalOverlay}>
+          <UploadDocumentForm
+            onCancel={toggleUploadFormVisibilty}
+            spaceId={space.id}
+            onUploadSuccess={toggleUploadFormVisibilty}
+          />
+        </View>
       )}
 
       {/* Update Space Form */}
       {isSheetVisible && (
-        <View style={styles.modalOverlay}>
-          <SpaceForm
-            space={space}
-            onCancel={toggleSheetVisiblity}
-            onCreate={handleUpdateSpace}
-            useDrawer={true}
-          />
-        </View>
+        <SpaceForm
+          space={space}
+          onCancel={toggleSheetVisiblity}
+          onCreate={handleUpdateSpace}
+          useDrawer
+        />
       )}
     </View>
   )
@@ -87,9 +87,10 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   modalOverlay: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
+    alignItems: "center",
     zIndex: 900,
   },
 })

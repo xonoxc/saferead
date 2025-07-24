@@ -73,7 +73,13 @@ export default function SpacesScreen() {
       />
 
       {createModalVisible && (
-        <View style={[StyleSheet.absoluteFillObject, styles.modalOverlay]}>
+        <View
+          style={[
+            StyleSheet.absoluteFillObject,
+            styles.modalOverlay,
+            { backgroundColor: colors.background },
+          ]}
+        >
           <SpaceForm onCreate={handleCreateSpace} onCancel={() => setCreateModalVisible(false)} />
         </View>
       )}
@@ -86,10 +92,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalOverlay: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
+    padding: 14,
     zIndex: 100,
   },
 })

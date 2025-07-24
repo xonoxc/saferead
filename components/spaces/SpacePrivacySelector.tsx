@@ -63,6 +63,8 @@ export default function SpacePrivacySelector({ field: { value, onChange } }: Pri
 const styles = StyleSheet.create({
   privacyContainer: {
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 10,
     marginBottom: 20,
   },

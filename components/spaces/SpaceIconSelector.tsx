@@ -50,6 +50,8 @@ export default function SpaceIconSelector({
 const styles = StyleSheet.create({
   grid: {
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     flexWrap: "wrap",
     gap: 12,
   },

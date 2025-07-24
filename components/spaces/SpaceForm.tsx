@@ -98,14 +98,16 @@ export const SpaceForm = ({
             control={control}
             name="color"
             render={({ field: { onChange, value } }) => (
-              <View style={styles.grid}>
-                {colors_palette.map(c => (
-                  <TouchableOpacity
-                    key={c}
-                    style={[styles.color, { backgroundColor: c }, c === value && styles.selected]}
-                    onPress={() => onChange(c)}
-                  />
-                ))}
+              <View style={styles.colorGridContainer}>
+                <View style={styles.grid}>
+                  {colors_palette.map(c => (
+                    <TouchableOpacity
+                      key={c}
+                      style={[styles.color, { backgroundColor: c }, c === value && styles.selected]}
+                      onPress={() => onChange(c)}
+                    />
+                  ))}
+                </View>
               </View>
             )}
           />
@@ -132,15 +134,17 @@ export const SpaceForm = ({
             name="is_favorite"
             render={({ field: { onChange, value } }) => (
               <View style={styles.favoriteContainer}>
-                <Text style={[styles.label, { color: colors.text, marginTop: 0 }]}>
-                  Faourite Space ?
-                </Text>
-                <Switch
-                  value={value}
-                  onValueChange={onChange}
-                  trackColor={{ false: colors.accent, true: colors.primary }}
-                  thumbColor={value ? colors.surface : colors.text}
-                />
+                <View style={styles.favouriteContainerChild}>
+                  <Text style={[styles.label, { color: colors.text, marginTop: 0 }]}>
+                    Faourite Space ?
+                  </Text>
+                  <Switch
+                    value={value}
+                    onValueChange={onChange}
+                    trackColor={{ false: colors.accent, true: colors.primary }}
+                    thumbColor={value ? colors.surface : colors.text}
+                  />
+                </View>
               </View>
             )}
           />
@@ -169,7 +173,7 @@ export const SpaceForm = ({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingBottom: 40 },
+  container: { flex: 1, paddingBottom: 40, flexDirection: "column" },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -195,8 +199,14 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 12,
   },
+  colorGridContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   grid: {
     flexDirection: "row",
+    alignItems: "center",
     flexWrap: "wrap",
     gap: 12,
   },
@@ -241,8 +251,14 @@ const styles = StyleSheet.create({
   },
   favoriteContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
+  },
+  favouriteContainerChild: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
   },
 })

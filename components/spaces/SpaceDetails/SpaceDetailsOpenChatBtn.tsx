@@ -1,12 +1,7 @@
 import React from "react"
 import { StyleSheet, TouchableOpacity, Text } from "react-native"
 import { MessageSquare } from "lucide-react-native"
-import Animated, {
-  useAnimatedStyle,
-  interpolate,
-  Extrapolate,
-  withTiming,
-} from "react-native-reanimated"
+import Animated, { useAnimatedStyle, interpolate, withTiming } from "react-native-reanimated"
 import type { SharedValue } from "react-native-reanimated"
 import { Fonts, FontSizes } from "@/constants"
 
@@ -67,6 +62,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
+    paddingHorizontal: 16,
     shadowRadius: 4,
   },
   chatButtonText: {

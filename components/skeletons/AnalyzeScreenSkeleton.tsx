@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, ScrollView , useWindowDimensions } from "react-native"
+import { View, Text, StyleSheet, ScrollView, useWindowDimensions } from "react-native"
 import Skeleton from "./Skeleton"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
@@ -37,9 +37,8 @@ const AnalyzeScreenSkeleton = ({ isAnalizing = false }: AnalyzeScreenSkeletonPro
 
         <View style={styles.uploadSection}>
           <View style={styles.uploadGrid}>
-            <Skeleton width="30%" height={100} borderRadius={12} />
-            <Skeleton width="30%" height={100} borderRadius={12} />
-            <Skeleton width="30%" height={100} borderRadius={12} />
+            <Skeleton width="45%" height={100} borderRadius={12} />
+            <Skeleton width="45%" height={100} borderRadius={12} />
           </View>
         </View>
 

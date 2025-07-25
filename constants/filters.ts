@@ -40,7 +40,11 @@ export const spaceFilterFields: FilterField[] = [
   {
     key: "ordering",
     label: "Sort by",
-    type: "text",
+    type: "select", // ← changed from "text"
+    options: [
+      { label: "Recently Created", value: "-created_at" },
+      { label: "A-Z", value: "name" },
+    ],
   },
 ]
 
@@ -59,9 +63,22 @@ export const documentFilterFields: FilterField[] = [
     label: "Document Type",
     type: "select",
     options: [
-      { label: "PDF", value: "pdf" },
-      { label: "Word", value: "word" },
-      { label: "Spreadsheet", value: "spreadsheet" },
+      { value: "", label: "All Types" },
+      { value: "terms", label: "Terms & Conditions" },
+      { value: "privacy", label: "Privacy Policy" },
+      { value: "legal", label: "Legal Agreement" },
+      { value: "other", label: "Other Document" },
+    ],
+  },
+  {
+    key: "status",
+    label: "Status",
+    type: "select",
+    options: [
+      { value: "", label: "All Status" },
+      { value: "completed", label: "Completed" },
+      { value: "processing", label: "Processing" },
+      { value: "failed", label: "Failed" },
     ],
   },
   {
@@ -81,6 +98,14 @@ export const documentFilterFields: FilterField[] = [
   {
     key: "ordering",
     label: "Sort By",
-    type: "text",
+    type: "select",
+    options: [
+      { value: "-created_at", label: "Newest First" },
+      { value: "created_at", label: "Oldest First" },
+      { value: "-confidence_score", label: "Highest Confidence" },
+      { value: "confidence_score", label: "Lowest Confidence" },
+      { value: "-processed_at", label: "Recently Processed" },
+      { value: "processed_at", label: "Oldest Processed" },
+    ],
   },
 ]

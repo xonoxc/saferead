@@ -3,6 +3,7 @@ import { TextInput } from "@/components/TextInput"
 import { useTheme } from "@/hooks/useTheme"
 
 import type { FilterField } from "@/types/filter"
+import { Fonts, FontSizes } from "@/constants"
 
 interface DateRangeFieldProps {
   field: FilterField
@@ -17,7 +18,7 @@ export function DateRangeField({ field, from, to, onChange }: DateRangeFieldProp
     <View style={styles.section}>
       <View style={styles.labelRow}>
         {field.icon}
-        <Text style={[styles.label, { color: colors.text }]}>{field.label}</Text>
+        <Text style={[styles.label, { color: colors.textMuted }]}>{field.label}</Text>
       </View>
       <View style={{ flexDirection: "row", gap: 8 }}>
         <TextInput
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.bold,
   },
 })

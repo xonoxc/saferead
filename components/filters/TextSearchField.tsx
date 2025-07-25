@@ -3,6 +3,7 @@ import { TextInput } from "@/components/TextInput"
 import { useTheme } from "@/hooks/useTheme"
 
 import type { FilterField } from "@/types/filter"
+import { Fonts, FontSizes } from "@/constants"
 
 interface TextSearchFieldProps {
   field: FilterField
@@ -16,7 +17,7 @@ export function TextSearchField({ field, value, onChange }: TextSearchFieldProps
     <View style={styles.section}>
       <View style={styles.labelRow}>
         {field.icon}
-        <Text style={[styles.label, { color: colors.text }]}>{field.label}</Text>
+        <Text style={[styles.label, { color: colors.textMuted }]}>{field.label}</Text>
       </View>
       <TextInput
         value={value}
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.bold,
   },
 })

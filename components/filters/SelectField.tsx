@@ -2,6 +2,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 
 import type { FilterField } from "@/types/filter"
+import { Fonts, FontSizes } from "@/constants"
+import { SelectableChip } from "./SelectableChip"
 
 interface SelectFieldProps {
   field: FilterField
@@ -19,21 +21,12 @@ export function SelectField({ field, value, onChange }: SelectFieldProps) {
       </View>
       <View style={styles.optionsRow}>
         {field.options?.map((option: { label: string; value: any }) => (
-          <TouchableOpacity
+          <SelectableChip
             key={option.value.toString()}
+            label={option.label}
+            selected={value === option.value}
             onPress={() => onChange(option.value)}
-            style={{
-              backgroundColor: value === option.value ? colors.primary : colors.card,
-              borderColor: colors.border,
-              padding: 8,
-              borderRadius: 8,
-              marginRight: 8,
-            }}
-          >
-            <Text style={{ color: value === option.value ? colors.background : colors.text }}>
-              {option.label}
-            </Text>
-          </TouchableOpacity>
+          />
         ))}
       </View>
     </View>
@@ -51,8 +44,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: FontSizes.md,
+    fontFamily: Fonts.bold,
+  },
+  btnText: {
+    fontSize: FontSizes.xs,
+    fontFamily: Fonts.bold,
   },
   optionsRow: {
     flexDirection: "row",

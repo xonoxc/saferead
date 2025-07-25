@@ -6,6 +6,8 @@ import type { FilterField } from "@/types/filter"
 import { SelectField } from "./SelectField"
 import { TextSearchField } from "./TextSearchField"
 import { DateRangeField } from "./DateRangeField"
+import { FilterHeader } from "./FilterSectionHeader"
+import { Fonts, FontSizes } from "@/constants"
 
 interface UniversalFilterProps {
   visible: boolean
@@ -46,12 +48,7 @@ export const UniversalFilter = ({
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>Filter</Text>
-          <TouchableOpacity onPress={onClose}>
-            <Text style={{ color: colors.text }}>Close</Text>
-          </TouchableOpacity>
-        </View>
+        <FilterHeader title="Filter" onClose={onClose} />
 
         <ScrollView style={styles.content}>
           {fields.map(field => {
@@ -99,13 +96,13 @@ export const UniversalFilter = ({
             onPress={handleReset}
             style={[styles.actionButton, { backgroundColor: colors.primary }]}
           >
-            <Text style={{ color: colors.background }}>Reset</Text>
+            <Text style={[styles.actionBtnText, { color: colors.background }]}>Reset</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleApply}
             style={[styles.actionButton, { backgroundColor: colors.primary }]}
           >
-            <Text style={{ color: colors.background }}>Apply</Text>
+            <Text style={[styles.actionBtnText, { color: colors.background }]}>Apply</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -143,5 +140,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+  },
+  actionBtnText: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.semiBold,
   },
 })

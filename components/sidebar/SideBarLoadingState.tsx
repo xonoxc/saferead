@@ -1,10 +1,9 @@
-import { useTheme } from "@/hooks/useTheme"
 import { Filter, Search } from "lucide-react-native"
-import { FlatList, TouchableOpacity, View, StyleSheet, TextInput } from "react-native"
-import { DocumentCardSkeleton } from "../skeletons"
+import { TouchableOpacity, View, StyleSheet, TextInput } from "react-native"
 import { Fonts, FontSizes } from "@/constants"
+import { LoadingSpinner } from "../LoadingSpinner"
 
-const SKELETON_COUNT = 3
+import { useTheme } from "@/hooks/useTheme"
 
 interface SideBarLoadingStateProps {
   searchQuery: string
@@ -53,14 +52,8 @@ export default function SideBarLoadingState({
           <Filter size={18} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={Array.from({ length: SKELETON_COUNT }).map((_, i) => ({ id: `skeleton-${i}` }))}
-        bounces={true}
-        keyExtractor={item => item.id}
-        renderItem={() => <DocumentCardSkeleton />}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+
+      <LoadingSpinner />
     </View>
   )
 }

@@ -7,6 +7,8 @@ import { SpaceForm } from "@/components/spaces/SpaceForm"
 import useSpaceScreen from "@/hooks/screens/useSpacesScreen"
 import SpacesFallback from "@/components/spaces/MainScreen/SpaceFallback"
 import SpaceScreenHeader from "@/components/spaces/MainScreen/RenderHeaderFunc"
+import { UniversalFilter } from "@/components/filters/UniversalFilters"
+import { spaceFilterFields } from "@/constants/filters"
 
 export default function SpacesScreen() {
   const { colors } = useTheme()
@@ -18,6 +20,11 @@ export default function SpacesScreen() {
     hasNextPage,
     fetchNextPage,
     viewMode,
+
+    setCurrentFilters,
+    showFilter,
+    currentFilters,
+    setShowFilter,
     setViewMode,
     searchQuery,
     setSearchQuery,
@@ -37,6 +44,7 @@ export default function SpacesScreen() {
         viewMode={viewMode}
         setViewMode={setViewMode}
         searchQuery={searchQuery}
+        setShowFilter={setShowFilter}
         setSearchQuery={setSearchQuery}
         setCreateModalVisible={setCreateModalVisible}
       />
@@ -83,6 +91,14 @@ export default function SpacesScreen() {
           <SpaceForm onCreate={handleCreateSpace} onCancel={() => setCreateModalVisible(false)} />
         </View>
       )}
+
+      <UniversalFilter
+        fields={spaceFilterFields}
+        visible={showFilter}
+        onClose={() => setShowFilter(false)}
+        onApply={setCurrentFilters}
+        currentFilters={currentFilters}
+      />
     </View>
   )
 }

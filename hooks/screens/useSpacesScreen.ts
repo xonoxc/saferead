@@ -4,12 +4,13 @@ import { useQueryClient } from "@tanstack/react-query"
 import { attempt } from "@/utils/attempt"
 import { createSpace } from "@/services/space.service"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
-import { router, type RelativePathString } from "expo-router"
+import { router } from "expo-router"
+import { useDrawerAlert } from "../alerts/useAlert"
 
 import type { ViewType } from "@/types/view"
 import type { Space } from "@/types"
-import { CreateSpaceForm, SpaceFormData } from "../forms/useSpaceHookForm"
-import { useDrawerAlert } from "../alerts/useAlert"
+import type { CreateSpaceForm, SpaceFormData } from "../forms/useSpaceHookForm"
+import type { RelativePathString } from "expo-router"
 
 export default function useSpaceScreen() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useSpaces()
@@ -17,6 +18,8 @@ export default function useSpaceScreen() {
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [viewMode, setViewMode] = useState<ViewType>("grid")
+  const [currentFilters, setCurrentFilters] = useState<Record<string, any>>({})
+  const [showFilter, setShowFilter] = useState(false)
 
   const queryClient = useQueryClient()
 
@@ -86,6 +89,12 @@ export default function useSpaceScreen() {
     spaces: filteredSpaces,
     fetchNextPage,
     hasNextPage,
+
+    currentFilters,
+    setCurrentFilters,
+    showFilter,
+    setShowFilter,
+
     isFetchingNextPage,
     createModalVisible,
     setCreateModalVisible,

@@ -3,17 +3,19 @@ import { View, StyleSheet, FlatList, RefreshControl } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { Search, FileText } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { DocumentFilter } from "../documents/DocumentFilter"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { AnalysisResponse } from "@/types/api/documents.types"
 
 import { EmptyState } from "../EmptyState"
 
-import type { FilterOptions as DocumentFilters } from "@/types/docs"
 import SideBarLoadingState from "./SideBarLoadingState"
 import { SideBarDocumentCard } from "./SideBarDocumentCard"
 import SidebarSearch from "./SideBarSearch"
 import SideBarErrorMessage from "./SideBarErrorMessage"
+import { UniversalFilter } from "../filters/UniversalFilters"
+import { documentFilterFields } from "@/constants/filters"
+
+import type { FilterOptions as DocumentFilters } from "@/types/docs"
 
 interface SideBarDocumentContentProps {
   spaceId?: string
@@ -151,7 +153,8 @@ export default function SideBarDocumentContent({
         />
       )}
 
-      <DocumentFilter
+      <UniversalFilter
+        fields={documentFilterFields}
         visible={showFilter}
         onClose={() => setShowFilter(false)}
         onApply={applyFilters}

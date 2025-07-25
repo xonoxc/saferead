@@ -1,12 +1,12 @@
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
-import { Plus, Search } from "lucide-react-native"
+import { Plus } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 
 import type { ColorsType } from "@/hooks/useTheme"
 import type { SetStateFunction } from "@/types/state"
 import type { ViewType } from "@/types/view"
 import ViewMode from "../ViewModeSetter"
-import { TextInput } from "@/components/TextInput"
+import SearchBar from "@/components/search/SearchBar"
 
 interface SpaceScreenHeaderProps {
   colors: ColorsType
@@ -15,6 +15,8 @@ interface SpaceScreenHeaderProps {
   searchQuery: string
   setSearchQuery: SetStateFunction<string>
   setCreateModalVisible: (visible: boolean) => void
+
+  setShowFilter: (visible: boolean) => void
 }
 
 export default function SpaceScreenHeader({
@@ -24,6 +26,7 @@ export default function SpaceScreenHeader({
   setSearchQuery,
   searchQuery,
   setCreateModalVisible,
+  setShowFilter,
 }: SpaceScreenHeaderProps) {
   return (
     <View style={styles.headerContainer}>
@@ -41,17 +44,14 @@ export default function SpaceScreenHeader({
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.searchContainer}>
-        <View style={[styles.searchInputContainer, { borderColor: colors.border }]}>
-          <TextInput
-            value={searchQuery}
-            leftAccessory={<Search size={20} color={colors.textMuted} />}
-            onChangeText={setSearchQuery}
-            placeholder="Search spaces..."
-            placeholderTextColor={colors.textMuted}
-          />
-        </View>
-      </View>
+
+      <SearchBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        placeholder="Search spaces..."
+        showFilter
+        onFilterPress={() => setShowFilter(true)}
+      />
     </View>
   )
 }
@@ -81,14 +81,5 @@ const styles = StyleSheet.create({
   createButton: {
     padding: 8,
     borderRadius: 12,
-  },
-  searchContainer: {
-    paddingVertical: 8,
-  },
-  searchInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 12,
   },
 })

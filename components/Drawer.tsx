@@ -5,6 +5,7 @@ import { StyleProp, ViewStyle } from "react-native"
 
 interface DrawerProps {
   children: ReactNode
+  visible: boolean
   enableAbsolute?: boolean
 }
 
@@ -19,8 +20,10 @@ const absoluteStyles: ViewStyle = {
   overflow: "hidden",
 }
 
-export const Drawer: React.FC<DrawerProps> = ({ children, enableAbsolute }) => {
+export const Drawer: React.FC<DrawerProps> = ({ children, visible = true, enableAbsolute }) => {
   const { colors } = useTheme()
+
+  if (!visible) return null
 
   const baseStyle = {
     backgroundColor: colors.background,

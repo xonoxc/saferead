@@ -7,6 +7,7 @@ import { UserSpaceDocument } from "@/types/api/spaces.documents.types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { getFileIcon } from "@/utils/helpers/files"
 import { attempt } from "@/utils/attempt"
+import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 
 interface UserSpaceDocumentCardProps {
   document: UserSpaceDocument
@@ -16,6 +17,7 @@ interface UserSpaceDocumentCardProps {
 
 export function UserSpaceDocumentCard({ document, spaceColor, onPin }: UserSpaceDocumentCardProps) {
   const { colors } = useTheme()
+  const showAlert = useDrawerAlert()
 
   const FileIcon = getFileIcon(document.file_extension)
   const cardColor = spaceColor || colors.primary
@@ -25,7 +27,18 @@ export function UserSpaceDocumentCard({ document, spaceColor, onPin }: UserSpace
 
     const resp = await attempt(WebBrowser.openBrowserAsync(document.document_file))
     if (!resp.ok) {
-      Alert.alert("Error", "Could not open the document.")
+      showAlert({
+        type: "error",
+        title: "Error Opening Document",
+        message: "There was an error opening the document. Please try again later.",
+        actions: [
+          {
+            text: "OK",
+            style: "default",
+            onPress: () => {},
+          },
+        ],
+      })
       return
     }
   }

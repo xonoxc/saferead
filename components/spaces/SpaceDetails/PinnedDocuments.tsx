@@ -12,9 +12,7 @@ interface PinnedDocumentsProps {
 }
 
 export default function PinnedDocuments({ documents, spaceColor, colors }: PinnedDocumentsProps) {
-  if (documents.length === 0) {
-    return null
-  }
+  if (documents.length === 0) return null
 
   return (
     <View style={styles.container}>

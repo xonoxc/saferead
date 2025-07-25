@@ -21,12 +21,15 @@ export default function SpaceDetailScreen() {
     recentDocuments,
     animatedStyle,
     isSheetVisible,
+    isChatBtnVisible,
     isUploadDocFormVisible,
     toggleSheetVisiblity,
     toggleUploadFormVisibilty,
     handleOpenChat,
     handleFavoritePress,
     handleUpdateSpace,
+    setChatBtnVisible,
+    handleDocumentListScroll,
     handlePinDocumentToSpace: togglePinnedStatus,
   } = useSpaceDetailsScreen({ colors })
 
@@ -66,11 +69,18 @@ export default function SpaceDetailScreen() {
           colors={colors}
           spaceColor={space.color}
           onPin={togglePinnedStatus}
+          onScroll={handleDocumentListScroll}
         />
       </View>
 
       {/* Open Chat Button */}
-      <SpaceDetailsOpenChatBtn onPress={handleOpenChat} color={space.color} />
+      {isChatBtnVisible && (
+        <SpaceDetailsOpenChatBtn
+          onPress={handleOpenChat}
+          color={space.color}
+          visibility={isChatBtnVisible}
+        />
+      )}
 
       {isUploadDocFormVisible && (
         <UploadDocumentForm

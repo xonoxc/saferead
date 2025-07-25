@@ -1,28 +1,41 @@
 import { UserSpaceDocumentCard } from "@/components/documents/UserSpaceDocumentCard"
 import { Fonts, FontSizes } from "@/constants"
-import { View, StyleSheet, Text, FlatList } from "react-native"
+import {
+  View,
+  StyleSheet,
+  Text,
+  FlatList,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from "react-native"
+import Animated from "react-native-reanimated"
+
+interface SpaceRecentDocumentListProps {
+  documents: any[]
+  colors: { text: string; background: string }
+  spaceColor: string
+  onPin?: (documentId: string, documentFile: string) => void
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void
+}
 
 export default function SpaceRecentDocumentList({
   documents,
   colors,
   spaceColor,
   onPin,
-}: {
-  documents: any[]
-  colors: { text: string; background: string }
-  spaceColor: string
-  onPin?: (documentId: string, documentFile: string) => void
-}) {
+  onScroll,
+}: SpaceRecentDocumentListProps) {
   return (
     <View style={styles.documentsContainer}>
       <Text style={[styles.documentsTitle, { color: colors.text }]}>Recent Documents</Text>
-      <FlatList
+      <Animated.FlatList
         data={documents}
         renderItem={({ item }) => (
           <UserSpaceDocumentCard document={item} spaceColor={spaceColor} onPin={onPin} />
         )}
         keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
         contentContainerStyle={styles.documentsList}
       />
     </View>

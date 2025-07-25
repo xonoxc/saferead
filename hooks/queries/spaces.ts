@@ -13,7 +13,7 @@ import type { PaginatedSpaceDocuments } from "@/types/api/spaces.documents.types
 import type { PaginatedSpaces, Space } from "@/types/api/spaces.types"
 import type { SpaceFilterOptions } from "@/types/spaces"
 
-export const useSpaces = (filters: SpaceFilterOptions, enabled = true) => {
+export const useSpaces = (filters?: SpaceFilterOptions, enabled = true) => {
   return useInfiniteQuery<PaginatedSpaces>({
     queryKey: ["spaces", filters],
     queryFn: ({ pageParam = 1 }) => getSpaces(pageParam as number, filters),

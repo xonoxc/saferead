@@ -1,21 +1,40 @@
 import React from "react"
 import { StyleSheet, TouchableOpacity, Text } from "react-native"
 import { MessageSquare } from "lucide-react-native"
-import Animated, { FadeInUp, FadeOut } from "react-native-reanimated"
+import Animated, {
+  useAnimatedStyle,
+  interpolate,
+  Extrapolate,
+  withTiming,
+} from "react-native-reanimated"
+import type { SharedValue } from "react-native-reanimated"
 import { Fonts, FontSizes } from "@/constants"
 
 interface SpaceDetailsOpenChatBtnProps {
   onPress?: () => void
   color: string
+  visibility: SharedValue<number>
 }
 
-export default function SpaceDetailsOpenChatBtn({ onPress, color }: SpaceDetailsOpenChatBtnProps) {
+export default function SpaceDetailsOpenChatBtn({
+  onPress,
+  color,
+  visibility,
+}: SpaceDetailsOpenChatBtnProps) {
+  const animatedStyle = useAnimatedStyle(() => {
+    const opacity = withTiming(visibility.value, { duration: 200 })
+    const translateY = withTiming(interpolate(visibility.value, [0, 1], [50, 0], "clamp"), {
+      duration: 200,
+    })
+
+    return {
+      opacity,
+      transform: [{ translateY }],
+    }
+  }, [])
+
   return (
-    <Animated.View
-      style={[styles.chatButtonContainer]}
-      entering={FadeInUp.delay(500).springify()}
-      exiting={FadeOut}
-    >
+    <Animated.View style={[styles.chatButtonContainer, animatedStyle]}>
       <TouchableOpacity
         onPress={onPress}
         style={[styles.chatButton, { backgroundColor: color }]}

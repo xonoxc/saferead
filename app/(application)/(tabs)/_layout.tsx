@@ -1,16 +1,10 @@
-import { Redirect, Tabs } from "expo-router"
+import { Tabs } from "expo-router"
 import { Home, Settings, Box, ScanSearch } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { useAuth } from "@/hooks/useAuth"
 import { getTabBarStyles } from "@/utils/helpers/tabs"
 
 export default function TabLayout() {
   const { colors } = useTheme()
-  const { isAuthenticated } = useAuth()
-
-  if (!isAuthenticated) {
-    return <Redirect href="/(auth)/welcome" />
-  }
 
   return (
     <Tabs

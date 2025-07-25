@@ -1,13 +1,20 @@
 import { useTheme } from "@/hooks/useTheme"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { Stack } from "expo-router"
+import { Redirect, Stack } from "expo-router"
 import { useState } from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { CustomBackBtn } from "@/components"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function ApplicationLayout() {
   const { colors } = useTheme()
   const [queryClient] = useState(() => new QueryClient())
+
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)/welcome" />
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

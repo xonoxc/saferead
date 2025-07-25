@@ -40,10 +40,6 @@ export async function getSpaceStats(spaceId: string) {
   return resp.data
 }
 
-export async function toggleFavoriteSpace(spaceId: string, data: { is_favorite: boolean }) {
-  return apiClient.post(`/user_space/spaces/${spaceId}/toggle_favorite/`, data)
-}
-
 export async function addDocumentToSpace(data: {
   space: string
   document_file: ReactNativeFile | File | Blob
@@ -70,4 +66,32 @@ export async function addDocumentToSpace(data: {
       "Content-Type": "multipart/form-data",
     },
   })
+}
+
+/*
+ *
+ * @param data - Object containing the document ID and space ID
+ *  @returns {Promise<void>} - A promise that resolves when the document is pinned
+ * **/
+
+export type PinDocumetToSpaceMethodParams = {
+  id: string
+  space: string
+  document_file_url: string
+}
+
+export async function pinDocumentToSpace({
+  id,
+  space,
+  document_file_url,
+}: PinDocumetToSpaceMethodParams) {
+  return apiClient.post(`/user_space/documents/${id}/toggle_pin/`, {
+    id,
+    space,
+    document_file: document_file_url,
+  })
+}
+
+export async function toggleFavoriteSpace(spaceId: string) {
+  return apiClient.post(`/user_space/spaces/${spaceId}/toggle_favorite/`)
 }

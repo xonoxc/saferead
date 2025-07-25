@@ -1,5 +1,5 @@
 import React from "react"
-import { View, StyleSheet } from "react-native"
+import { ScrollView, StyleSheet, View } from "react-native"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { useSpaceDetailsScreen } from "@/hooks/screens/useSpaceDetailScreen"
 import { useTheme } from "@/hooks/useTheme"
@@ -9,6 +9,7 @@ import SpaceRecentDocumentList from "@/components/spaces/SpaceDetails/SpaceRecen
 import SpaceDetailsOpenChatBtn from "@/components/spaces/SpaceDetails/SpaceDetailsOpenChatBtn"
 import { SpaceForm } from "@/components/spaces/SpaceForm"
 import { UploadDocumentForm } from "@/components/spaces/UploadDocumentForm"
+import PinnedDocuments from "@/components/spaces/SpaceDetails/PinnedDocuments"
 
 export default function SpaceDetailScreen() {
   const { colors } = useTheme()
@@ -24,6 +25,7 @@ export default function SpaceDetailScreen() {
     handleOpenChat,
     handleFavoritePress,
     handleUpdateSpace,
+    handlePinDocumentToSpace,
   } = useSpaceDetailsScreen({ colors })
 
   if (!space) {
@@ -34,7 +36,8 @@ export default function SpaceDetailScreen() {
     )
   }
 
-  console.log("space", JSON.stringify(space, null, 2))
+  const pinnedDocuments = space.recent_documents.filter(doc => doc.is_pinned)
+  const recentDocuments = space.recent_documents.filter(doc => !doc.is_pinned)
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -49,13 +52,18 @@ export default function SpaceDetailScreen() {
 
       {/* Stats */}
       <SpaceDetailsStats stats={stats} colors={colors} />
+      <View style={{ flex: 1 }}>
+        {/* Pinned Documents */}
+        <PinnedDocuments documents={pinnedDocuments} colors={colors} spaceColor={space.color} />
 
-      {/* Recent Documents */}
-      <SpaceRecentDocumentList
-        documents={space.recent_documents}
-        colors={colors}
-        spaceColor={space.color}
-      />
+        {/* Recent Documents */}
+        <SpaceRecentDocumentList
+          documents={recentDocuments}
+          colors={colors}
+          spaceColor={space.color}
+          onPin={handlePinDocumentToSpace}
+        />
+      </View>
 
       {/* Open Chat Button */}
       <SpaceDetailsOpenChatBtn onPress={handleOpenChat} color={space.color} />

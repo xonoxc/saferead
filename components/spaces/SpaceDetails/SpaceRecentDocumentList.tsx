@@ -6,10 +6,12 @@ export default function SpaceRecentDocumentList({
   documents,
   colors,
   spaceColor,
+  onPin,
 }: {
   documents: any[]
   colors: { text: string; background: string }
   spaceColor: string
+  onPin?: (documentId: string, documentFile: string) => void
 }) {
   return (
     <View style={styles.documentsContainer}>
@@ -17,7 +19,7 @@ export default function SpaceRecentDocumentList({
       <FlatList
         data={documents}
         renderItem={({ item }) => (
-          <UserSpaceDocumentCard document={item} spaceColor={spaceColor} />
+          <UserSpaceDocumentCard document={item} spaceColor={spaceColor} onPin={onPin} />
         )}
         keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}

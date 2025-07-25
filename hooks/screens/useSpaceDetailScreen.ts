@@ -2,7 +2,7 @@ import { useState } from "react"
 import { FileText, TrendingUp } from "lucide-react-native"
 import { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated"
 import { useLocalSearchParams, useRouter } from "expo-router"
-import { useSpaces } from "@/hooks/queries/spaces"
+import { usePinDocumentMutation, useSpaces, useToggleFavoriteSpace } from "@/hooks/queries/spaces"
 import { Alert } from "react-native"
 import { updateSpace } from "@/services/space.service"
 import { useSpaceStore } from "@/store/useSpaceStore"
@@ -28,6 +28,9 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
   const flattendSpaces = spaces?.pages.flatMap(page => page.results) ?? []
   const space = flattendSpaces.find(s => s.id === id)
 
+  const toggleFavouriteSpace = useToggleFavoriteSpace(space?.id as string)
+  const pinDocumentToSpace = usePinDocumentMutation(space?.id as string)
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }))
@@ -37,12 +40,38 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       scale.value = withSpring(1)
     })
 
-    if (space) {
-      await updateSpace(space.id, { is_favorite: !space.is_favorite })
-      Alert.alert("Success", space.is_favorite ? "Removed from favorites" : "Added to favorites", [
-        { text: "OK", onPress: () => {} },
-      ])
+    if (!space) return
+
+    const resp = await attempt(toggleFavouriteSpace.mutateAsync())
+    if (!resp.ok) {
+      const errorMessage = getErrorMessage(resp.error)
+      Alert.alert("Error", errorMessage || "Failed to toggle favorite status of space")
+      return
     }
+    Alert.alert("Success", space.is_favorite ? "Removed from favorites" : "Added to favorites", [
+      { text: "OK", onPress: () => {} },
+    ])
+  }
+
+  const handlePinDocumentToSpace = async (documentId: string, document_file: string) => {
+    if (!space?.id) return
+
+    const resp = await attempt(
+      pinDocumentToSpace.mutateAsync({
+        id: documentId,
+        space: space.id,
+        document_file_url: document_file,
+      })
+    )
+    if (!resp.ok) {
+      const errorMessage = getErrorMessage(resp.error)
+      Alert.alert("Error", errorMessage || "Failed to pin document to space")
+      return
+    }
+
+    Alert.alert("Success", "Document pinned to space successfully", [
+      { text: "OK", onPress: () => {} },
+    ])
   }
 
   const stats = [
@@ -105,6 +134,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
     space,
     stats,
     handleFavoritePress,
+    handlePinDocumentToSpace,
     handleOpenChat,
     isSheetVisible,
     isUploadDocFormVisible,

@@ -5,6 +5,8 @@ import {
   getSpaceDocuments as getSpaceDocumentsApi,
   getSpaceStats as getSpaceStatsApi,
   toggleFavoriteSpace as toggleFavoriteSpaceApi,
+  pinDocumentToSpace,
+  type PinDocumetToSpaceMethodParams,
 } from "@/services/space.service"
 
 import type { PaginatedSpaceDocuments } from "@/types/api/spaces.documents.types"
@@ -29,6 +31,7 @@ export const useSpaces = (enabled = true) => {
 
 export const useDeleteSpace = () => {
   const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: deleteSpaceApi,
     onSuccess: () => {
@@ -65,11 +68,30 @@ export const useSpaceStats = (spaceId: string, enabled = true) => {
 
 export const useToggleFavoriteSpace = (spaceId: string) => {
   const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: (data: { is_favorite: boolean }) => toggleFavoriteSpaceApi(spaceId, data),
+    mutationFn: () => toggleFavoriteSpaceApi(spaceId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["spaces", spaceId] })
       queryClient.invalidateQueries({ queryKey: ["spaces"] })
+    },
+  })
+}
+
+export const usePinDocumentMutation = (spaceId: string) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: PinDocumetToSpaceMethodParams) => pinDocumentToSpace(data),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["spaces", spaceId, "documents"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["spaces", spaceId, "stats"],
+        }),
+      ])
     },
   })
 }

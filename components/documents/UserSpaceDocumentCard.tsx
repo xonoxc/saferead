@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native"
-import { Calendar, Tag } from "lucide-react-native"
+import { Calendar, Pin, Tag } from "lucide-react-native"
 import * as WebBrowser from "expo-web-browser"
 import { useTheme } from "@/hooks/useTheme"
 import { UserSpaceDocument } from "@/types/api/spaces.documents.types"
@@ -11,9 +11,10 @@ import { attempt } from "@/utils/attempt"
 interface UserSpaceDocumentCardProps {
   document: UserSpaceDocument
   spaceColor?: string
+  onPin?: (documentId: string, documentFile: string) => void
 }
 
-export function UserSpaceDocumentCard({ document, spaceColor }: UserSpaceDocumentCardProps) {
+export function UserSpaceDocumentCard({ document, spaceColor, onPin }: UserSpaceDocumentCardProps) {
   const { colors } = useTheme()
 
   const FileIcon = getFileIcon(document.file_extension)
@@ -26,6 +27,12 @@ export function UserSpaceDocumentCard({ document, spaceColor }: UserSpaceDocumen
     if (!resp.ok) {
       Alert.alert("Error", "Could not open the document.")
       return
+    }
+  }
+
+  const handlePinPress = () => {
+    if (onPin && document.document_file) {
+      onPin(document.id, document.document_file)
     }
   }
 
@@ -52,6 +59,11 @@ export function UserSpaceDocumentCard({ document, spaceColor }: UserSpaceDocumen
             {document.file_size}
           </Text>
         </View>
+        {onPin && (
+          <TouchableOpacity onPress={handlePinPress} style={styles.pinButton}>
+            <Pin size={18} color={colors.textMuted} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.footer}>
@@ -137,5 +149,8 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
     marginLeft: 6,
+  },
+  pinButton: {
+    padding: 8,
   },
 })

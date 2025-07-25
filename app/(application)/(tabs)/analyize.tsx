@@ -5,8 +5,6 @@ import { ChatView } from "@/components/chat"
 import { Dimensions, View, StyleSheet } from "react-native"
 import Animated, {
   Easing,
-  FadeIn,
-  FadeOut,
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,

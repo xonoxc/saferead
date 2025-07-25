@@ -14,6 +14,7 @@ interface DrawerProps {
   children: ReactNode
   visible: boolean
   enableAbsolute?: boolean
+  position?: "bottom" | "full"
 }
 
 const absoluteStyles: ViewStyle = {
@@ -21,14 +22,23 @@ const absoluteStyles: ViewStyle = {
   left: 0,
   right: 0,
   bottom: 0,
-  top: 0,
   zIndex: 1000,
   borderTopLeftRadius: 24,
   borderTopRightRadius: 24,
   overflow: "hidden",
 }
 
-export const Drawer: React.FC<DrawerProps> = ({ children, visible = true, enableAbsolute }) => {
+const fullScreenStyles: ViewStyle = {
+  ...absoluteStyles,
+  top: 0,
+}
+
+export const Drawer: React.FC<DrawerProps> = ({
+  children,
+  visible = true,
+  enableAbsolute,
+  position,
+}) => {
   const { colors } = useTheme()
 
   if (!visible) return null
@@ -37,9 +47,10 @@ export const Drawer: React.FC<DrawerProps> = ({ children, visible = true, enable
     backgroundColor: colors.background,
     flex: 1,
   }
+  const drawerPosition = position ?? "full"
 
   const containerStyle: StyleProp<ViewStyle> = [
-    enableAbsolute ? absoluteStyles : { flex: 1 },
+    ...(enableAbsolute ? [drawerPosition === "full" ? fullScreenStyles : absoluteStyles] : []),
     baseStyle,
   ]
 
@@ -55,6 +66,7 @@ export const Drawer: React.FC<DrawerProps> = ({ children, visible = true, enable
       >
         <ScrollView
           style={{ flex: 1 }}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
         >

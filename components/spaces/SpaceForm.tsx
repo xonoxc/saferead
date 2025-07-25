@@ -1,5 +1,14 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Switch } from "react-native"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Switch,
+  StyleProp,
+  ViewStyle,
+} from "react-native"
 import { TextInput } from "@/components/TextInput"
 import { Button } from "@/components/Button"
 import { useTheme } from "@/hooks/useTheme"
@@ -17,11 +26,13 @@ export const SpaceForm = ({
   onCancel,
   space,
   useDrawer,
+  extraContainerStyles,
 }: {
   onCreate: (data: SpaceFormData) => Promise<void>
   onCancel: () => void
   space?: Space
   useDrawer?: boolean
+  extraContainerStyles?: StyleProp<ViewStyle>
 }) => {
   const { colors } = useTheme()
 
@@ -46,7 +57,9 @@ export const SpaceForm = ({
 
   return (
     <Drawer enableAbsolute={useDrawer} visible>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View
+        style={[extraContainerStyles, styles.container, { backgroundColor: colors.background }]}
+      >
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>
             {isUpdateMode ? "Update Space" : "Create New Space"}

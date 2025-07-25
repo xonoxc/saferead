@@ -28,7 +28,7 @@ export function DrawerAlert({ visible, title, message, actions = [] }: DrawerAle
   const { colors } = useTheme()
 
   return (
-    <Drawer visible={visible} enableAbsolute>
+    <Drawer visible={visible} enableAbsolute position="bottom">
       <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 16 }}>
         {title && (
           <Text style={[styles.title, { color: colors.text, marginBottom: 8 }]}>{title}</Text>

@@ -20,7 +20,7 @@ export default function SidebarSearch({
         alignItems: "center",
         justifyContent: "center",
         paddingBottom: 1,
-        paddingHorizontal: 8,
+        paddingHorizontal: 12,
         gap: 8,
       }}
     >

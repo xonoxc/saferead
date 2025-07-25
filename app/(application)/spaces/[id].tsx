@@ -84,7 +84,12 @@ export default function SpaceDetailScreen() {
 
       {/* Update Space Form */}
       {isSheetVisible && (
-        <SpaceForm space={space} onCancel={toggleSheetVisiblity} onCreate={handleUpdateSpace} />
+        <SpaceForm
+          space={space}
+          onCancel={toggleSheetVisiblity}
+          onCreate={handleUpdateSpace}
+          useDrawer
+        />
       )}
     </View>
   )

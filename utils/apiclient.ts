@@ -26,12 +26,15 @@ export async function getAccessToken(): Promise<string | null> {
 
 export const apiClient = axios.create({
   baseURL: serverURL,
-  timeout: 1000,
+  timeout: 120000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
   },
   withCredentials: true,
+  transitional: {
+    clarifyTimeoutError: true,
+  },
 })
 
 apiClient.interceptors.request.use(

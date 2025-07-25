@@ -11,11 +11,12 @@ import {
 
 import type { PaginatedSpaceDocuments } from "@/types/api/spaces.documents.types"
 import type { PaginatedSpaces, Space } from "@/types/api/spaces.types"
+import type { SpaceFilterOptions } from "@/types/spaces"
 
-export const useSpaces = (enabled = true) => {
-  const query = useInfiniteQuery<PaginatedSpaces>({
-    queryKey: ["spaces"],
-    queryFn: ({ pageParam = 1 }) => getSpaces(pageParam as number),
+export const useSpaces = (filters: SpaceFilterOptions, enabled = true) => {
+  return useInfiniteQuery<PaginatedSpaces>({
+    queryKey: ["spaces", filters],
+    queryFn: ({ pageParam = 1 }) => getSpaces(pageParam as number, filters),
     getNextPageParam: lastPage => {
       if (!lastPage.next) return undefined
       const match = lastPage.next.match(/page=(\d+)/)
@@ -25,8 +26,6 @@ export const useSpaces = (enabled = true) => {
     enabled,
     refetchOnMount: true,
   })
-
-  return query
 }
 
 export const useDeleteSpace = () => {
@@ -41,7 +40,7 @@ export const useDeleteSpace = () => {
 }
 
 export const useSpaceDocuments = (spaceId: string, enabled = true) => {
-  const query = useInfiniteQuery<PaginatedSpaceDocuments>({
+  return useInfiniteQuery<PaginatedSpaceDocuments>({
     queryKey: ["spaces", spaceId, "documents"],
     queryFn: ({ pageParam = 1 }) => getSpaceDocumentsApi(spaceId, pageParam as number),
     getNextPageParam: lastPage => {
@@ -52,18 +51,14 @@ export const useSpaceDocuments = (spaceId: string, enabled = true) => {
     initialPageParam: 1,
     enabled: enabled && !!spaceId,
   })
-
-  return query
 }
 
 export const useSpaceStats = (spaceId: string, enabled = true) => {
-  const query = useQuery<Space>({
+  return useQuery<Space>({
     queryKey: ["spaces", spaceId, "stats"],
     queryFn: () => getSpaceStatsApi(spaceId),
     enabled: enabled && !!spaceId,
   })
-
-  return query
 }
 
 export const useToggleFavoriteSpace = (spaceId: string) => {

@@ -3,13 +3,15 @@ import { buildFileUploadFormData } from "@/utils/helpers/files"
 
 import type { ReactNativeFile } from "@/types/file"
 import type { SpaceDataParam } from "@/utils/validation/space"
+import type { SpaceFilterOptions } from "@/types/spaces"
 
 /*
  * User Space API Functions
  * **/
-export async function getSpaces(page?: number) {
+export async function getSpaces(page?: number, filters: SpaceFilterOptions = {}) {
   const params = {
     ...(page && { page }),
+    ...filters,
   }
   const resp = await apiClient.get("/user_space/spaces/", { params })
   return resp.data

@@ -13,7 +13,6 @@ import type { CreateSpaceForm, SpaceFormData } from "../forms/useSpaceHookForm"
 import type { RelativePathString } from "expo-router"
 
 export default function useSpaceScreen() {
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useSpaces()
   const { mutateAsync: deleteSpace } = useDeleteSpace()
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState<string>("")
@@ -24,6 +23,11 @@ export default function useSpaceScreen() {
   const queryClient = useQueryClient()
 
   const showBottomAlert = useDrawerAlert()
+
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useSpaces(
+    currentFilters,
+    true
+  )
 
   const spaces = data?.pages.flatMap(page => page.results) ?? []
 

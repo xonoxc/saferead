@@ -26,8 +26,8 @@ export default function HomeScreenStatCard({ stat, style }: StatCardProps) {
         style,
       ]}
     >
-      <View style={[styles.statIcon, { backgroundColor: `${stat.color}20` }]}>
-        <stat.icon size={24} color={stat.color} />
+      <View style={[styles.statIcon, { backgroundColor: `${stat?.color}20` }]}>
+        <stat.icon size={24} color={stat?.color} />
       </View>
       <Text style={[styles.statValue, { color: colors.text }]}>
         {stat.value}

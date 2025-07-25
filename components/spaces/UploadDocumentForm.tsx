@@ -35,7 +35,7 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
   })
 
   return (
-    <Drawer>
+    <Drawer visible>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>Upload Document</Text>

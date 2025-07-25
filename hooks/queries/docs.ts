@@ -5,10 +5,10 @@ import {
   deleteDocument as deleteDocumentApi,
 } from "@/services/document.service"
 
-import type { FilterOptions } from "@/types/docs"
+import type { DocumentFilterOptions } from "@/types/docs"
 import type { DocumentsListResponse } from "@/types/api/documents.types"
 
-export const useDocuments = (filters?: FilterOptions, enabled = true) => {
+export const useDocuments = (filters?: DocumentFilterOptions, enabled = true) => {
   const query = useInfiniteQuery<DocumentsListResponse>({
     queryKey: ["documents", filters],
     queryFn: ({ pageParam = 1 }) => getDocuments(pageParam as number, filters),

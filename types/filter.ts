@@ -10,3 +10,12 @@ export interface FilterField {
   icon?: React.ReactNode
   options?: FilterFieldOption[]
 }
+
+export interface BaseFilterOptions {
+  created_at_gte?: string
+  created_at_lte?: string
+  ordering?: string
+  search?: string
+  updated_at?: string
+  created_at?: string
+}

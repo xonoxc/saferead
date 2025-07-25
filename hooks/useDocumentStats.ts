@@ -3,13 +3,7 @@ import { getDocumentStats } from "@/services/document.service"
 import { StatsResponse } from "@/types/api/documents.types"
 
 export const useDocumentStats = () => {
-  const {
-    data: stats,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery<StatsResponse, Error>({
+  const result = useQuery<StatsResponse, Error>({
     queryKey: ["documentStats"],
     queryFn: getDocumentStats,
     staleTime: 1000 * 60 * 5,
@@ -18,9 +12,8 @@ export const useDocumentStats = () => {
   })
 
   return {
-    stats,
-    isLoading,
-    error: isError ? error.message : null,
-    refetch,
+    ...result,
+    stats: result.data,
+    error: result.isError ? result.error.message : null,
   }
 }

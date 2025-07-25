@@ -45,7 +45,7 @@ export const SpaceForm = ({
   const selectedColor = useWatch({ control, name: "color" }) ?? colors.text
 
   return (
-    <Drawer enableAbsolute={useDrawer}>
+    <Drawer enableAbsolute={useDrawer} visible>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>

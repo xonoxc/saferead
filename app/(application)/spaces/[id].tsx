@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   modalOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    height: "100%",
     backgroundColor: "transparent",
     justifyContent: "center",
     alignItems: "center",

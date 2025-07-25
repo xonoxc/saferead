@@ -46,7 +46,7 @@ export const UniversalFilter = ({
   }
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+    <Modal visible={visible} animationType="slide" presentationStyle="fullScreen">
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <FilterHeader title="Filter" onClose={onClose} />
 

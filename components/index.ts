@@ -1,4 +1,4 @@
-export { default as UpgradeButton } from "./UpgradeButton";
+export { default as UpgradeButton } from "./UpgradeButton"
 
 export * from "./sidebar/Sidebar"
 export * from "./chat"
@@ -23,5 +23,3 @@ export * from "./LoadingSpinner"
 export * from "./ErrorMessage"
 
 export * from "./CustomBackBtn"
-
-export * from "./SearchBar"

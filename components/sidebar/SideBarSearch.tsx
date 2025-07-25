@@ -19,7 +19,7 @@ export default function SidebarSearch({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        paddingBottom: 20,
+        paddingBottom: 1,
         paddingHorizontal: 8,
         gap: 8,
       }}

@@ -19,6 +19,7 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import { KeyboardProvider } from "react-native-keyboard-controller"
 
 import { ErrorBoundary } from "@/components/ErrorBoundry"
+import { DrawerAlertRenderer } from "@/hooks/alerts/useAlert"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -74,13 +75,15 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <AuthProvider>
-        <ThemeProvider>
+      <ThemeProvider>
+        <AuthProvider>
           <ErrorBoundary>
-            <AppContent />
+            <DrawerAlertRenderer>
+              <AppContent />
+            </DrawerAlertRenderer>
           </ErrorBoundary>
-        </ThemeProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   )
 }

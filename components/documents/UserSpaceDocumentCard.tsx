@@ -1,6 +1,6 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native"
-import { Calendar, Pin, Tag } from "lucide-react-native"
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { Calendar, Pin, PinOff, Tag } from "lucide-react-native"
 import * as WebBrowser from "expo-web-browser"
 import { useTheme } from "@/hooks/useTheme"
 import { UserSpaceDocument } from "@/types/api/spaces.documents.types"
@@ -10,12 +10,18 @@ import { attempt } from "@/utils/attempt"
 import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 
 interface UserSpaceDocumentCardProps {
+  pinned?: boolean
   document: UserSpaceDocument
   spaceColor?: string
   onPin?: (documentId: string, documentFile: string) => void
 }
 
-export function UserSpaceDocumentCard({ document, spaceColor, onPin }: UserSpaceDocumentCardProps) {
+export function UserSpaceDocumentCard({
+  document,
+  spaceColor,
+  onPin,
+  pinned = false,
+}: UserSpaceDocumentCardProps) {
   const { colors } = useTheme()
   const showAlert = useDrawerAlert()
 
@@ -34,7 +40,7 @@ export function UserSpaceDocumentCard({ document, spaceColor, onPin }: UserSpace
         actions: [
           {
             text: "OK",
-            style: "default",
+            style: "primary",
             onPress: () => {},
           },
         ],
@@ -74,7 +80,11 @@ export function UserSpaceDocumentCard({ document, spaceColor, onPin }: UserSpace
         </View>
         {onPin && (
           <TouchableOpacity onPress={handlePinPress} style={styles.pinButton}>
-            <Pin size={18} color={colors.textMuted} />
+            {pinned ? (
+              <PinOff size={18} color={spaceColor} />
+            ) : (
+              <Pin size={18} color={spaceColor} />
+            )}
           </TouchableOpacity>
         )}
       </View>

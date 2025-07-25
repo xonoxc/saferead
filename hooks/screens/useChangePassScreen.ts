@@ -8,15 +8,15 @@ import { apiClient } from "@/utils/apiclient"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
 import { useAuth } from "@/hooks/useAuth"
-
 import { router } from "expo-router"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Alert } from "react-native"
+import { useDrawerAlert } from "../alerts/useAlert"
 
 export default function useChangePassScreen() {
   const { logout } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const showBottomAlert = useDrawerAlert()
 
   const {
     control,
@@ -37,19 +37,30 @@ export default function useChangePassScreen() {
     setIsSubmitting(false)
 
     if (!result.ok) {
-      Alert.alert("Error", getErrorMessage(result.error))
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: getErrorMessage(result.error) || "Failed to change password",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 
-    Alert.alert("Success", "Your password has been changed successfully. Please sign in again.", [
-      {
-        text: "OK",
-        onPress: async () => {
-          await logout()
-          router.replace("/(auth)/login")
+    showBottomAlert({
+      type: "success",
+      title: "Success",
+      message: "Your password has been changed successfully. Please sign in again.",
+      actions: [
+        {
+          text: "OK",
+          style: "primary",
+          onPress: async () => {
+            await logout()
+            router.replace("/(auth)/login")
+          },
         },
-      },
-    ])
+      ],
+    })
   }
 
   return {

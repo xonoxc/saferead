@@ -1,5 +1,5 @@
 import React from "react"
-import { ScrollView, StyleSheet, View } from "react-native"
+import { StyleSheet, View } from "react-native"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { useSpaceDetailsScreen } from "@/hooks/screens/useSpaceDetailScreen"
 import { useTheme } from "@/hooks/useTheme"
@@ -17,6 +17,8 @@ export default function SpaceDetailScreen() {
   const {
     space,
     stats,
+    pinnedDocuments,
+    recentDocuments,
     animatedStyle,
     isSheetVisible,
     isUploadDocFormVisible,
@@ -25,7 +27,7 @@ export default function SpaceDetailScreen() {
     handleOpenChat,
     handleFavoritePress,
     handleUpdateSpace,
-    handlePinDocumentToSpace,
+    handlePinDocumentToSpace: togglePinnedStatus,
   } = useSpaceDetailsScreen({ colors })
 
   if (!space) {
@@ -35,9 +37,6 @@ export default function SpaceDetailScreen() {
       </View>
     )
   }
-
-  const pinnedDocuments = space.recent_documents.filter(doc => doc.is_pinned)
-  const recentDocuments = space.recent_documents.filter(doc => !doc.is_pinned)
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -54,14 +53,19 @@ export default function SpaceDetailScreen() {
       <SpaceDetailsStats stats={stats} colors={colors} />
       <View style={{ flex: 1 }}>
         {/* Pinned Documents */}
-        <PinnedDocuments documents={pinnedDocuments} colors={colors} spaceColor={space.color} />
+        <PinnedDocuments
+          documents={pinnedDocuments ?? []}
+          colors={colors}
+          spaceColor={space.color}
+          onUnpinPress={togglePinnedStatus}
+        />
 
         {/* Recent Documents */}
         <SpaceRecentDocumentList
-          documents={recentDocuments}
+          documents={recentDocuments ?? []}
           colors={colors}
           spaceColor={space.color}
-          onPin={handlePinDocumentToSpace}
+          onPin={togglePinnedStatus}
         />
       </View>
 

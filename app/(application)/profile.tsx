@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from "react-native"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native"
 import {
   ArrowLeft,
   Camera,
@@ -24,6 +24,7 @@ import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { attempt } from "@/utils/attempt"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
+import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 
 export default function ProfileScreen() {
   const { colors } = useTheme()
@@ -41,6 +42,8 @@ export default function ProfileScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const scale = useSharedValue(1)
+
+  const showBottomAlert = useDrawerAlert()
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -80,11 +83,20 @@ export default function ProfileScreen() {
       })
     )
     if (!resp.ok) {
-      Alert.alert("Error", getErrorMessage(resp.error))
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: getErrorMessage(resp.error) || "Failed to update profile",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 
-    Alert.alert("Success", "Profile updated successfully!")
+    showBottomAlert({
+      title: "Success",
+      message: "Profile updated successfully!",
+      actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+    })
     setIsEditing(false)
   }
 
@@ -104,11 +116,15 @@ export default function ProfileScreen() {
       scale.value = withSpring(1)
     })
 
-    Alert.alert("Change Profile Photo", "Choose how you want to update your profile photo", [
-      { text: "Camera", onPress: () => {} },
-      { text: "Photo Library", onPress: () => {} },
-      { text: "Cancel", style: "cancel" },
-    ])
+    showBottomAlert({
+      title: "Change Profile Photo",
+      message: "Choose how you want to update your profile photo",
+      actions: [
+        { text: "Camera", style: "primary", onPress: () => {} },
+        { text: "Photo Library", style: "primary", onPress: () => {} },
+        { text: "Cancel", style: "primary", onPress: () => {} },
+      ],
+    })
   }
 
   const updateFormData = (key: string, value: string) => {

@@ -12,6 +12,7 @@ import { useDocuments, useDeleteDocument } from "@/hooks/queries/docs"
 import { attempt } from "@/utils/attempt"
 import { useAnalysisStore } from "@/store/useAnalysisStore"
 import { useSpaceStore } from "@/store/useSpaceStore"
+import { useDrawerAlert } from "../alerts/useAlert"
 
 export function useDocumentScreen() {
   const applyFilters = useDocumentsStore(s => s.applyFilters)
@@ -38,6 +39,8 @@ export function useDocumentScreen() {
 
   const { mutateAsync: deleteDocument, isPending: isDeleting } = useDeleteDocument()
 
+  const showBottomAlert = useDrawerAlert()
+
   const handleAddDocument = () => {
     if (!selectedSpace?.id) return
     router.push(`/spaces/${selectedSpace.id}`)
@@ -46,10 +49,26 @@ export function useDocumentScreen() {
   const handleDeleteDocument = async (documentId: string) => {
     const resp = await attempt(deleteDocument(documentId))
     if (!resp.ok) {
-      Alert.alert("Error", resp.error.message || "Failed to delete document")
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: resp.error.message || "Failed to delete document",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
-    Alert.alert("Success", "Document deleted successfully~! ✨")
+
+    showBottomAlert({
+      title: "Success",
+      message: "Document deleted successfully! ✨",
+      actions: [
+        {
+          text: "OK",
+          style: "primary",
+          onPress: () => {},
+        },
+      ],
+    })
   }
 
   const handleRefresh = async () => {

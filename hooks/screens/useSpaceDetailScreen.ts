@@ -3,7 +3,6 @@ import { FileText, TrendingUp } from "lucide-react-native"
 import { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { usePinDocumentMutation, useSpaces, useToggleFavoriteSpace } from "@/hooks/queries/spaces"
-import { Alert } from "react-native"
 import { updateSpace } from "@/services/space.service"
 import { useSpaceStore } from "@/store/useSpaceStore"
 
@@ -12,12 +11,15 @@ import { attempt } from "@/utils/attempt"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { useQueryClient } from "@tanstack/react-query"
 import { UpdateSpaceForm } from "../forms/useSpaceHookForm"
+import { useDrawerAlert } from "../alerts/useAlert"
 
 export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
   const { id } = useLocalSearchParams<{ id: string }>()
   const { data: spaces } = useSpaces()
   const router = useRouter()
   const setSpace = useSpaceStore(s => s.setSelectedSpace)
+
+  const showBottomAlert = useDrawerAlert()
 
   const queryClient = useQueryClient()
 
@@ -29,7 +31,10 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
   const space = flattendSpaces.find(s => s.id === id)
 
   const toggleFavouriteSpace = useToggleFavoriteSpace(space?.id as string)
-  const pinDocumentToSpace = usePinDocumentMutation(space?.id as string)
+  const pinDocumentToSpace = usePinDocumentMutation()
+
+  const pinnedDocuments = space?.recent_documents.filter(doc => doc.is_pinned)
+  const recentDocuments = space?.recent_documents.filter(doc => !doc.is_pinned)
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -45,12 +50,21 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
     const resp = await attempt(toggleFavouriteSpace.mutateAsync())
     if (!resp.ok) {
       const errorMessage = getErrorMessage(resp.error)
-      Alert.alert("Error", errorMessage || "Failed to toggle favorite status of space")
+
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: errorMessage || "Failed to toggle favorite status of space",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
+
       return
     }
-    Alert.alert("Success", space.is_favorite ? "Removed from favorites" : "Added to favorites", [
-      { text: "OK", onPress: () => {} },
-    ])
+    showBottomAlert({
+      title: "Success",
+      message: space.is_favorite ? "Removed from favorites" : "Added to favorites",
+      actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+    })
   }
 
   const handlePinDocumentToSpace = async (documentId: string, document_file: string) => {
@@ -65,13 +79,21 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
     )
     if (!resp.ok) {
       const errorMessage = getErrorMessage(resp.error)
-      Alert.alert("Error", errorMessage || "Failed to pin document to space")
+
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: errorMessage || "Failed to pin document to space",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 
-    Alert.alert("Success", "Document pinned to space successfully", [
-      { text: "OK", onPress: () => {} },
-    ])
+    showBottomAlert({
+      title: "Success",
+      message: "Document pinned to space successfully",
+      actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+    })
   }
 
   const stats = [
@@ -118,8 +140,12 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
 
     const resp = await attempt(updateSpace(space.id, data))
     if (!resp.ok) {
-      const errorMessage = getErrorMessage(resp.error)
-      Alert.alert("Error", errorMessage || "Failed to update space")
+      showBottomAlert({
+        title: "Error",
+        message: getErrorMessage(resp.error) || "Failed to update space",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
+
       return
     }
 
@@ -133,6 +159,8 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
   return {
     space,
     stats,
+    pinnedDocuments,
+    recentDocuments,
     handleFavoritePress,
     handlePinDocumentToSpace,
     handleOpenChat,

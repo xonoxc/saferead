@@ -37,6 +37,7 @@ export function ChatView() {
 
   const handleSend = () => {
     KeyboardController.dismiss()
+
     if (message.trim()) {
       const newMessage = { text: message, sender: "user" as const }
       setChatHistory(prev => [...prev, newMessage])

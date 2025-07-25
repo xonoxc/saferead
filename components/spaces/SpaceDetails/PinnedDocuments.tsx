@@ -9,9 +9,15 @@ interface PinnedDocumentsProps {
   documents: UserSpaceDocument[]
   spaceColor?: string
   colors: ColorsType
+  onUnpinPress?: (docsId: string, docsFile: string) => void
 }
 
-export default function PinnedDocuments({ documents, spaceColor, colors }: PinnedDocumentsProps) {
+export default function PinnedDocuments({
+  documents,
+  spaceColor,
+  colors,
+  onUnpinPress,
+}: PinnedDocumentsProps) {
   if (documents.length === 0) return null
 
   return (
@@ -19,7 +25,14 @@ export default function PinnedDocuments({ documents, spaceColor, colors }: Pinne
       <Text style={[styles.title, { color: colors.text }]}>Pinned Documents</Text>
       <FlatList
         data={documents}
-        renderItem={({ item }) => <UserSpaceDocumentCard document={item} spaceColor={spaceColor} />}
+        renderItem={({ item }) => (
+          <UserSpaceDocumentCard
+            pinned
+            document={item}
+            spaceColor={spaceColor}
+            onPin={onUnpinPress}
+          />
+        )}
         keyExtractor={item => item.id}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContent}

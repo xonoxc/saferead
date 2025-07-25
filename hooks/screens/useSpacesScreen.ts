@@ -4,21 +4,23 @@ import { useQueryClient } from "@tanstack/react-query"
 import { attempt } from "@/utils/attempt"
 import { createSpace } from "@/services/space.service"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
-import { Alert } from "react-native"
 import { router, type RelativePathString } from "expo-router"
 
 import type { ViewType } from "@/types/view"
 import type { Space } from "@/types"
 import { CreateSpaceForm, SpaceFormData } from "../forms/useSpaceHookForm"
+import { useDrawerAlert } from "../alerts/useAlert"
 
 export default function useSpaceScreen() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useSpaces()
-  const { mutate: deleteSpace } = useDeleteSpace()
+  const { mutateAsync: deleteSpace } = useDeleteSpace()
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [viewMode, setViewMode] = useState<ViewType>("grid")
 
   const queryClient = useQueryClient()
+
+  const showBottomAlert = useDrawerAlert()
 
   const spaces = data?.pages.flatMap(page => page.results) ?? []
 
@@ -31,8 +33,13 @@ export default function useSpaceScreen() {
   const handleCreateSpace = async (data: SpaceFormData) => {
     const result = await attempt(createSpace(data as CreateSpaceForm))
     if (!result.ok) {
-      const errorMessage = getErrorMessage(result.error)
-      Alert.alert("Error", errorMessage || "Failed to create space")
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: getErrorMessage(result.error) || "Failed to create space",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
+      setCreateModalVisible(false)
       return
     }
 
@@ -43,10 +50,31 @@ export default function useSpaceScreen() {
   }
 
   const handleDeleteSpace = (spaceId: string, spaceName: string) => {
-    Alert.alert("Delete Space", `Are you sure you want to delete "${spaceName}"?`, [
-      { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => deleteSpace(spaceId) },
-    ])
+    const safeDeleteSpace = async () => {
+      const resp = await attempt(deleteSpace(spaceId))
+      if (!resp.ok) {
+        showBottomAlert({
+          type: "error",
+          title: "Error",
+          message: getErrorMessage(resp.error) || "Failed to delete space",
+          actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+        })
+        return
+      }
+    }
+
+    showBottomAlert({
+      title: "Delete Space",
+      message: `Are you sure you want to delete "${spaceName}"?`,
+      actions: [
+        { text: "Cancel", style: "primary", onPress: () => {} },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => await safeDeleteSpace(),
+        },
+      ],
+    })
   }
 
   const handleSpaceSelectPress = (space: Space) => {

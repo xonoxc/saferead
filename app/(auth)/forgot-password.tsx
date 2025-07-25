@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native"
+import { View, Text, StyleSheet, ScrollView } from "react-native"
 import { Link, router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useForm, Controller } from "react-hook-form"
@@ -12,6 +12,7 @@ import { apiClient } from "@/utils/apiclient"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
 import { ModalLoadingSpinner } from "@/components/ModalLoadingSpinner"
+import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 
 export default function ForgotPasswordScreen() {
   const { colors } = useTheme()
@@ -28,20 +29,29 @@ export default function ForgotPasswordScreen() {
     },
   })
 
+  const showBottomAlert = useDrawerAlert()
+
   const onSubmit = async (data: EmailFormSchema) => {
     setIsSubmitting(true)
     const result = await attempt(apiClient.post("/auth/password/reset/", data))
     setIsSubmitting(false)
 
     if (!result.ok) {
-      Alert.alert("Error", getErrorMessage(result.error))
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: getErrorMessage(result.error) || "Failed to send password reset link",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 
-    Alert.alert(
-      "Check your email",
-      "If an account with that email exists, we have sent a password reset link."
-    )
+    showBottomAlert({
+      type: "success",
+      title: "Check your email",
+      message: "If an account with that email exists, we have sent a password reset link.",
+      actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+    })
     router.back()
   }
 

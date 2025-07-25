@@ -1,9 +1,10 @@
 import { ColorsType, useTheme } from "@/hooks/useTheme"
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
 import { ArrowDown, ArrowUp, FileText, Trash2, TrendingUp } from "lucide-react-native"
 
 import type { AnalysisResponse } from "@/types/api/documents.types"
 import { Fonts, FontSizes } from "@/constants"
+import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 
 interface DocumentCardProps {
   document: AnalysisResponse
@@ -14,9 +15,10 @@ interface DocumentCardProps {
 export const SideBarDocumentCard = ({ document, onPress, onDelete }: DocumentCardProps) => {
   const { colors, isDark } = useTheme()
 
+  const showBottomAlert = useDrawerAlert()
+
   const handleDelete = () => {
-    Alert.alert(
-      "Delete Document",
+    /* "Delete Document",
       "Are you sure you want to delete this document? This action cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
@@ -25,8 +27,20 @@ export const SideBarDocumentCard = ({ document, onPress, onDelete }: DocumentCar
           style: "destructive",
           onPress: () => onDelete(document.id),
         },
-      ]
-    )
+      ] */
+
+    showBottomAlert({
+      title: "Delete Document",
+      message: "Are you sure you want to delete this document?",
+      actions: [
+        { text: "Cancel", style: "secondary", onPress: () => {} },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => onDelete(document.id),
+        },
+      ],
+    })
   }
 
   const isDocumentComplete = isDocumentStatusCompleted(document)

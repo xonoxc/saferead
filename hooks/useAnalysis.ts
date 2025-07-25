@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { Alert } from "react-native"
 import { attempt } from "@/utils/attempt"
 import { useAuth } from "@/hooks/useAuth"
 import { DocumentType } from "@/components/documents/DocumentTypeSelector"
@@ -17,11 +16,13 @@ import { router } from "expo-router"
 import { useQueryClient } from "@tanstack/react-query"
 import { useSidebarStore } from "@/store/sidebar/useSidebarStore"
 import { useTabBarVisibility } from "./useTabBarVisiblitiy"
+import { useDrawerAlert } from "./alerts/useAlert"
 
 export function useAnalysis() {
   const { user } = useAuth()
 
   const queryClient = useQueryClient()
+  const showBottomAlert = useDrawerAlert()
 
   const analysisResult = useAnalysisStore(s => s.analysisResult)
   const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
@@ -46,7 +47,13 @@ export function useAnalysis() {
 
   const handleAnalyzeDocument = async (document: any, docType: DocumentType) => {
     if (!user) {
-      Alert.alert("Error", "Please log in to analyze documents")
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: "Please log in to analyze documents",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
+
       return
     }
 
@@ -69,13 +76,16 @@ export function useAnalysis() {
       })
       filename = document.title || "document.txt"
     } else {
-      Alert.alert("Unsupported document format. Please try again.")
+      showBottomAlert({
+        type: "error",
+        title: "Unsupported Document",
+        message: "The selected document format is not supported. Please try again.",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
 
       setIsAnalyzing(false)
       return
     }
-
-    console.log("Document File:", documentFile)
 
     const uploadResult = await attempt(
       uploadDocument({
@@ -86,8 +96,12 @@ export function useAnalysis() {
     )
 
     if (!uploadResult.ok) {
-      console.error("Upload Error:", uploadResult.error.message)
-      Alert.alert(uploadResult.error.message || "Failed to analyze document")
+      showBottomAlert({
+        type: "error",
+        title: "Analysis Error",
+        message: uploadResult.error.message || "Failed to analyze document",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
     } else {
       setAnalysisResult(uploadResult.data)
       router.push("/analysisres")
@@ -111,20 +125,24 @@ export function useAnalysis() {
 
   const handleDocumentUpload = async () => {
     if (!user) {
-      Alert.alert("Error", "Please log in to upload documents")
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: "Please log in to upload documents",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 
     const result = await pickDocument()
     if (!result.ok) {
       if (result.canceled) return
-
-      Alert.alert("Error", result.error?.message || "Failed to pick document", [
-        {
-          text: "OK",
-          onPress: () => {},
-        },
-      ])
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: result.error?.message || "Failed to pick document",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 
@@ -133,14 +151,23 @@ export function useAnalysis() {
 
   const handleDocumentScan = async () => {
     if (!user) {
-      Alert.alert("Error", "Please log in to scan documents")
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: "Please log in to scan documents",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 
     const result = await scanDocument()
     if (!result.ok) {
-      console.log("Scan Error:", result.error)
-      Alert.alert("Error", result.error?.message)
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: result.error?.message || "Failed to scan document",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 

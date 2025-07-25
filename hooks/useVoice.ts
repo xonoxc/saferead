@@ -11,6 +11,7 @@ import * as Speech from "expo-speech"
 import { VoiceNote } from "@/types"
 import { attempt, attemptSync } from "@/utils/attempt"
 import { Alert } from "react-native"
+import { useDrawerAlert } from "./alerts/useAlert"
 
 export const useVoice = () => {
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY)
@@ -20,6 +21,8 @@ export const useVoice = () => {
   const [permissionStatus, setPermissionStatus] = useState<"granted" | "denied" | "undetermined">(
     "undetermined"
   )
+
+  const showBottomAlert = useDrawerAlert()
 
   const [playerUri, setPlayerUri] = useState<string | null>(null)
   const player = useAudioPlayer(playerUri ?? undefined)
@@ -83,7 +86,12 @@ export const useVoice = () => {
 
     const recordStopAtt = await attempt(audioRecorder.stop())
     if (!recordStopAtt.ok) {
-      Alert.alert("Failed to stop recording!!", recordStopAtt.error.message)
+      showBottomAlert({
+        type: "error",
+        title: "Recording Error",
+        message: recordStopAtt.error.message || "Failed to stop recording.",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 
@@ -117,7 +125,12 @@ export const useVoice = () => {
       })
     )
     if (!resp.ok) {
-      console.error("Failed to speak text:", resp.error)
+      showBottomAlert({
+        type: "error",
+        title: "Speech Error",
+        message: resp.error.message || "Failed to speak the provided text.",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
     }
   }
 

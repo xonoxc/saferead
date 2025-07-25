@@ -2,13 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import * as DocumentPicker from "expo-document-picker"
 import { useForm } from "react-hook-form"
-import { Alert } from "react-native"
 import { z } from "zod"
 
 import { addDocumentToSpace } from "@/services/space.service"
 import { uploadDocumentFormSchema as schema } from "@/utils/validation/docs"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
+import { useDrawerAlert } from "../alerts/useAlert"
 
 type FormData = z.infer<typeof schema>
 
@@ -19,6 +19,8 @@ interface UseUploadDocumentFormProps {
 
 export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDocumentFormProps) {
   const queryClient = useQueryClient()
+
+  const showBottomAlert = useDrawerAlert()
 
   const {
     control,
@@ -61,11 +63,21 @@ export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDoc
         }),
       ])
       onUploadSuccess()
-      Alert.alert("Success", "Document uploaded successfully")
+
+      showBottomAlert({
+        type: "success",
+        title: "Upload Successful",
+        message: "Your document has been uploaded successfully.",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
     },
     onError: error => {
-      const errorMessage = getErrorMessage(error)
-      Alert.alert("Error", errorMessage)
+      showBottomAlert({
+        type: "error",
+        title: "Upload Error",
+        message: getErrorMessage(error),
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
     },
   })
 
@@ -83,7 +95,12 @@ export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDoc
     const file = result.data.assets[0]
 
     if (file.size && file.size > 10 * 1024 * 1024) {
-      Alert.alert("File too large", "Please select a file smaller than 10 MB.")
+      showBottomAlert({
+        type: "error",
+        title: "File too large",
+        message: "Please select a file smaller than 10 MB.",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native"
+import { View, Text, StyleSheet, ScrollView } from "react-native"
 import { router, useLocalSearchParams } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useForm, Controller } from "react-hook-form"
@@ -15,11 +15,14 @@ import { apiClient } from "@/utils/apiclient"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
 import { ModalLoadingSpinner } from "@/components/ModalLoadingSpinner"
+import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 
 export default function ResetPasswordScreen() {
   const { colors } = useTheme()
   const { uid, token } = useLocalSearchParams<{ uid: string; token: string }>()
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const showBottomAlert = useDrawerAlert()
 
   const {
     control,
@@ -36,7 +39,12 @@ export default function ResetPasswordScreen() {
 
   const onSubmit = async (data: ResetPasswordFormSchema) => {
     if (!uid || !token) {
-      Alert.alert("Error", "Invalid password reset link. Please try again.")
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: "Invalid password reset link. Please try again.",
+        actions: [{ text: "OK", style: "primary", onPress: () => router.replace("/(auth)/login") }],
+      })
       return
     }
 
@@ -46,11 +54,21 @@ export default function ResetPasswordScreen() {
     setIsSubmitting(false)
 
     if (!result.ok) {
-      Alert.alert("Error", getErrorMessage(result.error))
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: getErrorMessage(result.error) || "Failed to reset password. Please try again.",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
       return
     }
 
-    Alert.alert("Success", "Your password has been reset successfully. Please sign in.")
+    showBottomAlert({
+      type: "success",
+      title: "Success",
+      message: "Your password has been reset successfully. Please sign in.",
+      actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+    })
     router.replace("/(auth)/login")
   }
 

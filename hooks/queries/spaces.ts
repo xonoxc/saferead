@@ -78,20 +78,14 @@ export const useToggleFavoriteSpace = (spaceId: string) => {
   })
 }
 
-export const usePinDocumentMutation = (spaceId: string) => {
+export const usePinDocumentMutation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (data: PinDocumetToSpaceMethodParams) => pinDocumentToSpace(data),
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["spaces", spaceId, "documents"],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["spaces", spaceId, "stats"],
-        }),
-      ])
-    },
+    onSuccess: async () =>
+      await queryClient.invalidateQueries({
+        queryKey: ["spaces"],
+      }),
   })
 }

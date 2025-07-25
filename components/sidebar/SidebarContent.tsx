@@ -95,13 +95,7 @@ export default function SideBarDocumentContent({
   }
 
   if (isLoading || isDeleting) {
-    return (
-      <SideBarLoadingState
-        searchQuery={searchQuery}
-        handleSearch={handleSearch}
-        setShowFilter={setShowFilter}
-      />
-    )
+    return <SideBarLoadingState />
   }
 
   return (

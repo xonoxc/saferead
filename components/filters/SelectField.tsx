@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 
 import type { FilterField } from "@/types/filter"

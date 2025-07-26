@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import {
   View,
   Text,
@@ -8,52 +8,18 @@ import {
   KeyboardAvoidingView,
 } from "react-native"
 import { Send } from "lucide-react-native"
-import { useTheme } from "@/hooks/useTheme"
-import { useSpaceStore } from "@/store/useSpaceStore"
 import { SpaceIndicator } from "./spaceindicator/SpaceIndicator"
 
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import Animated, { FadeIn, FadeInDown, FadeOut } from "react-native-reanimated"
-import { KeyboardAwareScrollView, KeyboardController } from "react-native-keyboard-controller"
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { isIOS } from "@/utils/helpers/platform"
+import useChat from "@/hooks/chat/useChat"
 
 export function ChatView() {
-  const { colors } = useTheme()
-  const { selectedSpace } = useSpaceStore()
-  const [message, setMessage] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  const [chatHistory, setChatHistory] = useState<{ text: string; sender: "user" | "bot" }[]>([])
-
-  const isKeyboardVisible = KeyboardController.isVisible()
-
-  useEffect(() => {
-    if (selectedSpace) {
-      setChatHistory([
-        { text: `Welcome to ${selectedSpace.title}! How can I help you?`, sender: "bot" },
-      ])
-    }
-  }, [selectedSpace])
-
-  const handleSend = () => {
-    KeyboardController.dismiss()
-
-    if (message.trim()) {
-      const newMessage = { text: message, sender: "user" as const }
-      setChatHistory(prev => [...prev, newMessage])
-      setMessage("")
-      setIsTyping(true)
-
-      setTimeout(() => {
-        const botResponse = {
-          text: "This is a simulated response.",
-          sender: "bot" as const,
-        }
-        setChatHistory(prev => [...prev, botResponse])
-        setIsTyping(false)
-      }, 1500)
-    }
-  }
+  const { colors, message, setMessage, isTyping, chatHistory, isKeyboardVisible, handleSend } =
+    useChat()
 
   return (
     <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>

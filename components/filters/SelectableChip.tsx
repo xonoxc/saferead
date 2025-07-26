@@ -41,6 +41,6 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: FontSizes.xs,
-    fontFamily: Fonts.bold,
+    fontFamily: Fonts.regular,
   },
 })

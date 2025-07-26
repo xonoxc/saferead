@@ -2,12 +2,13 @@ import React, { useState } from "react"
 import { View, Text, Modal, ScrollView, TouchableOpacity, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 
-import type { FilterField } from "@/types/filter"
 import { SelectField } from "./SelectField"
 import { TextSearchField } from "./TextSearchField"
 import { DateRangeField } from "./DateRangeField"
 import { FilterHeader } from "./FilterSectionHeader"
 import { Fonts, FontSizes } from "@/constants"
+
+import type { FilterField } from "@/types/filter"
 
 interface UniversalFilterProps {
   visible: boolean
@@ -50,7 +51,7 @@ export const UniversalFilter = ({
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <FilterHeader title="Filter" onClose={onClose} />
 
-        <ScrollView style={styles.content}>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {fields.map(field => {
             switch (field.type) {
               case "select":

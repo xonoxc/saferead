@@ -20,7 +20,6 @@ export default function SpacesScreen() {
     hasNextPage,
     fetchNextPage,
     viewMode,
-
     setCurrentFilters,
     showFilter,
     currentFilters,

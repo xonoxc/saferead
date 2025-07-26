@@ -9,10 +9,11 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        sceneStyle: { backgroundColor: colors.background },
+        animation: "shift",
         headerShown: false,
         tabBarActiveTintColor: colors.text,
         tabBarShowLabel: false,
+        sceneStyle: { flex: 1, backgroundColor: colors.background },
         tabBarHideOnKeyboard: true,
         tabBarStyle: getTabBarStyles(colors),
       }}

@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, use } from "react"
+import { useState, useEffect, createContext, useContext } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
 import { User } from "@/types"
@@ -278,7 +278,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 }
 
 export const useAuth = () => {
-  const context = use(AuthContext)
+  const context = useContext(AuthContext)
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider")
   }

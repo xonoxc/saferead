@@ -10,11 +10,9 @@ import {
 import { RobotoMono_400Regular } from "@expo-google-fonts/roboto-mono"
 import { AuthProvider } from "@/hooks/useAuth"
 import { ThemeProvider, useTheme } from "@/hooks/useTheme"
-import { useFrameworkReady } from "@/hooks/useFrameworkReady"
 import * as SplashScreen from "expo-splash-screen"
-import * as SystemUI from "expo-system-ui"
 import React, { useEffect, useState } from "react"
-import { View } from "react-native"
+import { useColorScheme } from "react-native"
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
 import { KeyboardProvider } from "react-native-keyboard-controller"
 
@@ -32,49 +30,48 @@ const AppContent = () => {
     "RobotoMono-Regular": RobotoMono_400Regular,
   })
 
-  const { colors, isDark } = useTheme()
-  const [appReady, setAppReady] = useState(false)
+  const { colors, isDark, isThemeLoading } = useTheme()
+  const colorScheme = useColorScheme()
+  const [isAppLoading, setIsAppLoading] = useState(true)
+
+  console.log("colorscheme", colorScheme)
 
   useEffect(() => {
     if (!fontsLoaded) return
 
-    if (fontsLoaded) {
-      setAppReady(true)
+    if (!isThemeLoading) {
+      setTimeout(() => {
+        setIsAppLoading(false)
+        SplashScreen.hideAsync().catch(console.warn)
+      })
     }
-  }, [fontsLoaded])
+  }, [isThemeLoading, fontsLoaded])
 
-  const onLayout = async () => {
-    if (appReady) {
-      await SystemUI.setBackgroundColorAsync("#000000")
-      await SplashScreen.hideAsync()
-    }
-  }
-
-  if (!appReady) return null
+  if (isAppLoading || isThemeLoading) return null
 
   return (
     <KeyboardProvider>
-      <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={onLayout}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(application)" />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style={isDark ? "light" : "dark"} />
-      </View>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { flex: 1, backgroundColor: colors.background },
+        }}
+      >
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(application)" />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style={isDark ? "light" : "dark"} />
     </KeyboardProvider>
   )
 }
 
 export default function RootLayout() {
-  useFrameworkReady()
-
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+    <SafeAreaProvider
+      style={{ flex: 1, backgroundColor: "black" }}
+      initialMetrics={initialWindowMetrics}
+    >
       <ThemeProvider>
         <AuthProvider>
           <ErrorBoundary>

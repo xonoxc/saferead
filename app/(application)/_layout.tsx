@@ -18,12 +18,15 @@ export default function ApplicationLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background ?? "black" }}>
         <Stack>
           <Stack.Screen
             name="(tabs)"
             options={{
               headerShown: false,
+              contentStyle: {
+                backgroundColor: colors.background,
+              },
             }}
           />
           <Stack.Screen

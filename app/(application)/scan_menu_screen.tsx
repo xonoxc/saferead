@@ -1,73 +1,42 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { View, StyleSheet } from "react-native"
-
 import { useTheme } from "@/hooks/useTheme"
-import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
+import TopTabBar from "@/components/tabs/TopTabBar"
+import DocumentTab from "@/components/tabs/DocumentTab"
+import ConversationsTab from "@/components/tabs/ConversationsTab"
+import FilesTab from "@/components/tabs/FilesTab"
+import { useLocalSearchParams } from "expo-router"
 
-import DocumentTabHeader from "@/components/tabs/DocumentTab/DocumentTabHeader"
-import DocumentTabContent from "@/components/tabs/DocumentTab/DocumentTabContent"
+const tabs = [{ name: "Document" }, { name: "Conversation" }, { name: "Files" }]
 
 export default function ScanMenuScreen() {
   const { colors } = useTheme()
+  const params = useLocalSearchParams<{ tab?: string }>()
+  const [selectedTab, setSelectedTab] = useState(0)
 
-  const {
-    documents,
-    error,
-    spaceName,
-    spaceColor,
-    spaceId,
-    isLoading,
-    hasMore,
-    currentFilters,
-    searchQuery,
-    showFilter,
-    isRefreshing,
-    setShowFilter,
-    handleAddDocument,
-    handleDocumentSelectPress,
-    isDeleting,
-    setSearchQuery,
-    handleDeleteDocument,
-    handleRefresh,
-    handleSearch,
-    loadMoreDocuments,
-    applyFilters,
-    FallbackStateWrapper,
-  } = useDocumentScreen()
+  useEffect(() => {
+    if (params.tab === "conversation") {
+      setSelectedTab(1)
+    }
+  }, [params])
+
+  const renderContent = () => {
+    switch (selectedTab) {
+      case 0:
+        return <DocumentTab />
+      case 1:
+        return <ConversationsTab />
+      case 2:
+        return <FilesTab />
+      default:
+        return null
+    }
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <DocumentTabHeader
-        spaceName={spaceName}
-        spaceColor={spaceColor}
-        handleAddDocument={handleAddDocument}
-      />
-
-      <View style={{ flex: 1 }}>
-        <DocumentTabContent
-          spaceId={spaceId}
-          spaceName={spaceName}
-          documents={documents}
-          error={error}
-          isLoading={isLoading}
-          isRefreshing={isRefreshing}
-          isDeleting={isDeleting}
-          hasMore={hasMore}
-          currentFilters={currentFilters}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          showFilter={showFilter}
-          applyFilters={applyFilters}
-          setShowFilter={setShowFilter}
-          handleAddDocument={handleAddDocument}
-          handleDeleteDocument={handleDeleteDocument}
-          handleDocumentSelectPress={handleDocumentSelectPress}
-          handleSearch={handleSearch}
-          handleRefresh={handleRefresh}
-          loadMoreDocuments={loadMoreDocuments}
-          FallbackStateWrapper={FallbackStateWrapper}
-        />
-      </View>
+      <TopTabBar tabs={tabs} selectedTab={selectedTab} onTabPress={setSelectedTab} />
+      <View style={{ flex: 1 }}>{renderContent()}</View>
     </View>
   )
 }
@@ -75,7 +44,6 @@ export default function ScanMenuScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    zIndex: 10000,
     paddingTop: 15,
   },
 })

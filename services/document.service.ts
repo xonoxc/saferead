@@ -2,7 +2,7 @@ import { apiClient } from "@/utils/apiclient"
 import { attempt } from "@/utils/attempt"
 import { buildFileUploadFormData } from "@/utils/helpers/files"
 
-import type { FilterOptions } from "@/types/docs"
+import type { DocumentFilterOptions } from "@/types/docs"
 import type { UploadDocumentRequest } from "@/types/api/documents.types"
 
 export async function uploadDocument(data: UploadDocumentRequest) {
@@ -21,7 +21,7 @@ export async function uploadDocument(data: UploadDocumentRequest) {
   })
 }
 
-export async function getDocuments(page?: number, filters?: FilterOptions) {
+export async function getDocuments(page?: number, filters?: DocumentFilterOptions) {
   const params = prepareGetDocumentParams(page, filters)
   const resp = await apiClient.get("/scanner/documents/", { params })
   return resp.data
@@ -30,7 +30,7 @@ export async function getDocuments(page?: number, filters?: FilterOptions) {
 /*
  * Helper function to prepare parameters for the GET documents API call with existing filters
  * **/
-function prepareGetDocumentParams(page?: number, filters?: FilterOptions) {
+function prepareGetDocumentParams(page?: number, filters?: DocumentFilterOptions) {
   return {
     ...(page && { page }),
     ...(filters?.status && { status: filters.status }),

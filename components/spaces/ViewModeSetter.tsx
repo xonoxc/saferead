@@ -10,13 +10,19 @@ interface ViewModeProps {
   setViewMode: (mode: "list" | "grid") => void
 }
 
+const options = ["list", "grid"] as const
+
 export default function ViewMode({ viewMode, setViewMode }: ViewModeProps) {
   const { colors, isDark } = useTheme()
 
-  const options = ["list", "grid"] as const
   const index = options.indexOf(viewMode)
 
-  const bgAnim = useSlidingSelector(index, 50, 200, 15)
+  const bgAnim = useSlidingSelector({
+    index,
+    widthPerItem: 50,
+    duration: 200,
+    borderRadius: 15,
+  })
 
   return (
     <View style={[styles.container, { borderColor: isDark ? colors.border : colors.textMuted }]}>

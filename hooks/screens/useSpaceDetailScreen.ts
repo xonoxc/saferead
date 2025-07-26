@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { FileText, TrendingUp } from "lucide-react-native"
 import {
   useSharedValue,
@@ -18,6 +18,7 @@ import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { useQueryClient } from "@tanstack/react-query"
 import { UpdateSpaceForm } from "../forms/useSpaceHookForm"
 import { useDrawerAlert } from "../alerts/useAlert"
+import { useCreateConversationMutation } from "../queries/converstations"
 
 export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -40,6 +41,8 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
 
   const toggleFavouriteSpace = useToggleFavoriteSpace(space?.id as string)
   const pinDocumentToSpace = usePinDocumentMutation()
+
+  const { createConversationMutation, isCreatingConversation } = useCreateConversationMutation()
 
   const pinnedDocuments = space?.recent_documents.filter(doc => doc.is_pinned)
   const recentDocuments = space?.recent_documents.filter(doc => !doc.is_pinned)
@@ -73,6 +76,31 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       message: space.is_favorite ? "Removed from favorites" : "Added to favorites",
       actions: [{ text: "OK", style: "primary", onPress: () => {} }],
     })
+  }
+
+  const handleOpenChat = async () => {
+    if (!space) return
+
+    const resp = await attempt(
+      createConversationMutation({
+        space: space.id,
+        title: `${space.title}:{space.id}`,
+      })
+    )
+
+    if (!resp.ok) {
+      const errorMessage = getErrorMessage(resp.error)
+      showBottomAlert({
+        type: "error",
+        title: "Error",
+        message: errorMessage || "Failed to create conversation",
+        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+      })
+      return
+    }
+
+    setSpace(space)
+    router.replace("/(application)/(tabs)/analyize")
   }
 
   const handlePinDocumentToSpace = async (documentId: string, document_file: string) => {
@@ -118,13 +146,6 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       color: space?.color,
     },
   ]
-
-  const handleOpenChat = () => {
-    if (space) {
-      setSpace(space)
-      router.push("/(application)/(tabs)/analyize")
-    }
-  }
 
   /*
    *
@@ -188,6 +209,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
     handleOpenChat,
     isSheetVisible,
     isUploadDocFormVisible,
+    isCreatingConversation,
     isChatBtnVisible,
     setSheetVisible,
     handleDocumentListScroll,

@@ -16,7 +16,10 @@ export default function SpacePrivacySelector({ field: { value, onChange } }: Pri
   const { colors } = useTheme()
 
   const index = options.indexOf(value)
-  const bgStyle = useSlidingSelector(index, index * 160)
+  const bgStyle = useSlidingSelector({
+    index,
+    widthPerItem: index => index * 160,
+  })
 
   return (
     <View style={[styles.privacyContainer, { backgroundColor: colors.background }]}>

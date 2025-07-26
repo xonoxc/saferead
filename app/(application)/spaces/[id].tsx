@@ -28,7 +28,6 @@ export default function SpaceDetailScreen() {
     handleOpenChat,
     handleFavoritePress,
     handleUpdateSpace,
-    setChatBtnVisible,
     handleDocumentListScroll,
     handlePinDocumentToSpace: togglePinnedStatus,
   } = useSpaceDetailsScreen({ colors })

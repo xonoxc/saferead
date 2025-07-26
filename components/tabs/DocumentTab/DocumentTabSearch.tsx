@@ -1,17 +1,17 @@
 import Animated, { FadeInDown } from "react-native-reanimated"
-import SearchBar from "../search/SearchBar"
+import SearchBar from "@/components/search/SearchBar"
 
-interface SidebarSearchProps {
+interface DocumentTabSearchProps {
   searchQuery: string
-  handleSearch: (text: string) => void
-  setShowFilter: (show: boolean) => void
+  handleSearch(text: string): void
+  setShowFilter(show: boolean): void
 }
 
-export default function SidebarSearch({
+export default function DocumentTabSearch({
   searchQuery,
   handleSearch,
   setShowFilter,
-}: SidebarSearchProps) {
+}: DocumentTabSearchProps) {
   return (
     <Animated.View
       entering={FadeInDown.delay(200).springify()}

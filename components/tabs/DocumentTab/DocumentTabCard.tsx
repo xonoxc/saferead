@@ -12,23 +12,12 @@ interface DocumentCardProps {
   onDelete: (id: string) => void
 }
 
-export const SideBarDocumentCard = ({ document, onPress, onDelete }: DocumentCardProps) => {
+export function DocumentTabCard({ document, onPress, onDelete }: DocumentCardProps) {
   const { colors, isDark } = useTheme()
 
   const showBottomAlert = useDrawerAlert()
 
   const handleDelete = () => {
-    /* "Delete Document",
-      "Are you sure you want to delete this document? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => onDelete(document.id),
-        },
-      ] */
-
     showBottomAlert({
       title: "Delete Document",
       message: "Are you sure you want to delete this document?",

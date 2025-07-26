@@ -14,9 +14,9 @@ import { Document } from "@/types"
 import { useAnalysisStore } from "@/store/useAnalysisStore"
 import { router } from "expo-router"
 import { useQueryClient } from "@tanstack/react-query"
-import { useSidebarStore } from "@/store/sidebar/useSidebarStore"
-import { useTabBarVisibility } from "./useTabBarVisiblitiy"
 import { useDrawerAlert } from "./alerts/useAlert"
+
+import { useTabBarVisibilty } from "./useTabBarVisiblitiy"
 
 export function useAnalysis() {
   const { user } = useAuth()
@@ -24,24 +24,34 @@ export function useAnalysis() {
   const queryClient = useQueryClient()
   const showBottomAlert = useDrawerAlert()
 
+  /*
+   * all the stores used in this hook
+   * ***/
   const analysisResult = useAnalysisStore(s => s.analysisResult)
   const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
   const selectedSpace = useSpaceStore(s => s.selectedSpace)
   const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
-  const isSideBarOpen = useSidebarStore(s => s.isOpen)
-  const setIsSideBarOpen = useSidebarStore(s => s.setIsOpen)
 
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType>("other")
   const [showTextInput, setShowTextInput] = useState(false)
 
   const { data, isLoading: isRecentDocumentsLoading } = useDocuments()
+
   const recentDocuments = data?.pages.flatMap(page => page.results) ?? []
 
-  useTabBarVisibility(!(isSideBarOpen || !!selectedSpace?.id))
+  /*
+   *
+   * this is here to ensure that the tab bar is hidden in the space chat mode
+   * i.e. when active stpace id is present
+   * **/
+  useTabBarVisibilty(!selectedSpace?.id)
 
+  /*
+   *
+   * all the handlers below
+   * ***/
   const handleItemPress = (item: string) => {
-    setIsSideBarOpen(false)
     console.log(`You tapped on ${item}`)
   }
 
@@ -189,8 +199,6 @@ export function useAnalysis() {
     analysisResult,
     handleItemPress,
     handleDocumentUpload,
-    isSideBarOpen,
-    setIsSideBarOpen,
     handleDocumentScan,
     handleAnalyzeResult: handleAnalyzeDocument,
     selectedDocumentType,

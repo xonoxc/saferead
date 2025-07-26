@@ -30,7 +30,7 @@ export default function ApplicationLayout() {
             }}
           />
           <Stack.Screen
-            name="change-password"
+            name="change_password"
             options={{
               headerTitle: "",
               headerTitleStyle: {
@@ -48,6 +48,13 @@ export default function ApplicationLayout() {
 
           <Stack.Screen
             name="analysisres"
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="scan_menu_screen"
             options={{
               headerShown: false,
             }}

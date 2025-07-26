@@ -1,9 +1,9 @@
 import { View } from "react-native"
-import { LoadingSpinner } from "../LoadingSpinner"
+import { LoadingSpinner } from "@/components/LoadingSpinner"
 
 import { useTheme } from "@/hooks/useTheme"
 
-export default function SideBarLoadingState() {
+export default function DocumentTabLoadingState() {
   const { colors } = useTheme()
 
   return (

@@ -1,17 +1,17 @@
 import { create } from "zustand"
 
-import type { FilterOptions } from "@/types/docs"
+import type { DocumentFilterOptions } from "@/types/docs"
 
 type State = {
   spaceId?: string
-  currentFilters: FilterOptions
+  currentFilters: DocumentFilterOptions
   hasFetchedOnce: boolean
   error: string | null
 }
 
 type Actions = {
   init: (spaceId?: string) => void
-  applyFilters: (filters: FilterOptions) => void
+  applyFilters: (filters: DocumentFilterOptions) => void
   clearError: () => void
   resetFilters: () => void
 }
@@ -28,14 +28,14 @@ export const useDocumentsStore = create<State & Actions>((set, get) => {
         set({
           spaceId: spaceId,
           hasFetchedOnce: true,
-          currentFilters: { ...get().currentFilters, space_id: spaceId },
+          currentFilters: { ...get().currentFilters, space: spaceId },
         })
       }
     },
 
     applyFilters: filters => {
       const { spaceId } = get()
-      set({ currentFilters: { ...filters, space_id: spaceId } })
+      set({ currentFilters: { ...filters, space: spaceId } })
     },
 
     clearError: () => set({ error: null }),
@@ -43,7 +43,7 @@ export const useDocumentsStore = create<State & Actions>((set, get) => {
     resetFilters: () => {
       const { spaceId } = get()
       set({
-        currentFilters: { ordering: "-created_at", space_id: spaceId },
+        currentFilters: { ordering: "-created_at", space: spaceId },
         error: null,
       })
     },

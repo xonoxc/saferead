@@ -1,21 +1,18 @@
-import { useNavigation } from "expo-router"
 import { useEffect } from "react"
-import { useTheme } from "@/hooks/useTheme"
-import { getTabBarStyles } from "@/utils/helpers/tabs"
+import { useTabStore } from "@/store/tab"
 
-/*
- * @params visible - visible is when you want to show the tab bar
- * **/
-export function useTabBarVisibility(visible: boolean) {
-  const navigation = useNavigation()
-  const { colors } = useTheme()
+/**
+ * Automatically hides the tab bar when the component mounts
+ * and shows it again when it unmounts.
+ */
+export function useTabBarVisibilty(visible: boolean) {
+  const setTabBarVisibility = useTabStore(s => s.setTabBarVisibility)
 
   useEffect(() => {
-    navigation.setOptions({
-      tabBarStyle: {
-        ...getTabBarStyles(colors),
-        display: visible ? "flex" : "none",
-      },
-    })
-  }, [visible, colors])
+    setTabBarVisibility(visible)
+
+    return () => {
+      setTabBarVisibility(true)
+    }
+  }, [visible])
 }

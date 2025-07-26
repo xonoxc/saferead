@@ -7,25 +7,28 @@ import { LogOut } from "lucide-react-native"
 import type { Space } from "@/types"
 import type { ColorsType } from "@/hooks/useTheme"
 import { MinimalHamburgerIcon } from "../icon/Hamburger"
+import { router } from "expo-router"
 
 interface AnalyzeHeaderProps {
-  setIsSideBarOpen: (open: boolean) => void
   selectedSpace?: Space | null
   onSpaceExitButtonPress: () => void
   colors: ColorsType
 }
 
 export default function AnalyzeHeader({
-  setIsSideBarOpen,
   selectedSpace,
   onSpaceExitButtonPress,
   colors,
 }: AnalyzeHeaderProps) {
+  const handleHamBurgerPress = () => {
+    router.push("/(application)/scan_menu_screen")
+  }
+
   return (
     <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
       <View style={styles.innerHeader}>
         {/* Left: Menu */}
-        <TouchableOpacity onPress={() => setIsSideBarOpen(true)}>
+        <TouchableOpacity onPress={handleHamBurgerPress}>
           <MinimalHamburgerIcon color={colors.textMuted} size={38} />
         </TouchableOpacity>
 

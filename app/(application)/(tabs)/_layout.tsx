@@ -2,9 +2,11 @@ import { Tabs } from "expo-router"
 import { Home, Settings, Box, ScanSearch } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { getTabBarStyles } from "@/utils/helpers/tabs"
+import { useTabStore } from "@/store/tab"
 
 export default function TabLayout() {
   const { colors } = useTheme()
+  const tabVisible = useTabStore(s => s.tabVisible)
 
   return (
     <Tabs
@@ -15,7 +17,10 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         sceneStyle: { flex: 1, backgroundColor: colors.background },
         tabBarHideOnKeyboard: true,
-        tabBarStyle: getTabBarStyles(colors),
+        tabBarStyle: {
+          ...getTabBarStyles(colors),
+          display: tabVisible ? "flex" : "none",
+        },
       }}
     >
       <Tabs.Screen

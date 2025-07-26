@@ -4,7 +4,7 @@ import React from "react"
 import { Text, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 
-export default function SideBarErrorMessage({ error }: { error: Error }) {
+export default function DocumentTabErrorMessage({ error }: { error: Error }) {
   const { colors } = useTheme()
   return (
     <>

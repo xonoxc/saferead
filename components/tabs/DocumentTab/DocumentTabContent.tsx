@@ -6,18 +6,19 @@ import { useTheme } from "@/hooks/useTheme"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { AnalysisResponse } from "@/types/api/documents.types"
 
-import { EmptyState } from "../EmptyState"
+import { EmptyState } from "@/components/EmptyState"
 
-import SideBarLoadingState from "./SideBarLoadingState"
-import { SideBarDocumentCard } from "./SideBarDocumentCard"
-import SidebarSearch from "./SideBarSearch"
-import SideBarErrorMessage from "./SideBarErrorMessage"
-import { UniversalFilter } from "../filters/UniversalFilters"
+import { DocumentTabCard } from "./DocumentTabCard"
+import DocumentTabLoadingState from "./DocumentTabLoadingState"
+import DocumentTabErrorMessage from "./DocumentTabErrorMessage"
+import DocumentTabSearch from "./DocumentTabSearch"
+import { UniversalFilter } from "@/components/filters/UniversalFilters"
+
 import { documentFilterFields } from "@/constants/filters"
 
-import type { FilterOptions as DocumentFilters } from "@/types/docs"
+import type { DocumentFilterOptions } from "@/types/docs"
 
-interface SideBarDocumentContentProps {
+interface DocumentTabContentProps {
   spaceId?: string
   spaceName?: string
   isLoading: boolean
@@ -28,11 +29,11 @@ interface SideBarDocumentContentProps {
   error: any
 
   hasMore: boolean
-  currentFilters: DocumentFilters
+  currentFilters: DocumentFilterOptions
   searchQuery: string
   showFilter: boolean
 
-  applyFilters: (filters: DocumentFilters) => void
+  applyFilters: (filters: DocumentFilterOptions) => void
   setShowFilter: (visible: boolean) => void
   setSearchQuery: (query: string) => void
 
@@ -46,7 +47,7 @@ interface SideBarDocumentContentProps {
   FallbackStateWrapper: React.ComponentType
 }
 
-export default function SideBarDocumentContent({
+export default function DocumentTabContent({
   documents,
   error,
   hasMore,
@@ -66,12 +67,12 @@ export default function SideBarDocumentContent({
   loadMoreDocuments,
   isDeleting,
   FallbackStateWrapper,
-}: SideBarDocumentContentProps) {
+}: DocumentTabContentProps) {
   const { colors } = useTheme()
 
   const renderDocument = ({ item, index }: { item: AnalysisResponse; index: number }) => (
     <Animated.View entering={FadeInDown.delay(index * 50 + 300).springify()}>
-      <SideBarDocumentCard
+      <DocumentTabCard
         document={item}
         onPress={() => handleDocumentSelectPress(item)}
         onDelete={handleDeleteDocument}
@@ -89,24 +90,24 @@ export default function SideBarDocumentContent({
     if (!hasMore) return null
     return (
       <View style={styles.footerLoader}>
-        <LoadingSpinner size="small" />
+        <LoadingSpinner />
       </View>
     )
   }
 
   if (isLoading || isDeleting) {
-    return <SideBarLoadingState />
+    return <DocumentTabLoadingState />
   }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <SidebarSearch
+      <DocumentTabSearch
         searchQuery={searchQuery}
         setShowFilter={setShowFilter}
         handleSearch={handleSearch}
       />
 
-      <SideBarErrorMessage error={error} />
+      <DocumentTabErrorMessage error={error} />
 
       {isDocumentsDataAvailable() ? (
         <FlatList

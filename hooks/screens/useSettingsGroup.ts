@@ -33,7 +33,7 @@ export default function useSettingsGroups({
 }: {
   user: User | null
   mode: string
-  setTheme: (theme: ThemeMode) => Promise<void>
+  setTheme: (theme: ThemeMode) => void
   router: Router
   handleLogout: () => void
 }): SettingsGroup[] {
@@ -52,7 +52,7 @@ export default function useSettingsGroups({
         {
           icon: KeyRound,
           title: "Change Password",
-          onPress: () => router.push("/(application)/change-password"),
+          onPress: () => router.push("/(application)/change_password"),
         },
         { icon: Shield, title: "Privacy & Security", onPress: () => router.push("/privacy") },
       ],

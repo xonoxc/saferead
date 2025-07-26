@@ -20,6 +20,10 @@ export function getTabBarStyles(colors: ColorsType) {
       borderTopWidth: 0,
       shadowColor: colors.textMuted,
       zIndex: 1000,
+
+      transitionDuration: "300ms",
+      transitionProperty: "transform, opacity",
+      transitionTimingFunction: "ease-in-out",
     },
   })
 }

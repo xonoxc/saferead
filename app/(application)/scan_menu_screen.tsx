@@ -1,15 +1,14 @@
 import React from "react"
 import { View, StyleSheet } from "react-native"
 
-import SideBarDocumentContent from "./SidebarContent"
-import SideBarDocumentSpaceHeader from "./SiderBarDocumentSpaceHeader"
 import { useTheme } from "@/hooks/useTheme"
 import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
-import { useSidebarStore } from "@/store/sidebar/useSidebarStore"
 
-export const SideBar = () => {
+import DocumentTabHeader from "@/components/tabs/DocumentTab/DocumentTabHeader"
+import DocumentTabContent from "@/components/tabs/DocumentTab/DocumentTabContent"
+
+export default function ScanMenuScreen() {
   const { colors } = useTheme()
-  const setIsOpen = useSidebarStore(s => s.setIsOpen)
 
   const {
     documents,
@@ -37,16 +36,15 @@ export const SideBar = () => {
   } = useDocumentScreen()
 
   return (
-    <View style={[styles.sidebar, { backgroundColor: colors.background }]}>
-      <SideBarDocumentSpaceHeader
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <DocumentTabHeader
         spaceName={spaceName}
         spaceColor={spaceColor}
-        onClose={() => setIsOpen(false)}
         handleAddDocument={handleAddDocument}
       />
 
       <View style={{ flex: 1 }}>
-        <SideBarDocumentContent
+        <DocumentTabContent
           spaceId={spaceId}
           spaceName={spaceName}
           documents={documents}
@@ -75,8 +73,9 @@ export const SideBar = () => {
 }
 
 const styles = StyleSheet.create({
-  sidebar: {
+  container: {
     flex: 1,
+    zIndex: 10000,
     paddingTop: 15,
   },
 })

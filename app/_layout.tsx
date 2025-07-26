@@ -45,7 +45,7 @@ const AppContent = () => {
 
   const onLayout = async () => {
     if (appReady) {
-      await SystemUI.setBackgroundColorAsync("#000000")
+      await SystemUI.setBackgroundColorAsync(colors.background)
       await SplashScreen.hideAsync()
     }
   }
@@ -54,7 +54,7 @@ const AppContent = () => {
 
   return (
     <KeyboardProvider>
-      <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={onLayout}>
+      <View style={{ flex: 1 }} onLayout={onLayout}>
         <Stack
           screenOptions={{
             headerShown: false,

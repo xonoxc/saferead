@@ -16,7 +16,6 @@ export const LoadingSpinner = ({
 }) => {
   const { colors } = useTheme()
 
-  console.log("background color", colors.background)
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Text

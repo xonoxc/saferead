@@ -12,7 +12,6 @@ import { AuthProvider } from "@/hooks/useAuth"
 import { ThemeProvider, useTheme } from "@/hooks/useTheme"
 import * as SplashScreen from "expo-splash-screen"
 import React, { useEffect, useState } from "react"
-import { useColorScheme } from "react-native"
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
 import { KeyboardProvider } from "react-native-keyboard-controller"
 
@@ -31,10 +30,7 @@ const AppContent = () => {
   })
 
   const { colors, isDark, isThemeLoading } = useTheme()
-  const colorScheme = useColorScheme()
   const [isAppLoading, setIsAppLoading] = useState(true)
-
-  console.log("colorscheme", colorScheme)
 
   useEffect(() => {
     if (!fontsLoaded) return

@@ -1,63 +1,52 @@
-import { useState, useEffect, createContext, use } from "react"
+import { useEffect, useState, createContext, useContext } from "react"
 import { useColorScheme } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import Colors from "@/constants/Colors"
-import { attempt } from "@/utils/attempt"
 
 export type ThemeMode = "light" | "dark" | "system"
-
 export type ColorsType = typeof Colors.light
 
 interface ThemeContextType {
   mode: ThemeMode
-  colors: ColorsType
   isDark: boolean
+  colors: ColorsType
+  setTheme: (mode: ThemeMode) => void
   isThemeLoading: boolean
-  setTheme: (mode: ThemeMode) => Promise<void>
 }
 
 const ThemeContext = createContext<ThemeContextType | null>(null)
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const systemTheme = useColorScheme()
-  const [mode, setMode] = useState<ThemeMode>("dark")
+  const systemScheme = useColorScheme()
+  const [mode, setModeState] = useState<ThemeMode>("system")
   const [isThemeLoading, setIsThemeLoading] = useState(true)
 
   useEffect(() => {
-    loadTheme()
+    AsyncStorage.getItem("theme_mode").then(saved => {
+      if (saved === "light" || saved === "dark" || saved === "system") {
+        setModeState(saved)
+      }
+      setIsThemeLoading(false)
+    })
   }, [])
 
-  const loadTheme = async () => {
-    const res = await attempt(AsyncStorage.getItem("theme_mode"))
-    if (res.ok && res.data) {
-      setMode(res.data as ThemeMode)
-    }
-    setIsThemeLoading(false)
+  const setTheme = (newMode: ThemeMode) => {
+    setModeState(newMode)
+    AsyncStorage.setItem("theme_mode", newMode)
   }
 
-  const setTheme = async (newMode: ThemeMode) => {
-    const res = await attempt(AsyncStorage.setItem("theme_mode", newMode))
-    if (res.ok) {
-      setMode(newMode)
-    } else {
-      console.error("Failed to save theme:", res.error)
-    }
-  }
-
-  const isDark = mode === "dark" || (mode === "system" && systemTheme === "dark")
+  const isDark = mode === "dark" || (mode === "system" && systemScheme === "dark")
   const colors = isDark ? Colors.dark : Colors.light
 
   return (
-    <ThemeContext.Provider value={{ mode, colors, isDark, setTheme, isThemeLoading }}>
-      {children}
+    <ThemeContext.Provider value={{ mode, isDark, colors, setTheme, isThemeLoading }}>
+      {!isThemeLoading && children}
     </ThemeContext.Provider>
   )
 }
 
 export const useTheme = () => {
-  const context = use(ThemeContext)
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider")
-  }
-  return context
+  const ctx = useContext(ThemeContext)
+  if (!ctx) throw new Error("useTheme must be used within ThemeProvider")
+  return ctx
 }

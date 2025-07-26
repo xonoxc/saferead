@@ -1,20 +1,13 @@
 import React from "react"
-import {
-  ReduceMotion,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-  Easing,
-} from "react-native-reanimated"
+import { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 
 export function useSidebarAnimation(isSideBarOpen: boolean, SCREEN_WIDTH: number) {
   const translateX = useSharedValue(-SCREEN_WIDTH)
 
   React.useEffect(() => {
-    translateX.value = withTiming(isSideBarOpen ? 0 : -SCREEN_WIDTH, {
-      duration: 350,
-      easing: Easing.out(Easing.cubic),
-      reduceMotion: ReduceMotion.System ?? false,
+    translateX.value = withSpring(isSideBarOpen ? 0 : -SCREEN_WIDTH, {
+      damping: 20,
+      stiffness: 130,
     })
   }, [isSideBarOpen, translateX])
 

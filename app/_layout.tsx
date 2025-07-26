@@ -32,7 +32,7 @@ const AppContent = () => {
     "RobotoMono-Regular": RobotoMono_400Regular,
   })
 
-  const { colors, isDark } = useTheme()
+  const { colors, isDark, isThemeLoading } = useTheme()
   const [appReady, setAppReady] = useState(false)
 
   useEffect(() => {
@@ -45,12 +45,11 @@ const AppContent = () => {
 
   const onLayout = async () => {
     if (appReady) {
-      await SystemUI.setBackgroundColorAsync(colors.background)
       await SplashScreen.hideAsync()
     }
   }
 
-  if (!appReady) return null
+  if (!appReady || isThemeLoading) return null
 
   return (
     <KeyboardProvider>

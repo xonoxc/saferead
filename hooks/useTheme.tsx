@@ -12,6 +12,7 @@ interface ThemeContextType {
   mode: ThemeMode
   colors: ColorsType
   isDark: boolean
+  isThemeLoading: boolean
   setTheme: (mode: ThemeMode) => Promise<void>
 }
 
@@ -19,7 +20,8 @@ const ThemeContext = createContext<ThemeContextType | null>(null)
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const systemTheme = useColorScheme()
-  const [mode, setMode] = useState<ThemeMode>("system")
+  const [mode, setMode] = useState<ThemeMode>("dark")
+  const [isThemeLoading, setIsThemeLoading] = useState(true)
 
   useEffect(() => {
     loadTheme()
@@ -29,9 +31,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     const res = await attempt(AsyncStorage.getItem("theme_mode"))
     if (res.ok && res.data) {
       setMode(res.data as ThemeMode)
-    } else if (!res.ok) {
-      console.error("Failed to load theme:", res.error)
     }
+    setIsThemeLoading(false)
   }
 
   const setTheme = async (newMode: ThemeMode) => {
@@ -47,7 +48,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const colors = isDark ? Colors.dark : Colors.light
 
   return (
-    <ThemeContext.Provider value={{ mode, colors, isDark, setTheme }}>
+    <ThemeContext.Provider value={{ mode, colors, isDark, setTheme, isThemeLoading }}>
       {children}
     </ThemeContext.Provider>
   )

@@ -3,19 +3,15 @@ import { SideBar } from "@/components/sidebar"
 import { useAnalysis } from "@/hooks/useAnalysis"
 import { ChatView } from "@/components/chat"
 import { Dimensions, View, StyleSheet } from "react-native"
-import Animated, {
-  Easing,
-  ReduceMotion,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated"
+import Animated from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 
 import { AnalyzeScreenSkeleton } from "@/components/skeletons"
-import type { ViewType } from "@/types/view"
 import AnalyzeHeader from "@/components/analyize/Header"
 import AnalyizeDefaultContent from "@/components/analyize/DefaultContent"
+import { useSidebarAnimation } from "@/hooks/animation/useSidebarAnimation"
+
+import type { ViewType } from "@/types/view"
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window")
 
@@ -38,22 +34,7 @@ export default function AnalyzeScreen() {
     handleSpaceClose,
   } = useAnalysis()
 
-  const translateX = useSharedValue(-SCREEN_WIDTH)
-
-  React.useEffect(() => {
-    translateX.value = withTiming(isSideBarOpen ? 0 : -SCREEN_WIDTH, {
-      duration: 400,
-      easing: Easing.out(Easing.ease),
-      reduceMotion: ReduceMotion.System,
-    })
-  }, [isSideBarOpen, translateX])
-
-  const sidebarStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-  }))
-  const mainContentStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value + SCREEN_WIDTH }],
-  }))
+  const { mainContentStyle, sidebarStyle } = useSidebarAnimation(isSideBarOpen, SCREEN_WIDTH)
 
   if (isAnalyzing || isRecentDocumentsLoading)
     return <AnalyzeScreenSkeleton isAnalizing={isAnalyzing} />

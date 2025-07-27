@@ -131,7 +131,6 @@ const getVariantColors = (variant: EmptyStateVariant, colors: ColorsType) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     position: "relative",
   },
   backgroundElements: {
@@ -148,9 +147,6 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     padding: 32,
     paddingTop: 30,
   },

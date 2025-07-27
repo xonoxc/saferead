@@ -1,13 +1,11 @@
 import React from "react"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import { Calendar, Pin, PinOff, Tag } from "lucide-react-native"
-import * as WebBrowser from "expo-web-browser"
 import { useTheme } from "@/hooks/useTheme"
 import { UserSpaceDocument } from "@/types/api/spaces.documents.types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { getFileIcon } from "@/utils/helpers/files"
-import { attempt } from "@/utils/attempt"
-import { useDrawerAlert } from "@/hooks/alerts/useAlert"
+import { useBrowserLink } from "@/hooks/browser/useBrowserLink"
 
 interface UserSpaceDocumentCardProps {
   pinned?: boolean
@@ -23,29 +21,14 @@ export function UserSpaceDocumentCard({
   pinned = false,
 }: UserSpaceDocumentCardProps) {
   const { colors } = useTheme()
-  const showAlert = useDrawerAlert()
+  const openBrowserLink = useBrowserLink()
 
   const FileIcon = getFileIcon(document.file_extension)
   const cardColor = spaceColor || colors.primary
 
   const handlePress = async () => {
-    if (!document.document_file) return
-
-    const resp = await attempt(WebBrowser.openBrowserAsync(document.document_file))
-    if (!resp.ok) {
-      showAlert({
-        type: "error",
-        title: "Error Opening Document",
-        message: "There was an error opening the document. Please try again later.",
-        actions: [
-          {
-            text: "OK",
-            style: "primary",
-            onPress: () => {},
-          },
-        ],
-      })
-      return
+    if (document.document_file) {
+      await openBrowserLink(document.document_file)
     }
   }
 

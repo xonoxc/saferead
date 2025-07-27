@@ -9,9 +9,15 @@ interface CustomBackBtnProps {
   onPress?: () => void
   style?: ViewStyle
   direction?: BackBtnDirection
+  iconSize?: number
 }
 
-export function CustomBackBtn({ onPress, style, direction = "left" }: CustomBackBtnProps) {
+export function CustomBackBtn({
+  onPress,
+  style,
+  iconSize,
+  direction = "left",
+}: CustomBackBtnProps) {
   const { colors, isDark } = useTheme()
 
   const handlePress = () => {
@@ -28,7 +34,7 @@ export function CustomBackBtn({ onPress, style, direction = "left" }: CustomBack
       style={[styles.button, { borderColor: isDark ? colors.border : colors.secondary }, style]}
     >
       {direction === "left" ? (
-        <ChevronLeft size={24} color={colors.text} />
+        <ChevronLeft size={iconSize ?? 24} color={colors.text} />
       ) : (
         <ChevronRight size={24} color={colors.text} />
       )}

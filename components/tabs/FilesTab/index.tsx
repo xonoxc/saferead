@@ -50,7 +50,6 @@ export default function FilesTab() {
   return (
     <View style={styles.container}>
       <View style={styles.spaceTitleContainer}>
-        <Text style={[styles.spaceTitle, { color: colors.text }]}>Files in {space?.title}</Text>
         <View style={styles.header}>
           {true && (
             <TouchableOpacity

@@ -1,31 +1,20 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  useWindowDimensions,
-  ScrollView,
-} from "react-native"
+import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from "react-native"
 import React from "react"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useTheme } from "@/hooks/useTheme"
 import { CustomBackBtn } from "../CustomBackBtn"
 import { useSlidingSelector } from "@/hooks/animation/useSlidingSelector"
-import Animated from "react-native-reanimated"
 import { useSpaceStore } from "@/store/useSpaceStore"
 import { Box } from "lucide-react-native"
-
-type Tab = {
-  name: string
-}
+import { ScrollView } from "react-native"
+import Animated from "react-native-reanimated"
 
 type TopTabBarProps = {
-  tabs: Tab[]
   selectedTab: number
   onTabPress: (index: number) => void
 }
 
-const TopTabBar = ({ tabs, selectedTab, onTabPress }: TopTabBarProps) => {
+const TopTabBar = ({ selectedTab, onTabPress }: TopTabBarProps) => {
   const { colors } = useTheme()
   const { width } = useWindowDimensions()
 
@@ -41,7 +30,7 @@ const TopTabBar = ({ tabs, selectedTab, onTabPress }: TopTabBarProps) => {
 
   const isSingleTab = filteredTab.length === 1
 
-  const tabWidth = (width * 0.9) / tabs.length
+  const tabWidth = (width * 0.9) / filteredTab.length
   const safeTabIndex = Math.min(selectedTab, filteredTab.length - 1)
 
   const backgroundSlide = useSlidingSelector({
@@ -63,7 +52,7 @@ const TopTabBar = ({ tabs, selectedTab, onTabPress }: TopTabBarProps) => {
       ]}
     >
       <View style={styles.headerRow}>
-        <CustomBackBtn />
+        <CustomBackBtn iconSize={30} />
 
         <View style={styles.centerContent}>
           {isSingleTab ? (
@@ -93,27 +82,30 @@ const TopTabBar = ({ tabs, selectedTab, onTabPress }: TopTabBarProps) => {
           )}
         </View>
 
-        <View style={{ width: 40 }} />
+        <View style={{ width: 40, opacity: 0 }} />
       </View>
 
       {!isSingleTab && (
-        <View style={{ flex: 1 }}>
+        <>
           <Animated.View
             style={[
               styles.tabRow,
               backgroundSlide,
               {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
                 position: "absolute",
                 zIndex: 0,
+                opacity: 0,
+                top: 6,
+                height: 36,
+                borderRadius: 12,
+                backgroundColor: colors.primary + "22",
               },
             ]}
           />
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={[styles.tabRow, { paddingVertical: 6 }]}
+            contentContainerStyle={{ alignItems: "center", gap: 5 }}
           >
             {filteredTab.map((tab, index) => {
               const isActive = safeTabIndex === index
@@ -123,6 +115,7 @@ const TopTabBar = ({ tabs, selectedTab, onTabPress }: TopTabBarProps) => {
                   style={[
                     styles.tab,
                     {
+                      width: 120,
                       backgroundColor: isActive ? colors.primary : colors.card,
                     },
                   ]}
@@ -144,7 +137,7 @@ const TopTabBar = ({ tabs, selectedTab, onTabPress }: TopTabBarProps) => {
               )
             })}
           </ScrollView>
-        </View>
+        </>
       )}
     </View>
   )
@@ -153,7 +146,7 @@ const TopTabBar = ({ tabs, selectedTab, onTabPress }: TopTabBarProps) => {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 12,
-    padding: 7,
+    width: "100%",
     paddingHorizontal: 10,
     alignSelf: "center",
     alignItems: "center",
@@ -165,7 +158,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
-    marginVertical: 10,
+    marginVertical: 17,
   },
   singleTabText: {
     fontSize: FontSizes.sm,
@@ -177,22 +170,29 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   tabRow: {
+    width: "100%",
+    gap: 3,
     borderWidth: 2,
-    marginHorizontal: 17,
+    marginHorizontal: 10,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-
   centerContent: {
     alignItems: "center",
     justifyContent: "center",
   },
-
   containerTitle: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+  },
+  tabScrollContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 4,
+    gap: 6,
+    paddingBottom: 4,
   },
   title: {
     fontSize: FontSizes.lg,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
   },
   tab: {
-    paddingVertical: 10,
+    padding: 10,
     borderRadius: 12,
     marginHorizontal: 1,
     alignItems: "center",
@@ -208,6 +208,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: FontSizes.sm,
+    fontFamily: Fonts.semiBold,
   },
 })
 

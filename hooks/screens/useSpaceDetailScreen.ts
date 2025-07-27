@@ -149,7 +149,8 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
 
   /*
    *
-   * So that the upload form and the sheet do not overlap, we toggle visibility of one when the other is opened.
+   * So that the upload form and the sheet do not overlap,
+   * we toggle visibility of one when the other is opened.
    * **/
   const toggleSheetVisiblity = () => {
     if (isUploadDocFormVisible) {

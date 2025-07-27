@@ -4,7 +4,6 @@ import { router } from "expo-router"
 import React, { useState } from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { useDebouncedCallback } from "../useDebouncCallback"
-import { Button } from "@/components/Button"
 import { useTheme } from "../useTheme"
 import { FileText } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
@@ -40,11 +39,6 @@ export function useDocumentScreen() {
   const { mutateAsync: deleteDocument, isPending: isDeleting } = useDeleteDocument()
 
   const showBottomAlert = useDrawerAlert()
-
-  const handleAddDocument = () => {
-    if (!selectedSpace?.id) return
-    router.push(`/spaces/${selectedSpace.id}`)
-  }
 
   const handleDeleteDocument = async (documentId: string) => {
     const resp = await attempt(deleteDocument(documentId))
@@ -90,11 +84,7 @@ export function useDocumentScreen() {
   }
 
   const FallbackStateWrapper = () => (
-    <FallBackState
-      searchQuery={searchQuery}
-      handleAddDocument={handleAddDocument}
-      spaceName={selectedSpace?.title}
-    />
+    <FallBackState searchQuery={searchQuery} spaceName={selectedSpace?.title} />
   )
 
   return {
@@ -112,7 +102,6 @@ export function useDocumentScreen() {
     showFilter,
     isRefreshing: isRefetchingDocs,
     setShowFilter,
-    handleAddDocument,
     handleDocumentSelectPress,
     isDeleting,
     handleDeleteDocument,
@@ -131,15 +120,7 @@ export function useDocumentScreen() {
  *
  * fallback state component
  * **/
-function FallBackState({
-  searchQuery,
-  handleAddDocument,
-  spaceName,
-}: {
-  searchQuery?: string
-  handleAddDocument: () => void
-  spaceName?: string
-}) {
+function FallBackState({ searchQuery, spaceName }: { searchQuery?: string; spaceName?: string }) {
   const { colors } = useTheme()
 
   const title = spaceName
@@ -160,9 +141,6 @@ function FallBackState({
       <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
         {description}
       </Text>
-      {!searchQuery && (
-        <Button title="Add Document" onPress={handleAddDocument} variant="primary" size="large" />
-      )}
     </View>
   )
 }

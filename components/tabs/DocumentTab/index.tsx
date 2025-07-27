@@ -1,21 +1,18 @@
+import React from "react"
+import { View, StyleSheet } from "react-native"
 
-import React from "react";
-import { View, StyleSheet } from "react-native";
+import { useTheme } from "@/hooks/useTheme"
+import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
 
-import { useTheme } from "@/hooks/useTheme";
-import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen";
-
-import DocumentTabHeader from "@/components/tabs/DocumentTab/DocumentTabHeader";
-import DocumentTabContent from "@/components/tabs/DocumentTab/DocumentTabContent";
+import DocumentTabContent from "@/components/tabs/DocumentTab/DocumentTabContent"
 
 export default function DocumentTab() {
-  const { colors } = useTheme();
+  const { colors } = useTheme()
 
   const {
     documents,
     error,
     spaceName,
-    spaceColor,
     spaceId,
     isLoading,
     hasMore,
@@ -24,7 +21,6 @@ export default function DocumentTab() {
     showFilter,
     isRefreshing,
     setShowFilter,
-    handleAddDocument,
     handleDocumentSelectPress,
     isDeleting,
     setSearchQuery,
@@ -34,16 +30,10 @@ export default function DocumentTab() {
     loadMoreDocuments,
     applyFilters,
     FallbackStateWrapper,
-  } = useDocumentScreen();
+  } = useDocumentScreen()
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <DocumentTabHeader
-        spaceName={spaceName}
-        spaceColor={spaceColor}
-        handleAddDocument={handleAddDocument}
-      />
-
       <View style={{ flex: 1 }}>
         <DocumentTabContent
           spaceId={spaceId}
@@ -60,7 +50,6 @@ export default function DocumentTab() {
           showFilter={showFilter}
           applyFilters={applyFilters}
           setShowFilter={setShowFilter}
-          handleAddDocument={handleAddDocument}
           handleDeleteDocument={handleDeleteDocument}
           handleDocumentSelectPress={handleDocumentSelectPress}
           handleSearch={handleSearch}
@@ -70,7 +59,7 @@ export default function DocumentTab() {
         />
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -78,4 +67,4 @@ const styles = StyleSheet.create({
     flex: 1,
     zIndex: 10000,
   },
-});
+})

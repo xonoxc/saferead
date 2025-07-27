@@ -2,7 +2,7 @@ import { TouchableOpacity, View, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import UpgradeButton from "@/components/UpgradeButton"
 
-import { LogOut } from "lucide-react-native"
+import { CircleEllipsis, Ellipsis, LogOut } from "lucide-react-native"
 
 import type { Space } from "@/types"
 import type { ColorsType } from "@/hooks/useTheme"
@@ -29,7 +29,7 @@ export default function AnalyzeHeader({
       <View style={styles.innerHeader}>
         {/* Left: Menu */}
         <TouchableOpacity onPress={handleHamBurgerPress}>
-          <MinimalHamburgerIcon color={colors.textMuted} size={38} />
+          <CircleEllipsis color={colors.textMuted} size={27} />
         </TouchableOpacity>
 
         {/* Center: Upgrade */}
@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
-    paddingHorizontal: 10,
+    paddingHorizontal: 16,
   },
 })

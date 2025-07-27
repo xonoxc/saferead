@@ -6,6 +6,7 @@ import type { UserSpaceDocument } from "@/types/api/spaces.documents.types"
 
 export default function FileItem({ item }: { item: UserSpaceDocument }) {
   const { colors } = useTheme()
+
   return (
     <View style={[styles.itemContainer, { backgroundColor: colors.surface }]}>
       <Text style={[styles.itemTitle, { color: colors.text }]}>{item?.display_name}</Text>

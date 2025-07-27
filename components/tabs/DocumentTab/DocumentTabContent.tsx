@@ -37,7 +37,6 @@ interface DocumentTabContentProps {
   setShowFilter: (visible: boolean) => void
   setSearchQuery: (query: string) => void
 
-  handleAddDocument: () => void
   handleDeleteDocument: (id: string) => void
   handleDocumentSelectPress: (doc: AnalysisResponse) => void
   handleSearch: (query: string) => void
@@ -62,7 +61,6 @@ export default function DocumentTabContent({
   handleDeleteDocument,
   handleDocumentSelectPress,
   handleSearch,
-  handleAddDocument,
   handleRefresh,
   loadMoreDocuments,
   isDeleting,
@@ -140,7 +138,6 @@ export default function DocumentTabContent({
               : "Start your legal document analysis journey by adding your first document. Upload files, scan documents, or paste text to get started."
           }
           actionTitle={searchQuery ? undefined : "Add Your First Document"}
-          onAction={searchQuery ? undefined : handleAddDocument}
           secondaryActionTitle={searchQuery ? "Clear Search" : "Learn More"}
           onSecondaryAction={searchQuery ? () => setSearchQuery("") : () => {}}
           variant={searchQuery ? "search" : "default"}

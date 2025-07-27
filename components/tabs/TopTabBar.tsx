@@ -1,10 +1,19 @@
-import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from "react-native"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  useWindowDimensions,
+  ScrollView,
+} from "react-native"
 import React from "react"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useTheme } from "@/hooks/useTheme"
 import { CustomBackBtn } from "../CustomBackBtn"
 import { useSlidingSelector } from "@/hooks/animation/useSlidingSelector"
 import Animated from "react-native-reanimated"
+import { useSpaceStore } from "@/store/useSpaceStore"
+import { Box } from "lucide-react-native"
 
 type Tab = {
   name: string
@@ -16,19 +25,30 @@ type TopTabBarProps = {
   onTabPress: (index: number) => void
 }
 
-const tabsList = ["Documents", "Conversations", "Files"] as const
-
 const TopTabBar = ({ tabs, selectedTab, onTabPress }: TopTabBarProps) => {
   const { colors } = useTheme()
   const { width } = useWindowDimensions()
 
+  const MAX_TITLE_WIDTH = width * 0.5
+
+  const activeSpace = useSpaceStore(state => state.selectedSpace)
+  const hasActiveSpace = !!activeSpace?.id
+
+  const filteredTab = [
+    { name: "Documents" },
+    ...(hasActiveSpace ? [{ name: "Conversations" }, { name: "Files" }] : []),
+  ]
+
+  const isSingleTab = filteredTab.length === 1
+
   const tabWidth = (width * 0.9) / tabs.length
-  const tabIndex = tabsList.indexOf(tabs[selectedTab]?.name as (typeof tabsList)[number])
+  const safeTabIndex = Math.min(selectedTab, filteredTab.length - 1)
+
   const backgroundSlide = useSlidingSelector({
-    index: tabIndex,
-    widthPerItem: index => index,
+    index: safeTabIndex,
+    widthPerItem: tabWidth,
     duration: 1000,
-    borderRadius: 8,
+    borderRadius: 12,
   })
 
   return (
@@ -44,45 +64,88 @@ const TopTabBar = ({ tabs, selectedTab, onTabPress }: TopTabBarProps) => {
     >
       <View style={styles.headerRow}>
         <CustomBackBtn />
-      </View>
 
-      <Animated.View
-        style={[
-          styles.tabRow,
-          backgroundSlide,
-          { backgroundColor: colors.card, borderColor: colors.border },
-        ]}
-      >
-        {tabs.map((tab, index) => {
-          const isActive = selectedTab === index
-          return (
-            <TouchableOpacity
-              key={tab.name}
+        <View style={styles.centerContent}>
+          {isSingleTab ? (
+            <Text
               style={[
-                styles.tab,
+                styles.singleTabText,
                 {
-                  width: tabWidth,
-                  backgroundColor: isActive ? colors.primary : colors.card,
+                  color: colors.text,
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
                 },
               ]}
-              onPress={() => onTabPress(index)}
-              activeOpacity={0.7}
             >
+              Your {filteredTab[0].name}
+            </Text>
+          ) : (
+            <View style={styles.containerTitle}>
+              <Box size={20} color={activeSpace?.color || colors.primary} />
               <Text
-                style={[
-                  styles.tabText,
-                  {
-                    color: isActive ? colors.background : colors.textMuted,
-                    fontFamily: isActive ? Fonts.bold : Fonts.regular,
-                  },
-                ]}
+                style={[styles.title, { maxWidth: MAX_TITLE_WIDTH, color: colors.text }]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
               >
-                {tab.name}
+                {activeSpace?.title}
               </Text>
-            </TouchableOpacity>
-          )
-        })}
-      </Animated.View>
+            </View>
+          )}
+        </View>
+
+        <View style={{ width: 40 }} />
+      </View>
+
+      {!isSingleTab && (
+        <View style={{ flex: 1 }}>
+          <Animated.View
+            style={[
+              styles.tabRow,
+              backgroundSlide,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                position: "absolute",
+                zIndex: 0,
+              },
+            ]}
+          />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[styles.tabRow, { paddingVertical: 6 }]}
+          >
+            {filteredTab.map((tab, index) => {
+              const isActive = safeTabIndex === index
+              return (
+                <TouchableOpacity
+                  key={tab.name}
+                  style={[
+                    styles.tab,
+                    {
+                      backgroundColor: isActive ? colors.primary : colors.card,
+                    },
+                  ]}
+                  onPress={() => onTabPress(index)}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.tabText,
+                      {
+                        color: isActive ? colors.background : colors.textMuted,
+                        fontFamily: isActive ? Fonts.bold : Fonts.regular,
+                      },
+                    ]}
+                  >
+                    {tab.name}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
+          </ScrollView>
+        </View>
+      )}
     </View>
   )
 }
@@ -91,28 +154,54 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 12,
     padding: 7,
-    paddingHorizontal: 6,
+    paddingHorizontal: 10,
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 16,
+    marginVertical: 2,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     width: "100%",
-    marginBottom: 8,
+    marginVertical: 10,
+  },
+  singleTabText: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.semiBold,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    textAlign: "center",
   },
   tabRow: {
     borderWidth: 2,
+    marginHorizontal: 17,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
+
+  centerContent: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  containerTitle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  title: {
+    fontSize: FontSizes.lg,
+    fontFamily: Fonts.bold,
+    maxWidth: "100%",
+  },
   tab: {
     paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: 12,
     marginHorizontal: 1,
     alignItems: "center",
     justifyContent: "center",

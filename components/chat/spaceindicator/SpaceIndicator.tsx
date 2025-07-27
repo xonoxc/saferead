@@ -37,7 +37,11 @@ export function SpaceIndicator() {
           style={[styles.trigger, { backgroundColor: colors.card, borderColor: colors.border }]}
         >
           <Box color={colors.text} size={18} />
-          <Text style={[styles.triggerText, { color: colors.text }]}>
+          <Text
+            style={[styles.triggerText, { color: colors.text, maxWidth: 55 }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {selectedOption?.label || selectedSpace?.title}
           </Text>
           <ChevronsUpDown size={18} color={colors.textMuted} />

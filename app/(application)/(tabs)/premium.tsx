@@ -5,6 +5,7 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts } from "@/constants/Fonts"
 import { CustomBackBtn } from "@/components"
+import { router } from "expo-router"
 
 export default function PremiumScreen() {
   const { colors } = useTheme()
@@ -15,7 +16,7 @@ export default function PremiumScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.header}>
         <View style={{ width: "15%" }}>
-          <CustomBackBtn />
+          <CustomBackBtn onPress={() => router.push("/analyize")} />
         </View>
       </Animated.View>
 

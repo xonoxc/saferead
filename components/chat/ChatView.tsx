@@ -56,6 +56,7 @@ export function ChatView() {
           <KeyboardAwareScrollView
             contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 6, paddingBottom: 100 }}
             keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
             keyboardDismissMode="interactive"
           >
             {chatHistory.map((chat, index) => {

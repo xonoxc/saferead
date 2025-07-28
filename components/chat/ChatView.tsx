@@ -7,7 +7,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
 } from "react-native"
-import { Send } from "lucide-react-native"
+import { CircleDot, FileCheck2, Send } from "lucide-react-native"
 import { SpaceIndicator } from "./spaceindicator/SpaceIndicator"
 
 import { Fonts, FontSizes } from "@/constants/Fonts"
@@ -15,11 +15,29 @@ import Animated, { FadeIn, FadeInDown, FadeOut } from "react-native-reanimated"
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { isIOS } from "@/utils/helpers/platform"
-import useChat from "@/hooks/chat/useChat"
+import useChat, { ChatContextSources } from "@/hooks/chat/useChat"
+
+import type { ColorsType } from "@/hooks/useTheme"
 
 export function ChatView() {
-  const { colors, message, setMessage, isTyping, chatHistory, isKeyboardVisible, handleSend } =
-    useChat()
+  const {
+    colors,
+    message,
+    setMessage,
+    isTyping,
+    chatHistory,
+    isKeyboardVisible,
+    handleSend,
+    cancelResponse,
+  } = useChat()
+
+  const handleInputSideButtonPress = () => {
+    if (isTyping) {
+      cancelResponse()
+    } else {
+      handleSend()
+    }
+  }
 
   return (
     <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>
@@ -36,32 +54,38 @@ export function ChatView() {
           </View>
 
           <KeyboardAwareScrollView
-            contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 6 }}
+            contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 6, paddingBottom: 100 }}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="interactive"
           >
-            {chatHistory.map((chat, index) => (
-              <Animated.View
-                key={index}
-                entering={FadeInDown.delay(100 * index).springify()}
-                style={[
-                  styles.chatBubble,
-                  chat.sender === "user" ? styles.userBubble : styles.botBubble,
-                  {
-                    backgroundColor: chat.sender === "user" ? colors.primary : colors.card,
-                  },
-                ]}
-              >
-                <Text
-                  style={{
-                    color: chat.sender === "user" ? colors.background : colors.text,
-                    fontFamily: Fonts.regular,
-                  }}
-                >
-                  {chat.text}
-                </Text>
-              </Animated.View>
-            ))}
+            {chatHistory.map((chat, index) => {
+              return (
+                <View key={index} style={{ marginBottom: 12, flex: 1 }}>
+                  <ChatBubble chat={chat} index={index} colors={colors} />
+
+                  {chat.sender === "bot" && chat.sources && chat?.sources?.length > 0 && (
+                    <View style={{ marginTop: 4, flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                      {chat.sources.map((doc, i) => (
+                        <View
+                          key={i}
+                          style={{
+                            backgroundColor: colors.background,
+                            paddingHorizontal: 10,
+                            paddingVertical: 4,
+                            borderRadius: 16,
+                          }}
+                        >
+                          <Text style={{ fontSize: 12, color: colors.text }}>
+                            <FileCheck2 size={16} color={colors.card} />
+                            {doc.name}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              )
+            })}
             {isTyping && (
               <Animated.View
                 entering={FadeIn}
@@ -97,14 +121,55 @@ export function ChatView() {
             />
             <TouchableOpacity
               style={[styles.sendButton, { backgroundColor: colors.primary }]}
-              onPress={handleSend}
+              onPress={handleInputSideButtonPress}
               disabled={!message.trim()}
             >
-              <Send size={24} color={colors.background} />
+              {isTyping ? (
+                <CircleDot size={24} color={colors.background} />
+              ) : (
+                <Send size={24} color={colors.background} />
+              )}
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
+    </Animated.View>
+  )
+}
+
+function ChatBubble({
+  chat,
+  index,
+  colors,
+}: {
+  chat: {
+    text: string
+    sender: "user" | "bot"
+    sources?: ChatContextSources[]
+  }
+  index: number
+  colors: ColorsType
+}) {
+  return (
+    <Animated.View
+      key={index}
+      entering={FadeInDown.delay(100 * index).springify()}
+      style={[
+        styles.chatBubble,
+        chat.sender === "user" ? styles.userBubble : styles.botBubble,
+        {
+          backgroundColor: chat.sender === "user" ? colors.primary : colors.card,
+        },
+      ]}
+    >
+      <Text
+        style={{
+          color: chat.sender === "user" ? colors.background : colors.text,
+          fontFamily: Fonts.regular,
+        }}
+      >
+        {chat.text}
+      </Text>
     </Animated.View>
   )
 }

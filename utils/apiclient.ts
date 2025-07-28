@@ -6,7 +6,6 @@ import { serverURL } from "@/constants/server"
 import { attempt } from "./attempt"
 import { router } from "expo-router"
 import { useUserStore } from "@/store/useUserStore"
-import { useGlobalErrorStore } from "@/store/useGlobalErrorStore"
 import { useAlertStore } from "@/store/useAlertStore"
 
 const AUTH_HEADER = "Authorization"
@@ -83,16 +82,6 @@ export async function handleApiError(error: AxiosError): Promise<never> {
       await clearUser()
 
       router.replace("/(auth)/login")
-      break
-    }
-
-    case status === 500: {
-      const { setError } = useGlobalErrorStore.getState()
-
-      setError({
-        message: "Internal Server Error",
-        code: "500",
-      })
       break
     }
   }

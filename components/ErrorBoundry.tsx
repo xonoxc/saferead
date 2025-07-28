@@ -1,6 +1,5 @@
 import React, { Component, ReactNode } from "react"
 import ServerErrorScreen from "./ErrorScreen"
-import { useGlobalErrorStore } from "@/store/useGlobalErrorStore"
 
 interface Props {
   children: ReactNode
@@ -25,12 +24,6 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: any) {
     this.setState({ hasError: true, error, errorInfo })
-
-    const { setError } = useGlobalErrorStore.getState()
-    setError({
-      message: error.message || "Unknown error occurred",
-      code: "UNHANDLED_EXCEPTION",
-    })
   }
 
   handleRetry = () => {
@@ -39,9 +32,6 @@ export class ErrorBoundary extends Component<Props, State> {
       error: null,
       errorInfo: null,
     })
-
-    const { clearError } = useGlobalErrorStore.getState()
-    clearError()
   }
 
   handleContactSupport = () => {
@@ -49,18 +39,14 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   render() {
-    const storeError = useGlobalErrorStore.getState().error
-    const shouldShowErrorScreen = this.state.hasError || this.state.error || storeError
+    const shouldShowErrorScreen = this.state.hasError || this.state.error
 
     if (shouldShowErrorScreen) {
       if (this.props.fallback) return this.props.fallback
 
-      const errorMessage =
-        storeError?.message ??
-        this.state.error?.message ??
-        "Something went wrong. Please try again.!"
+      const errorMessage = this.state.error?.message ?? "Something went wrong. Please try again.!"
 
-      const errorCode = storeError?.code ?? "UNHANDLED_EXCEPTION"
+      const errorCode = "UNEXPECTED_ERROR"
 
       return (
         <ServerErrorScreen

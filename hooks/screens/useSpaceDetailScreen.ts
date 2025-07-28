@@ -26,7 +26,9 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
   const prevScrollY = useSharedValue(0)
   const { data: spaces } = useSpaces()
   const router = useRouter()
+
   const setSpace = useSpaceStore(s => s.setSelectedSpace)
+  const setActiveConverstationId = useSpaceStore(s => s.setActiveConverstationId)
 
   const showBottomAlert = useDrawerAlert()
 
@@ -100,6 +102,8 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
     }
 
     setSpace(space)
+    setActiveConverstationId(resp.data.id)
+
     router.replace("/(application)/(tabs)/analyize")
   }
 

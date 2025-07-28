@@ -8,10 +8,10 @@ import {
   useAudioPlayer,
 } from "expo-audio"
 import * as Speech from "expo-speech"
-import { VoiceNote } from "@/types"
 import { attempt, attemptSync } from "@/utils/attempt"
-import { Alert } from "react-native"
 import { useDrawerAlert } from "./alerts/useAlert"
+
+import type { VoiceNote } from "@/types"
 
 export const useVoice = () => {
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY)

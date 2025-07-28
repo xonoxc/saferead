@@ -7,7 +7,7 @@ warmUpAsync()
 export function useBrowserLink() {
   const showAlert = useDrawerAlert()
 
-  return async (fileLink?: string) => {
+  return async function (fileLink?: string) {
     if (!fileLink) return
 
     const resp = await attempt(openBrowserAsync(fileLink))

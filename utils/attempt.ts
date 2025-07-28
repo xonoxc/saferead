@@ -40,6 +40,7 @@ type ErrorType = Error | ExpectedError
 /*
  *
  * actual attempt function | axios overloaded
+ *
  * **/
 export async function attempt<T, E = ErrorType>(fn: AttemptArg<T>): Promise<Result<T, E>> {
   try {

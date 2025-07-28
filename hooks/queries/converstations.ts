@@ -3,6 +3,9 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 
 import type { PaginatedConverSationResponse } from "@/types/api/conversations.types"
 import type { ConversationFilterOptions } from "@/types/conversations"
+import { apiClient, getAccessToken } from "@/utils/apiclient"
+import { serverURL } from "@/constants"
+import { fetch } from "expo/fetch"
 
 export const useCreateConversationMutation = () => {
   const queryClient = useQueryClient()
@@ -34,4 +37,76 @@ export const useConversations = (filters?: ConversationFilterOptions, enabled = 
     enabled,
     refetchOnMount: true,
   })
+}
+
+type StreamResponseCallbakcParams = {
+  conversation_id: string
+  message: string
+}
+
+export const useInstantChatResponse = () => {
+  return async function (
+    data: StreamResponseCallbakcParams,
+    onMessage?: (message: string) => void,
+    signal?: AbortSignal
+  ) {
+    const token = await getAccessToken()
+
+    const resp = await fetch(`${serverURL}/user_space/chatbot/instant-response/`, {
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `token ${token}`,
+      },
+      method: "POST",
+      body: JSON.stringify({ ...data }),
+      signal,
+    })
+
+    if (!resp.ok) {
+      return {
+        ok: false,
+        error: new Error(`HTTP ${resp.status}: ${resp.statusText}`),
+      }
+    }
+
+    const bodyReader = resp.body?.getReader()
+    if (!bodyReader) {
+      return {
+        ok: false,
+        error: new Error("Response body is not readable"),
+      }
+    }
+
+    const decoder = new TextDecoder("utf-8")
+    if (!decoder) {
+      return {
+        ok: false,
+        error: new Error("TextDecoder is not supported in this environment"),
+      }
+    }
+
+    while (true) {
+      const { done, value } = (await bodyReader?.read()) ?? {}
+      if (done) {
+        break
+      }
+      const chunk = decoder.decode(value, { stream: true }).trim()
+      if (!chunk) continue
+
+      onMessage?.(chunk)
+    }
+
+    return {
+      ok: true,
+      error: null,
+    }
+  }
+}
+
+export const useInstantJSONResponse = () => {
+  return async function (data: StreamResponseCallbakcParams) {
+    return apiClient.post("/user_space/chatbot/instant-response/", {
+      ...data,
+    })
+  }
 }

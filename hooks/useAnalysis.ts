@@ -1,22 +1,23 @@
-import { useState } from "react"
-import { attempt } from "@/utils/attempt"
-import { useAuth } from "@/hooks/useAuth"
-import { DocumentType } from "@/components/documents/DocumentTypeSelector"
-import { useSpaceStore } from "@/store/useSpaceStore"
-import { AnalysisResponse } from "@/types/api/documents.types"
-
-import { uploadDocument } from "@/services/document.service"
-
 import * as DocumentPicker from "expo-document-picker"
 import * as ImagePicker from "expo-image-picker"
-import { useDocuments } from "./queries/docs"
-import { Document } from "@/types"
-import { useAnalysisStore } from "@/store/useAnalysisStore"
 import { router } from "expo-router"
+import { attempt } from "@/utils/attempt"
+
+import { useState } from "react"
+import { useAuth } from "@/hooks/useAuth"
+import { useSpaceStore } from "@/store/useSpaceStore"
+import { uploadDocument } from "@/services/document.service"
+import { useDocuments } from "./queries/docs"
+import { useAnalysisStore } from "@/store/useAnalysisStore"
 import { useQueryClient } from "@tanstack/react-query"
 import { useDrawerAlert } from "./alerts/useAlert"
-
 import { useTabBarVisibilty } from "./useTabBarVisiblitiy"
+import { usePreventRemove } from "@react-navigation/native"
+
+import type { AnalysisResponse } from "@/types/api/documents.types"
+import type { DocumentType } from "@/components/documents/DocumentTypeSelector"
+import type { Document } from "@/types"
+import { usePreventTabSwitch } from "./blocking/usePreventTabSwitch"
 
 export function useAnalysis() {
   const { user } = useAuth()
@@ -54,7 +55,6 @@ export function useAnalysis() {
   const handleItemPress = (item: string) => {
     console.log(`You tapped on ${item}`)
   }
-
   const handleAnalyzeDocument = async (document: any, docType: DocumentType) => {
     if (!user) {
       showBottomAlert({

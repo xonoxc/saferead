@@ -5,6 +5,7 @@ import { useState } from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { CustomBackBtn } from "@/components"
 import { useAuth } from "@/hooks/useAuth"
+import { OfflineScreen } from "@/components/OfflineScreen"
 
 export default function ApplicationLayout() {
   const { colors } = useTheme()

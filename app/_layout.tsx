@@ -17,6 +17,8 @@ import { KeyboardProvider } from "react-native-keyboard-controller"
 
 import { ErrorBoundary } from "@/components/ErrorBoundry"
 import { DrawerAlertRenderer } from "@/hooks/alerts/useAlert"
+import useNetworkStatus from "@/hooks/net/useNetworkStatus"
+import { OfflineScreen } from "@/components/OfflineScreen"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -31,6 +33,7 @@ const AppContent = () => {
 
   const { colors, isDark, isThemeLoading } = useTheme()
   const [isAppLoading, setIsAppLoading] = useState(true)
+  const isOffline = useNetworkStatus()
 
   useEffect(() => {
     if (!fontsLoaded) return
@@ -44,6 +47,10 @@ const AppContent = () => {
   }, [isThemeLoading, fontsLoaded])
 
   if (isAppLoading || isThemeLoading) return null
+
+  if (isOffline) {
+    return <OfflineScreen />
+  }
 
   return (
     <KeyboardProvider>

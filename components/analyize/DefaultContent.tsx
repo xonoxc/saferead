@@ -1,5 +1,7 @@
 import { View } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
+import { LinearGradient } from "expo-linear-gradient"
+
 import { type DocumentType, DocumentTypeSelector } from "../documents/DocumentTypeSelector"
 
 import UploadOptions from "./UploadOptions"
@@ -34,27 +36,45 @@ export default function AnalyizeDefaultContent({
   onRecentDocumentPress,
 }: AnalyizeDefaultContentProps) {
   return (
-    <View style={{ flex: 1, padding: 20 }}>
+    <View
+      style={{ flex: 1, padding: 20, paddingHorizontal: 6, backgroundColor: colors.background }}
+    >
       {/* Document Type Selector */}
-      <Animated.View entering={FadeInDown.delay(200).springify()}>
-        <DocumentTypeSelector selectedType={selectedDocType} onSelect={onDocumentSelectType} />
-      </Animated.View>
+      <LinearGradient
+        colors={["#673AB7", "#512DA8"]}
+        style={{
+          marginBottom: 25,
+          marginTop: 11,
+          backgroundColor: colors.card,
+          paddingTop: 40,
+          borderRadius: 40,
+          padding: 20,
+        }}
+      >
+        <Animated.View entering={FadeInDown.delay(200).springify()}>
+          <DocumentTypeSelector selectedType={selectedDocType} onSelect={onDocumentSelectType} />
+        </Animated.View>
 
-      {/* Upload Options */}
-      <UploadOptions
-        colors={colors}
-        onDocumentUpload={onDocumentUpload}
-        onDocumentScan={onDocumentScan}
-      />
+        {/* Upload Options */}
+        <UploadOptions
+          colors={colors}
+          onDocumentUpload={onDocumentUpload}
+          onDocumentScan={onDocumentScan}
+        />
+      </LinearGradient>
 
-      {/* Recent Documents Section */}
-      <RecentDocumentListings
-        colors={colors}
-        recentDocuments={recentDocuments}
-        viewType={ViewType}
-        setViewType={onSetViewType}
-        onRecentDocumentPress={onRecentDocumentPress}
-      />
+      <View
+        style={{ flex: 1, padding: 20, paddingHorizontal: 2, backgroundColor: colors.background }}
+      >
+        {/* Recent Documents Section */}
+        <RecentDocumentListings
+          colors={colors}
+          recentDocuments={recentDocuments}
+          viewType={ViewType}
+          setViewType={onSetViewType}
+          onRecentDocumentPress={onRecentDocumentPress}
+        />
+      </View>
     </View>
   )
 }

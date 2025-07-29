@@ -22,7 +22,7 @@ export default function UploadOptions({
             styles.uploadOption,
             {
               borderColor: colors.border,
-              backgroundColor: colors.card,
+              backgroundColor: colors.background,
             },
           ]}
           onPress={onDocumentScan}
@@ -38,7 +38,7 @@ export default function UploadOptions({
             styles.uploadOption,
             {
               borderColor: colors.border,
-              backgroundColor: colors.card,
+              backgroundColor: colors.background,
             },
           ]}
           onPress={onDocumentUpload}
@@ -63,9 +63,7 @@ const styles = StyleSheet.create({
   },
   uploadOption: {
     flex: 1,
-    borderRadius: 18,
-    borderStyle: "dashed",
-    borderWidth: 1,
+    borderRadius: 24,
     padding: 16,
     alignItems: "center",
     gap: 8,

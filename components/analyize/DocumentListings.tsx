@@ -51,6 +51,7 @@ export default function RecentDocumentListings({
           </View>
           <FlatList
             data={recentDocuments.slice(0, 5)}
+            collapsableChildren={true}
             renderItem={renderRecentItem}
             keyExtractor={item => item.id}
             numColumns={viewType === "grid" ? 2 : 1}
@@ -73,14 +74,15 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: FontSizes.lg,
+    fontSize: FontSizes.md,
     fontFamily: Fonts.semiBold,
     marginBottom: 16,
   },
   recentHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
     marginBottom: 16,
   },
   viewToggle: {

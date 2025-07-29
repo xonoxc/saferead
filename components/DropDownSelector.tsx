@@ -9,6 +9,7 @@ import {
   StyleSheet,
   StyleProp,
   ViewStyle,
+  TextStyle,
 } from "react-native"
 import { ChevronDown, Check, Dot, LucideIcon } from "lucide-react-native"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
@@ -35,6 +36,7 @@ interface DropdownSelectorProps<T> {
   ) => React.ReactElement | null
 
   triggerText?: string
+  triggerTextStyles?: StyleProp<TextStyle>
   selectorStyles?: StyleProp<ViewStyle>
 }
 
@@ -47,6 +49,8 @@ export default function DropdownSelector<T>({
   renderOption,
   loading = false,
   triggerText,
+
+  triggerTextStyles,
   selectorStyles = {},
 }: DropdownSelectorProps<T>) {
   const { colors } = useTheme()
@@ -62,6 +66,7 @@ export default function DropdownSelector<T>({
         selectedOption={selectedOption}
         onOpen={() => setOpen(true)}
         renderTrigger={renderTrigger}
+        triggerTextStyles={triggerTextStyles}
         selectorStyles={selectorStyles}
         triggerText={triggerText}
       />
@@ -90,12 +95,14 @@ function DropdownTrigger<T>({
   onOpen,
   renderTrigger,
   triggerText,
+  triggerTextStyles,
   selectorStyles,
 }: {
   selectedOption?: DropdownOption<T>
   onOpen: () => void
   renderTrigger?: (open: () => void, selectedOption?: DropdownOption<T>) => React.ReactNode
   triggerText?: string
+  triggerTextStyles?: StyleProp<TextStyle>
   selectorStyles: StyleProp<ViewStyle>
 }) {
   const { colors } = useTheme()
@@ -113,7 +120,7 @@ function DropdownTrigger<T>({
     >
       <View style={styles.row}>
         {renderIcon(selectedOption?.icon, colors)}
-        <Text style={[styles.selectedText, { color: colors.text }]}>
+        <Text style={[styles.selectedText, { color: colors.text }, triggerTextStyles]}>
           {selectedOption?.label || triggerText || "Select an option"}
         </Text>
       </View>

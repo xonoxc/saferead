@@ -1,8 +1,9 @@
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { AnalysisResponse } from "@/types/api/documents.types"
-import { ArrowDown, ArrowUp, FileText, TrendingUp } from "lucide-react-native"
+import { ArrowDown, ArrowUp, FileText } from "lucide-react-native"
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native"
+import { ProgressBar } from "../ProgressBar"
 
 interface RecentDocumentItemProps {
   document: AnalysisResponse
@@ -25,9 +26,9 @@ export const RecentDocumentItem = ({
         styles.recentDocumentItem,
         isGridView ? styles.gridItem : styles.listItem,
         {
-          backgroundColor: colors.card,
-          borderWidth: isDark ? 0 : 1,
-          borderColor: colors.border,
+          borderBottomWidth: 1,
+          borderStyle: "dashed",
+          borderColor: isDark ? colors.border : colors.borderLight,
           shadowOpacity: isDark ? 0 : 0.1,
         },
       ]}
@@ -55,6 +56,8 @@ export const RecentDocumentItem = ({
           >
             {document.original_filename}
           </Text>
+
+          {/* Progress bar inserted here */}
           {!isGridView && (
             <Text style={[styles.documentType, { color: colors.textSecondary }]}>
               {getDocumentTypeLabel(document.document_type)}
@@ -73,14 +76,12 @@ export const RecentDocumentItem = ({
         )}
       </View>
 
+      <View style={{ paddingHorizontal: "20%" }}>
+        <ProgressBar value={document.confidence_score} color={colors.primary} />
+      </View>
+
       {isDocumentComplete(document) && !isGridView && (
         <View style={styles.documentStats}>
-          <View style={styles.statItem}>
-            <TrendingUp size={14} color={colors.primary} />
-            <Text style={[styles.statText, { color: colors.textSecondary }]}>
-              {(document.confidence_score * 100).toFixed(0)}% confidence
-            </Text>
-          </View>
           <View style={styles.statItem}>
             <View style={styles.statTextView}>
               <ArrowDown color={colors.error} size={13} />
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
   documentIcon: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -202,14 +203,14 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
   },
   statusText: {
-    fontSize: FontSizes.xs,
+    fontSize: 10,
     fontFamily: Fonts.medium,
     textTransform: "capitalize",
   },
   statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 5,
     marginBottom: 4,
   },
 })

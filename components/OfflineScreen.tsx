@@ -100,18 +100,10 @@ export const OfflineScreen: React.FC<OfflineScreenProps> = ({
           {/* Pulse Circles */}
           <Animated.View style={pulseAnimatedStyle}>
             <Animated.View
-              style={[
-                styles.pulseCircle,
-                styles.pulseCircle1,
-                { borderColor: colors.error },
-              ]}
+              style={[styles.pulseCircle, styles.pulseCircle1, { borderColor: colors.error }]}
             />
             <Animated.View
-              style={[
-                styles.pulseCircle,
-                styles.pulseCircle2,
-                { borderColor: colors.error },
-              ]}
+              style={[styles.pulseCircle, styles.pulseCircle2, { borderColor: colors.error }]}
             />
           </Animated.View>
 

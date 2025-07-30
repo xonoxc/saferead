@@ -1,10 +1,11 @@
 import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
-import { ArrowDown, ArrowUp, FileText, Trash2, TrendingUp } from "lucide-react-native"
+import { ArrowDown, ArrowUp, FileText, Trash2 } from "lucide-react-native"
 
 import type { AnalysisResponse } from "@/types/api/documents.types"
 import { Fonts, FontSizes } from "@/constants"
 import { useDrawerAlert } from "@/hooks/alerts/useAlert"
+import { ProgressBar } from "@/components/ProgressBar"
 
 interface DocumentCardProps {
   document: AnalysisResponse
@@ -13,7 +14,7 @@ interface DocumentCardProps {
 }
 
 export function DocumentTabCard({ document, onPress, onDelete }: DocumentCardProps) {
-  const { colors, isDark } = useTheme()
+  const { colors } = useTheme()
 
   const showBottomAlert = useDrawerAlert()
 
@@ -39,15 +40,15 @@ export function DocumentTabCard({ document, onPress, onDelete }: DocumentCardPro
       style={[
         styles.documentCard,
         {
-          backgroundColor: isDark ? colors.card : colors.card,
+          backgroundColor: colors.background,
           borderColor: colors.border,
-          borderWidth: 1,
+          borderBottomWidth: 1,
         },
       ]}
       onPress={onPress}
     >
       <View style={styles.cardHeader}>
-        <View style={[styles.documentIcon, { backgroundColor: colors.primary + "20" }]}>
+        <View style={styles.documentIcon}>
           <FileText size={24} color={colors.primary} />
         </View>
         <View style={styles.documentInfo}>
@@ -89,13 +90,13 @@ export function DocumentTabCard({ document, onPress, onDelete }: DocumentCardPro
           <View style={styles.confidenceContainer}>
             <View style={styles.analysisStats}>
               <View style={styles.statTextView}>
-                <ArrowUp color={colors.error} size={13} />
+                <ArrowUp color={colors.error} size={13} strokeWidth={4} />
                 <Text style={[styles.statText, { color: colors.error }]}>
                   {document.risky_points.length}
                 </Text>
               </View>
               <View style={styles.statTextView}>
-                <ArrowDown color={colors.success} size={13} />
+                <ArrowDown color={colors.success} size={13} strokeWidth={4} />
                 <Text style={[styles.statText, { color: colors.success }]}>
                   {document.favourable_points.length}
                 </Text>
@@ -103,10 +104,7 @@ export function DocumentTabCard({ document, onPress, onDelete }: DocumentCardPro
             </View>
 
             <View style={styles.confidenceScoreView}>
-              <TrendingUp size={13} color={colors.primary} style={{ marginRight: 4 }} />
-              <Text style={[styles.confidenceText, { color: colors.textSecondary }]}>
-                {(document.confidence_score * 100).toFixed(0)}%
-              </Text>
+              <ProgressBar value={document.confidence_score} />
             </View>
           </View>
         )}

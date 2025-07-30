@@ -56,8 +56,8 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   return (
     <Animated.View
-      entering={SlideInDown.duration(200).easing(Easing.out(Easing.exp))}
-      exiting={SlideOutDown.duration(200).easing(Easing.in(Easing.exp))}
+      entering={SlideInDown.duration(550).easing(Easing.out(Easing.cubic))}
+      exiting={SlideOutDown.duration(550).easing(Easing.in(Easing.cubic))}
       style={containerStyle}
     >
       <KeyboardAvoidingView

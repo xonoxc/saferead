@@ -41,7 +41,7 @@ export default function AnalyizeDefaultContent({
     >
       {/* Document Type Selector */}
       <LinearGradient
-        colors={["#7c3aed", "#4338ca"]}
+        colors={[colors.vio, colors.blueg]}
         style={{
           marginBottom: 25,
           marginTop: 13,

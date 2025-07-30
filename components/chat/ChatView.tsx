@@ -121,14 +121,14 @@ export function ChatView() {
               placeholderTextColor={colors.textMuted}
             />
             <TouchableOpacity
-              style={[styles.sendButton, { backgroundColor: colors.primary }]}
+              style={[styles.sendButton, { backgroundColor: colors.vio }]}
               onPress={handleInputSideButtonPress}
               disabled={!message.trim()}
             >
               {isTyping ? (
                 <CircleDot size={24} color={colors.background} />
               ) : (
-                <Send size={24} color={colors.background} />
+                <Send size={24} color={colors.text} />
               )}
             </TouchableOpacity>
           </View>

@@ -84,15 +84,17 @@ export const RecentDocumentItem = ({
         <View style={styles.documentStats}>
           <View style={styles.statItem}>
             <View style={styles.statTextView}>
-              <ArrowDown color={colors.error} size={13} />
-              <Text style={[styles.statText, { color: colors.error }]}>
+              <ArrowDown color={colors.red} size={13} strokeWidth={5} />
+              <Text style={[styles.statText, { color: colors.red, fontFamily: Fonts.semiBold }]}>
                 {document.risky_points.length}
               </Text>
             </View>
 
             <View style={styles.statTextView}>
-              <ArrowUp color={colors.success} size={13} />
-              <Text style={[styles.statText, { color: colors.success }]}>
+              <ArrowUp color={colors.success} size={13} strokeWidth={5} />
+              <Text
+                style={[styles.statText, { color: colors.success, fontFamily: Fonts.semiBold }]}
+              >
                 {document.favourable_points.length}
               </Text>
             </View>

@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 
-export function ProgressBar({ value, color }: { value: number; color: string }) {
+export function ProgressBar({ value }: { value: number }) {
   const { colors } = useTheme()
 
   return (
@@ -16,7 +16,7 @@ export function ProgressBar({ value, color }: { value: number; color: string }) 
             barStyles.filler,
             {
               width: `${value * 100}%`,
-              backgroundColor: color,
+              backgroundColor: colors.vio,
             },
           ]}
         />

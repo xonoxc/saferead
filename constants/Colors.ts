@@ -19,6 +19,9 @@ const Colors = {
     forgotPassword: "#2563EB",
     skeletonBackground: "#E5E7EB",
     skeletonShimmer: "#F3F4F6",
+    vio: "#7c3aed",
+    blueg: "#4338ca",
+    red: "#9d174d",
   },
   dark: {
     primary: "#FFFFFF",
@@ -40,6 +43,9 @@ const Colors = {
     forgotPassword: "#38BDF8",
     skeletonBackground: "#333333",
     skeletonShimmer: "#444444",
+    vio: "#7c3aed",
+    blueg: "#4338ca",
+    red: "#9d174d",
   },
 }
 

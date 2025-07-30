@@ -1,7 +1,6 @@
 import { FileLock2, FileText, Scale, ShieldCheck } from "lucide-react-native"
 import DropdownSelector, { type DropdownOption } from "../DropDownSelector"
 import { ColorsType, useTheme } from "@/hooks/useTheme"
-import { Fonts } from "@/constants"
 
 export type DocumentType = "terms" | "privacy" | "legal" | "other"
 

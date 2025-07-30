@@ -151,14 +151,14 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 2,
+    marginVertical: 1,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
-    marginVertical: 17,
+    marginVertical: 13,
   },
   singleTabText: {
     fontSize: FontSizes.sm,

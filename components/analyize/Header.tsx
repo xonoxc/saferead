@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
   },
 })

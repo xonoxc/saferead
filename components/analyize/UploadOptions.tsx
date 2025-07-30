@@ -27,10 +27,10 @@ export default function UploadOptions({
           ]}
           onPress={onDocumentScan}
         >
-          <View style={[styles.uploadIcon, { backgroundColor: colors.primary + "20" }]}>
+          <View style={styles.uploadIcon}>
             <Camera size={24} color={colors.primary} />
           </View>
-          <Text style={[styles.uploadText, { color: colors.text }]}>Scan Document</Text>
+          <Text style={[styles.uploadText, { color: colors.text }]}>Scan Docs</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -43,7 +43,7 @@ export default function UploadOptions({
           ]}
           onPress={onDocumentUpload}
         >
-          <View style={[styles.uploadIcon, { backgroundColor: colors.secondary + "20" }]}>
+          <View style={styles.uploadIcon}>
             <Upload size={24} color={colors.secondary} />
           </View>
           <Text style={[styles.uploadText, { color: colors.text }]}>Upload File</Text>
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   },
   uploadOption: {
     flex: 1,
-    borderRadius: 24,
+    borderRadius: 30,
     padding: 16,
     alignItems: "center",
     gap: 8,

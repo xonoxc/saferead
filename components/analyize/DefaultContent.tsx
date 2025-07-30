@@ -41,13 +41,13 @@ export default function AnalyizeDefaultContent({
     >
       {/* Document Type Selector */}
       <LinearGradient
-        colors={["#673AB7", "#512DA8"]}
+        colors={["#7c3aed", "#4338ca"]}
         style={{
           marginBottom: 25,
-          marginTop: 11,
+          marginTop: 13,
           backgroundColor: colors.card,
           paddingTop: 40,
-          borderRadius: 40,
+          borderRadius: 50,
           padding: 20,
         }}
       >

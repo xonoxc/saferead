@@ -19,7 +19,7 @@ export const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
     <DropdownSelector
       selected={selectedType}
       selectorStyles={{
-        borderRadius: 20,
+        borderRadius: 24,
         backgroundColor: colors.background,
       }}
       options={getSelectorOptions(colors)}

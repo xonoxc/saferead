@@ -54,7 +54,7 @@ export function ChatView() {
           </View>
 
           <KeyboardAwareScrollView
-            contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 6, paddingBottom: 100 }}
+            contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 6, paddingBottom: 100 }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             keyboardDismissMode="interactive"
@@ -166,6 +166,7 @@ function ChatBubble({
       <Text
         style={{
           color: chat.sender === "user" ? colors.background : colors.text,
+          fontSize: FontSizes.xxs,
           fontFamily: Fonts.regular,
         }}
       >
@@ -242,7 +243,8 @@ const styles = StyleSheet.create({
   sendButton: {
     width: 48,
     height: 48,
-    borderRadius: 10,
+    borderRadius: 16,
+    padding: 10,
     justifyContent: "center",
     alignItems: "center",
   },

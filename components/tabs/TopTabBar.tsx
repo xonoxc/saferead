@@ -8,6 +8,7 @@ import { useSpaceStore } from "@/store/useSpaceStore"
 import { Box } from "lucide-react-native"
 import { ScrollView } from "react-native"
 import Animated from "react-native-reanimated"
+import { router } from "expo-router"
 
 type TopTabBarProps = {
   selectedTab: number
@@ -52,7 +53,7 @@ const TopTabBar = ({ selectedTab, onTabPress }: TopTabBarProps) => {
       ]}
     >
       <View style={styles.headerRow}>
-        <CustomBackBtn iconSize={30} />
+        <CustomBackBtn iconSize={24} onPress={() => router.back()} />
 
         <View style={styles.centerContent}>
           {isSingleTab ? (

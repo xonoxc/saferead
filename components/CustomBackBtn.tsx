@@ -33,13 +33,17 @@ export function CustomBackBtn({
       onPress={handlePress}
       style={[styles.button, { borderColor: isDark ? colors.border : colors.secondary }, style]}
     >
-      {direction === "left" ? (
+      {isLeft(direction) ? (
         <ChevronLeft size={iconSize ?? 24} color={colors.text} />
       ) : (
         <ChevronRight size={24} color={colors.text} />
       )}
     </TouchableOpacity>
   )
+}
+
+function isLeft(direction: BackBtnDirection): boolean {
+  return direction === "left"
 }
 
 const styles = StyleSheet.create({

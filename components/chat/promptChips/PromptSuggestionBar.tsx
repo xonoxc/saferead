@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native"
 import { PromptChip } from "./Chips"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
+import { WandSparkles } from "lucide-react-native"
 
 interface PromptSuggestionBarProps {
   onPromptSelect: (prompt: string) => void
@@ -26,7 +27,10 @@ export const PromptSuggestionBar = ({ onPromptSelect }: PromptSuggestionBarProps
 
   return (
     <View>
-      <Text style={[styles.title, { color: colors.textSecondary }]}>Try:</Text>
+      <View style={styles.titleContainer}>
+        <WandSparkles color={colors.text} size={18} />
+        <Text style={[styles.title, { color: colors.textSecondary }]}>Try:</Text>
+      </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.container}>
         {prompts.map((prompt, index) => (
           <PromptChip key={index} label={prompt} onPress={onPromptSelect} />
@@ -40,9 +44,13 @@ const styles = StyleSheet.create({
   containerContainer: {
     flexDirection: "column",
     flexWrap: "wrap",
-    gap: 10,
+    gap: 1,
     marginTop: 8,
     marginBottom: 8,
+  },
+  titleContainer: {
+    justifyContent: "flex-start",
+    flexDirection: "row",
   },
   title: {
     fontSize: FontSizes.sm,
@@ -54,5 +62,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     flexGrow: 0,
+    gap: 8,
+    paddingBottom: 10,
   },
 })

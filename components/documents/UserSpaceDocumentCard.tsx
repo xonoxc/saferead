@@ -40,7 +40,7 @@ export function UserSpaceDocumentCard({
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
+      style={[styles.card, { backgroundColor: colors.background, borderColor: colors.border }]}
       onPress={handlePress}
       activeOpacity={0.7}
     >
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginVertical: 8,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     elevation: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },

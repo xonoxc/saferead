@@ -42,17 +42,19 @@ export default function SpaceDetailScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <SpaceDetailHeader
-        animatedStyle={animatedStyle}
-        space={space}
-        onFavoritePress={handleFavoritePress}
-        onCreateBtnPress={toggleUploadFormVisibilty}
-        onSettingsPress={toggleSheetVisiblity}
-      />
+      <View style={{ paddingHorizontal: 7, paddingBottom: 10 }}>
+        {/* Header */}
+        <SpaceDetailHeader
+          animatedStyle={animatedStyle}
+          space={space}
+          onFavoritePress={handleFavoritePress}
+          onCreateBtnPress={toggleUploadFormVisibilty}
+          onSettingsPress={toggleSheetVisiblity}
+        />
 
-      {/* Stats */}
-      <SpaceDetailsStats stats={stats} colors={colors} />
+        {/* Stats */}
+        <SpaceDetailsStats stats={stats} colors={colors} />
+      </View>
       <View style={{ flex: 1 }}>
         {/* Pinned Documents */}
         <PinnedDocuments

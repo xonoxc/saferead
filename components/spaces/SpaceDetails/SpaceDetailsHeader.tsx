@@ -63,26 +63,23 @@ export default function SpaceDetailHeader({
             </TouchableOpacity>
           </Animated.View>
 
-          <TouchableOpacity
-            style={[styles.settingsButton, { backgroundColor: colors.surface }]}
-            onPress={onSettingsPress}
-          >
+          <TouchableOpacity style={styles.settingsButton} onPress={onSettingsPress}>
             <Settings size={20} color={space.color} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <View style={styles.spaceInfo}>
-        <View style={[styles.spaceIconLarge, { backgroundColor: `${space.color}20` }]}>
+      <View style={[styles.spaceInfo, { backgroundColor: space.color }]}>
+        <View style={[styles.spaceIconLarge, { backgroundColor: colors.background }]}>
           <SpaceIcon name={space.icon as SpaceIconName} color={space.color} size={50} />
         </View>
 
         <View style={styles.spaceMeta}>
           <Text style={[styles.spaceTitle, { color: colors.text }]}>{space.title}</Text>
-          <Text style={[styles.spaceDescription, { color: colors.textSecondary }]}>
+          <Text style={[styles.spaceDescription, { color: colors.background }]}>
             {space.description || "No description provided"}
           </Text>
-          <Text style={[styles.spaceDate, { color: colors.textMuted }]}>
+          <Text style={[styles.spaceDate, { color: colors.background }]}>
             Created {new Date(space.created_at).toLocaleDateString()}
           </Text>
         </View>
@@ -109,19 +106,21 @@ const styles = StyleSheet.create({
   favoriteButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
   },
   settingsButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
   },
   spaceInfo: {
     flexDirection: "row",
+    padding: 16,
+    borderRadius: 30,
     alignItems: "center",
     justifyContent: "flex-start",
     width: "100%",
@@ -129,7 +128,7 @@ const styles = StyleSheet.create({
   spaceIconLarge: {
     width: 100,
     height: 100,
-    borderRadius: 50,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 20,
@@ -146,13 +145,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   spaceDescription: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.semiBold,
     marginBottom: 8,
     lineHeight: 20,
   },
   spaceDate: {
-    fontSize: FontSizes.sm,
+    fontSize: FontSizes.xs,
     fontFamily: Fonts.regular,
   },
 })

@@ -24,9 +24,12 @@ export function ChatHistory({ chatHistory }: { chatHistory: Chats }) {
                     key={i}
                     style={{
                       backgroundColor: colors.background,
-                      paddingHorizontal: 10,
+                      paddingHorizontal: 16,
+                      marginRight: 20,
                       paddingVertical: 4,
                       borderRadius: 16,
+                      marginBottom: 6,
+                      minWidth: 0,
                     }}
                   >
                     <View
@@ -37,6 +40,7 @@ export function ChatHistory({ chatHistory }: { chatHistory: Chats }) {
                         alignItems: "center",
                         gap: 8,
                         borderRadius: 10,
+                        flexShrink: 1,
                         padding: 10,
                       }}
                     >
@@ -48,6 +52,7 @@ export function ChatHistory({ chatHistory }: { chatHistory: Chats }) {
                           fontFamily: Fonts.medium,
                           alignItems: "center",
                           justifyContent: "center",
+                          flexShrink: 1,
                           flexDirection: "row",
                           gap: 8,
                         }}

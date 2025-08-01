@@ -24,7 +24,7 @@ export default function SearchBar({
 
   return (
     <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.container}>
-      <View style={[styles.searchBar, { borderColor: colors.border }]}>
+      <View style={[styles.searchBar, { borderColor: colors.vio }]}>
         <TextInput
           style={[styles.input, { color: colors.text }]}
           leftAccessory={<Search size={18} color={colors.textMuted} />}

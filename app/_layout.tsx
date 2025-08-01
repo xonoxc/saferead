@@ -71,10 +71,7 @@ const AppContent = () => {
 
 export default function RootLayout() {
   return (
-    <SafeAreaProvider
-      style={{ flex: 1, backgroundColor: "black" }}
-      initialMetrics={initialWindowMetrics}
-    >
+    <SafeAreaProvider style={{ flex: 1 }} initialMetrics={initialWindowMetrics}>
       <ThemeProvider>
         <AuthProvider>
           <ErrorBoundary>

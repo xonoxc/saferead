@@ -18,10 +18,10 @@ import HomeScreenDocPendingStatus from "@/components/home/HomeScreenDocPendingSt
 export default function HomeScreen() {
   const { colors } = useTheme()
   const { user } = useAuth()
-  const { stats, isLoading, error, refetch } = useDocumentStats()
+  const { stats, isLoading, error, refetch, isRefetching } = useDocumentStats()
   const { handleScroll } = useTabHideScroll()
 
-  if (isLoading) {
+  if (isLoading || isRefetching) {
     return <HomeScreenSkeleton />
   }
 

@@ -26,7 +26,6 @@ export default function SpacesFallback({
   return (
     <View style={{ paddingTop: 110 }}>
       <EmptyState
-        icon={searchQuery ? Search : Box}
         title={details.title}
         description={details.description}
         actionTitle={details.actionTitle}

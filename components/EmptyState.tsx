@@ -11,7 +11,7 @@ const { width: screenWidth } = Dimensions.get("window")
 export type EmptyStateVariant = "default" | "search" | "error"
 
 interface EmptyStateProps {
-  icon: LucideIcon
+  icon?: LucideIcon
   title: string
   description: string
   actionTitle?: string
@@ -58,25 +58,28 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       )}
 
       <View style={styles.content}>
-        <View style={styles.iconContainer}>
-          <View
-            style={[
-              styles.pulseCircle,
-              styles.pulseCircle1,
-              { borderColor: variantColors.primary },
-            ]}
-          />
-          <View
-            style={[
-              styles.pulseCircle,
-              styles.pulseCircle2,
-              { borderColor: variantColors.primary },
-            ]}
-          />
-          <View style={[styles.iconWrapper, { backgroundColor: variantColors.background }]}>
-            <IconComponent size={48} color={variantColors.primary} />
+        {IconComponent && (
+          <View style={styles.iconContainer}>
+            <View
+              style={[
+                styles.pulseCircle,
+                styles.pulseCircle1,
+                { borderColor: variantColors.primary },
+              ]}
+            />
+            <View
+              style={[
+                styles.pulseCircle,
+                styles.pulseCircle2,
+                { borderColor: variantColors.primary },
+              ]}
+            />
+
+            <View style={[styles.iconWrapper, { backgroundColor: variantColors.background }]}>
+              <IconComponent size={48} color={variantColors.primary} />
+            </View>
           </View>
-        </View>
+        )}
 
         <View style={styles.textContainer}>
           <Text style={[styles.title, { color: colors.text }]}>{title}</Text>

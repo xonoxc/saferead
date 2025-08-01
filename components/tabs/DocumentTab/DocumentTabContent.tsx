@@ -93,7 +93,7 @@ export default function DocumentTabContent({
     )
   }
 
-  if (isLoading || isDeleting) {
+  if (isLoading || isDeleting || isRefreshing) {
     return <DocumentTabLoadingState />
   }
 

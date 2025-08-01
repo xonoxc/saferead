@@ -1,5 +1,4 @@
 import { EmptyState } from "@/components/EmptyState"
-import { Box, Search } from "lucide-react-native"
 import { View } from "react-native"
 
 export default function SpacesFallback({

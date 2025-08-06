@@ -104,7 +104,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
     setSpace(space)
     setActiveConverstationId(resp.data.id)
 
-    router.replace("/(application)/(tabs)/analyize")
+    router.push("/(application)/(tabs)/analyize")
   }
 
   const handlePinDocumentToSpace = async (documentId: string, document_file: string) => {

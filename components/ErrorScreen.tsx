@@ -103,7 +103,7 @@ export default function ServerErrorScreen({
     }
 
     if (!router.canGoBack()) {
-      router.replace("/")
+      router.push("/")
       return
     }
 

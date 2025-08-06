@@ -43,7 +43,7 @@ export default function ResetPasswordScreen() {
         type: "error",
         title: "Error",
         message: "Invalid password reset link. Please try again.",
-        actions: [{ text: "OK", style: "primary", onPress: () => router.replace("/(auth)/login") }],
+        actions: [{ text: "OK", style: "primary", onPress: () => router.push("/(auth)/login") }],
       })
       return
     }
@@ -69,7 +69,7 @@ export default function ResetPasswordScreen() {
       message: "Your password has been reset successfully. Please sign in.",
       actions: [{ text: "OK", style: "primary", onPress: () => {} }],
     })
-    router.replace("/(auth)/login")
+    router.push("/(auth)/login")
   }
 
   if (!uid || !token) {

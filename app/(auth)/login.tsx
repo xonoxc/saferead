@@ -35,7 +35,7 @@ export default function LoginScreen() {
       setErrorMessage(result.message)
       return
     }
-    router.replace("/(application)/(tabs)")
+    router.push("/(application)/(tabs)")
   }
 
   return (

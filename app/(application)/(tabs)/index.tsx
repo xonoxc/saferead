@@ -26,7 +26,7 @@ export default function HomeScreen() {
   }
 
   if (error) {
-    return <HomeScreenErrorFallback error={error} colors={colors} />
+    return <HomeScreenErrorFallback error={error} colors={colors} onRetry={refetch} />
   }
 
   return (

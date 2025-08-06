@@ -72,7 +72,7 @@ export async function handleApiError(error: AxiosError): Promise<never> {
             text: "Login",
             style: "primary",
             onPress: () => {
-              router.replace("/(auth)/login")
+              router.push("/(auth)/login")
             },
           },
         ],
@@ -81,7 +81,7 @@ export async function handleApiError(error: AxiosError): Promise<never> {
       const { clearUser } = useUserStore.getState()
       await clearUser()
 
-      router.replace("/(auth)/login")
+      router.push("/(auth)/login")
       break
     }
   }

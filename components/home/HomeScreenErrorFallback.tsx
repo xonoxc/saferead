@@ -1,14 +1,16 @@
 import { Fonts, FontSizes } from "@/constants"
 import { ColorsType } from "@/hooks/useTheme"
-import { XCircle } from "lucide-react-native"
-import { StyleSheet, Text, View } from "react-native"
+import { RotateCcw, XCircle } from "lucide-react-native"
+import { Pressable, StyleSheet, Text, View } from "react-native"
 
 export default function HomeScreenErrorFallback({
   error,
   colors,
+  onRetry,
 }: {
   error: string
   colors: ColorsType
+  onRetry: () => void
 }) {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -16,6 +18,14 @@ export default function HomeScreenErrorFallback({
         <XCircle size={48} color={colors.error} />
         <Text style={[styles.errorTitle, { color: colors.text }]}>Unable to load statistics</Text>
         <Text style={[styles.errorDescription, { color: colors.textSecondary }]}>{error}</Text>
+
+        <Pressable
+          onPress={onRetry}
+          style={[styles.retryButton, { backgroundColor: colors.primary }]}
+        >
+          <RotateCcw size={15} color={colors.background} strokeWidth={3} />
+          <Text style={styles.retryButtonText}>Try Again</Text>
+        </Pressable>
       </View>
     </View>
   )
@@ -42,5 +52,18 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     textAlign: "center",
     marginTop: 8,
+  },
+  retryButton: {
+    marginTop: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 12,
+    gap: 8,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.semiBold,
   },
 })

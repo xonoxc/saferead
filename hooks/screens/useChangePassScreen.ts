@@ -56,7 +56,7 @@ export default function useChangePassScreen() {
           style: "primary",
           onPress: async () => {
             await logout()
-            router.replace("/(auth)/login")
+            router.push("/(auth)/login")
           },
         },
       ],

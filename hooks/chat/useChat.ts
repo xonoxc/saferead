@@ -1,13 +1,14 @@
 import { useSpaceStore } from "@/store/useSpaceStore"
 import { useTheme } from "../useTheme"
 import { useRef, useState } from "react"
-import { KeyboardAwareScrollViewProps, KeyboardController } from "react-native-keyboard-controller"
+import { KeyboardController } from "react-native-keyboard-controller"
 import { useInstantJSONResponse } from "../queries/converstations"
 import { useDrawerAlert } from "../alerts/useAlert"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
 import { useKeyBoardVisiblity } from "../kayboard/useKeyboardVisiblity"
 import { usePreventTabSwitch } from "../blocking/usePreventTabSwitch"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 export type ChatContextSources = {
   id: string
@@ -25,7 +26,7 @@ export default function useChat() {
   const [aboortController, setAbortController] = useState<AbortController>(new AbortController())
   const [showScrollToBottom, setShowScrollToBottom] = useState(false)
 
-  const scrollViewRef = useRef<KeyboardAwareScrollViewProps>(null)
+  const scrollViewRef = useRef<KeyboardAwareScrollView | null>(null)
 
   const selectedSpace = useSpaceStore(s => s.selectedSpace)
   const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
@@ -53,7 +54,9 @@ export default function useChat() {
   }
 
   const scrollToBottom = () => {
-    scrollViewRef.current?.scrolltoEnd({ animated: true })
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd(true)
+    }
   }
 
   const handleSend = async (overrideMessage?: string) => {
@@ -96,58 +99,6 @@ export default function useChat() {
 
     setIsTyping(false)
   }
-
-  /*const handleSend = async () => {
-    KeyboardController.dismiss()
-
-    if (!message.trim()) return
-
-    const userMessage = { text: message, sender: "user" as const }
-    setChatHistory(prev => [...prev, userMessage])
-    setMessage("")
-    setIsTyping(true)
-
-    setChatHistory(prev => {
-      const index = prev.length
-      botIndexRef.current = index
-      return [...prev, { text: "", sender: "bot" }]
-    })
-
-    console.log("Sending message to bot:", {
-      message,
-      conversation_id: activeConversationId,
-    })
-
-    const resp = await getStreamingResponse(
-      { message, conversation_id: activeConversationId! },
-      chunk => {
-        const cleanChunk = chunk?.trim()
-        if (!cleanChunk) return
-
-        setChatHistory(prev => {
-          const updated = [...prev]
-          const botIndex = botIndexRef.current
-          if (botIndex !== null && updated[botIndex]) {
-            updated[botIndex].text += cleanChunk
-          }
-          return updated
-        })
-      },
-      aboortController.signal
-    )
-
-    if (!resp?.ok) {
-      const errorMessage = getErrorMessage(resp?.error)
-      showBottomMessage({
-        type: "error",
-        title: "Error",
-        message: errorMessage || "Failed to get response from bot",
-        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
-      })
-    }
-
-    setIsTyping(false)
-  } */
 
   const isChatEmpty = () => chatHistory.length === 0
 

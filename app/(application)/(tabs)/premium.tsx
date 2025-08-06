@@ -9,6 +9,8 @@ import { router } from "expo-router"
 import { usePlans } from "@/hooks/queries/plans"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import type { Plan } from "@/services/plans.service"
+import { PlansLoadingState } from "@/components/plans/PlansLoadingState"
+import { Plansfallback } from "@/components/plans/PlansFallback"
 
 export default function PremiumScreen() {
   const { colors } = useTheme()
@@ -17,138 +19,17 @@ export default function PremiumScreen() {
 
   const plans = plansData?.results || []
   const premiumPlan = plans.find(plan => plan.plan_type === "premium")
-  const freePlan = plans.find(plan => plan.plan_type === "free")
 
-  // Set default selected plan to premium if available
-  React.useEffect(() => {
-    if (premiumPlan && !selectedPlan) {
-      setSelectedPlan(premiumPlan)
-    }
-  }, [premiumPlan, selectedPlan])
+  const effectiveSelectedPlan = selectedPlan ?? premiumPlan
+  const isCardSelected = (plan: Plan) =>
+    selectedPlan ? selectedPlan.id === plan.id : premiumPlan?.id === plan.id
 
   if (isLoading) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.header}>
-          <View style={{ width: "15%" }}>
-            <CustomBackBtn onPress={() => router.push("/analyize")} />
-          </View>
-        </Animated.View>
-        <View style={styles.loadingContainer}>
-          <LoadingSpinner />
-          <Text style={[styles.loadingText, { color: colors.text }]}>Loading plans...</Text>
-        </View>
-      </View>
-    )
+    return <PlansLoadingState />
   }
 
   if (error || !plans.length) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.header}>
-          <View style={{ width: "15%" }}>
-            <CustomBackBtn onPress={() => router.push("/analyize")} />
-          </View>
-        </Animated.View>
-        <View style={styles.errorContainer}>
-          <Text style={[styles.errorText, { color: colors.error }]}>
-            Unable to load plans. Please try again later.
-          </Text>
-        </View>
-      </View>
-    )
-  }
-
-  const getFeatureDisplayText = (key: string, value: any): string => {
-    switch (key) {
-      case "storage_limit_gb":
-        return `${value}GB Storage`
-      case "retention_days":
-        return `${value} Days Data Retention`
-      case "documents_uploaded_limit":
-        return typeof value === "string" && value === "unlimited" 
-          ? "Unlimited Document Uploads" 
-          : `${value} Document Uploads`
-      case "analysis_generated_limit":
-        return typeof value === "string" && value === "unlimited"
-          ? "Unlimited AI Analysis"
-          : `${value} AI Analysis`
-      case "spaces_created_limit":
-        return typeof value === "string" && value === "unlimited"
-          ? "Unlimited Spaces"
-          : `${value} Spaces`
-      case "export_formats":
-        return `Export to ${Array.isArray(value) ? value.join(", ").toUpperCase() : value}`
-      case "priority_support":
-        return value ? "Priority Customer Support" : "Standard Support"
-      case "advanced_analysis":
-        return value ? "Advanced AI Analysis" : "Basic Analysis"
-      case "collaboration":
-        return value ? "Team Collaboration" : "Individual Use Only"
-      case "custom_templates":
-        return value ? "Custom Templates" : "Standard Templates"
-      case "branding_removal":
-        return value ? "No Branding" : "SafeRead Branding"
-      case "ads_enabled":
-        return value ? "Ads Included" : "Ad-Free Experience"
-      case "api_access":
-        return value ? "API Access" : "No API Access"
-      case "bulk_processing":
-        return value ? "Bulk Document Processing" : "Single Document Processing"
-      default:
-        if (typeof value === "boolean") {
-          return value ? key.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()) : ""
-        }
-        return `${value} ${key.replace(/_/g, " ")}`
-    }
-  }
-
-  const getKeyFeatures = (plan: Plan) => {
-    const keyFeatureMap = {
-      advanced_analysis: {
-        icon: Brain,
-        title: "Advanced AI Analysis",
-        description: "Access to our most powerful legal AI models",
-      },
-      bulk_processing: {
-        icon: Zap,
-        title: "Lightning Fast Processing",
-        description: "Priority queue for instant document analysis",
-      },
-      priority_support: {
-        icon: Shield,
-        title: "Priority Support",
-        description: "Get help when you need it most",
-      },
-    }
-
-    return Object.entries(keyFeatureMap)
-      .filter(([key]) => plan.features[key as keyof typeof plan.features])
-      .map(([, feature]) => feature)
-  }
-
-  const getDisplayFeatures = (plan: Plan) => {
-    const importantFeatures = [
-      "documents_uploaded_limit",
-      "analysis_generated_limit",
-      "storage_limit_gb",
-      "spaces_created_limit",
-      "export_formats",
-      "advanced_analysis",
-      "collaboration",
-      "priority_support",
-      "custom_templates",
-      "branding_removal",
-      "ads_enabled",
-    ]
-
-    return importantFeatures
-      .map(key => {
-        const value = plan.features[key as keyof typeof plan.features]
-        const text = getFeatureDisplayText(key, value)
-        return text ? text : null
-      })
-      .filter(Boolean) as string[]
+    return <Plansfallback />
   }
 
   return (
@@ -169,22 +50,21 @@ export default function PremiumScreen() {
             <Sparkles size={32} color="#FFD700" />
           </View>
 
-          <Text style={styles.title}>
-            {selectedPlan?.display_name || "SafeRead Pro"}
-          </Text>
+          <Text style={styles.title}>{effectiveSelectedPlan?.display_name || "SafeRead Pro"}</Text>
 
           <Text style={styles.subtitle}>
-            {selectedPlan?.description || "Access our most powerful AI models and advanced legal analysis features"}
+            {effectiveSelectedPlan?.description ||
+              "Access our most powerful AI models and advanced legal analysis features"}
           </Text>
         </Animated.View>
 
         {/* Key Features */}
-        {selectedPlan && (
+        {effectiveSelectedPlan && (
           <Animated.View
             entering={FadeInDown.delay(300).springify()}
             style={styles.keyFeaturesSection}
           >
-            {getKeyFeatures(selectedPlan).map((feature, index) => (
+            {getKeyFeatures(effectiveSelectedPlan).map((feature, index) => (
               <Animated.View
                 key={index}
                 entering={FadeInDown.delay(400 + index * 100).springify()}
@@ -203,9 +83,12 @@ export default function PremiumScreen() {
         )}
 
         {/* Features List */}
-        {selectedPlan && (
-          <Animated.View entering={FadeInDown.delay(600).springify()} style={styles.featuresSection}>
-            {getDisplayFeatures(selectedPlan).map((feature, index) => (
+        {effectiveSelectedPlan && (
+          <Animated.View
+            entering={FadeInDown.delay(600).springify()}
+            style={styles.featuresSection}
+          >
+            {getDisplayFeatures(effectiveSelectedPlan).map((feature, index) => (
               <Animated.View
                 key={index}
                 entering={FadeInDown.delay(700 + index * 50).springify()}
@@ -223,13 +106,10 @@ export default function PremiumScreen() {
         {/* Pricing Cards */}
         <Animated.View entering={FadeInDown.delay(1000).springify()} style={styles.pricingSection}>
           <View style={styles.pricingCards}>
-            {plans.map((plan) => (
+            {plans.map(plan => (
               <TouchableOpacity
                 key={plan.id}
-                style={[
-                  styles.pricingCard,
-                  selectedPlan?.id === plan.id && styles.selectedCard
-                ]}
+                style={[styles.pricingCard, isCardSelected(plan) && styles.selectedCard]}
                 onPress={() => setSelectedPlan(plan)}
               >
                 <Text style={styles.planName}>{plan.display_name}</Text>
@@ -246,16 +126,17 @@ export default function PremiumScreen() {
         </Animated.View>
 
         {/* CTA Button */}
-        {selectedPlan && selectedPlan.plan_type !== "free" && (
+        {effectiveSelectedPlan && effectiveSelectedPlan.plan_type !== "free" && (
           <Animated.View entering={FadeInDown.delay(1200).springify()} style={styles.ctaSection}>
             <TouchableOpacity style={styles.upgradeButton}>
               <Text style={styles.upgradeButtonText}>
-                Upgrade to {selectedPlan.display_name}
+                Upgrade to {effectiveSelectedPlan.display_name}
               </Text>
             </TouchableOpacity>
 
             <Text style={styles.billingInfo}>
-              Auto-renews for ${selectedPlan.price}/{selectedPlan.billing_cycle} until cancelled
+              Auto-renews for ${effectiveSelectedPlan.price}/{effectiveSelectedPlan.billing_cycle}{" "}
+              until cancelled
             </Text>
 
             <TouchableOpacity style={styles.restoreButton}>
@@ -279,6 +160,98 @@ export default function PremiumScreen() {
       </ScrollView>
     </View>
   )
+}
+
+const getDisplayFeatures = (plan: Plan) => {
+  const importantFeatures = [
+    "documents_uploaded_limit",
+    "analysis_generated_limit",
+    "storage_limit_gb",
+    "spaces_created_limit",
+    "export_formats",
+    "advanced_analysis",
+    "collaboration",
+    "priority_support",
+    "custom_templates",
+    "branding_removal",
+    "ads_enabled",
+  ]
+
+  return importantFeatures
+    .map(key => {
+      const value = plan.features[key as keyof typeof plan.features]
+      const text = getFeatureDisplayText(key, value)
+      return text ? text : null
+    })
+    .filter(Boolean) as string[]
+}
+
+const getKeyFeatures = (plan: Plan) => {
+  const keyFeatureMap = {
+    advanced_analysis: {
+      icon: Brain,
+      title: "Advanced AI Analysis",
+      description: "Access to our most powerful legal AI models",
+    },
+    bulk_processing: {
+      icon: Zap,
+      title: "Lightning Fast Processing",
+      description: "Priority queue for instant document analysis",
+    },
+    priority_support: {
+      icon: Shield,
+      title: "Priority Support",
+      description: "Get help when you need it most",
+    },
+  }
+
+  return Object.entries(keyFeatureMap)
+    .filter(([key]) => plan.features[key as keyof typeof plan.features])
+    .map(([, feature]) => feature)
+}
+
+const getFeatureDisplayText = (key: string, value: any): string => {
+  switch (key) {
+    case "storage_limit_gb":
+      return `${value}GB Storage`
+    case "retention_days":
+      return `${value} Days Data Retention`
+    case "documents_uploaded_limit":
+      return typeof value === "string" && value === "unlimited"
+        ? "Unlimited Document Uploads"
+        : `${value} Document Uploads`
+    case "analysis_generated_limit":
+      return typeof value === "string" && value === "unlimited"
+        ? "Unlimited AI Analysis"
+        : `${value} AI Analysis`
+    case "spaces_created_limit":
+      return typeof value === "string" && value === "unlimited"
+        ? "Unlimited Spaces"
+        : `${value} Spaces`
+    case "export_formats":
+      return `Export to ${Array.isArray(value) ? value.join(", ").toUpperCase() : value}`
+    case "priority_support":
+      return value ? "Priority Customer Support" : "Standard Support"
+    case "advanced_analysis":
+      return value ? "Advanced AI Analysis" : "Basic Analysis"
+    case "collaboration":
+      return value ? "Team Collaboration" : "Individual Use Only"
+    case "custom_templates":
+      return value ? "Custom Templates" : "Standard Templates"
+    case "branding_removal":
+      return value ? "No Branding" : "SafeRead Branding"
+    case "ads_enabled":
+      return value ? "Ads Included" : "Ad-Free Experience"
+    case "api_access":
+      return value ? "API Access" : "No API Access"
+    case "bulk_processing":
+      return value ? "Bulk Document Processing" : "Single Document Processing"
+    default:
+      if (typeof value === "boolean") {
+        return value ? key.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()) : ""
+      }
+      return `${value} ${key.replace(/_/g, " ")}`
+  }
 }
 
 const styles = StyleSheet.create({

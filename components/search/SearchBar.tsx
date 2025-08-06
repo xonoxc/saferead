@@ -4,6 +4,7 @@ import { Filter, Search } from "lucide-react-native"
 import { TouchableOpacity, View, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { TextInput } from "../TextInput"
+import SearchRightAccessory from "./SearchRightAccessory"
 
 interface SearchHeaderProps {
   searchQuery: string
@@ -29,12 +30,12 @@ export default function SearchBar({
           style={[styles.input, { color: colors.text }]}
           leftAccessory={<Search size={18} color={colors.textMuted} />}
           rightAccessory={
-            showFilter &&
-            onFilterPress && (
-              <TouchableOpacity style={styles.filterBtn} onPress={onFilterPress}>
-                <Filter size={18} color={colors.textMuted} />
-              </TouchableOpacity>
-            )
+            <SearchRightAccessory
+              searchQuery={searchQuery}
+              onSearchChange={searchQuery => onSearchChange(searchQuery)}
+              showFilter={showFilter}
+              onFilterPress={onFilterPress}
+            />
           }
           value={searchQuery}
           onChangeText={onSearchChange}
@@ -71,12 +72,5 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FontSizes.sm,
     fontFamily: Fonts.semiBold,
-  },
-  filterBtn: {
-    borderRadius: 12,
-    padding: 14,
-    paddingHorizontal: 12,
-    justifyContent: "center",
-    alignItems: "center",
   },
 })

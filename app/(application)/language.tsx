@@ -12,6 +12,7 @@ import { router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { TextInput } from "@/components/TextInput"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import SearchBar from "@/components/search/SearchBar"
 
 interface Language {
   code: string
@@ -106,8 +107,6 @@ export default function LanguageScreen() {
 
   const handleLanguageSelect = (languageCode: string) => {
     setSelectedLanguage(languageCode)
-    // Here you would typically save the language preference
-    // and potentially restart the app or update the locale
   }
 
   const LanguageItem: React.FC<{ language: Language; index: number; isSelected: boolean }> = ({
@@ -212,18 +211,9 @@ export default function LanguageScreen() {
         {/* Search */}
         <Animated.View
           entering={FadeInDown.delay(300).springify()}
-          style={[
-            styles.searchContainer,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}
+          style={[styles.searchContainer]}
         >
-          <Search size={20} color={colors.textMuted} />
-          <TextInput
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="Search languages..."
-            style={styles.searchInput}
-          />
+          <SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
         </Animated.View>
 
         {/* Popular Languages */}
@@ -369,12 +359,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 12,
-    marginBottom: 24,
+    marginBottom: 14,
   },
   searchInput: {
     flex: 1,

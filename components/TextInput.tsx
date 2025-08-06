@@ -37,7 +37,7 @@ export const TextInput: React.FC<TextInputProps> = ({
 }) => {
   const { colors } = useTheme()
   const [isFocused, setIsFocused] = useState(false)
-  const [hide, setHide] = useState(false)
+  const [hide, setHide] = useState(true)
 
   const showToggle = rest.secureTextEntry && !rest.multiline
 

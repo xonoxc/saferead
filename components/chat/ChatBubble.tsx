@@ -34,16 +34,7 @@ export function ChatBubble({
         },
       ]}
     >
-      <Markdown
-        style={markdownStyles}
-        rules={{
-          list_item: (_, children) => {
-            return (
-              <View style={{ flexDirection: "row", alignItems: "flex-start" }}>{children}</View>
-            )
-          },
-        }}
-      >
+      <Markdown style={markdownStyles} mergeStyle={true}>
         {chat.text}
       </Markdown>
     </Animated.View>
@@ -60,7 +51,7 @@ function getMarkdownStyles(colors: ColorsType, chat: Chats[number]) {
     },
     bullet_list: {
       marginVertical: 6,
-      paddingLeft: 4,
+      paddingLeft: 2,
     },
     ordered_list: {
       marginVertical: 6,

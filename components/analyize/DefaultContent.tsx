@@ -1,9 +1,14 @@
-import { View } from "react-native"
-import Animated, { FadeInDown } from "react-native-reanimated"
+import { StyleSheet, Dimensions } from "react-native"
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedScrollHandler,
+  interpolate,
+} from "react-native-reanimated"
 import { LinearGradient } from "expo-linear-gradient"
+import { FadeInDown } from "react-native-reanimated"
 
 import { type DocumentType, DocumentTypeSelector } from "../documents/DocumentTypeSelector"
-
 import UploadOptions from "./UploadOptions"
 import RecentDocumentListings from "./DocumentListings"
 
@@ -24,6 +29,8 @@ interface AnalyizeDefaultContentProps {
   onRecentDocumentPress: (item: AnalysisResponse) => void
 }
 
+const HEADER_HEIGHT = Dimensions.get("window").height * 0.4
+
 export default function AnalyizeDefaultContent({
   colors,
   selectedDocType,
@@ -35,38 +42,57 @@ export default function AnalyizeDefaultContent({
   onDocumentUpload,
   onRecentDocumentPress,
 }: AnalyizeDefaultContentProps) {
+  const scrollY = useSharedValue(0)
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: event => {
+      scrollY.value = event.contentOffset.y
+    },
+  })
+
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      height: interpolate(scrollY.value, [0, HEADER_HEIGHT], [HEADER_HEIGHT, 0], "clamp"),
+      opacity: interpolate(scrollY.value, [0, HEADER_HEIGHT / 2], [1, 0], "clamp"),
+    }
+  })
+
+  const listAnimatedStyle = useAnimatedStyle(() => {
+    const topOffset = interpolate(scrollY.value, [0, HEADER_HEIGHT], [HEADER_HEIGHT, 0], "clamp")
+    return {
+      paddingTop: topOffset,
+    }
+  })
+
   return (
-    <View
-      style={{ flex: 1, padding: 20, paddingHorizontal: 6, backgroundColor: colors.background }}
+    <Animated.ScrollView
+      onScroll={onScroll}
+      scrollEventThrottle={16}
+      showsVerticalScrollIndicator={false}
+      style={{ flex: 1, backgroundColor: colors.background }}
     >
-      {/* Document Type Selector */}
-      <LinearGradient
-        colors={[colors.vio, colors.blueg]}
-        style={{
-          marginBottom: 25,
-          marginTop: 13,
-          backgroundColor: colors.card,
-          paddingTop: 40,
-          borderRadius: 50,
-          padding: 20,
-        }}
+      {/* Animated Header */}
+      <Animated.View
+        style={[
+          headerAnimatedStyle,
+          { overflow: "hidden", position: "absolute", top: 0, left: 0, right: 0, zIndex: 1 },
+        ]}
       >
-        <Animated.View entering={FadeInDown.delay(200).springify()}>
-          <DocumentTypeSelector selectedType={selectedDocType} onSelect={onDocumentSelectType} />
-        </Animated.View>
+        <LinearGradient colors={[colors.vio, colors.blueg]} style={styles.headerGradient}>
+          <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <DocumentTypeSelector selectedType={selectedDocType} onSelect={onDocumentSelectType} />
+          </Animated.View>
 
-        {/* Upload Options */}
-        <UploadOptions
-          colors={colors}
-          onDocumentUpload={onDocumentUpload}
-          onDocumentScan={onDocumentScan}
-        />
-      </LinearGradient>
+          <UploadOptions
+            colors={colors}
+            onDocumentUpload={onDocumentUpload}
+            onDocumentScan={onDocumentScan}
+          />
+        </LinearGradient>
+      </Animated.View>
 
-      <View
-        style={{ flex: 1, padding: 20, paddingHorizontal: 2, backgroundColor: colors.background }}
-      >
-        {/* Recent Documents Section */}
+      {/* Recent document listing */}
+      <Animated.View style={[{ flex: 1, paddingHorizontal: 2 }, listAnimatedStyle]}>
         <RecentDocumentListings
           colors={colors}
           recentDocuments={recentDocuments}
@@ -74,7 +100,17 @@ export default function AnalyizeDefaultContent({
           setViewType={onSetViewType}
           onRecentDocumentPress={onRecentDocumentPress}
         />
-      </View>
-    </View>
+      </Animated.View>
+    </Animated.ScrollView>
   )
 }
+
+const styles = StyleSheet.create({
+  headerGradient: {
+    marginHorizontal: 6,
+    marginTop: 13,
+    borderRadius: 50,
+    padding: 20,
+    paddingTop: 40,
+  },
+})

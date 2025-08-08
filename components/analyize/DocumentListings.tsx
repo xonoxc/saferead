@@ -35,36 +35,33 @@ export default function RecentDocumentListings({
   )
 
   return (
-    <>
-      <View style={styles.recentHeader}>
-        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Recent Analysis</Text>
-        <View style={styles.viewToggle}>
-          <ViewMode viewMode={viewType} setViewMode={setViewType} />
-        </View>
-      </View>
-      <ScrollView
-        style={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 30 }}
-      >
-        {/* Recent Documents */}
-        {recentDocuments.length > 0 && (
-          <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.recentSection}>
-            <FlatList
-              data={recentDocuments.slice(0, 5)}
-              collapsableChildren={true}
-              renderItem={renderRecentItem}
-              keyExtractor={item => item.id}
-              numColumns={viewType === "grid" ? 2 : 1}
-              key={viewType}
-              scrollEnabled={false}
-              columnWrapperStyle={viewType === "grid" ? { gap: 10 } : undefined}
-              contentContainerStyle={{ gap: 10 }}
-            />
-          </Animated.View>
-        )}
-      </ScrollView>
-    </>
+    <ScrollView
+      style={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 30 }}
+    >
+      {/* Recent Documents */}
+      {recentDocuments.length > 0 && (
+        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.recentSection}>
+          <View style={styles.recentHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Recent Analysis</Text>
+            <View style={styles.viewToggle}>
+              <ViewMode viewMode={viewType} setViewMode={setViewType} />
+            </View>
+          </View>
+          <FlatList
+            data={recentDocuments.slice(0, 5)}
+            renderItem={renderRecentItem}
+            keyExtractor={item => item.id}
+            numColumns={viewType === "grid" ? 2 : 1}
+            key={viewType}
+            scrollEnabled={false}
+            columnWrapperStyle={viewType === "grid" ? { gap: 10 } : undefined}
+            contentContainerStyle={{ gap: 10 }}
+          />
+        </Animated.View>
+      )}
+    </ScrollView>
   )
 }
 
@@ -76,15 +73,14 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: FontSizes.md,
+    fontSize: FontSizes.lg,
     fontFamily: Fonts.semiBold,
     marginBottom: 16,
   },
   recentHeader: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
+    alignItems: "center",
     marginBottom: 16,
   },
   viewToggle: {

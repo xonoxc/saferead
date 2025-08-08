@@ -2,11 +2,10 @@ import { TouchableOpacity, View, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import UpgradeButton from "@/components/UpgradeButton"
 
-import { CircleEllipsis, Ellipsis, LogOut } from "lucide-react-native"
+import { CircleEllipsis, LogOut } from "lucide-react-native"
 
 import type { Space } from "@/types"
 import type { ColorsType } from "@/hooks/useTheme"
-import { MinimalHamburgerIcon } from "../icon/Hamburger"
 import { router } from "expo-router"
 
 interface AnalyzeHeaderProps {

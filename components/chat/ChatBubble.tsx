@@ -1,9 +1,11 @@
 import { Chats } from "@/hooks/chat/useChat"
 import Animated, { FadeInDown } from "react-native-reanimated"
-import { Text, StyleSheet } from "react-native"
+import { StyleSheet, View } from "react-native"
 import { Fonts, FontSizes } from "@/constants"
 
 import type { ColorsType } from "@/hooks/useTheme"
+
+import Markdown from "react-native-markdown-display"
 
 export function ChatBubble({
   chat,
@@ -14,6 +16,8 @@ export function ChatBubble({
   index: number
   colors: ColorsType
 }) {
+  const markdownStyles = getMarkdownStyles(colors, chat)
+
   return (
     <Animated.View
       key={index}
@@ -30,17 +34,62 @@ export function ChatBubble({
         },
       ]}
     >
-      <Text
-        style={{
-          color: chat.sender === "user" ? colors.background : colors.text,
-          fontSize: FontSizes.xxs,
-          fontFamily: chat.sender === "bot" ? Fonts.medium : Fonts.semiBold,
+      <Markdown
+        style={markdownStyles}
+        rules={{
+          list_item: (_, children) => {
+            return (
+              <View style={{ flexDirection: "row", alignItems: "flex-start" }}>{children}</View>
+            )
+          },
         }}
       >
         {chat.text}
-      </Text>
+      </Markdown>
     </Animated.View>
   )
+}
+
+function getMarkdownStyles(colors: ColorsType, chat: Chats[number]) {
+  return {
+    body: {
+      color: chat.sender === "user" ? colors.background : colors.text,
+      fontSize: FontSizes.xxs,
+      fontFamily: chat.sender === "bot" ? Fonts.medium : Fonts.semiBold,
+      lineHeight: 18,
+    },
+    bullet_list: {
+      marginVertical: 6,
+      paddingLeft: 4,
+    },
+    ordered_list: {
+      marginVertical: 6,
+      paddingLeft: 4,
+    },
+    bullet_list_icon: {
+      color: colors.textMuted,
+    },
+    strong: {
+      fontFamily: Fonts.semiBold,
+      color: colors.text,
+    },
+    paragraph: {
+      marginBottom: 8,
+    },
+    code_inline: {
+      backgroundColor: colors.surface,
+      color: colors.text,
+      fontFamily: Fonts.medium,
+      fontSize: FontSizes.xxs,
+      paddingHorizontal: 4,
+      paddingVertical: 2,
+      borderRadius: 4,
+    },
+    list_item: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+    },
+  } as any
 }
 
 const styles = StyleSheet.create({

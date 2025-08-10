@@ -6,9 +6,10 @@ import { useInstantJSONResponse } from "../queries/converstations"
 import { useDrawerAlert } from "../alerts/useAlert"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
-import { useKeyBoardVisiblity } from "../kayboard/useKeyboardVisiblity"
+import { useKeyBoardVisibility } from "../kayboard/useKeyboardVisiblity"
 import { usePreventTabSwitch } from "../blocking/usePreventTabSwitch"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import { ScrollView } from "react-native-reanimated/lib/typescript/Animated"
+import React from "react"
 
 export type ChatContextSources = {
   id: string
@@ -23,10 +24,12 @@ export default function useChat() {
   const [message, setMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [chatHistory, setChatHistory] = useState<Chats>([])
-  const [aboortController, setAbortController] = useState<AbortController>(new AbortController())
-  const [showScrollToBottom, setShowScrollToBottom] = useState(false)
+  const [abortController, setAbortController] = useState<AbortController>(
+    () => new AbortController()
+  )
+  const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false)
 
-  const scrollViewRef = useRef<KeyboardAwareScrollView | null>(null)
+  const scrollViewRef = useRef<ScrollView | null>(null)
 
   const selectedSpace = useSpaceStore(s => s.selectedSpace)
   const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
@@ -36,7 +39,7 @@ export default function useChat() {
   const getStreamingResponse = useInstantJSONResponse()
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(KeyboardController.isVisible())
-  useKeyBoardVisiblity(setKeyboardVisible)
+  useKeyBoardVisibility(setKeyboardVisible)
 
   /*
    * this is to prevent the users from leaving the screen when in chat mode
@@ -47,6 +50,15 @@ export default function useChat() {
     "You are in a space chat. Are you sure you want to leave?"
   )
 
+  /*
+   * this is to handle the cleanup of the abort controller
+   * **/
+  React.useEffect(() => {
+    return () => {
+      abortController.abort()
+    }
+  }, [])
+
   const handleScroll = (event: any) => {
     const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent
     const isNearBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 100
@@ -55,11 +67,13 @@ export default function useChat() {
 
   const scrollToBottom = () => {
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd(true)
+      scrollViewRef.current.scrollToEnd({ animated: true })
     }
   }
 
   const handleSend = async (overrideMessage?: string) => {
+    scrollToBottom()
+
     KeyboardController.dismiss()
     setKeyboardVisible(false)
 
@@ -103,8 +117,8 @@ export default function useChat() {
   const isChatEmpty = () => chatHistory.length === 0
 
   const cancelResponse = () => {
-    if (aboortController) {
-      aboortController.abort("User cancelled the request")
+    if (abortController) {
+      abortController.abort("User cancelled the request")
       setAbortController(new AbortController())
       setIsTyping(false)
     }
@@ -134,5 +148,7 @@ export default function useChat() {
     handlePromptSeggestionPress,
     isKeyboardVisible,
     handleSend,
+    scrollViewRef,
+    scrollToBottom,
   }
 }

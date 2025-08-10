@@ -53,6 +53,14 @@ function getMarkdownStyles(colors: ColorsType, chat: Chats[number]) {
       marginVertical: 6,
       paddingLeft: 2,
     },
+    blockquote: {
+      borderLeftWidth: 2,
+      borderLeftColor: colors.textMuted,
+      paddingLeft: 8,
+      marginVertical: 6,
+      color: colors.textMuted,
+      fontFamily: Fonts.medium,
+    },
     ordered_list: {
       marginVertical: 6,
       paddingLeft: 4,

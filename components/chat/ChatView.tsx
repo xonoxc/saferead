@@ -24,6 +24,8 @@ export function ChatView() {
     isKeyboardVisible,
     handleInputSideButtonPress,
     handlePromptSeggestionPress,
+    scrollViewRef,
+    scrollToBottom,
   } = useChat()
 
   return (
@@ -41,10 +43,12 @@ export function ChatView() {
           </View>
 
           <KeyboardAwareScrollView
+            ref={scrollViewRef}
             contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 6, paddingBottom: 100 }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             keyboardDismissMode="interactive"
+            onContentSizeChange={() => scrollToBottom()}
           >
             {isChatEmpty() ? <ChatGreeting /> : <ChatHistory chatHistory={chatHistory} />}
             {isTyping && <TypingBubble />}

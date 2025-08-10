@@ -1,7 +1,7 @@
 import React from "react"
 import { KeyboardEvents } from "react-native-keyboard-controller"
 
-export function useKeyBoardVisiblity(stateSetterFn: (visible: boolean) => void) {
+export function useKeyBoardVisibility(stateSetterFn: (visible: boolean) => void) {
   React.useEffect(() => {
     const showSub = KeyboardEvents.addListener("keyboardDidShow", () => {
       stateSetterFn(true)

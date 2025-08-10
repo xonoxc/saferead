@@ -2,6 +2,7 @@ import { useTheme } from "@/hooks/useTheme"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { Text, StyleSheet } from "react-native"
 import { Fonts } from "@/constants"
+import ResponseLoader from "./ResponseLoader"
 
 export function TypingBubble() {
   const { colors } = useTheme()
@@ -10,7 +11,7 @@ export function TypingBubble() {
       entering={FadeIn}
       style={[styles.chatBubble, styles.botBubble, { backgroundColor: colors.card }]}
     >
-      <Text style={{ color: colors.text, fontFamily: Fonts.regular }}>Typing...</Text>
+      <ResponseLoader />
     </Animated.View>
   )
 }

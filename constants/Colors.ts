@@ -1,6 +1,7 @@
 const Colors = {
   light: {
     primary: "#000000",
+    primaryFaded: "rgba(0, 0, 0, 0.1)",
     secondary: "#333333",
     accent: "#666666",
     success: "#22C55E",
@@ -12,6 +13,7 @@ const Colors = {
     card: "#FAF3F0",
     text: "#000000",
     textSecondary: "#333333",
+    textTertiary: "rgba(0, 0, 0, 0.5)",
     textMuted: "#666666",
     border: "#d8dee9",
     borderLight: "#F3F4F6",
@@ -25,6 +27,7 @@ const Colors = {
   },
   dark: {
     primary: "#FFFFFF",
+    primaryFaded: "rgba(255, 255, 255, 0.1)",
     secondary: "#E5E7EB",
     accent: "#9CA3AF",
     success: "#22C55E",
@@ -36,6 +39,7 @@ const Colors = {
     card: "#1A1A1A",
     text: "#FFFFFF",
     textSecondary: "#E5E7EB",
+    textTertiary: "rgba(255, 255, 255, 0.5)",
     textMuted: "#9CA3AF",
     border: "#333333",
     borderLight: "#1A1A1A",

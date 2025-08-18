@@ -1,5 +1,5 @@
 import { useTheme } from "@/hooks/useTheme"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Redirect, Stack } from "expo-router"
 import { useState } from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -8,7 +8,27 @@ import { useAuth } from "@/hooks/useAuth"
 
 export default function ApplicationLayout() {
   const { colors } = useTheme()
-  const [queryClient] = useState(() => new QueryClient())
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        mutationCache: new MutationCache({
+          /*
+           * this is a global handler that invalidates the queries after a successful mutation
+           * just add
+           * ***meta: { invalidates: [["queryKey"]] }***
+           * to the mutation options
+           */
+          onSuccess: async (_data, _variables, _context, mutation) => {
+            const invalidates = mutation.meta?.invalidateQueries
+            if (invalidates && Array.isArray(invalidates)) {
+              await Promise.all(
+                invalidates.map(queryKey => queryClient.invalidateQueries(queryKey))
+              )
+            }
+          },
+        }),
+      })
+  )
 
   const { isAuthenticated } = useAuth()
 
@@ -18,7 +38,7 @@ export default function ApplicationLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background ?? "black" }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
         <Stack>
           <Stack.Screen
             name="(tabs)"

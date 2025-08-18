@@ -12,12 +12,10 @@ import { useAnalysisStore } from "@/store/useAnalysisStore"
 import { useQueryClient } from "@tanstack/react-query"
 import { useDrawerAlert } from "./alerts/useAlert"
 import { useTabBarVisibilty } from "./useTabBarVisiblitiy"
-import { usePreventRemove } from "@react-navigation/native"
 
 import type { AnalysisResponse } from "@/types/api/documents.types"
 import type { DocumentType } from "@/components/documents/DocumentTypeSelector"
 import type { Document } from "@/types"
-import { usePreventTabSwitch } from "./blocking/usePreventTabSwitch"
 
 export function useAnalysis() {
   const { user } = useAuth()

@@ -22,3 +22,5 @@ export * from "./LoadingSpinner"
 export * from "./ErrorMessage"
 
 export * from "./CustomBackBtn"
+
+export * from "./onboarding"

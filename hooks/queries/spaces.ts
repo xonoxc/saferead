@@ -36,6 +36,7 @@ export const useDeleteSpace = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["spaces"] })
     },
+    meta: {},
   })
 }
 

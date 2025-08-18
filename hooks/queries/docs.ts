@@ -40,5 +40,8 @@ export const useDeleteDocument = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["documents"] })
     },
+    meta: {
+      invalidates: [["documents"]],
+    },
   })
 }

@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query"
 import {
   getSpaces,
   deleteSpace as deleteSpaceApi,
@@ -29,14 +29,11 @@ export const useSpaces = (filters?: SpaceFilterOptions, enabled = true) => {
 }
 
 export const useDeleteSpace = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: deleteSpaceApi,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["spaces"] })
+    meta: {
+      invalidatedQueries: [["spaces"]],
     },
-    meta: {},
   })
 }
 
@@ -63,25 +60,19 @@ export const useSpaceStats = (spaceId: string, enabled = true) => {
 }
 
 export const useToggleFavoriteSpace = (spaceId: string) => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: () => toggleFavoriteSpaceApi(spaceId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["spaces", spaceId] })
-      queryClient.invalidateQueries({ queryKey: ["spaces"] })
+    meta: {
+      invalidatedQueries: [["spaces", spaceId], ["spaces"]],
     },
   })
 }
 
 export const usePinDocumentMutation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: PinDocumetToSpaceMethodParams) => pinDocumentToSpace(data),
-    onSuccess: async () =>
-      await queryClient.invalidateQueries({
-        queryKey: ["spaces"],
-      }),
+    meta: {
+      invalidatedQueries: [["spaces"]],
+    },
   })
 }

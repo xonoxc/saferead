@@ -9,3 +9,4 @@ export const usePlans = (enabled = true) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
+

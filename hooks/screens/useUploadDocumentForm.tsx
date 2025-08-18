@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import * as DocumentPicker from "expo-document-picker"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -18,8 +18,6 @@ interface UseUploadDocumentFormProps {
 }
 
 export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDocumentFormProps) {
-  const queryClient = useQueryClient()
-
   const showBottomAlert = useDrawerAlert()
 
   const {
@@ -51,17 +49,6 @@ export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDoc
       })
     },
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["spaces", spaceId, "documents"],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["spaces", spaceId, "stats"],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["spaces"],
-        }),
-      ])
       onUploadSuccess()
 
       showBottomAlert({
@@ -78,6 +65,13 @@ export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDoc
         message: getErrorMessage(error),
         actions: [{ text: "OK", style: "primary", onPress: () => {} }],
       })
+    },
+    meta: {
+      invalidatedQueries: [
+        ["spaces", spaceId, "documents"],
+        ["spaces", spaceId, "stats"],
+        ["spaces"],
+      ],
     },
   })
 
@@ -108,9 +102,7 @@ export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDoc
     setValue("displayName", file.name ?? "")
   }
 
-  const onSubmit = (data: FormData) => {
-    mutation.mutate(data)
-  }
+  const onSubmit = (data: FormData) => mutation.mutate(data)
 
   return {
     control,

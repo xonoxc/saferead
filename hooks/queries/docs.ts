@@ -1,4 +1,4 @@
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useInfiniteQuery, useMutation } from "@tanstack/react-query"
 import {
   getDocuments,
   getDocumentById,
@@ -34,14 +34,10 @@ export const useDocument = (documentId: string) => {
 }
 
 export const useDeleteDocument = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: deleteDocumentApi,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["documents"] })
-    },
     meta: {
-      invalidates: [["documents"]],
+      invalidatedQueries: [["documents"]],
     },
   })
 }

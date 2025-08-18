@@ -1,34 +1,27 @@
 import { useTheme } from "@/hooks/useTheme"
-import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Redirect, Stack } from "expo-router"
 import { useState } from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { CustomBackBtn } from "@/components"
 import { useAuth } from "@/hooks/useAuth"
+import { createApplicationMutationCache } from "@/config/mutationCache"
 
 export default function ApplicationLayout() {
   const { colors } = useTheme()
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        mutationCache: new MutationCache({
-          /*
-           * this is a global handler that invalidates the queries after a successful mutation
-           * just add
-           * ***meta: { invalidates: [["queryKey"]] }***
-           * to the mutation options
-           */
-          onSuccess: async (_data, _variables, _context, mutation) => {
-            const invalidates = mutation.meta?.invalidateQueries
-            if (invalidates && Array.isArray(invalidates)) {
-              await Promise.all(
-                invalidates.map(queryKey => queryClient.invalidateQueries(queryKey))
-              )
-            }
-          },
-        }),
-      })
-  )
+  /*
+   * Global queryCLient instance for the application
+   * **/
+  const [queryClient] = useState(() => {
+    let qc: QueryClient
+    qc = new QueryClient({
+      /*
+       * double closure injection to ensure the queryClient is available
+       * **/
+      mutationCache: createApplicationMutationCache(() => qc),
+    })
+    return qc
+  })
 
   const { isAuthenticated } = useAuth()
 

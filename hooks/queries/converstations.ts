@@ -1,19 +1,18 @@
 import { createConversation, getConversations } from "@/services/conversation.service"
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query"
 
-import type { PaginatedConverSationResponse } from "@/types/api/conversations.types"
-import type { ConversationFilterOptions } from "@/types/conversations"
 import { apiClient, getAccessToken } from "@/utils/apiclient"
 import { serverURL } from "@/constants"
 import { fetch } from "expo/fetch"
 
-export const useCreateConversationMutation = () => {
-  const queryClient = useQueryClient()
+import type { PaginatedConverSationResponse } from "@/types/api/conversations.types"
+import type { ConversationFilterOptions } from "@/types/conversations"
 
+export const useCreateConversationMutation = () => {
   const mutation = useMutation({
     mutationFn: createConversation,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["conversations"] })
+    meta: {
+      invalidatedQueries: [["conversations"]],
     },
   })
 

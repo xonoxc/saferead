@@ -9,14 +9,16 @@ import {
   Volume2,
 } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
-import { useTheme, ColorsType } from "@/hooks/useTheme"
 import { useVoice } from "@/hooks/useVoice"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { AnalysisResponse } from "@/types/api/documents.types"
 import { attempt } from "@/utils/attempt"
 import { CustomBackBtn } from "../CustomBackBtn"
 import { getDocumentShareContent } from "@/constants/share"
 import { LineDivider } from "../LineDivider"
+
+import { useTheme, type ColorsType } from "@/hooks/useTheme"
+
+import type { AnalysisResponse } from "@/types/api/documents.types"
 
 export const DocumentAnalysisView = ({
   analysis,

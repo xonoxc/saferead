@@ -1,3 +1,6 @@
+import ViewMode from "../ViewModeSetter"
+import SearchBar from "@/components/search/SearchBar"
+
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
 import { Plus } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
@@ -5,8 +8,6 @@ import { Fonts, FontSizes } from "@/constants"
 import type { ColorsType } from "@/hooks/useTheme"
 import type { SetStateFunction } from "@/types/state"
 import type { ViewType } from "@/types/view"
-import ViewMode from "../ViewModeSetter"
-import SearchBar from "@/components/search/SearchBar"
 
 interface SpaceScreenHeaderProps {
   colors: ColorsType

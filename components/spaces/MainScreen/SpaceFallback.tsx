@@ -1,5 +1,5 @@
-import { EmptyState } from "@/components/EmptyState"
 import { View } from "react-native"
+import { EmptyState } from "@/components/EmptyState"
 
 export default function SpacesFallback({
   searchQuery,

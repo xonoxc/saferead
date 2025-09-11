@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native"
-import { ReactNode } from "react"
 import { useTheme } from "@/hooks/useTheme"
+
+import type { ReactNode } from "react"
 
 interface FilterSectionProps {
   title: string

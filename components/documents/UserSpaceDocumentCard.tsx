@@ -2,10 +2,11 @@ import React from "react"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import { Calendar, Pin, PinOff, Tag } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { UserSpaceDocument } from "@/types/api/spaces.documents.types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { getFileIcon } from "@/utils/helpers/files"
 import { useBrowserLink } from "@/hooks/browser/useBrowserLink"
+
+import type { UserSpaceDocument } from "@/types/api/spaces.documents.types"
 
 interface UserSpaceDocumentCardProps {
   pinned?: boolean

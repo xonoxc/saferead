@@ -1,5 +1,6 @@
 import { create } from "zustand"
-import { AlertOptions as RNalertOptions } from "react-native"
+
+import type { AlertOptions as RNalertOptions } from "react-native"
 
 export interface AlertAction {
   text: string

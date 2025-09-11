@@ -1,14 +1,15 @@
 import React from "react"
+import { useTheme } from "@/hooks/useTheme"
+import { Fonts, FontSizes } from "@/constants"
+
 import {
   TouchableOpacity,
   Text,
   StyleSheet,
   ActivityIndicator,
-  StyleProp,
-  ViewStyle,
+  type StyleProp,
+  type ViewStyle,
 } from "react-native"
-import { useTheme } from "@/hooks/useTheme"
-import { Fonts, FontSizes } from "@/constants"
 
 interface ButtonProps {
   title: string

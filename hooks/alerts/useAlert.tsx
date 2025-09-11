@@ -1,8 +1,7 @@
 import { DrawerAlert } from "@/components/alert/DrawerAlert"
-import { ReactNode } from "react"
 import { useAlertStore } from "@/store/useAlertStore"
 
-export const DrawerAlertRenderer = ({ children }: { children: ReactNode }) => {
+export const DrawerAlertRenderer = ({ children }: { children: React.ReactNode }) => {
   const { alertOptions, hideAlert } = useAlertStore()
 
   return (

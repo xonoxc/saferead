@@ -1,7 +1,8 @@
 import React from "react"
 import { View, Text, StyleSheet } from "react-native"
-import { iconMap, SpaceIconName } from "@/constants/spaceform"
 import { Box } from "lucide-react-native"
+
+import { iconMap, type SpaceIconName } from "@/constants/spaceform"
 
 type SpaceIconProps = {
   name: SpaceIconName

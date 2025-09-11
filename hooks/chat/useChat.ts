@@ -1,6 +1,6 @@
 import { useSpaceStore } from "@/store/useSpaceStore"
 import { useTheme } from "../useTheme"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { KeyboardController } from "react-native-keyboard-controller"
 import { useInstantJSONResponse } from "../queries/converstations"
 import { useDrawerAlert } from "../alerts/useAlert"
@@ -9,7 +9,6 @@ import { attempt } from "@/utils/attempt"
 import { useKeyBoardVisibility } from "../kayboard/useKeyboardVisiblity"
 import { usePreventTabSwitch } from "../blocking/usePreventTabSwitch"
 import { ScrollView } from "react-native-reanimated/lib/typescript/Animated"
-import React from "react"
 
 export type ChatContextSources = {
   id: string
@@ -53,11 +52,11 @@ export default function useChat() {
   /*
    * this is to handle the cleanup of the abort controller
    * **/
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       abortController.abort()
     }
-  }, [])
+  }, [abortController])
 
   const handleScroll = (event: any) => {
     const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent

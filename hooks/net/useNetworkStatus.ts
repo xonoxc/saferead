@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import * as Network from "expo-network"
 
 export default function useNetworkStatus() {
-  const [isOffline, setIsOffline] = useState(false)
+  const [isOffline, setIsOffline] = useState<boolean>(false)
 
   useEffect(() => {
     const subscription = Network.addNetworkStateListener(e => {

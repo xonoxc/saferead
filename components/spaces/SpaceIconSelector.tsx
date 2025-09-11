@@ -1,9 +1,11 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native"
-import type { ControllerRenderProps } from "react-hook-form"
-import { useTheme } from "@/hooks/useTheme"
 import Animated from "react-native-reanimated"
 
+import { View, TouchableOpacity, StyleSheet } from "react-native"
+import { useTheme } from "@/hooks/useTheme"
+
 import { iconMap } from "@/constants/spaceform"
+
+import type { ControllerRenderProps } from "react-hook-form"
 
 interface IConSelectorProps {
   field: ControllerRenderProps<any, "icon">

@@ -7,12 +7,12 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
+  type StyleProp,
+  type ViewStyle,
+  type TextStyle,
 } from "react-native"
-import { ChevronDown, Check, Dot, LucideIcon } from "lucide-react-native"
-import { ColorsType, useTheme } from "@/hooks/useTheme"
+import { ChevronDown, Check, Dot, type LucideIcon } from "lucide-react-native"
+import { type ColorsType, useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 
 export interface DropdownOption<T> {

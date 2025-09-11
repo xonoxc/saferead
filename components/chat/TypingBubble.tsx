@@ -1,7 +1,6 @@
 import { useTheme } from "@/hooks/useTheme"
 import Animated, { FadeIn } from "react-native-reanimated"
-import { Text, StyleSheet } from "react-native"
-import { Fonts } from "@/constants"
+import { StyleSheet } from "react-native"
 import ResponseLoader from "./ResponseLoader"
 
 export function TypingBubble() {

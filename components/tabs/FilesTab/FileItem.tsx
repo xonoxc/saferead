@@ -1,6 +1,6 @@
 import { Fonts } from "@/constants"
 import { useTheme } from "@/hooks/useTheme"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
+import { Text, StyleSheet, TouchableOpacity } from "react-native"
 import { useBrowserLink } from "@/hooks/browser/useBrowserLink"
 
 import type { UserSpaceDocument } from "@/types/api/spaces.documents.types"

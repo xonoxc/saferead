@@ -1,14 +1,14 @@
-import { UserSpaceDocumentCard } from "@/components/documents/UserSpaceDocumentCard"
+import Animated from "react-native-reanimated"
 import { Fonts, FontSizes } from "@/constants"
 import {
   View,
   StyleSheet,
   Text,
-  FlatList,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from "react-native"
-import Animated from "react-native-reanimated"
+
+import { UserSpaceDocumentCard } from "@/components/documents/UserSpaceDocumentCard"
 
 interface SpaceRecentDocumentListProps {
   documents: any[]

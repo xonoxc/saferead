@@ -2,7 +2,8 @@ import React from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 
-import { type DropdownOption, DropdownSelector } from "@/components/DropDownSelector"
+import DropdownSelector, { type DropdownOption } from "@/components/DropDownSelector"
+
 import type { Space } from "@/types"
 
 interface SpaceSelectorProps {
@@ -33,7 +34,7 @@ export function SpaceSelector({ spaces, selectedSpace, onSelectSpace }: SpaceSel
         label="Choose a space to chat with"
         options={spaceItems}
         onSelect={handleSelect}
-        selected={selectedSpace?.id ?? ""}
+        selected={selectedSpace ?? ""}
       />
     </View>
   )

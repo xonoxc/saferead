@@ -1,8 +1,9 @@
 import React from "react"
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native"
-import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+
+import { type ColorsType, useTheme } from "@/hooks/useTheme"
 
 import type { LucideIcon } from "lucide-react-native"
 

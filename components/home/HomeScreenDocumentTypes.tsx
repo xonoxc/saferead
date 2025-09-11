@@ -1,13 +1,13 @@
+import TypeCard from "./HomeScreenTypeCard"
+
 import Animated, { FadeInDown } from "react-native-reanimated"
-
 import { View, Text, StyleSheet } from "react-native"
-
 import { FileText, Shield, Scale, FileCheck } from "lucide-react-native"
+import { Fonts, FontSizes } from "@/constants"
+
+import { useTheme, type ColorsType } from "@/hooks/useTheme"
 
 import type { StatsResponse } from "@/types/api/documents.types"
-import { useTheme, type ColorsType } from "@/hooks/useTheme"
-import { Fonts, FontSizes } from "@/constants"
-import TypeCard from "./HomeScreenTypeCard"
 
 export default function HomeScreenDocumentType({ stats }: { stats: StatsResponse | undefined }) {
   const { colors } = useTheme()

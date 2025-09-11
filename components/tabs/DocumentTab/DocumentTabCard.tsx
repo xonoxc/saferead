@@ -1,11 +1,12 @@
-import { ColorsType, useTheme } from "@/hooks/useTheme"
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
 import { ArrowDown, ArrowUp, FileText, Trash2 } from "lucide-react-native"
-
-import type { AnalysisResponse } from "@/types/api/documents.types"
 import { Fonts, FontSizes } from "@/constants"
 import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 import { ProgressBar } from "@/components/ProgressBar"
+
+import { type ColorsType, useTheme } from "@/hooks/useTheme"
+
+import type { AnalysisResponse } from "@/types/api/documents.types"
 
 interface DocumentCardProps {
   document: AnalysisResponse

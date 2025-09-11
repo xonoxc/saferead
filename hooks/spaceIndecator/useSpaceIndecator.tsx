@@ -3,9 +3,10 @@ import { useSpaceStore } from "@/store/useSpaceStore"
 import { useTheme } from "@/hooks/useTheme"
 import { Box } from "lucide-react-native"
 
+import { useAnimatedStyle, withTiming } from "react-native-reanimated"
+
 import type { DropdownOption } from "@/components/DropDownSelector"
 import type { Space } from "@/types"
-import { useAnimatedStyle, withTiming } from "react-native-reanimated"
 
 export function useSpaceIndecator() {
   const { colors } = useTheme()

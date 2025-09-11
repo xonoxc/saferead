@@ -2,9 +2,10 @@ import React, { useState } from "react"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import { FileCheck2, X } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
+import { Drawer } from "../Drawer"
+
 import type { Chats } from "@/hooks/chat/useChat"
 import type { ColorsType } from "@/hooks/useTheme"
-import { Drawer } from "../Drawer"
 
 export function ChatSources({ chat, colors }: { chat: Chats[number]; colors: ColorsType }) {
   const [isDrawerOpen, setDrawerOpen] = useState(false)

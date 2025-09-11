@@ -2,8 +2,9 @@ import React from "react"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import { FileText, Calendar, TriangleAlert as AlertTriangle, Shield } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { Document } from "@/types"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+
+import type { Document } from "@/types"
 
 interface DocumentCardProps {
   document: Document

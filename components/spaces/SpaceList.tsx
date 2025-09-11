@@ -1,12 +1,14 @@
 import React from "react"
+import SpaceIcon from "./Icon"
+
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native"
 import { FileText, Trash2, Heart } from "lucide-react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+
 import type { Space } from "@/types"
-import SpaceIcon from "./Icon"
-import { SpaceIconName } from "@/constants/spaceform"
+import type { SpaceIconName } from "@/constants/spaceform"
 
 const { width } = Dimensions.get("window")
 

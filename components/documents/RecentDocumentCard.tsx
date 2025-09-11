@@ -1,9 +1,11 @@
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { ColorsType, useTheme } from "@/hooks/useTheme"
-import { AnalysisResponse } from "@/types/api/documents.types"
 import { ArrowDown, ArrowUp, FileText } from "lucide-react-native"
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native"
 import { ProgressBar } from "../ProgressBar"
+
+import { type ColorsType, useTheme } from "@/hooks/useTheme"
+
+import type { AnalysisResponse } from "@/types/api/documents.types"
 
 interface RecentDocumentItemProps {
   document: AnalysisResponse

@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 
-import type { FilterField } from "@/types/filter"
 import { Fonts, FontSizes } from "@/constants"
 import { SelectableChip } from "./SelectableChip"
+
+import type { FilterField } from "@/types/filter"
 
 interface SelectFieldProps {
   field: FilterField

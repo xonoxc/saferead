@@ -2,8 +2,9 @@ import { View, Text, StyleSheet } from "react-native"
 import { TextInput } from "@/components/TextInput"
 import { useTheme } from "@/hooks/useTheme"
 
-import type { FilterField } from "@/types/filter"
 import { Fonts, FontSizes } from "@/constants"
+
+import type { FilterField } from "@/types/filter"
 
 interface DateRangeFieldProps {
   field: FilterField

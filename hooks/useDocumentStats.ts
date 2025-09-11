@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { getDocumentStats } from "@/services/document.service"
-import { StatsResponse } from "@/types/api/documents.types"
+
+import type { StatsResponse } from "@/types/api/documents.types"
 
 export const useDocumentStats = () => {
   const result = useQuery<StatsResponse, Error>({

@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { View, Text, StyleSheet, ScrollView } from "react-native"
-import { Link, RelativePathString, router } from "expo-router"
+import { Link, type RelativePathString, router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"

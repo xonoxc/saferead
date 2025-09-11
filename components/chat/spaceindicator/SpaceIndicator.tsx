@@ -1,12 +1,14 @@
 import React from "react"
 import { Text, TouchableOpacity, StyleSheet } from "react-native"
 import { Box, ChevronsUpDown } from "lucide-react-native"
-import DropdownSelector, { DropdownOption } from "@/components/DropDownSelector"
 import { useSpaces } from "@/hooks/queries/spaces"
 import { useSpaceStore } from "@/store/useSpaceStore"
-import { Space } from "@/types"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+
+import DropdownSelector, { type DropdownOption } from "@/components/DropDownSelector"
+
+import type { Space } from "@/types"
 
 export function SpaceIndicator() {
   const { colors } = useTheme()

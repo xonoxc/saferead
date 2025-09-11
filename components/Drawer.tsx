@@ -1,17 +1,18 @@
-import React, { ReactNode } from "react"
+import React from "react"
+import Animated, { Easing, SlideInDown, SlideOutDown } from "react-native-reanimated"
+import { useTheme } from "@/hooks/useTheme"
+
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleProp,
-  ViewStyle,
+  type StyleProp,
+  type ViewStyle,
   View,
 } from "react-native"
-import Animated, { Easing, SlideInDown, SlideOutDown } from "react-native-reanimated"
-import { useTheme } from "@/hooks/useTheme"
 
 interface DrawerProps {
-  children: ReactNode
+  children: React.ReactNode
   visible: boolean
   enableAbsolute?: boolean
   position?: "bottom" | "full"

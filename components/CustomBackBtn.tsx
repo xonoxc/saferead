@@ -1,7 +1,8 @@
 import { useTheme } from "@/hooks/useTheme"
 import { router } from "expo-router"
 import { ChevronLeft, ChevronRight } from "lucide-react-native"
-import { TouchableOpacity, StyleSheet, ViewStyle } from "react-native"
+
+import { TouchableOpacity, StyleSheet, type ViewStyle } from "react-native"
 
 export type BackBtnDirection = "left" | "right"
 

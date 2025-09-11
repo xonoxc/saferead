@@ -2,8 +2,9 @@ import React from "react"
 import { StyleSheet, TouchableOpacity, Text } from "react-native"
 import { MessageSquare } from "lucide-react-native"
 import Animated, { useAnimatedStyle, interpolate, withTiming } from "react-native-reanimated"
-import type { SharedValue } from "react-native-reanimated"
 import { Fonts, FontSizes } from "@/constants"
+
+import type { SharedValue } from "react-native-reanimated"
 
 interface SpaceDetailsOpenChatBtnProps {
   onPress?: () => void

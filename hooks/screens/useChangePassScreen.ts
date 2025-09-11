@@ -1,9 +1,5 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import {
-  type ChangePasswordFormSchema,
-  changePasswordFormSchema,
-} from "@/utils/validation/change-password"
 import { apiClient } from "@/utils/apiclient"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
@@ -11,6 +7,11 @@ import { useAuth } from "@/hooks/useAuth"
 import { router } from "expo-router"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useDrawerAlert } from "../alerts/useAlert"
+
+import {
+  type ChangePasswordFormSchema,
+  changePasswordFormSchema,
+} from "@/utils/validation/change-password"
 
 export default function useChangePassScreen() {
   const { logout } = useAuth()

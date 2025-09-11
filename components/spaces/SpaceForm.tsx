@@ -1,14 +1,6 @@
 import React from "react"
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Switch,
-  StyleProp,
-  ViewStyle,
-} from "react-native"
+import SpacePrivacySelector from "./SpacePrivacySelector"
+
 import { TextInput } from "@/components/TextInput"
 import { Button } from "@/components/Button"
 import { useTheme } from "@/hooks/useTheme"
@@ -17,9 +9,20 @@ import { colors_palette } from "@/constants/spaceform"
 import SpaceIconSelector from "./SpaceIconSelector"
 import { Controller, useWatch } from "react-hook-form"
 import { Drawer } from "../Drawer"
-import { Space } from "@/types"
-import { useSpaceHookForm, SpaceFormData } from "@/hooks/forms/useSpaceHookForm"
-import SpacePrivacySelector from "./SpacePrivacySelector"
+
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Switch,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native"
+import { useSpaceHookForm, type SpaceFormData } from "@/hooks/forms/useSpaceHookForm"
+
+import type { Space } from "@/types"
 
 export const SpaceForm = ({
   onCreate,

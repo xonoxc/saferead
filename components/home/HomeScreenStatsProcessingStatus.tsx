@@ -1,11 +1,10 @@
 import Animated, { FadeInDown } from "react-native-reanimated"
-
 import { View, Text, StyleSheet } from "react-native"
-
-import type { StatsResponse } from "@/types/api/documents.types"
 import { useTheme } from "@/hooks/useTheme"
 import { Loader } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
+
+import type { StatsResponse } from "@/types/api/documents.types"
 
 export default function HomeScreenStatsProcessingStatus({
   stats,

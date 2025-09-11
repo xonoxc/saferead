@@ -1,5 +1,6 @@
 import { View } from "react-native"
-import { ReactNode } from "react"
+
+import type { ReactNode } from "react"
 
 export const ChipGroup = ({ children }: { children: ReactNode }) => {
   return (

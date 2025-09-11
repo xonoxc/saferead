@@ -1,11 +1,11 @@
 import Animated, { FadeInDown } from "react-native-reanimated"
 import HomeScreenStatCard from "@/components/home/HomeScreenStatCard"
-import { StatsResponse } from "@/types/api/documents.types"
-import { ColorsType, useTheme } from "@/hooks/useTheme"
-
 import { View, StyleSheet } from "react-native"
-
 import { FileText, TrendingUp, CircleAlert as AlertCircle, CheckCircle } from "lucide-react-native"
+
+import { type ColorsType, useTheme } from "@/hooks/useTheme"
+
+import type { StatsResponse } from "@/types/api/documents.types"
 
 export function HomeScreenMainStats({ stats }: { stats: StatsResponse }) {
   const { colors } = useTheme()

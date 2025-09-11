@@ -1,17 +1,6 @@
 import React from "react"
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native"
 import { Controller } from "react-hook-form"
-import {
-  SquarePen,
-  Presentation,
-  FileDiff,
-  ChevronDown,
-  FileType,
-  LucideIcon,
-  FileText,
-  FileImage,
-  File,
-} from "lucide-react-native"
 
 import { Button, TextInput } from "@/components"
 import { Drawer } from "../Drawer"
@@ -20,6 +9,18 @@ import { useTheme } from "@/hooks/useTheme"
 import { FontSizes, Fonts } from "@/constants/Fonts"
 import { useUploadDocumentForm } from "@/hooks/screens/useUploadDocumentForm"
 import { DocumentPicker } from "./DocumentPicker"
+
+import {
+  SquarePen,
+  Presentation,
+  FileDiff,
+  ChevronDown,
+  FileType,
+  type LucideIcon,
+  FileText,
+  FileImage,
+  File,
+} from "lucide-react-native"
 
 interface Props {
   spaceId: string

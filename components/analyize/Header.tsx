@@ -1,12 +1,12 @@
 import { TouchableOpacity, View, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import UpgradeButton from "@/components/UpgradeButton"
-
 import { CircleEllipsis, LogOut } from "lucide-react-native"
+
+import { router } from "expo-router"
 
 import type { Space } from "@/types"
 import type { ColorsType } from "@/hooks/useTheme"
-import { router } from "expo-router"
 
 interface AnalyzeHeaderProps {
   selectedSpace?: Space | null

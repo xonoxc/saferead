@@ -1,7 +1,8 @@
 import React from "react"
 import { Sun, Moon, Smartphone } from "lucide-react-native"
-import { useTheme, type ThemeMode } from "@/hooks/useTheme"
 import DropdownSelector from "../DropDownSelector"
+
+import { useTheme, type ThemeMode } from "@/hooks/useTheme"
 
 export default function SettingsThemeDropdown() {
   const { mode, setTheme, colors } = useTheme()

@@ -1,9 +1,9 @@
-import React, { Component, ReactNode } from "react"
+import React from "react"
 import ServerErrorScreen from "./ErrorScreen"
 
 interface Props {
-  children: ReactNode
-  fallback?: ReactNode
+  children: React.ReactNode
+  fallback?: React.ReactNode
 }
 
 interface State {
@@ -12,7 +12,7 @@ interface State {
   errorInfo: any
 }
 
-export class ErrorBoundary extends Component<Props, State> {
+export class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {

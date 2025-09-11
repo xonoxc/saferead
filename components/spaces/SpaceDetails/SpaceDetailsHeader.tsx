@@ -1,15 +1,16 @@
 import React from "react"
+import SpaceIcon from "@/components/spaces/Icon"
+
 import { View, TouchableOpacity, StyleSheet, Text } from "react-native"
 import { Settings, Plus, Heart } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { CustomBackBtn } from "@/components"
 import { useTheme } from "@/hooks/useTheme"
 
-import SpaceIcon from "@/components/spaces/Icon"
+import { Fonts, FontSizes } from "@/constants"
 
 import type { SpaceIconName } from "@/constants/spaceform"
-import { Space } from "@/types"
-import { Fonts, FontSizes } from "@/constants"
+import type { Space } from "@/types"
 
 export default function SpaceDetailHeader({
   space,

@@ -1,7 +1,8 @@
 import { Fonts, FontSizes } from "@/constants"
-import { ColorsType } from "@/hooks/useTheme"
 import { RotateCcw, XCircle } from "lucide-react-native"
 import { Pressable, StyleSheet, Text, View } from "react-native"
+
+import type { ColorsType } from "@/hooks/useTheme"
 
 export default function HomeScreenErrorFallback({
   error,

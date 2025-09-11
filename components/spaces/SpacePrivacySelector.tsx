@@ -1,10 +1,11 @@
 import { Globe, LockIcon } from "lucide-react-native"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import { useSlidingSelector } from "@/hooks/animation/useSlidingSelector"
-import type { ControllerRenderProps } from "react-hook-form"
 import { useTheme } from "@/hooks/useTheme"
 import Animated from "react-native-reanimated"
 import { Fonts } from "@/constants"
+
+import type { ControllerRenderProps } from "react-hook-form"
 
 interface PrivacySelectorProps {
   field: ControllerRenderProps<any, "privacy">

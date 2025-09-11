@@ -23,12 +23,7 @@ const HomeScreenSkeleton = () => {
         <Skeleton width="100%" height={130} borderRadius={20} style={{ marginBottom: 12 }} />
         <View style={styles.row}>
           <View style={styles.leftColumn}>
-            <Skeleton
-              width="100%"
-              height={130}
-              borderRadius={20}
-              style={{ marginBottom: 12 }}
-            />
+            <Skeleton width="100%" height={130} borderRadius={20} style={{ marginBottom: 12 }} />
             <Skeleton width="100%" height={120} borderRadius={20} />
           </View>
           <Skeleton width="48%" height={264} borderRadius={20} />

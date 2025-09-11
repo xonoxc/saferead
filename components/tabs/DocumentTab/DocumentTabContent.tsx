@@ -1,22 +1,20 @@
 import React from "react"
+import DocumentTabLoadingState from "./DocumentTabLoadingState"
+import DocumentTabErrorMessage from "./DocumentTabErrorMessage"
+import DocumentTabSearch from "./DocumentTabSearch"
+
 import { View, StyleSheet, FlatList, RefreshControl } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { Search, FileText } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
-import { AnalysisResponse } from "@/types/api/documents.types"
-
 import { EmptyState } from "@/components/EmptyState"
-
 import { DocumentTabCard } from "./DocumentTabCard"
-import DocumentTabLoadingState from "./DocumentTabLoadingState"
-import DocumentTabErrorMessage from "./DocumentTabErrorMessage"
-import DocumentTabSearch from "./DocumentTabSearch"
 import { UniversalFilter } from "@/components/filters/UniversalFilters"
-
 import { documentFilterFields } from "@/constants/filters"
 
 import type { DocumentFilterOptions } from "@/types/docs"
+import type { AnalysisResponse } from "@/types/api/documents.types"
 
 interface DocumentTabContentProps {
   spaceId?: string

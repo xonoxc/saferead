@@ -3,7 +3,7 @@ import type {
   PaginatedConverSationResponse,
   Conversation,
 } from "@/types/api/conversations.types"
-import { ConversationFilterOptions } from "@/types/conversations"
+import type { ConversationFilterOptions } from "@/types/conversations"
 
 import { apiClient } from "@/utils/apiclient"
 

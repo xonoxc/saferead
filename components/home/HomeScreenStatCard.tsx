@@ -1,9 +1,8 @@
 import { useTheme } from "@/hooks/useTheme"
-import { LucideIcon } from "lucide-react-native"
-
 import { Fonts, FontSizes } from "@/constants/Fonts"
-
 import { View, Text, StyleSheet } from "react-native"
+
+import type { LucideIcon } from "lucide-react-native"
 
 interface StatCardProps {
   stat: {

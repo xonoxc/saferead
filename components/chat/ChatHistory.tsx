@@ -1,10 +1,12 @@
+import React from "react"
+
+import { View } from "react-native"
+import { ChatBubble } from "./ChatBubble"
+import { ChatSources } from "./ChatSources"
+
 import { useTheme } from "@/hooks/useTheme"
 
 import type { Chats } from "@/hooks/chat/useChat"
-import { View } from "react-native"
-import React from "react"
-import { ChatBubble } from "./ChatBubble"
-import { ChatSources } from "./ChatSources"
 
 export function ChatHistory({ chatHistory }: { chatHistory: Chats }) {
   const { colors } = useTheme()

@@ -1,6 +1,7 @@
-import { ViewStyle } from "react-native"
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated"
 import { useEffect } from "react"
+
+import type { ViewStyle } from "react-native"
 
 interface Props {
   isVisible: boolean

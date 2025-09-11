@@ -12,13 +12,15 @@ import { usePinDocumentMutation, useSpaces, useToggleFavoriteSpace } from "@/hoo
 import { updateSpace } from "@/services/space.service"
 import { useSpaceStore } from "@/store/useSpaceStore"
 
-import { ColorsType } from "../useTheme"
 import { attempt } from "@/utils/attempt"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { useQueryClient } from "@tanstack/react-query"
-import { UpdateSpaceForm } from "../forms/useSpaceHookForm"
 import { useDrawerAlert } from "../alerts/useAlert"
+
 import { useCreateConversationMutation } from "../queries/converstations"
+
+import type { ColorsType } from "../useTheme"
+import type { UpdateSpaceForm } from "../forms/useSpaceHookForm"
 
 export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
   const { id } = useLocalSearchParams<{ id: string }>()

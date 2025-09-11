@@ -1,5 +1,5 @@
-import { Fonts, FontSizes } from "@/constants"
 import React from "react"
+import { Fonts, FontSizes } from "@/constants"
 import { View, Text, StyleSheet } from "react-native"
 
 export default function ResponseLoader() {

@@ -8,9 +8,10 @@ import Animated, {
 import { LinearGradient } from "expo-linear-gradient"
 import { FadeInDown } from "react-native-reanimated"
 
-import { type DocumentType, DocumentTypeSelector } from "../documents/DocumentTypeSelector"
 import UploadOptions from "./UploadOptions"
 import RecentDocumentListings from "./DocumentListings"
+
+import { type DocumentType, DocumentTypeSelector } from "../documents/DocumentTypeSelector"
 
 import type { SetStateFunction } from "@/types/state"
 import type { ColorsType } from "@/hooks/useTheme"

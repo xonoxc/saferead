@@ -75,7 +75,6 @@ export async function addDocumentToSpace(data: {
  * @param data - Object containing the document ID and space ID
  *  @returns {Promise<void>} - A promise that resolves when the document is pinned
  * **/
-
 export type PinDocumetToSpaceMethodParams = {
   id: string
   space: string

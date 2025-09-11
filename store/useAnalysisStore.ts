@@ -1,5 +1,6 @@
 import { create } from "zustand"
-import { AnalysisResponse } from "@/types/api/documents.types"
+
+import type { AnalysisResponse } from "@/types/api/documents.types"
 
 type State = {
   analysisResult: AnalysisResponse | null

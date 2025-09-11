@@ -1,6 +1,7 @@
 import { useNavigation } from "expo-router"
 import React from "react"
-import { NativeScrollEvent, NativeSyntheticEvent } from "react-native"
+
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native"
 
 export function useTabHideScroll() {
   const navigation = useNavigation()

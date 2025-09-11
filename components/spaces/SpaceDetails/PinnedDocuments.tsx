@@ -1,9 +1,10 @@
 import React from "react"
 import { View, Text, StyleSheet, FlatList } from "react-native"
 import { UserSpaceDocumentCard } from "@/components/documents/UserSpaceDocumentCard"
-import { UserSpaceDocument } from "@/types/api/spaces.documents.types"
-import { ColorsType } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+
+import type { UserSpaceDocument } from "@/types/api/spaces.documents.types"
+import type { ColorsType } from "@/hooks/useTheme"
 
 interface PinnedDocumentsProps {
   documents: UserSpaceDocument[]

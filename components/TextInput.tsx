@@ -4,11 +4,11 @@ import {
   TextInput as RNTextInput,
   Text,
   StyleSheet,
-  StyleProp,
-  TextStyle,
-  ViewStyle,
-  NativeSyntheticEvent,
-  TextInputFocusEventData,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+  type NativeSyntheticEvent,
+  type TextInputFocusEventData,
   Pressable,
 } from "react-native"
 import { useTheme } from "@/hooks/useTheme"

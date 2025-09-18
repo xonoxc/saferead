@@ -8,213 +8,220 @@ import { type ColorsType, useTheme } from "@/hooks/useTheme"
 import type { AnalysisResponse } from "@/types/api/documents.types"
 
 interface RecentDocumentItemProps {
-  document: AnalysisResponse
-  onPress: () => void
-  viewType?: "list" | "grid"
+   document: AnalysisResponse
+   onPress: () => void
+   viewType?: "list" | "grid"
 }
 
 export const RecentDocumentItem = ({
-  document,
-  onPress,
-  viewType = "list",
+   document,
+   onPress,
+   viewType = "list",
 }: RecentDocumentItemProps) => {
-  const { colors, isDark } = useTheme()
-  const isGridView = viewType === "grid"
-  const statusColor = getStatusColor(document.status, colors)
+   const { colors, isDark } = useTheme()
+   const isGridView = viewType === "grid"
+   const statusColor = getStatusColor(document.status, colors)
 
-  return (
-    <TouchableOpacity
-      style={[
-        styles.recentDocumentItem,
-        isGridView ? styles.gridItem : styles.listItem,
-        {
-          borderBottomWidth: 1,
-          borderStyle: "dashed",
-          borderColor: isDark ? colors.border : colors.borderLight,
-          shadowOpacity: isDark ? 0 : 0.1,
-        },
-      ]}
-      onPress={onPress}
-    >
-      <View style={[styles.documentHeader, isGridView && styles.gridDocumentHeader]}>
-        <View
-          style={[
-            styles.documentIcon,
+   return (
+      <TouchableOpacity
+         style={[
+            styles.recentDocumentItem,
+            isGridView ? styles.gridItem : styles.listItem,
             {
-              backgroundColor: isGridView ? statusColor + "20" : colors.primary + "20",
+               borderBottomWidth: 1,
+               borderStyle: "dashed",
+               borderColor: isDark ? colors.border : colors.borderLight,
+               shadowOpacity: isDark ? 0 : 0.1,
             },
-          ]}
-        >
-          <FileText size={20} color={isGridView ? statusColor : colors.primary} />
-        </View>
-        <View style={styles.documentInfo}>
-          <Text
-            style={[
-              styles.documentTitle,
-              isGridView && styles.gridDocumentTitle,
-              { color: colors.text },
-            ]}
-            numberOfLines={isGridView ? 2 : 1}
-          >
-            {document.original_filename}
-          </Text>
-
-          {/* Progress bar inserted here */}
-          {!isGridView && (
-            <Text style={[styles.documentType, { color: colors.textSecondary }]}>
-              {getDocumentTypeLabel(document.document_type)}
-            </Text>
-          )}
-        </View>
-        {!isGridView && (
-          <View style={styles.documentMeta}>
-            <View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
-              <Text style={[styles.statusText, { color: statusColor }]}>{document.status}</Text>
+         ]}
+         onPress={onPress}
+      >
+         <View style={[styles.documentHeader, isGridView && styles.gridDocumentHeader]}>
+            <View
+               style={[
+                  styles.documentIcon,
+                  {
+                     backgroundColor: isGridView ? statusColor + "20" : colors.primary + "20",
+                  },
+               ]}
+            >
+               <FileText size={20} color={isGridView ? statusColor : colors.primary} />
             </View>
-            <Text style={[styles.documentDate, { color: colors.textSecondary }]}>
-              {new Date(document.created_at).toLocaleDateString()}
-            </Text>
-          </View>
-        )}
-      </View>
+            <View style={styles.documentInfo}>
+               <Text
+                  style={[
+                     styles.documentTitle,
+                     isGridView && styles.gridDocumentTitle,
+                     { color: colors.text },
+                  ]}
+                  numberOfLines={isGridView ? 2 : 1}
+               >
+                  {document.original_filename}
+               </Text>
 
-      <View style={{ paddingHorizontal: "20%" }}>
-        <ProgressBar value={document.confidence_score} color={colors.primary} />
-      </View>
-
-      {isDocumentComplete(document) && !isGridView && (
-        <View style={styles.documentStats}>
-          <View style={styles.statItem}>
-            <View style={styles.statTextView}>
-              <ArrowDown color={colors.red} size={13} strokeWidth={5} />
-              <Text style={[styles.statText, { color: colors.red, fontFamily: Fonts.semiBold }]}>
-                {document.risky_points.length}
-              </Text>
+               {/* Progress bar inserted here */}
+               {!isGridView && (
+                  <Text style={[styles.documentType, { color: colors.textSecondary }]}>
+                     {getDocumentTypeLabel(document.document_type)}
+                  </Text>
+               )}
             </View>
+            {!isGridView && (
+               <View style={styles.documentMeta}>
+                  <View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
+                     <Text style={[styles.statusText, { color: statusColor }]}>
+                        {document.status}
+                     </Text>
+                  </View>
+                  <Text style={[styles.documentDate, { color: colors.textSecondary }]}>
+                     {new Date(document.created_at).toLocaleDateString()}
+                  </Text>
+               </View>
+            )}
+         </View>
 
-            <View style={styles.statTextView}>
-              <ArrowUp color={colors.success} size={13} strokeWidth={5} />
-              <Text
-                style={[styles.statText, { color: colors.success, fontFamily: Fonts.semiBold }]}
-              >
-                {document.favourable_points.length}
-              </Text>
+         <View style={{ paddingHorizontal: "20%" }}>
+            <ProgressBar value={document.confidence_score} color={colors.primary} />
+         </View>
+
+         {isDocumentComplete(document) && !isGridView && (
+            <View style={styles.documentStats}>
+               <View style={styles.statItem}>
+                  <View style={styles.statTextView}>
+                     <ArrowDown color={colors.red} size={13} strokeWidth={5} />
+                     <Text
+                        style={[styles.statText, { color: colors.red, fontFamily: Fonts.semiBold }]}
+                     >
+                        {document.risky_points.length}
+                     </Text>
+                  </View>
+
+                  <View style={styles.statTextView}>
+                     <ArrowUp color={colors.success} size={13} strokeWidth={5} />
+                     <Text
+                        style={[
+                           styles.statText,
+                           { color: colors.success, fontFamily: Fonts.semiBold },
+                        ]}
+                     >
+                        {document.favourable_points.length}
+                     </Text>
+                  </View>
+               </View>
             </View>
-          </View>
-        </View>
-      )}
-    </TouchableOpacity>
-  )
+         )}
+      </TouchableOpacity>
+   )
 }
 
 function isDocumentComplete(document: AnalysisResponse): boolean {
-  return document.status === "completed"
+   return document.status === "completed"
 }
 
 const getStatusColor = (status: string, colors: ColorsType) => {
-  switch (status) {
-    case "completed":
-      return colors.success
-    case "processing":
-      return colors.warning
-    case "failed":
-      return colors.error
-    default:
-      return colors.textSecondary
-  }
+   switch (status) {
+      case "completed":
+         return colors.success
+      case "processing":
+         return colors.warning
+      case "failed":
+         return colors.error
+      default:
+         return colors.textSecondary
+   }
 }
 
 const getDocumentTypeLabel = (type: string) => {
-  const types: Record<string, string> = {
-    terms: "Terms & Conditions",
-    privacy: "Privacy Policy",
-    legal: "Legal Agreement",
-    other: "Other Document",
-  }
-  return types[type] || type
+   const types: Record<string, string> = {
+      terms: "Terms & Conditions",
+      privacy: "Privacy Policy",
+      legal: "Legal Agreement",
+      other: "Other Document",
+   }
+   return types[type] || type
 }
 
 const styles = StyleSheet.create({
-  documentStats: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 8,
-  },
-  statText: {
-    fontSize: FontSizes.xs,
-    fontFamily: Fonts.regular,
-  },
-  statItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  statTextView: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 2,
-  },
-  documentHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 2,
-  },
-  gridDocumentHeader: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: 10,
-  },
-  recentDocumentItem: {
-    borderRadius: 21,
-    padding: 16,
-  },
-  listItem: {
-    marginBottom: 2,
-  },
-  gridItem: {
-    flex: 1,
-  },
-  documentIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  documentType: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.regular,
-  },
-  documentInfo: {
-    flex: 1,
-  },
-  documentTitle: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.medium,
-    marginBottom: 2,
-  },
-  gridDocumentTitle: {
-    fontSize: FontSizes.sm,
-  },
-  documentMeta: {
-    alignItems: "flex-end",
-  },
-  documentDate: {
-    fontSize: FontSizes.xs,
-    fontFamily: Fonts.regular,
-  },
-  statusText: {
-    fontSize: 10,
-    fontFamily: Fonts.medium,
-    textTransform: "capitalize",
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 5,
-    marginBottom: 4,
-  },
+   documentStats: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingTop: 8,
+   },
+   statText: {
+      fontSize: FontSizes.xs,
+      fontFamily: Fonts.regular,
+   },
+   statItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+   },
+   statTextView: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 2,
+   },
+   documentHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 2,
+   },
+   gridDocumentHeader: {
+      flexDirection: "column",
+      alignItems: "flex-start",
+      gap: 10,
+   },
+   recentDocumentItem: {
+      borderRadius: 21,
+      padding: 16,
+   },
+   listItem: {
+      marginBottom: 2,
+   },
+   gridItem: {
+      flex: 1,
+   },
+   documentIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 12,
+   },
+   documentType: {
+      fontSize: FontSizes.sm,
+      fontFamily: Fonts.regular,
+   },
+   documentInfo: {
+      flex: 1,
+   },
+   documentTitle: {
+      fontSize: FontSizes.md,
+      fontFamily: Fonts.medium,
+      marginBottom: 2,
+   },
+   gridDocumentTitle: {
+      fontSize: FontSizes.sm,
+   },
+   documentMeta: {
+      alignItems: "flex-end",
+   },
+   documentDate: {
+      fontSize: FontSizes.xs,
+      fontFamily: Fonts.regular,
+   },
+   statusText: {
+      fontSize: 10,
+      fontFamily: Fonts.medium,
+      textTransform: "capitalize",
+   },
+   statusBadge: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 5,
+      marginBottom: 4,
+   },
 })

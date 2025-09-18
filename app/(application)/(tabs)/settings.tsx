@@ -10,64 +10,64 @@ import SettingsThemeDropdown from "@/components/settings/SettingsThemeDropDown"
 import { Fonts, FontSizes } from "@/constants"
 
 export default function SettingsScreen() {
-  const { colors, mode, setTheme } = useTheme()
-  const { user, logout } = useAuth()
-  const router = useRouter()
-  const queryClient = useQueryClient()
+   const { colors, mode, setTheme } = useTheme()
+   const { user, logout } = useAuth()
+   const router = useRouter()
+   const queryClient = useQueryClient()
 
-  const handleLogout = async () => {
-    queryClient.clear()
-    await logout()
-  }
+   const handleLogout = async () => {
+      queryClient.clear()
+      await logout()
+   }
 
-  const groups = useSettingsGroups({ user, mode, setTheme, router, handleLogout })
+   const groups = useSettingsGroups({ user, mode, setTheme, router, handleLogout })
 
-  return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={{ paddingBottom: 120 }}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
-      </View>
+   return (
+      <ScrollView
+         style={[styles.container, { backgroundColor: colors.background }]}
+         contentContainerStyle={{ paddingBottom: 120 }}
+         showsVerticalScrollIndicator={false}
+      >
+         <View style={styles.header}>
+            <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
+         </View>
 
-      <View style={styles.content}>
-        <SettingsThemeDropdown />
-        {groups.map((group, i) => (
-          <SettingsGroup key={i} group={group} />
-        ))}
-      </View>
+         <View style={styles.content}>
+            <SettingsThemeDropdown />
+            {groups.map((group, i) => (
+               <SettingsGroup key={i} group={group} />
+            ))}
+         </View>
 
-      <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: colors.textMuted }]}>SafeRead v1.0.0</Text>
-      </View>
-    </ScrollView>
-  )
+         <View style={styles.footer}>
+            <Text style={[styles.footerText, { color: colors.textMuted }]}>SafeRead v1.0.0</Text>
+         </View>
+      </ScrollView>
+   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    paddingBottom: 0,
-  },
-  title: {
-    fontSize: FontSizes.xxxl,
-    fontFamily: Fonts.bold,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  footer: {
-    padding: 20,
-    alignItems: "center",
-  },
-  footerText: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.regular,
-  },
+   container: {
+      flex: 1,
+   },
+   header: {
+      padding: 20,
+      paddingBottom: 0,
+   },
+   title: {
+      fontSize: FontSizes.xxxl,
+      fontFamily: Fonts.bold,
+   },
+   content: {
+      flex: 1,
+      padding: 20,
+   },
+   footer: {
+      padding: 20,
+      alignItems: "center",
+   },
+   footerText: {
+      fontSize: FontSizes.sm,
+      fontFamily: Fonts.regular,
+   },
 })

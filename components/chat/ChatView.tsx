@@ -14,71 +14,75 @@ import { ChatToolBar } from "./ChatToolBar"
 import { ChatHistory } from "./ChatHistory"
 
 export function ChatView() {
-  const {
-    colors,
-    message,
-    setMessage,
-    isTyping,
-    isChatEmpty,
-    chatHistory,
-    isKeyboardVisible,
-    handleInputSideButtonPress,
-    handlePromptSeggestionPress,
-    scrollViewRef,
-    scrollToBottom,
-  } = useChat()
+   const {
+      colors,
+      message,
+      setMessage,
+      isTyping,
+      isChatEmpty,
+      chatHistory,
+      isKeyboardVisible,
+      handleInputSideButtonPress,
+      handlePromptSeggestionPress,
+      scrollViewRef,
+      scrollToBottom,
+   } = useChat()
 
-  return (
-    <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={isIOS() ? "padding" : "height"}
-          keyboardVerticalOffset={isKeyboardVisible ? 0 : 90}
-        >
-          <View style={[styles.header, { backgroundColor: colors.background }]}>
-            <View style={styles.headerContent}>
-              <SpaceIndicator />
-            </View>
-          </View>
+   return (
+      <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>
+         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+            <KeyboardAvoidingView
+               style={{ flex: 1 }}
+               behavior={isIOS() ? "padding" : "height"}
+               keyboardVerticalOffset={isKeyboardVisible ? 0 : 90}
+            >
+               <View style={[styles.header, { backgroundColor: colors.background }]}>
+                  <View style={styles.headerContent}>
+                     <SpaceIndicator />
+                  </View>
+               </View>
 
-          <KeyboardAwareScrollView
-            ref={scrollViewRef}
-            contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 6, paddingBottom: 100 }}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-            keyboardDismissMode="interactive"
-            onContentSizeChange={() => scrollToBottom()}
-          >
-            {isChatEmpty() ? <ChatGreeting /> : <ChatHistory chatHistory={chatHistory} />}
-            {isTyping && <TypingBubble />}
-          </KeyboardAwareScrollView>
+               <KeyboardAwareScrollView
+                  ref={scrollViewRef}
+                  contentContainerStyle={{
+                     paddingHorizontal: 12,
+                     paddingTop: 6,
+                     paddingBottom: 100,
+                  }}
+                  keyboardShouldPersistTaps="handled"
+                  showsVerticalScrollIndicator={false}
+                  keyboardDismissMode="interactive"
+                  onContentSizeChange={() => scrollToBottom()}
+               >
+                  {isChatEmpty() ? <ChatGreeting /> : <ChatHistory chatHistory={chatHistory} />}
+                  {isTyping && <TypingBubble />}
+               </KeyboardAwareScrollView>
 
-          <ChatToolBar
-            message={message}
-            setMessage={setMessage}
-            isTyping={isTyping}
-            isChatEmpty={isChatEmpty}
-            handleInputSideButtonPress={handleInputSideButtonPress}
-            handlePromptSeggestionPress={text => handlePromptSeggestionPress(text)}
-          />
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </Animated.View>
-  )
+               <ChatToolBar
+                  message={message}
+                  setMessage={setMessage}
+                  isTyping={isTyping}
+                  isChatEmpty={isChatEmpty}
+                  handleInputSideButtonPress={handleInputSideButtonPress}
+                  handlePromptSeggestionPress={text => handlePromptSeggestionPress(text)}
+               />
+            </KeyboardAvoidingView>
+         </SafeAreaView>
+      </Animated.View>
+   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: 14,
-    paddingTop: 20,
-  },
-  headerContent: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+   container: {
+      flex: 1,
+   },
+   header: {
+      paddingHorizontal: 14,
+      paddingTop: 20,
+   },
+   headerContent: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+   },
 })

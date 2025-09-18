@@ -16,53 +16,53 @@ import type { StatsResponse } from "@/types/api/documents.types"
 import HomeScreenDocPendingStatus from "@/components/home/HomeScreenDocPendingStatus"
 
 export default function HomeScreen() {
-  const { colors } = useTheme()
-  const { user } = useAuth()
-  const { stats, isLoading, error, refetch, isRefetching } = useDocumentStats()
-  const { handleScroll } = useTabHideScroll()
+   const { colors } = useTheme()
+   const { user } = useAuth()
+   const { stats, isLoading, error, refetch, isRefetching } = useDocumentStats()
+   const { handleScroll } = useTabHideScroll()
 
-  if (isLoading || isRefetching) {
-    return <HomeScreenSkeleton />
-  }
+   if (isLoading || isRefetching) {
+      return <HomeScreenSkeleton />
+   }
 
-  if (error) {
-    return <HomeScreenErrorFallback error={error} colors={colors} onRetry={refetch} />
-  }
+   if (error) {
+      return <HomeScreenErrorFallback error={error} colors={colors} onRetry={refetch} />
+   }
 
-  return (
-    <ScrollView
-      onScroll={handleScroll}
-      scrollEventThrottle={16}
-      style={{
-        flex: 1,
-        paddingVertical: 20,
-        backgroundColor: colors.background,
-      }}
-      contentContainerStyle={{ paddingBottom: 120 }}
-      bounces
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={isLoading}
-          onRefresh={refetch}
-          colors={[colors.text]}
-          progressBackgroundColor={colors.background}
-        />
-      }
-    >
-      <HomeScreenHeader colors={colors} user={user} />
+   return (
+      <ScrollView
+         onScroll={handleScroll}
+         scrollEventThrottle={16}
+         style={{
+            flex: 1,
+            paddingVertical: 20,
+            backgroundColor: colors.background,
+         }}
+         contentContainerStyle={{ paddingBottom: 120 }}
+         bounces
+         showsVerticalScrollIndicator={false}
+         refreshControl={
+            <RefreshControl
+               refreshing={isLoading}
+               onRefresh={refetch}
+               colors={[colors.text]}
+               progressBackgroundColor={colors.background}
+            />
+         }
+      >
+         <HomeScreenHeader colors={colors} user={user} />
 
-      {/* Main Statistics */}
-      <HomeScreenMainStats stats={stats as StatsResponse} />
+         {/* Main Statistics */}
+         <HomeScreenMainStats stats={stats as StatsResponse} />
 
-      {/* Document Types */}
-      <HomeScreenDocumentType stats={stats as StatsResponse} />
+         {/* Document Types */}
+         <HomeScreenDocumentType stats={stats as StatsResponse} />
 
-      {/* Processing Status */}
-      <HomeScreenStatsProcessingStatus stats={stats as StatsResponse} />
+         {/* Processing Status */}
+         <HomeScreenStatsProcessingStatus stats={stats as StatsResponse} />
 
-      {/* Pending Documents */}
-      <HomeScreenDocPendingStatus stats={stats as StatsResponse} />
-    </ScrollView>
-  )
+         {/* Pending Documents */}
+         <HomeScreenDocPendingStatus stats={stats as StatsResponse} />
+      </ScrollView>
+   )
 }

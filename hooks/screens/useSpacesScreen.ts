@@ -13,101 +13,101 @@ import type { CreateSpaceForm, SpaceFormData } from "../forms/useSpaceHookForm"
 import type { RelativePathString } from "expo-router"
 
 export default function useSpaceScreen() {
-  const { mutateAsync: deleteSpace } = useDeleteSpace()
-  const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
-  const [searchQuery, setSearchQuery] = useState<string>("")
-  const [viewMode, setViewMode] = useState<ViewType>("grid")
-  const [currentFilters, setCurrentFilters] = useState<Record<string, any>>({})
-  const [showFilter, setShowFilter] = useState(false)
+   const { mutateAsync: deleteSpace } = useDeleteSpace()
+   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
+   const [searchQuery, setSearchQuery] = useState<string>("")
+   const [viewMode, setViewMode] = useState<ViewType>("grid")
+   const [currentFilters, setCurrentFilters] = useState<Record<string, any>>({})
+   const [showFilter, setShowFilter] = useState(false)
 
-  const queryClient = useQueryClient()
+   const queryClient = useQueryClient()
 
-  const showBottomAlert = useDrawerAlert()
+   const showBottomAlert = useDrawerAlert()
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useSpaces(
-    currentFilters,
-    true
-  )
+   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useSpaces(
+      currentFilters,
+      true
+   )
 
-  const spaces = data?.pages.flatMap(page => page.results) ?? []
+   const spaces = data?.pages.flatMap(page => page.results) ?? []
 
-  const filteredSpaces = spaces.filter(
-    space =>
-      space.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      space.description.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+   const filteredSpaces = spaces.filter(
+      space =>
+         space.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+         space.description.toLowerCase().includes(searchQuery.toLowerCase())
+   )
 
-  const handleCreateSpace = async (data: SpaceFormData) => {
-    const result = await attempt(createSpace(data as CreateSpaceForm))
-    if (!result.ok) {
-      showBottomAlert({
-        type: "error",
-        title: "Error",
-        message: getErrorMessage(result.error) || "Failed to create space",
-        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+   const handleCreateSpace = async (data: SpaceFormData) => {
+      const result = await attempt(createSpace(data as CreateSpaceForm))
+      if (!result.ok) {
+         showBottomAlert({
+            type: "error",
+            title: "Error",
+            message: getErrorMessage(result.error) || "Failed to create space",
+            actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+         })
+         setCreateModalVisible(false)
+         return
+      }
+
+      await queryClient.invalidateQueries({
+         queryKey: ["spaces"],
       })
       setCreateModalVisible(false)
-      return
-    }
+   }
 
-    await queryClient.invalidateQueries({
-      queryKey: ["spaces"],
-    })
-    setCreateModalVisible(false)
-  }
-
-  const handleDeleteSpace = (spaceId: string, spaceName: string) => {
-    const safeDeleteSpace = async () => {
-      const resp = await attempt(deleteSpace(spaceId))
-      if (!resp.ok) {
-        showBottomAlert({
-          type: "error",
-          title: "Error",
-          message: getErrorMessage(resp.error) || "Failed to delete space",
-          actions: [{ text: "OK", style: "primary", onPress: () => {} }],
-        })
-        return
+   const handleDeleteSpace = (spaceId: string, spaceName: string) => {
+      const safeDeleteSpace = async () => {
+         const resp = await attempt(deleteSpace(spaceId))
+         if (!resp.ok) {
+            showBottomAlert({
+               type: "error",
+               title: "Error",
+               message: getErrorMessage(resp.error) || "Failed to delete space",
+               actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+            })
+            return
+         }
       }
-    }
 
-    showBottomAlert({
-      title: "Delete Space",
-      message: `Are you sure you want to delete "${spaceName}"?`,
-      actions: [
-        { text: "Cancel", style: "primary", onPress: () => {} },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => await safeDeleteSpace(),
-        },
-      ],
-    })
-  }
+      showBottomAlert({
+         title: "Delete Space",
+         message: `Are you sure you want to delete "${spaceName}"?`,
+         actions: [
+            { text: "Cancel", style: "primary", onPress: () => {} },
+            {
+               text: "Delete",
+               style: "destructive",
+               onPress: async () => await safeDeleteSpace(),
+            },
+         ],
+      })
+   }
 
-  const handleSpaceSelectPress = (space: Space) => {
-    router.push(`/spaces/${space.id}` as RelativePathString)
-  }
+   const handleSpaceSelectPress = (space: Space) => {
+      router.push(`/spaces/${space.id}` as RelativePathString)
+   }
 
-  return {
-    isLoading,
-    spaces: filteredSpaces,
-    fetchNextPage,
-    hasNextPage,
+   return {
+      isLoading,
+      spaces: filteredSpaces,
+      fetchNextPage,
+      hasNextPage,
 
-    currentFilters,
-    setCurrentFilters,
-    showFilter,
-    setShowFilter,
+      currentFilters,
+      setCurrentFilters,
+      showFilter,
+      setShowFilter,
 
-    isFetchingNextPage,
-    createModalVisible,
-    setCreateModalVisible,
-    searchQuery,
-    setSearchQuery,
-    viewMode,
-    setViewMode,
-    handleCreateSpace,
-    handleDeleteSpace,
-    handleSpaceSelectPress,
-  }
+      isFetchingNextPage,
+      createModalVisible,
+      setCreateModalVisible,
+      searchQuery,
+      setSearchQuery,
+      viewMode,
+      setViewMode,
+      handleCreateSpace,
+      handleDeleteSpace,
+      handleSpaceSelectPress,
+   }
 }

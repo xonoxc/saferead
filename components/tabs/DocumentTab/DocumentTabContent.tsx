@@ -17,153 +17,153 @@ import type { DocumentFilterOptions } from "@/types/docs"
 import type { AnalysisResponse } from "@/types/api/documents.types"
 
 interface DocumentTabContentProps {
-  spaceId?: string
-  spaceName?: string
-  isLoading: boolean
-  isRefreshing: boolean
-  isDeleting: boolean
+   spaceId?: string
+   spaceName?: string
+   isLoading: boolean
+   isRefreshing: boolean
+   isDeleting: boolean
 
-  documents: AnalysisResponse[]
-  error: any
+   documents: AnalysisResponse[]
+   error: any
 
-  hasMore: boolean
-  currentFilters: DocumentFilterOptions
-  searchQuery: string
-  showFilter: boolean
+   hasMore: boolean
+   currentFilters: DocumentFilterOptions
+   searchQuery: string
+   showFilter: boolean
 
-  applyFilters: (filters: DocumentFilterOptions) => void
-  setShowFilter: (visible: boolean) => void
-  setSearchQuery: (query: string) => void
+   applyFilters: (filters: DocumentFilterOptions) => void
+   setShowFilter: (visible: boolean) => void
+   setSearchQuery: (query: string) => void
 
-  handleDeleteDocument: (id: string) => void
-  handleDocumentSelectPress: (doc: AnalysisResponse) => void
-  handleSearch: (query: string) => void
-  handleRefresh: () => void
-  loadMoreDocuments: () => void
+   handleDeleteDocument: (id: string) => void
+   handleDocumentSelectPress: (doc: AnalysisResponse) => void
+   handleSearch: (query: string) => void
+   handleRefresh: () => void
+   loadMoreDocuments: () => void
 
-  FallbackStateWrapper: React.ComponentType
+   FallbackStateWrapper: React.ComponentType
 }
 
 export default function DocumentTabContent({
-  documents,
-  error,
-  hasMore,
-  currentFilters,
-  searchQuery,
-  setSearchQuery,
-  applyFilters,
-  showFilter,
-  isLoading,
-  isRefreshing,
-  setShowFilter,
-  handleDeleteDocument,
-  handleDocumentSelectPress,
-  handleSearch,
-  handleRefresh,
-  loadMoreDocuments,
-  isDeleting,
-  FallbackStateWrapper,
+   documents,
+   error,
+   hasMore,
+   currentFilters,
+   searchQuery,
+   setSearchQuery,
+   applyFilters,
+   showFilter,
+   isLoading,
+   isRefreshing,
+   setShowFilter,
+   handleDeleteDocument,
+   handleDocumentSelectPress,
+   handleSearch,
+   handleRefresh,
+   loadMoreDocuments,
+   isDeleting,
+   FallbackStateWrapper,
 }: DocumentTabContentProps) {
-  const { colors } = useTheme()
+   const { colors } = useTheme()
 
-  const renderDocument = ({ item, index }: { item: AnalysisResponse; index: number }) => (
-    <Animated.View entering={FadeInDown.delay(index * 50 + 300).springify()}>
-      <DocumentTabCard
-        document={item}
-        onPress={() => handleDocumentSelectPress(item)}
-        onDelete={handleDeleteDocument}
-      />
-    </Animated.View>
-  )
+   const renderDocument = ({ item, index }: { item: AnalysisResponse; index: number }) => (
+      <Animated.View entering={FadeInDown.delay(index * 50 + 300).springify()}>
+         <DocumentTabCard
+            document={item}
+            onPress={() => handleDocumentSelectPress(item)}
+            onDelete={handleDeleteDocument}
+         />
+      </Animated.View>
+   )
 
-  const isDocumentsDataAvailable = () => {
-    return documents.length > 0 && !error
-  }
+   const isDocumentsDataAvailable = () => {
+      return documents.length > 0 && !error
+   }
 
-  const keyExtractor = (item: AnalysisResponse) => item.id
+   const keyExtractor = (item: AnalysisResponse) => item.id
 
-  const renderFooter = () => {
-    if (!hasMore) return null
-    return (
-      <View style={styles.footerLoader}>
-        <LoadingSpinner />
-      </View>
-    )
-  }
+   const renderFooter = () => {
+      if (!hasMore) return null
+      return (
+         <View style={styles.footerLoader}>
+            <LoadingSpinner />
+         </View>
+      )
+   }
 
-  if (isLoading || isDeleting || isRefreshing) {
-    return <DocumentTabLoadingState />
-  }
+   if (isLoading || isDeleting || isRefreshing) {
+      return <DocumentTabLoadingState />
+   }
 
-  return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <DocumentTabSearch
-        searchQuery={searchQuery}
-        setShowFilter={setShowFilter}
-        handleSearch={handleSearch}
-      />
+   return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+         <DocumentTabSearch
+            searchQuery={searchQuery}
+            setShowFilter={setShowFilter}
+            handleSearch={handleSearch}
+         />
 
-      <DocumentTabErrorMessage error={error} />
+         <DocumentTabErrorMessage error={error} />
 
-      {isDocumentsDataAvailable() ? (
-        <FlatList
-          data={documents}
-          bounces={true}
-          renderItem={renderDocument}
-          keyExtractor={keyExtractor}
-          contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={handleRefresh}
-              colors={[colors.primary]}
-              progressBackgroundColor={colors.background}
+         {isDocumentsDataAvailable() ? (
+            <FlatList
+               data={documents}
+               bounces={true}
+               renderItem={renderDocument}
+               keyExtractor={keyExtractor}
+               contentContainerStyle={styles.listContent}
+               refreshControl={
+                  <RefreshControl
+                     refreshing={isRefreshing}
+                     onRefresh={handleRefresh}
+                     colors={[colors.primary]}
+                     progressBackgroundColor={colors.background}
+                  />
+               }
+               onEndReached={loadMoreDocuments}
+               onEndReachedThreshold={0.5}
+               ListFooterComponent={renderFooter}
+               ListEmptyComponent={FallbackStateWrapper}
+               showsVerticalScrollIndicator={false}
             />
-          }
-          onEndReached={loadMoreDocuments}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={renderFooter}
-          ListEmptyComponent={FallbackStateWrapper}
-          showsVerticalScrollIndicator={false}
-        />
-      ) : (
-        <EmptyState
-          icon={searchQuery ? Search : FileText}
-          title={searchQuery ? "No Results Found" : "No Documents Yet"}
-          description={
-            searchQuery
-              ? `No documents match "${searchQuery}". Try adjusting your search terms or check your spelling.`
-              : "Start your legal document analysis journey by adding your first document. Upload files, scan documents, or paste text to get started."
-          }
-          actionTitle={searchQuery ? undefined : "Add Your First Document"}
-          secondaryActionTitle={searchQuery ? "Clear Search" : "Learn More"}
-          onSecondaryAction={searchQuery ? () => setSearchQuery("") : () => {}}
-          variant={searchQuery ? "search" : "default"}
-          showFloatingElements={!searchQuery}
-        />
-      )}
+         ) : (
+            <EmptyState
+               icon={searchQuery ? Search : FileText}
+               title={searchQuery ? "No Results Found" : "No Documents Yet"}
+               description={
+                  searchQuery
+                     ? `No documents match "${searchQuery}". Try adjusting your search terms or check your spelling.`
+                     : "Start your legal document analysis journey by adding your first document. Upload files, scan documents, or paste text to get started."
+               }
+               actionTitle={searchQuery ? undefined : "Add Your First Document"}
+               secondaryActionTitle={searchQuery ? "Clear Search" : "Learn More"}
+               onSecondaryAction={searchQuery ? () => setSearchQuery("") : () => {}}
+               variant={searchQuery ? "search" : "default"}
+               showFloatingElements={!searchQuery}
+            />
+         )}
 
-      <UniversalFilter
-        fields={documentFilterFields}
-        visible={showFilter}
-        onClose={() => setShowFilter(false)}
-        onApply={applyFilters}
-        currentFilters={currentFilters}
-      />
-    </View>
-  )
+         <UniversalFilter
+            fields={documentFilterFields}
+            visible={showFilter}
+            onClose={() => setShowFilter(false)}
+            onApply={applyFilters}
+            currentFilters={currentFilters}
+         />
+      </View>
+   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 120,
-  },
-  footerLoader: {
-    paddingVertical: 20,
-    alignItems: "center",
-  },
+   container: {
+      flex: 1,
+   },
+   listContent: {
+      paddingHorizontal: 20,
+      paddingBottom: 120,
+   },
+   footerLoader: {
+      paddingVertical: 20,
+      alignItems: "center",
+   },
 })

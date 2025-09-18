@@ -5,43 +5,43 @@ import { Box } from "lucide-react-native"
 import { iconMap, type SpaceIconName } from "@/constants/spaceform"
 
 type SpaceIconProps = {
-  name: SpaceIconName
-  color?: string
-  size?: number
-  background?: boolean
+   name: SpaceIconName
+   color?: string
+   size?: number
+   background?: boolean
 }
 
 export default function SpaceIcon({
-  name,
-  color = "#000",
-  size = 20,
-  background = false,
+   name,
+   color = "#000",
+   size = 20,
+   background = false,
 }: SpaceIconProps) {
-  const Icon = iconMap[name]
+   const Icon = iconMap[name]
 
-  if (!Icon) {
-    return (
+   if (!Icon) {
+      return (
+         <View style={[styles.iconWrapper, background && { backgroundColor: `${color}20` }]}>
+            <Text style={{ color }}>
+               <Box />
+            </Text>
+         </View>
+      )
+   }
+
+   return (
       <View style={[styles.iconWrapper, background && { backgroundColor: `${color}20` }]}>
-        <Text style={{ color }}>
-          <Box />
-        </Text>
+         <Icon size={size} color={color} />
       </View>
-    )
-  }
-
-  return (
-    <View style={[styles.iconWrapper, background && { backgroundColor: `${color}20` }]}>
-      <Icon size={size} color={color} />
-    </View>
-  )
+   )
 }
 
 const styles = StyleSheet.create({
-  iconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+   iconWrapper: {
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+   },
 })

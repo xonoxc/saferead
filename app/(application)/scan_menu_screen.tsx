@@ -10,40 +10,40 @@ import { useLocalSearchParams } from "expo-router"
 const tabs = [{ name: "Document" }, { name: "Conversation" }, { name: "Files" }]
 
 export default function ScanMenuScreen() {
-  const { colors } = useTheme()
-  const params = useLocalSearchParams<{ tab?: string }>()
-  const [selectedTab, setSelectedTab] = useState(0)
+   const { colors } = useTheme()
+   const params = useLocalSearchParams<{ tab?: string }>()
+   const [selectedTab, setSelectedTab] = useState(0)
 
-  useEffect(() => {
-    if (params.tab === "conversation") {
-      setSelectedTab(1)
-    }
-  }, [params])
+   useEffect(() => {
+      if (params.tab === "conversation") {
+         setSelectedTab(1)
+      }
+   }, [params])
 
-  const renderContent = () => {
-    switch (selectedTab) {
-      case 0:
-        return <DocumentTab />
-      case 1:
-        return <ConversationsTab />
-      case 2:
-        return <FilesTab />
-      default:
-        return null
-    }
-  }
+   const renderContent = () => {
+      switch (selectedTab) {
+         case 0:
+            return <DocumentTab />
+         case 1:
+            return <ConversationsTab />
+         case 2:
+            return <FilesTab />
+         default:
+            return null
+      }
+   }
 
-  return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <TopTabBar tabs={tabs} selectedTab={selectedTab} onTabPress={setSelectedTab} />
-      <View style={{ flex: 1 }}>{renderContent()}</View>
-    </View>
-  )
+   return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+         <TopTabBar tabs={tabs} selectedTab={selectedTab} onTabPress={setSelectedTab} />
+         <View style={{ flex: 1 }}>{renderContent()}</View>
+      </View>
+   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 15,
-  },
+   container: {
+      flex: 1,
+      paddingTop: 15,
+   },
 })

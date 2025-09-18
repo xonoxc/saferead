@@ -4,11 +4,11 @@
 import "@tanstack/react-query"
 
 interface CustomMutationMeta extends Record<string, unknown> {
-  invalidatedQueries?: Array<Array<string | unknown>>
+   invalidatedQueries?: Array<Array<string | unknown>>
 }
 
 declare module "@tanstack/react-query" {
-  interface Register {
-    mutationMeta: CustomMutationMeta
-  }
+   interface Register {
+      mutationMeta: CustomMutationMeta
+   }
 }

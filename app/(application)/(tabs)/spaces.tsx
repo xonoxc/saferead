@@ -11,105 +11,108 @@ import { UniversalFilter } from "@/components/filters/UniversalFilters"
 import { spaceFilterFields } from "@/constants/filters"
 
 export default function SpacesScreen() {
-  const { colors } = useTheme()
+   const { colors } = useTheme()
 
-  const {
-    spaces,
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-    viewMode,
-    setCurrentFilters,
-    showFilter,
-    currentFilters,
-    setShowFilter,
-    setViewMode,
-    searchQuery,
-    setSearchQuery,
-    createModalVisible,
-    setCreateModalVisible,
-    handleCreateSpace,
-    handleDeleteSpace,
-    handleSpaceSelectPress,
-  } = useSpaceScreen()
+   const {
+      spaces,
+      isLoading,
+      isFetchingNextPage,
+      hasNextPage,
+      fetchNextPage,
+      viewMode,
+      setCurrentFilters,
+      showFilter,
+      currentFilters,
+      setShowFilter,
+      setViewMode,
+      searchQuery,
+      setSearchQuery,
+      createModalVisible,
+      setCreateModalVisible,
+      handleCreateSpace,
+      handleDeleteSpace,
+      handleSpaceSelectPress,
+   } = useSpaceScreen()
 
-  if (isLoading) return <LoadingSpinner />
+   if (isLoading) return <LoadingSpinner />
 
-  return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <SpaceScreenHeader
-        colors={colors}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        searchQuery={searchQuery}
-        setShowFilter={setShowFilter}
-        setSearchQuery={setSearchQuery}
-        setCreateModalVisible={setCreateModalVisible}
-      />
-
-      <FlatList
-        data={spaces}
-        key={viewMode}
-        numColumns={viewMode === "grid" ? 2 : 1}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
-        renderItem={({ item }) => (
-          <SpaceList
-            space={item}
+   return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+         <SpaceScreenHeader
+            colors={colors}
             viewMode={viewMode}
-            onDelete={handleDeleteSpace}
-            onSpaceSelect={handleSpaceSelectPress}
-          />
-        )}
-        keyExtractor={item => item.id}
-        ListEmptyComponent={
-          <SpacesFallback
+            setViewMode={setViewMode}
             searchQuery={searchQuery}
+            setShowFilter={setShowFilter}
             setSearchQuery={setSearchQuery}
-            setShowCreateModal={() => setCreateModalVisible(true)}
-          />
-        }
-        onEndReached={() => {
-          if (hasNextPage && !isFetchingNextPage) {
-            fetchNextPage()
-          }
-        }}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={isFetchingNextPage ? <LoadingSpinner /> : null}
-      />
+            setCreateModalVisible={setCreateModalVisible}
+         />
 
-      {createModalVisible && (
-        <View
-          style={[
-            StyleSheet.absoluteFillObject,
-            styles.modalOverlay,
-            { backgroundColor: colors.background },
-          ]}
-        >
-          <SpaceForm onCreate={handleCreateSpace} onCancel={() => setCreateModalVisible(false)} />
-        </View>
-      )}
+         <FlatList
+            data={spaces}
+            key={viewMode}
+            numColumns={viewMode === "grid" ? 2 : 1}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
+            renderItem={({ item }) => (
+               <SpaceList
+                  space={item}
+                  viewMode={viewMode}
+                  onDelete={handleDeleteSpace}
+                  onSpaceSelect={handleSpaceSelectPress}
+               />
+            )}
+            keyExtractor={item => item.id}
+            ListEmptyComponent={
+               <SpacesFallback
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  setShowCreateModal={() => setCreateModalVisible(true)}
+               />
+            }
+            onEndReached={() => {
+               if (hasNextPage && !isFetchingNextPage) {
+                  fetchNextPage()
+               }
+            }}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={isFetchingNextPage ? <LoadingSpinner /> : null}
+         />
 
-      <UniversalFilter
-        fields={spaceFilterFields}
-        visible={showFilter}
-        onClose={() => setShowFilter(false)}
-        onApply={setCurrentFilters}
-        currentFilters={currentFilters}
-      />
-    </View>
-  )
+         {createModalVisible && (
+            <View
+               style={[
+                  StyleSheet.absoluteFillObject,
+                  styles.modalOverlay,
+                  { backgroundColor: colors.background },
+               ]}
+            >
+               <SpaceForm
+                  onCreate={handleCreateSpace}
+                  onCancel={() => setCreateModalVisible(false)}
+               />
+            </View>
+         )}
+
+         <UniversalFilter
+            fields={spaceFilterFields}
+            visible={showFilter}
+            onClose={() => setShowFilter(false)}
+            onApply={setCurrentFilters}
+            currentFilters={currentFilters}
+         />
+      </View>
+   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  modalOverlay: {
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 14,
-    zIndex: 100,
-  },
+   container: {
+      flex: 1,
+   },
+   modalOverlay: {
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 14,
+      zIndex: 100,
+   },
 })

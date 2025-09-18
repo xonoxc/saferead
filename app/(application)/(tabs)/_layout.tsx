@@ -5,62 +5,62 @@ import { getTabBarStyles } from "@/utils/helpers/tabs"
 import { useTabStore } from "@/store/tab"
 
 export default function TabLayout() {
-  const { colors } = useTheme()
-  const tabVisible = useTabStore(s => s.tabVisible)
+   const { colors } = useTheme()
+   const tabVisible = useTabStore(s => s.tabVisible)
 
-  return (
-    <Tabs
-      screenOptions={{
-        animation: "shift",
-        headerShown: false,
-        tabBarActiveTintColor: colors.text,
-        tabBarShowLabel: false,
-        sceneStyle: { flex: 1, backgroundColor: colors.background },
-        tabBarHideOnKeyboard: true,
-        tabBarStyle: {
-          ...getTabBarStyles(colors),
-          display: tabVisible ? "flex" : "none",
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="analyize"
-        options={{
-          title: "Analyze",
-          tabBarIcon: ({ size, color }) => <ScanSearch size={size} color={color} />,
-        }}
-      />
+   return (
+      <Tabs
+         screenOptions={{
+            animation: "shift",
+            headerShown: false,
+            tabBarActiveTintColor: colors.text,
+            tabBarShowLabel: false,
+            sceneStyle: { flex: 1, backgroundColor: colors.background },
+            tabBarHideOnKeyboard: true,
+            tabBarStyle: {
+               ...getTabBarStyles(colors),
+               display: tabVisible ? "flex" : "none",
+            },
+         }}
+      >
+         <Tabs.Screen
+            name="index"
+            options={{
+               title: "Home",
+               tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
+            }}
+         />
+         <Tabs.Screen
+            name="analyize"
+            options={{
+               title: "Analyze",
+               tabBarIcon: ({ size, color }) => <ScanSearch size={size} color={color} />,
+            }}
+         />
 
-      <Tabs.Screen
-        name="spaces"
-        options={{
-          title: "Spaces",
-          tabBarIcon: ({ size, color }) => <Box size={size} color={color} />,
-        }}
-      />
+         <Tabs.Screen
+            name="spaces"
+            options={{
+               title: "Spaces",
+               tabBarIcon: ({ size, color }) => <Box size={size} color={color} />,
+            }}
+         />
 
-      <Tabs.Screen
-        name="premium"
-        options={{
-          href: null,
-          /* title: "Premium",
+         <Tabs.Screen
+            name="premium"
+            options={{
+               href: null,
+               /* title: "Premium",
           tabBarIcon: ({ size, color }) => <CreditCard size={size} color={color} />, */
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: "Settings",
-          tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
-        }}
-      />
-    </Tabs>
-  )
+            }}
+         />
+         <Tabs.Screen
+            name="settings"
+            options={{
+               title: "Settings",
+               tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
+            }}
+         />
+      </Tabs>
+   )
 }

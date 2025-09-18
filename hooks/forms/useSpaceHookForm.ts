@@ -12,24 +12,24 @@ export type UpdateSpaceForm = z.infer<typeof updateSpaceSchema>
 export type SpaceFormData = CreateSpaceForm | UpdateSpaceForm
 
 export function useSpaceHookForm({
-  mode,
-  onSubmit,
-  defaultValues,
+   mode,
+   onSubmit,
+   defaultValues,
 }: {
-  mode: Mode
-  onSubmit: (data: SpaceFormData) => void
-  defaultValues?: Partial<SpaceFormData>
+   mode: Mode
+   onSubmit: (data: SpaceFormData) => void
+   defaultValues?: Partial<SpaceFormData>
 }) {
-  const schema = mode === "create" ? createSpaceSchema : updateSpaceSchema
+   const schema = mode === "create" ? createSpaceSchema : updateSpaceSchema
 
-  const methods = useForm<SpaceFormData>({
-    mode: "onChange",
-    resolver: zodResolver(schema),
-    defaultValues,
-  })
+   const methods = useForm<SpaceFormData>({
+      mode: "onChange",
+      resolver: zodResolver(schema),
+      defaultValues,
+   })
 
-  return {
-    ...methods,
-    handleSubmit: methods.handleSubmit(onSubmit),
-  }
+   return {
+      ...methods,
+      handleSubmit: methods.handleSubmit(onSubmit),
+   }
 }

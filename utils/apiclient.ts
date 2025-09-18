@@ -11,80 +11,80 @@ import { useAlertStore } from "@/store/useAlertStore"
 const AUTH_HEADER = "Authorization"
 
 export async function getAccessToken(): Promise<string | null> {
-  const result = await attempt(
-    isWeb() ? AsyncStorage.getItem("access_token") : SecureStore.getItemAsync("access_token")
-  )
+   const result = await attempt(
+      isWeb() ? AsyncStorage.getItem("access_token") : SecureStore.getItemAsync("access_token")
+   )
 
-  if (!result.ok) {
-    console.warn("Failed to load token:", result.error)
-    return null
-  }
+   if (!result.ok) {
+      console.warn("Failed to load token:", result.error)
+      return null
+   }
 
-  return result.data
+   return result.data
 }
 
 export const apiClient = axios.create({
-  baseURL: serverURL,
-  timeout: 120000,
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
-  withCredentials: true,
-  transitional: {
-    clarifyTimeoutError: true,
-  },
+   baseURL: serverURL,
+   timeout: 120000,
+   headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+   },
+   withCredentials: true,
+   transitional: {
+      clarifyTimeoutError: true,
+   },
 })
 
 apiClient.interceptors.request.use(
-  async config => {
-    if (config.url?.includes("/auth/login") || config.url?.includes("/auth/registration")) {
-      return config
-    }
+   async config => {
+      if (config.url?.includes("/auth/login") || config.url?.includes("/auth/registration")) {
+         return config
+      }
 
-    const token = await getAccessToken()
-    if (token) {
-      config.headers[AUTH_HEADER] = `token ${token}`
-    }
-    return config
-  },
-  error => Promise.reject(error)
+      const token = await getAccessToken()
+      if (token) {
+         config.headers[AUTH_HEADER] = `token ${token}`
+      }
+      return config
+   },
+   error => Promise.reject(error)
 )
 
 apiClient.interceptors.response.use(response => response, handleApiError)
 
 export async function handleApiError(error: AxiosError): Promise<never> {
-  const status = error?.response?.status
+   const status = error?.response?.status
 
-  switch (true) {
-    case error.code === "ERR_NETWORK": {
-      error.message = "Can’t connect. Please check your internet."
-      break
-    }
+   switch (true) {
+      case error.code === "ERR_NETWORK": {
+         error.message = "Can’t connect. Please check your internet."
+         break
+      }
 
-    case status === 401: {
-      const showAlert = useAlertStore.getState().showAlert
-      showAlert({
-        title: "Unauthorized",
-        message: "Your session has expired. Please log in again.",
-        actions: [
-          {
-            text: "Login",
-            style: "primary",
-            onPress: () => {
-              router.push("/(auth)/login")
-            },
-          },
-        ],
-      })
+      case status === 401: {
+         const showAlert = useAlertStore.getState().showAlert
+         showAlert({
+            title: "Unauthorized",
+            message: "Your session has expired. Please log in again.",
+            actions: [
+               {
+                  text: "Login",
+                  style: "primary",
+                  onPress: () => {
+                     router.push("/(auth)/login")
+                  },
+               },
+            ],
+         })
 
-      const { clearUser } = useUserStore.getState()
-      await clearUser()
+         const { clearUser } = useUserStore.getState()
+         await clearUser()
 
-      router.push("/(auth)/login")
-      break
-    }
-  }
+         router.push("/(auth)/login")
+         break
+      }
+   }
 
-  return Promise.reject(error)
+   return Promise.reject(error)
 }

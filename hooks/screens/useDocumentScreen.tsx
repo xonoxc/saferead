@@ -14,105 +14,105 @@ import { useSpaceStore } from "@/store/useSpaceStore"
 import { useDrawerAlert } from "../alerts/useAlert"
 
 export function useDocumentScreen() {
-  const applyFilters = useDocumentsStore(s => s.applyFilters)
-  const currentFilters = useDocumentsStore(s => s.currentFilters)
+   const applyFilters = useDocumentsStore(s => s.applyFilters)
+   const currentFilters = useDocumentsStore(s => s.currentFilters)
 
-  const [searchQuery, setSearchQuery] = useState("")
-  const [showFilter, setShowFilter] = useState(false)
-  const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
+   const [searchQuery, setSearchQuery] = useState("")
+   const [showFilter, setShowFilter] = useState(false)
+   const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
 
-  const selectedSpace = useSpaceStore(s => s.selectedSpace)
+   const selectedSpace = useSpaceStore(s => s.selectedSpace)
 
-  const {
-    data,
-    isLoading,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    refetch,
-    isRefetching: isRefetchingDocs,
-    isFetchingNextPage,
-  } = useDocuments(currentFilters)
+   const {
+      data,
+      isLoading,
+      error,
+      fetchNextPage,
+      hasNextPage,
+      refetch,
+      isRefetching: isRefetchingDocs,
+      isFetchingNextPage,
+   } = useDocuments(currentFilters)
 
-  const documents = data?.pages.flatMap(page => page.results) ?? []
+   const documents = data?.pages.flatMap(page => page.results) ?? []
 
-  const { mutateAsync: deleteDocument, isPending: isDeleting } = useDeleteDocument()
+   const { mutateAsync: deleteDocument, isPending: isDeleting } = useDeleteDocument()
 
-  const showBottomAlert = useDrawerAlert()
+   const showBottomAlert = useDrawerAlert()
 
-  const handleDeleteDocument = async (documentId: string) => {
-    const resp = await attempt(deleteDocument(documentId))
-    if (!resp.ok) {
+   const handleDeleteDocument = async (documentId: string) => {
+      const resp = await attempt(deleteDocument(documentId))
+      if (!resp.ok) {
+         showBottomAlert({
+            type: "error",
+            title: "Error",
+            message: resp.error.message || "Failed to delete document",
+            actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+         })
+         return
+      }
+
       showBottomAlert({
-        type: "error",
-        title: "Error",
-        message: resp.error.message || "Failed to delete document",
-        actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+         title: "Success",
+         message: "Document deleted successfully! ✨",
+         actions: [
+            {
+               text: "OK",
+               style: "primary",
+               onPress: () => {},
+            },
+         ],
       })
-      return
-    }
+   }
 
-    showBottomAlert({
-      title: "Success",
-      message: "Document deleted successfully! ✨",
-      actions: [
-        {
-          text: "OK",
-          style: "primary",
-          onPress: () => {},
-        },
-      ],
-    })
-  }
+   const handleRefresh = async () => {
+      await refetch()
+   }
 
-  const handleRefresh = async () => {
-    await refetch()
-  }
+   const debouncedSearch = useDebouncedCallback((text: string) => {
+      applyFilters({ search: text })
+   }, 300)
 
-  const debouncedSearch = useDebouncedCallback((text: string) => {
-    applyFilters({ search: text })
-  }, 300)
+   const handleSearch = (text: string) => {
+      setSearchQuery(text)
+      debouncedSearch(text)
+   }
 
-  const handleSearch = (text: string) => {
-    setSearchQuery(text)
-    debouncedSearch(text)
-  }
+   const handleDocumentSelectPress = (document: AnalysisResponse) => {
+      setAnalysisResult(document)
+      router.push("/analysisres")
+   }
 
-  const handleDocumentSelectPress = (document: AnalysisResponse) => {
-    setAnalysisResult(document)
-    router.push("/analysisres")
-  }
+   const FallbackStateWrapper = () => (
+      <FallBackState searchQuery={searchQuery} spaceName={selectedSpace?.title} />
+   )
 
-  const FallbackStateWrapper = () => (
-    <FallBackState searchQuery={searchQuery} spaceName={selectedSpace?.title} />
-  )
-
-  return {
-    documents,
-    spaceName: selectedSpace?.title,
-    spaceColor: selectedSpace?.color,
-    spaceId: selectedSpace?.id,
-    error,
-    isLoading,
-    isFetchingNextPage,
-    hasMore: hasNextPage,
-    setSearchQuery,
-    currentFilters,
-    searchQuery,
-    showFilter,
-    isRefreshing: isRefetchingDocs,
-    setShowFilter,
-    handleDocumentSelectPress,
-    isDeleting,
-    handleDeleteDocument,
-    handleRefresh,
-    handleSearch,
-    loadMoreDocuments: () => {
-      if (hasNextPage) fetchNextPage()
-    },
-    applyFilters,
-    FallbackStateWrapper,
-  }
+   return {
+      documents,
+      spaceName: selectedSpace?.title,
+      spaceColor: selectedSpace?.color,
+      spaceId: selectedSpace?.id,
+      error,
+      isLoading,
+      isFetchingNextPage,
+      hasMore: hasNextPage,
+      setSearchQuery,
+      currentFilters,
+      searchQuery,
+      showFilter,
+      isRefreshing: isRefetchingDocs,
+      setShowFilter,
+      handleDocumentSelectPress,
+      isDeleting,
+      handleDeleteDocument,
+      handleRefresh,
+      handleSearch,
+      loadMoreDocuments: () => {
+         if (hasNextPage) fetchNextPage()
+      },
+      applyFilters,
+      FallbackStateWrapper,
+   }
 }
 
 /*
@@ -121,50 +121,50 @@ export function useDocumentScreen() {
  * fallback state component
  * **/
 function FallBackState({ searchQuery, spaceName }: { searchQuery?: string; spaceName?: string }) {
-  const { colors } = useTheme()
+   const { colors } = useTheme()
 
-  const title = spaceName
-    ? `No documents in ${spaceName}`
-    : searchQuery
-      ? "No Documents Found"
-      : "No Documents Yet"
-  const description = spaceName
-    ? "Add a document to this space to get started"
-    : searchQuery
-      ? "Try adjusting your search terms or filters"
-      : "Start by analyzing your first legal document"
+   const title = spaceName
+      ? `No documents in ${spaceName}`
+      : searchQuery
+        ? "No Documents Found"
+        : "No Documents Yet"
+   const description = spaceName
+      ? "Add a document to this space to get started"
+      : searchQuery
+        ? "Try adjusting your search terms or filters"
+        : "Start by analyzing your first legal document"
 
-  return (
-    <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
-      <FileText size={64} color={colors.textMuted} />
-      <Text style={[styles.emptyStateTitle, { color: colors.text }]}>{title}</Text>
-      <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
-        {description}
-      </Text>
-    </View>
-  )
+   return (
+      <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
+         <FileText size={64} color={colors.textMuted} />
+         <Text style={[styles.emptyStateTitle, { color: colors.text }]}>{title}</Text>
+         <Text style={[styles.emptyStateDescription, { color: colors.textSecondary }]}>
+            {description}
+         </Text>
+      </View>
+   )
 }
 
 const styles = StyleSheet.create({
-  emptyState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 2,
-    height: "100%",
-    paddingVertical: 200,
-  },
-  emptyStateTitle: {
-    fontSize: FontSizes.xl,
-    fontFamily: Fonts.semiBold,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyStateDescription: {
-    fontSize: FontSizes.md,
-    fontFamily: Fonts.regular,
-    textAlign: "center",
-    marginBottom: 24,
-    paddingHorizontal: 40,
-  },
+   emptyState: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 2,
+      height: "100%",
+      paddingVertical: 200,
+   },
+   emptyStateTitle: {
+      fontSize: FontSizes.xl,
+      fontFamily: Fonts.semiBold,
+      marginTop: 16,
+      marginBottom: 8,
+   },
+   emptyStateDescription: {
+      fontSize: FontSizes.md,
+      fontFamily: Fonts.regular,
+      textAlign: "center",
+      marginBottom: 24,
+      paddingHorizontal: 40,
+   },
 })

@@ -4,11 +4,11 @@ import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { useTheme } from "@/hooks/useTheme"
 
 export default function DocumentTabLoadingState() {
-  const { colors } = useTheme()
+   const { colors } = useTheme()
 
-  return (
-    <View style={{ backgroundColor: colors.background, flex: 1 }}>
-      <LoadingSpinner />
-    </View>
-  )
+   return (
+      <View style={{ backgroundColor: colors.background, flex: 1 }}>
+         <LoadingSpinner />
+      </View>
+   )
 }

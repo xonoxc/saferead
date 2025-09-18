@@ -9,59 +9,59 @@ import type { Space } from "@/types"
 import type { ColorsType } from "@/hooks/useTheme"
 
 interface AnalyzeHeaderProps {
-  selectedSpace?: Space | null
-  onSpaceExitButtonPress: () => void
-  colors: ColorsType
+   selectedSpace?: Space | null
+   onSpaceExitButtonPress: () => void
+   colors: ColorsType
 }
 
 export default function AnalyzeHeader({
-  selectedSpace,
-  onSpaceExitButtonPress,
-  colors,
+   selectedSpace,
+   onSpaceExitButtonPress,
+   colors,
 }: AnalyzeHeaderProps) {
-  const handleHamBurgerPress = () => {
-    router.push("/(application)/scan_menu_screen")
-  }
+   const handleHamBurgerPress = () => {
+      router.push("/(application)/scan_menu_screen")
+   }
 
-  return (
-    <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
-      <View style={styles.innerHeader}>
-        {/* Left: Menu */}
-        <TouchableOpacity onPress={handleHamBurgerPress}>
-          <CircleEllipsis color={colors.textMuted} size={27} />
-        </TouchableOpacity>
+   return (
+      <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
+         <View style={styles.innerHeader}>
+            {/* Left: Menu */}
+            <TouchableOpacity onPress={handleHamBurgerPress}>
+               <CircleEllipsis color={colors.textMuted} size={27} />
+            </TouchableOpacity>
 
-        {/* Center: Upgrade */}
-        <View style={{ flex: 1, alignItems: "center" }}>
-          <UpgradeButton />
-        </View>
+            {/* Center: Upgrade */}
+            <View style={{ flex: 1, alignItems: "center" }}>
+               <UpgradeButton />
+            </View>
 
-        {/* Right: Exit only if inside Chat */}
-        {selectedSpace ? (
-          <TouchableOpacity onPress={onSpaceExitButtonPress}>
-            <LogOut size={22} color={colors.text} />
-          </TouchableOpacity>
-        ) : (
-          <View style={{ width: 24 }} />
-        )}
-      </View>
-    </Animated.View>
-  )
+            {/* Right: Exit only if inside Chat */}
+            {selectedSpace ? (
+               <TouchableOpacity onPress={onSpaceExitButtonPress}>
+                  <LogOut size={22} color={colors.text} />
+               </TouchableOpacity>
+            ) : (
+               <View style={{ width: 24 }} />
+            )}
+         </View>
+      </Animated.View>
+   )
 }
 
 const styles = StyleSheet.create({
-  header: {
-    padding: 20,
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    paddingHorizontal: 10,
-    paddingBottom: 0,
-  },
-  innerHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingHorizontal: 10,
-  },
+   header: {
+      padding: 20,
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      paddingHorizontal: 10,
+      paddingBottom: 0,
+   },
+   innerHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%",
+      paddingHorizontal: 10,
+   },
 })

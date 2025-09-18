@@ -6,13 +6,13 @@ import { useTabStore } from "@/store/tab"
  * and shows it again when it unmounts.
  */
 export function useTabBarVisibilty(visible: boolean) {
-  const setTabBarVisibility = useTabStore(s => s.setTabBarVisibility)
+   const setTabBarVisibility = useTabStore(s => s.setTabBarVisibility)
 
-  useEffect(() => {
-    setTabBarVisibility(visible)
+   useEffect(() => {
+      setTabBarVisibility(visible)
 
-    return () => {
-      setTabBarVisibility(true)
-    }
-  }, [visible])
+      return () => {
+         setTabBarVisibility(true)
+      }
+   }, [visible])
 }

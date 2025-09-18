@@ -1,8 +1,6 @@
 import React from "react"
 import { StyleSheet, View } from "react-native"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
-import { useSpaceDetailsScreen } from "@/hooks/screens/useSpaceDetailScreen"
-import { useTheme } from "@/hooks/useTheme"
 import SpaceDetailHeader from "@/components/spaces/SpaceDetails/SpaceDetailsHeader"
 import SpaceDetailsStats from "@/components/spaces/SpaceDetails/SpaceDetailsStats"
 import SpaceRecentDocumentList from "@/components/spaces/SpaceDetails/SpaceRecentDocumentList"
@@ -11,106 +9,109 @@ import { SpaceForm } from "@/components/spaces/SpaceForm"
 import { UploadDocumentForm } from "@/components/spaces/UploadDocumentForm"
 import PinnedDocuments from "@/components/spaces/SpaceDetails/PinnedDocuments"
 
+import { useSpaceDetailsScreen } from "@/hooks/screens/useSpaceDetailScreen"
+import { useTheme } from "@/hooks/useTheme"
+
 export default function SpaceDetailScreen() {
-  const { colors } = useTheme()
+   const { colors } = useTheme()
 
-  const {
-    space,
-    stats,
-    pinnedDocuments,
-    recentDocuments,
-    animatedStyle,
-    isSheetVisible,
-    isChatBtnVisible,
-    isUploadDocFormVisible,
-    toggleSheetVisiblity,
-    toggleUploadFormVisibilty,
-    handleOpenChat,
-    handleFavoritePress,
-    handleUpdateSpace,
-    handleDocumentListScroll,
-    handlePinDocumentToSpace: togglePinnedStatus,
-  } = useSpaceDetailsScreen({ colors })
+   const {
+      space,
+      stats,
+      pinnedDocuments,
+      recentDocuments,
+      animatedStyle,
+      isSheetVisible,
+      isChatBtnVisible,
+      isUploadDocFormVisible,
+      toggleSheetVisiblity,
+      toggleUploadFormVisibilty,
+      handleOpenChat,
+      handleFavoritePress,
+      handleUpdateSpace,
+      handleDocumentListScroll,
+      handlePinDocumentToSpace: togglePinnedStatus,
+   } = useSpaceDetailsScreen({ colors })
 
-  if (!space) {
-    return (
+   if (!space) {
+      return (
+         <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <LoadingSpinner />
+         </View>
+      )
+   }
+
+   return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <LoadingSpinner />
+         <View style={{ paddingHorizontal: 7, paddingBottom: 10 }}>
+            {/* Header */}
+            <SpaceDetailHeader
+               animatedStyle={animatedStyle}
+               space={space}
+               onFavoritePress={handleFavoritePress}
+               onCreateBtnPress={toggleUploadFormVisibilty}
+               onSettingsPress={toggleSheetVisiblity}
+            />
+
+            {/* Stats */}
+            <SpaceDetailsStats stats={stats} colors={colors} />
+         </View>
+         <View style={{ flex: 1 }}>
+            {/* Pinned Documents */}
+            <PinnedDocuments
+               documents={pinnedDocuments ?? []}
+               colors={colors}
+               spaceColor={space.color}
+               onUnpinPress={togglePinnedStatus}
+            />
+
+            {/* Recent Documents */}
+            <SpaceRecentDocumentList
+               documents={recentDocuments ?? []}
+               colors={colors}
+               spaceColor={space.color}
+               onPin={togglePinnedStatus}
+               onScroll={handleDocumentListScroll}
+            />
+         </View>
+
+         {/* Open Chat Button */}
+         {isChatBtnVisible && (
+            <SpaceDetailsOpenChatBtn
+               onPress={handleOpenChat}
+               color={space.color}
+               visibility={isChatBtnVisible}
+            />
+         )}
+
+         {isUploadDocFormVisible && (
+            <UploadDocumentForm
+               onCancel={toggleUploadFormVisibilty}
+               spaceId={space.id}
+               onUploadSuccess={toggleUploadFormVisibilty}
+            />
+         )}
+
+         {/* Update Space Form */}
+         {isSheetVisible && (
+            <SpaceForm
+               space={space}
+               onCancel={toggleSheetVisiblity}
+               onCreate={handleUpdateSpace}
+               extraContainerStyles={{
+                  padding: 10,
+                  paddingHorizontal: 20,
+               }}
+               useDrawer
+            />
+         )}
       </View>
-    )
-  }
-
-  return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={{ paddingHorizontal: 7, paddingBottom: 10 }}>
-        {/* Header */}
-        <SpaceDetailHeader
-          animatedStyle={animatedStyle}
-          space={space}
-          onFavoritePress={handleFavoritePress}
-          onCreateBtnPress={toggleUploadFormVisibilty}
-          onSettingsPress={toggleSheetVisiblity}
-        />
-
-        {/* Stats */}
-        <SpaceDetailsStats stats={stats} colors={colors} />
-      </View>
-      <View style={{ flex: 1 }}>
-        {/* Pinned Documents */}
-        <PinnedDocuments
-          documents={pinnedDocuments ?? []}
-          colors={colors}
-          spaceColor={space.color}
-          onUnpinPress={togglePinnedStatus}
-        />
-
-        {/* Recent Documents */}
-        <SpaceRecentDocumentList
-          documents={recentDocuments ?? []}
-          colors={colors}
-          spaceColor={space.color}
-          onPin={togglePinnedStatus}
-          onScroll={handleDocumentListScroll}
-        />
-      </View>
-
-      {/* Open Chat Button */}
-      {isChatBtnVisible && (
-        <SpaceDetailsOpenChatBtn
-          onPress={handleOpenChat}
-          color={space.color}
-          visibility={isChatBtnVisible}
-        />
-      )}
-
-      {isUploadDocFormVisible && (
-        <UploadDocumentForm
-          onCancel={toggleUploadFormVisibilty}
-          spaceId={space.id}
-          onUploadSuccess={toggleUploadFormVisibilty}
-        />
-      )}
-
-      {/* Update Space Form */}
-      {isSheetVisible && (
-        <SpaceForm
-          space={space}
-          onCancel={toggleSheetVisiblity}
-          onCreate={handleUpdateSpace}
-          extraContainerStyles={{
-            padding: 10,
-            paddingHorizontal: 20,
-          }}
-          useDrawer
-        />
-      )}
-    </View>
-  )
+   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 10,
-  },
+   container: {
+      flex: 1,
+      paddingTop: 10,
+   },
 })

@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
-import { ArrowLeft, Check, Globe, Search } from "lucide-react-native"
+import { ArrowLeft, Check, Globe } from "lucide-react-native"
 import Animated, {
    FadeInDown,
    FadeInRight,
@@ -10,7 +10,6 @@ import Animated, {
 } from "react-native-reanimated"
 import { router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
-import { TextInput } from "@/components/TextInput"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import SearchBar from "@/components/search/SearchBar"
 

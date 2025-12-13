@@ -17,7 +17,6 @@ export default function AnalyzeScreen() {
    const {
       isAnalyzing,
       handleDocumentUpload,
-      handleDocumentScan,
       selectedDocumentType,
       setSelectedDocumentType,
       recentDocuments,
@@ -48,7 +47,6 @@ export default function AnalyzeScreen() {
                recentDocuments={recentDocuments}
                selectedDocType={selectedDocumentType}
                onSetViewType={setViewType}
-               onDocumentScan={handleDocumentScan}
                onDocumentUpload={handleDocumentUpload}
                onDocumentSelectType={setSelectedDocumentType}
                onRecentDocumentPress={handleRecentDocumentPress}

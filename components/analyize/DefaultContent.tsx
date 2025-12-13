@@ -14,17 +14,16 @@ import RecentDocumentListings from "./DocumentListings"
 import { type DocumentType, DocumentTypeSelector } from "../documents/DocumentTypeSelector"
 
 import type { SetStateFunction } from "@/types/state"
-import type { ColorsType } from "@/hooks/useTheme"
 import type { ViewType } from "@/types/view"
 import type { AnalysisResponse } from "@/types/api/documents.types"
+import type { ThemedComponent } from "@/types/colored"
 
-interface AnalyizeDefaultContentProps {
-   colors: ColorsType
+interface AnalyizeDefaultContentProps extends ThemedComponent {
    selectedDocType: DocumentType
+
    recentDocuments: AnalysisResponse[]
    ViewType: ViewType
-   onDocumentSelectType: SetStateFunction<DocumentType>
-   onDocumentScan: () => void
+   onDocumentSelectType: (doctype: DocumentType) => void
    onDocumentUpload: () => void
    onSetViewType: SetStateFunction<ViewType>
    onRecentDocumentPress: (item: AnalysisResponse) => void
@@ -39,7 +38,6 @@ export default function AnalyizeDefaultContent({
    ViewType,
    onDocumentSelectType,
    onSetViewType,
-   onDocumentScan,
    onDocumentUpload,
    onRecentDocumentPress,
 }: AnalyizeDefaultContentProps) {
@@ -87,11 +85,7 @@ export default function AnalyizeDefaultContent({
                   />
                </Animated.View>
 
-               <UploadOptions
-                  colors={colors}
-                  onDocumentUpload={onDocumentUpload}
-                  onDocumentScan={onDocumentScan}
-               />
+               <UploadOptions onDocumentUpload={onDocumentUpload} />
             </LinearGradient>
          </Animated.View>
 

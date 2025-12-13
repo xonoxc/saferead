@@ -14,9 +14,11 @@ export const ModalLoadingSpinner = ({ visible, message }: ModalLoadingSpinnerPro
    return (
       <Modal transparent visible={visible} animationType="fade">
          <View style={styles.container}>
-            <View style={[styles.innerContainer, { backgroundColor: colors.surface }]}>
-               <LoadingSpinner message={message} />
-            </View>
+            {message && (
+               <View style={[styles.innerContainer, { backgroundColor: colors.surface }]}>
+                  <LoadingSpinner loaderMessage={message} />
+               </View>
+            )}
          </View>
       </Modal>
    )

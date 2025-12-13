@@ -25,7 +25,7 @@ export interface Document {
    id: string
    title: string
    type: "contract" | "legal" | "agreement" | "other"
-   content: string
+   content?: string
    originalFormat: "pdf" | "image" | "text"
    fileSize: number
    createdAt: string

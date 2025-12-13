@@ -83,26 +83,67 @@ export function attemptSync<T, E = Error>(fn: T): Result<T, E> {
 /*
  * handleAxiosError function : handles axios errors and returns a structured error message
  * **/
-const handleAxiosError = (error: any) => {
-   if (error.response) {
-      const contentType = error.response.headers["content-type"]
-      const errorStatus = error.response.status
 
-      if (contentType && contentType.includes("application/json")) {
-         const serverMessage =
-            error.response.data.message ||
-            error.response.data.error ||
-            JSON.stringify(error.response.data)
+interface ExpectedAxiosError {
+   status: number
+   message: string
+}
 
-         return {
-            status: errorStatus,
-            message: serverMessage,
-         }
-      } else {
-         return {
-            status: errorStatus,
-            message: "Internal server error. please try again later!",
-         }
+const handleAxiosError = (error: AxiosError): ExpectedAxiosError => {
+   switch (true) {
+      case !!error.response:
+         return serverError(error)
+
+      case error.code === "ECONNABORTED":
+         return timeoutError()
+
+      case !error.response:
+         return networkError()
+
+      default:
+         return unknownAxiosError()
+   }
+}
+
+function serverError(error: AxiosError): ExpectedError {
+   const response = error.response!
+   const contentType = response.headers?.["content-type"]
+
+   if (contentType?.includes("application/json")) {
+      const message =
+         (response.data as any)?.message ||
+         (response.data as any)?.error ||
+         JSON.stringify(response.data)
+
+      return {
+         status: response.status,
+         message,
       }
+   }
+
+   return {
+      status: response.status,
+      message: "Internal server error. Please try again later!",
+   }
+}
+
+function timeoutError(): ExpectedError {
+   return {
+      status: 0,
+      message: "Request timed out. Please try again.",
+   }
+}
+
+function networkError(): ExpectedError {
+   return {
+      status: 0,
+      message: "Network error. Please check your connection.",
+   }
+}
+
+function unknownAxiosError(): ExpectedError {
+   return {
+      status: 0,
+      message: "Unexpected error occurred.",
    }
 }

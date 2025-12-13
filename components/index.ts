@@ -7,8 +7,6 @@ export * from "./DropDownSelector"
 
 export * from "./GoogleSignInButton"
 
-export * from "./ScanButton"
-
 export * from "./ModalLoadingSpinner"
 
 export * from "./TextInput"

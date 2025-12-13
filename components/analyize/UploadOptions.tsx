@@ -1,38 +1,19 @@
-import { Camera, Upload } from "lucide-react-native"
+import { Upload } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 import Animated, { FadeInDown } from "react-native-reanimated"
+import { useTheme } from "@/hooks/useTheme"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
 
-import type { ColorsType } from "@/hooks/useTheme"
-
-export default function UploadOptions({
-   colors,
-   onDocumentScan,
-   onDocumentUpload,
-}: {
-   colors: ColorsType
-   onDocumentScan: () => void
+interface UploadOptionsProps {
    onDocumentUpload: () => void
-}) {
+}
+
+export default function UploadOptions({ onDocumentUpload }: UploadOptionsProps) {
+   const { colors } = useTheme()
+
    return (
       <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.uploadSection}>
          <View style={styles.uploadGrid}>
-            <TouchableOpacity
-               style={[
-                  styles.uploadOption,
-                  {
-                     borderColor: colors.border,
-                     backgroundColor: colors.background,
-                  },
-               ]}
-               onPress={onDocumentScan}
-            >
-               <View style={styles.uploadIcon}>
-                  <Camera size={24} color={colors.primary} />
-               </View>
-               <Text style={[styles.uploadText, { color: colors.text }]}>Scan Docs</Text>
-            </TouchableOpacity>
-
             <TouchableOpacity
                style={[
                   styles.uploadOption,

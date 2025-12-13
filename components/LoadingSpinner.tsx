@@ -7,13 +7,13 @@ import { Fonts, FontSizes } from "@/constants"
 type FontFamilyOptions = keyof typeof Fonts
 type FontSizeOptions = keyof typeof FontSizes
 
-export const LoadingSpinner = ({
-   FontSize,
-   fontFamily,
-}: {
+interface LoadingSpinnerProps {
    FontSize?: FontSizeOptions
    fontFamily?: FontFamilyOptions
-}) => {
+   loaderMessage?: string
+}
+
+export const LoadingSpinner = ({ FontSize, fontFamily, loaderMessage }: LoadingSpinnerProps) => {
    const { colors } = useTheme()
 
    return (
@@ -25,7 +25,7 @@ export const LoadingSpinner = ({
                fontFamily: fontFamily ? Fonts[fontFamily] : Fonts.regular,
             }}
          >
-            loading...
+            {loaderMessage ? loaderMessage : "Loading..."}
          </Text>
       </View>
    )

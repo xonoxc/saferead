@@ -10,16 +10,13 @@ export default function AuthLayout() {
    const { colors } = useTheme()
    const { hasCompletedOnboarding, isLoading, completeOnboarding, skipOnboarding } = useOnboarding()
 
-   if (isAuthenticated) {
-      return <Redirect href="/(application)/(tabs)" />
-   }
-
-   if (!isAuthenticated && !hasCompletedOnboarding) {
-      return <Onboarding onComplete={completeOnboarding} onSkip={skipOnboarding} />
-   }
-
-   if (isLoading) {
-      return <LoadingSpinner />
+   switch (true) {
+      case isAuthenticated:
+         return <Redirect href="/(application)/(tabs)" />
+      case !isAuthenticated && !hasCompletedOnboarding:
+         return <Onboarding onComplete={completeOnboarding} onSkip={skipOnboarding} />
+      case isLoading:
+         return <LoadingSpinner />
    }
 
    return (

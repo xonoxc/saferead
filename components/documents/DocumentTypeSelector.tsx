@@ -4,7 +4,7 @@ import { type ColorsType, useTheme } from "@/hooks/useTheme"
 
 export type DocumentType = "terms" | "privacy" | "legal" | "other"
 
-interface DocumentTypeSelectorProps {
+export interface DocumentTypeSelectorProps {
    selectedType: DocumentType
    onSelect: (type: DocumentType) => void
 }

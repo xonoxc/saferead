@@ -11,6 +11,7 @@ import { useTabBarVisibilty } from "./useTabBarVisiblitiy"
 import type { AnalysisResponse } from "@/types/api/documents.types"
 import { useAnalyzeAction } from "./useAnalyzeAction"
 import { pickDocument } from "@/utils/docs/picker"
+import { toast } from "@backpackapp-io/react-native-toast"
 
 export function useAnalysis() {
    const { user } = useAuth()
@@ -21,7 +22,6 @@ export function useAnalysis() {
    /*
     * all the stores used in this hook
     * ***/
-   const isAnalyzing = useAnalysisStore(s => s.isAnalyzing)
    const analysisResult = useAnalysisStore(s => s.analysisResult)
    const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
    const selectedSpace = useSpaceStore(s => s.selectedSpace)
@@ -73,7 +73,11 @@ export function useAnalysis() {
          return
       }
 
+      const id = toast.loading("Analyzing document...")
+
       await handleAnalyzeDocument(result.data, selectedDocumentType)
+
+      toast.dismiss(id)
    }
 
    const handleRecentDocumentPress = (document: AnalysisResponse) => {
@@ -85,7 +89,6 @@ export function useAnalysis() {
 
    return {
       user,
-      isAnalyzing,
       analysisResult,
       handleItemPress,
       handleDocumentUpload,

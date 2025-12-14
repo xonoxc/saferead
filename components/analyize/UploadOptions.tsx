@@ -3,12 +3,20 @@ import { Fonts, FontSizes } from "@/constants"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import {
+   DocumentTypeSelector,
+   type DocumentTypeSelectorProps,
+} from "../documents/DocumentTypeSelector"
 
-interface UploadOptionsProps {
+interface UploadOptionsProps extends DocumentTypeSelectorProps {
    onDocumentUpload: () => void
 }
 
-export default function UploadOptions({ onDocumentUpload }: UploadOptionsProps) {
+export default function UploadOptions({
+   onDocumentUpload,
+   onSelect,
+   selectedType,
+}: UploadOptionsProps) {
    const { colors } = useTheme()
 
    return (
@@ -24,6 +32,8 @@ export default function UploadOptions({ onDocumentUpload }: UploadOptionsProps) 
                ]}
                onPress={onDocumentUpload}
             >
+               <DocumentTypeSelector selectedType={selectedType} onSelect={onSelect} />
+
                <View style={styles.uploadIcon}>
                   <Upload size={24} color={colors.secondary} />
                </View>

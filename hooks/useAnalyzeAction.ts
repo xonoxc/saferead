@@ -13,13 +13,13 @@ import {
    type FileDocument,
 } from "@/types/docs"
 import { useInvalidator } from "./useInvalidator"
+import { toast } from "@backpackapp-io/react-native-toast"
 
 export function useAnalyzeAction() {
    const { user } = useAuth()
    const showBottomAlert = useDrawerAlert()
    const { invalidateQueries } = useInvalidator()
 
-   const setIsAnalyzing = useAnalysisStore(s => s.setIsAnalyzing)
    const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
 
    async function handleAnalyzeDocument(document: AnalyzeDocument, docType: DocumentType) {
@@ -34,7 +34,7 @@ export function useAnalyzeAction() {
          return
       }
 
-      setIsAnalyzing(true)
+      const toastId = toast.loading("Analyzing document...")
 
       let documentFile: FileDocument | File
       let filename: string
@@ -60,7 +60,7 @@ export function useAnalyzeAction() {
             actions: [{ text: "OK", style: "primary", onPress: () => {} }],
          })
 
-         setIsAnalyzing(false)
+         toast.dismiss(toastId)
          return
       }
 
@@ -86,7 +86,7 @@ export function useAnalyzeAction() {
 
       await invalidateQueries([["documents"], ["documentStats"]])
 
-      setIsAnalyzing(false)
+      toast.dismiss(toastId)
    }
 
    return {

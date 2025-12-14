@@ -1,25 +1,14 @@
 import React from "react"
-import { View, Text, StyleSheet, ScrollView, useWindowDimensions } from "react-native"
+import { View, StyleSheet, ScrollView } from "react-native"
 import Skeleton from "./Skeleton"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 
-interface AnalyzeScreenSkeletonProps {
-   isAnalizing?: boolean
-}
-
-const AnalyzeScreenSkeleton = ({ isAnalizing = false }: AnalyzeScreenSkeletonProps) => {
+const AnalyzeScreenSkeleton = () => {
    const { colors } = useTheme()
-   const { height } = useWindowDimensions()
 
    return (
       <View style={{ flex: 1 }}>
-         {isAnalizing && (
-            <View style={[styles.overlayContainer, { top: height / 2 - 50 }]}>
-               <Text style={[styles.overlayText, { color: colors.text }]}>Analyzing......</Text>
-            </View>
-         )}
-
          <ScrollView
             style={[styles.container, { backgroundColor: colors.background }]}
             contentContainerStyle={{ paddingBottom: 120 }}

@@ -15,7 +15,6 @@ export default function AnalyzeScreen() {
    const [viewType, setViewType] = useState<ViewType>("list")
 
    const {
-      isAnalyzing,
       handleDocumentUpload,
       selectedDocumentType,
       setSelectedDocumentType,
@@ -26,8 +25,7 @@ export default function AnalyzeScreen() {
       handleSpaceClose,
    } = useAnalysis()
 
-   if (isAnalyzing || isRecentDocumentsLoading)
-      return <AnalyzeScreenSkeleton isAnalizing={isAnalyzing} />
+   if (isRecentDocumentsLoading) return <AnalyzeScreenSkeleton />
 
    return (
       <View style={{ flex: 1, backgroundColor: colors.background }}>

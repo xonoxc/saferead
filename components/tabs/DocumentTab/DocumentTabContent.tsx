@@ -5,16 +5,16 @@ import DocumentTabSearch from "./DocumentTabSearch"
 
 import { View, StyleSheet, FlatList, RefreshControl } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
-import { Search, FileText } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
-import { EmptyState } from "@/components/EmptyState"
 import { DocumentTabCard } from "./DocumentTabCard"
 import { UniversalFilter } from "@/components/filters/UniversalFilters"
 import { documentFilterFields } from "@/constants/filters"
 
 import type { DocumentFilterOptions } from "@/types/docs"
 import type { AnalysisResponse } from "@/types/api/documents.types"
+import { DocumentsEmptyState } from "./DocuementEmptyState"
+import type { SetStateFunction } from "@/types/state"
 
 interface DocumentTabContentProps {
    spaceId?: string
@@ -33,7 +33,7 @@ interface DocumentTabContentProps {
 
    applyFilters: (filters: DocumentFilterOptions) => void
    setShowFilter: (visible: boolean) => void
-   setSearchQuery: (query: string) => void
+   setSearchQuery: SetStateFunction<string>
 
    handleDeleteDocument: (id: string) => void
    handleDocumentSelectPress: (doc: AnalysisResponse) => void
@@ -76,9 +76,7 @@ export default function DocumentTabContent({
       </Animated.View>
    )
 
-   const isDocumentsDataAvailable = () => {
-      return documents.length > 0 && !error
-   }
+   const isDocumentsDataAvailable = () => documents.length > 0 && !error
 
    const keyExtractor = (item: AnalysisResponse) => item.id
 
@@ -91,9 +89,7 @@ export default function DocumentTabContent({
       )
    }
 
-   if (isLoading || isDeleting || isRefreshing) {
-      return <DocumentTabLoadingState />
-   }
+   if (isLoading || isDeleting || isRefreshing) return <DocumentTabLoadingState />
 
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -105,7 +101,7 @@ export default function DocumentTabContent({
 
          <DocumentTabErrorMessage error={error} />
 
-         {isDocumentsDataAvailable() ? (
+         {false ? (
             <FlatList
                data={documents}
                bounces={true}
@@ -127,19 +123,11 @@ export default function DocumentTabContent({
                showsVerticalScrollIndicator={false}
             />
          ) : (
-            <EmptyState
-               icon={searchQuery ? Search : FileText}
-               title={searchQuery ? "No Results Found" : "No Documents Yet"}
-               description={
-                  searchQuery
-                     ? `No documents match "${searchQuery}". Try adjusting your search terms or check your spelling.`
-                     : "Start your legal document analysis journey by adding your first document. Upload files, scan documents, or paste text to get started."
-               }
-               actionTitle={searchQuery ? undefined : "Add Your First Document"}
-               secondaryActionTitle={searchQuery ? "Clear Search" : "Learn More"}
-               onSecondaryAction={searchQuery ? () => setSearchQuery("") : () => {}}
-               variant={searchQuery ? "search" : "default"}
-               showFloatingElements={!searchQuery}
+            <DocumentsEmptyState
+               searchControl={{
+                  value: searchQuery,
+                  onChange: setSearchQuery,
+               }}
             />
          )}
 

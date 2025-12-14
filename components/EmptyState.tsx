@@ -61,21 +61,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
          <View style={styles.content}>
             {IconComponent && (
                <View style={styles.iconContainer}>
-                  <View
-                     style={[
-                        styles.pulseCircle,
-                        styles.pulseCircle1,
-                        { borderColor: variantColors.primary },
-                     ]}
-                  />
-                  <View
-                     style={[
-                        styles.pulseCircle,
-                        styles.pulseCircle2,
-                        { borderColor: variantColors.primary },
-                     ]}
-                  />
-
                   <View style={[styles.iconWrapper, { backgroundColor: variantColors.background }]}>
                      <IconComponent size={48} color={variantColors.primary} />
                   </View>
@@ -138,6 +123,7 @@ const getVariantColors = (variant: EmptyStateVariant, colors: ColorsType) => {
 const styles = StyleSheet.create({
    container: {
       position: "relative",
+      borderWidth: 3,
    },
    backgroundElements: {
       position: "absolute",
@@ -157,25 +143,13 @@ const styles = StyleSheet.create({
       paddingTop: 30,
    },
    iconContainer: {
+      borderRadius: 100,
+      borderWidth: 3,
+      alignItems: "center",
+      justifyContent: "center",
+      borderColor: "#E0E0E0",
       position: "relative",
       marginBottom: 40,
-   },
-   pulseCircle: {
-      position: "absolute",
-      borderWidth: 2,
-      borderRadius: 100,
-   },
-   pulseCircle1: {
-      width: 140,
-      height: 140,
-      top: -30,
-      left: -30,
-   },
-   pulseCircle2: {
-      width: 180,
-      height: 180,
-      top: -50,
-      left: -50,
    },
    iconWrapper: {
       width: 80,

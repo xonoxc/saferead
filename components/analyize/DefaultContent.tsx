@@ -5,13 +5,12 @@ import Animated, {
    useAnimatedScrollHandler,
    interpolate,
 } from "react-native-reanimated"
-import { LinearGradient } from "expo-linear-gradient"
 import { FadeInDown } from "react-native-reanimated"
 
 import UploadOptions from "./UploadOptions"
 import RecentDocumentListings from "./DocumentListings"
 
-import { type DocumentType, DocumentTypeSelector } from "../documents/DocumentTypeSelector"
+import { type DocumentType } from "../documents/DocumentTypeSelector"
 
 import type { SetStateFunction } from "@/types/state"
 import type { ViewType } from "@/types/view"
@@ -77,16 +76,16 @@ export default function AnalyizeDefaultContent({
                { overflow: "hidden", position: "absolute", top: 0, left: 0, right: 0, zIndex: 1 },
             ]}
          >
-            <LinearGradient colors={[colors.vio, colors.blueg]} style={styles.headerGradient}>
-               <Animated.View entering={FadeInDown.delay(200).springify()}>
-                  <DocumentTypeSelector
-                     selectedType={selectedDocType}
-                     onSelect={onDocumentSelectType}
-                  />
-               </Animated.View>
-
-               <UploadOptions onDocumentUpload={onDocumentUpload} />
-            </LinearGradient>
+            <Animated.View
+               entering={FadeInDown.delay(200).springify()}
+               style={[styles.headerGradient, { backgroundColor: colors.surface }]}
+            >
+               <UploadOptions
+                  onDocumentUpload={onDocumentUpload}
+                  selectedType={selectedDocType}
+                  onSelect={onDocumentSelectType}
+               />
+            </Animated.View>
          </Animated.View>
 
          {/* Recent document listing */}

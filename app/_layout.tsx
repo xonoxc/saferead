@@ -19,6 +19,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundry"
 import { DrawerAlertRenderer } from "@/hooks/alerts/useAlert"
 import useNetworkStatus from "@/hooks/net/useNetworkStatus"
 import { OfflineScreen } from "@/components/OfflineScreen"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -76,7 +77,9 @@ export default function RootLayout() {
             <AuthProvider>
                <ErrorBoundary>
                   <DrawerAlertRenderer>
-                     <AppContent />
+                     <GestureHandlerRootView>
+                        <AppContent />
+                     </GestureHandlerRootView>
                   </DrawerAlertRenderer>
                </ErrorBoundary>
             </AuthProvider>

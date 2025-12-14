@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router"
-import { Home, Settings, Box, FileUp } from "lucide-react-native"
+import { Home, Settings, Box, Clock } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { getTabBarStyles } from "@/utils/helpers/tabs"
 import { useTabStore } from "@/store/tab"
@@ -36,7 +36,7 @@ export default function TabLayout() {
             name="analyize"
             options={{
                title: "Analyze",
-               tabBarIcon: props => <FileUp {...props} />,
+               tabBarIcon: props => <Clock {...props} />,
             }}
          />
 

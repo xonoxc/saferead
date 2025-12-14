@@ -11,7 +11,6 @@ import { type EmailFormSchema, emailFormSchema } from "@/utils/validation/email"
 import { apiClient } from "@/utils/apiclient"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
-import { ModalLoadingSpinner } from "@/components/ModalLoadingSpinner"
 import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 
 export default function ForgotPasswordScreen() {
@@ -57,7 +56,6 @@ export default function ForgotPasswordScreen() {
 
    return (
       <>
-         <ModalLoadingSpinner visible={isSubmitting} message="Sending reset link..." />
          <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
             <View style={styles.content}>
                <View style={styles.header}>

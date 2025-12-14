@@ -12,6 +12,7 @@
       "format": "prettier --write ."
    },
    "dependencies": {
+      "@backpackapp-io/react-native-toast": "^0.15.1",
       "@expo-google-fonts/inter": "^0.4.1",
       "@expo-google-fonts/roboto-mono": "^0.4.0",
       "@expo/vector-icons": "^14.1.0",

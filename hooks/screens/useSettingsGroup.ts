@@ -1,14 +1,5 @@
 import type { User } from "@/types"
-import {
-   Globe,
-   Volume2,
-   Shield,
-   Bell,
-   HelpCircle,
-   LogOut,
-   KeyRound,
-   User as UserIcon,
-} from "lucide-react-native"
+import { Globe, Shield, HelpCircle, LogOut, KeyRound, User as UserIcon } from "lucide-react-native"
 import type { ThemeMode } from "@/hooks/useTheme"
 import type { Router } from "expo-router"
 
@@ -68,7 +59,7 @@ export default function useSettingsGroups({
                   router.push("/language")
                },
             },
-            {
+            /* {
                icon: Volume2,
                title: "Text-to-Speech",
                value: user?.preferences?.textToSpeech,
@@ -81,7 +72,7 @@ export default function useSettingsGroups({
                value: user?.preferences?.notifications,
                type: "toggle",
                onPress: () => {},
-            },
+            }, */
          ],
       },
       {

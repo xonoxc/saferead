@@ -101,7 +101,7 @@ export default function DocumentTabContent({
 
          <DocumentTabErrorMessage error={error} />
 
-         {false ? (
+         {isDocumentsDataAvailable() ? (
             <FlatList
                data={documents}
                bounces={true}

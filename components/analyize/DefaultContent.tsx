@@ -1,13 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native"
-import Animated, {
-   useSharedValue,
-   useAnimatedStyle,
-   useAnimatedScrollHandler,
-   interpolate,
-} from "react-native-reanimated"
-import { FadeInDown } from "react-native-reanimated"
-
-import UploadOptions from "./UploadOptions"
+import Animated from "react-native-reanimated"
 import RecentDocumentListings from "./DocumentListings"
 
 import { type DocumentType } from "../documents/DocumentTypeSelector"
@@ -28,86 +19,22 @@ interface AnalyizeDefaultContentProps extends ThemedComponent {
    onRecentDocumentPress: (item: AnalysisResponse) => void
 }
 
-const HEADER_HEIGHT = Dimensions.get("window").height * 0.4
-
 export default function AnalyizeDefaultContent({
    colors,
-   selectedDocType,
    recentDocuments,
    ViewType,
-   onDocumentSelectType,
    onSetViewType,
-   onDocumentUpload,
    onRecentDocumentPress,
 }: AnalyizeDefaultContentProps) {
-   const scrollY = useSharedValue(0)
-
-   const onScroll = useAnimatedScrollHandler({
-      onScroll: event => {
-         scrollY.value = event.contentOffset.y
-      },
-   })
-
-   const headerAnimatedStyle = useAnimatedStyle(() => {
-      return {
-         height: interpolate(scrollY.value, [0, HEADER_HEIGHT], [HEADER_HEIGHT, 0], "clamp"),
-         opacity: interpolate(scrollY.value, [0, HEADER_HEIGHT / 2], [1, 0], "clamp"),
-      }
-   })
-
-   const listAnimatedStyle = useAnimatedStyle(() => {
-      const topOffset = interpolate(scrollY.value, [0, HEADER_HEIGHT], [HEADER_HEIGHT, 0], "clamp")
-      return {
-         paddingTop: topOffset,
-      }
-   })
-
    return (
-      <Animated.ScrollView
-         onScroll={onScroll}
-         scrollEventThrottle={16}
-         showsVerticalScrollIndicator={false}
-         style={{ flex: 1, backgroundColor: colors.background }}
-      >
-         {/* Animated Header */}
-         <Animated.View
-            style={[
-               headerAnimatedStyle,
-               { overflow: "hidden", position: "absolute", top: 0, left: 0, right: 0, zIndex: 1 },
-            ]}
-         >
-            <Animated.View
-               entering={FadeInDown.delay(200).springify()}
-               style={[styles.headerGradient, { backgroundColor: colors.surface }]}
-            >
-               <UploadOptions
-                  onDocumentUpload={onDocumentUpload}
-                  selectedType={selectedDocType}
-                  onSelect={onDocumentSelectType}
-               />
-            </Animated.View>
-         </Animated.View>
-
-         {/* Recent document listing */}
-         <Animated.View style={[{ flex: 1, paddingHorizontal: 2 }, listAnimatedStyle]}>
-            <RecentDocumentListings
-               colors={colors}
-               recentDocuments={recentDocuments}
-               viewType={ViewType}
-               setViewType={onSetViewType}
-               onRecentDocumentPress={onRecentDocumentPress}
-            />
-         </Animated.View>
-      </Animated.ScrollView>
+      <Animated.View style={[{ flex: 1, paddingHorizontal: 2 }]}>
+         <RecentDocumentListings
+            colors={colors}
+            recentDocuments={recentDocuments}
+            viewType={ViewType}
+            setViewType={onSetViewType}
+            onRecentDocumentPress={onRecentDocumentPress}
+         />
+      </Animated.View>
    )
 }
-
-const styles = StyleSheet.create({
-   headerGradient: {
-      marginHorizontal: 6,
-      marginTop: 13,
-      borderRadius: 50,
-      padding: 20,
-      paddingTop: 40,
-   },
-})

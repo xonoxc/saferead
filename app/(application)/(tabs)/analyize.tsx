@@ -30,6 +30,7 @@ export default function AnalyzeScreen() {
    return (
       <View style={{ flex: 1, backgroundColor: colors.background }}>
          {/* Header */}
+         {/* hamburder menu ---  upgrade button  --- exit button is space is selected */}
          <AnalyzeHeader
             selectedSpace={selectedSpace}
             onSpaceExitButtonPress={handleSpaceClose}

@@ -7,8 +7,6 @@ import ConversationsTab from "@/components/tabs/ConversationsTab"
 import FilesTab from "@/components/tabs/FilesTab"
 import { useLocalSearchParams } from "expo-router"
 
-const tabs = [{ name: "Document" }, { name: "Conversation" }, { name: "Files" }]
-
 export default function ScanMenuScreen() {
    const { colors } = useTheme()
    const params = useLocalSearchParams<{ tab?: string }>()
@@ -35,7 +33,7 @@ export default function ScanMenuScreen() {
 
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-         <TopTabBar tabs={tabs} selectedTab={selectedTab} onTabPress={setSelectedTab} />
+         <TopTabBar selectedTab={selectedTab} onTabPress={setSelectedTab} />
          <View style={{ flex: 1 }}>{renderContent()}</View>
       </View>
    )

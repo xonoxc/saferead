@@ -1,11 +1,11 @@
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { ArrowDown, ArrowUp, FileText } from "lucide-react-native"
+import { ArrowDown, ArrowUp, FileText, Check, X, Info } from "lucide-react-native"
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native"
 import { ProgressBar } from "../ProgressBar"
-
 import { type ColorsType, useTheme } from "@/hooks/useTheme"
 
 import type { AnalysisResponse } from "@/types/api/documents.types"
+import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 
 interface RecentDocumentItemProps {
    document: AnalysisResponse
@@ -18,95 +18,80 @@ export const RecentDocumentItem = ({
    onPress,
    viewType = "list",
 }: RecentDocumentItemProps) => {
-   const { colors, isDark } = useTheme()
+   const { colors } = useTheme()
    const isGridView = viewType === "grid"
+
    const statusColor = getStatusColor(document.status, colors)
+   const StatusIcon = getStatusIcon(document.status)
+
+   const showAlert = useDrawerAlert()
+
+   const showFullTitle = () =>
+      showAlert({
+         title: "Document Details",
+         message: "TITLE: " + document.original_filename,
+         actions: [{ text: "OK", style: "primary" }],
+      })
 
    return (
       <TouchableOpacity
-         style={[
-            styles.recentDocumentItem,
-            isGridView ? styles.gridItem : styles.listItem,
-            {
-               borderBottomWidth: 1,
-               borderStyle: "dashed",
-               borderColor: isDark ? colors.border : colors.borderLight,
-               shadowOpacity: isDark ? 0 : 0.1,
-            },
-         ]}
          onPress={onPress}
+         style={[
+            styles.container,
+            isGridView && styles.gridContainer,
+            { backgroundColor: colors.card + "10", borderColor: colors.border },
+         ]}
       >
-         <View style={[styles.documentHeader, isGridView && styles.gridDocumentHeader]}>
-            <View
-               style={[
-                  styles.documentIcon,
-                  {
-                     backgroundColor: isGridView ? statusColor + "20" : colors.primary + "20",
-                  },
-               ]}
-            >
-               <FileText size={20} color={isGridView ? statusColor : colors.primary} />
+         <View style={styles.infoBtnWrapper}>
+            <TouchableOpacity onPress={showFullTitle} hitSlop={10} style={styles.infoButton}>
+               <Info size={16} color={colors.textSecondary} />
+            </TouchableOpacity>
+         </View>
+
+         {/* Header */}
+         <View style={[styles.header, isGridView && styles.gridHeader]}>
+            <View style={[styles.iconWrapper, { backgroundColor: statusColor + "15" }]}>
+               <StatusIcon size={18} color={statusColor} />
             </View>
-            <View style={styles.documentInfo}>
+
+            <View style={styles.info}>
                <Text
-                  style={[
-                     styles.documentTitle,
-                     isGridView && styles.gridDocumentTitle,
-                     { color: colors.text },
-                  ]}
-                  numberOfLines={isGridView ? 2 : 1}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={[styles.title, { color: colors.text }]}
                >
                   {document.original_filename}
                </Text>
 
-               {/* Progress bar inserted here */}
                {!isGridView && (
-                  <Text style={[styles.documentType, { color: colors.textSecondary }]}>
-                     {getDocumentTypeLabel(document.document_type)}
+                  <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+                     {getDocumentTypeLabel(document.document_type)} ·{" "}
+                     {new Date(document.created_at).toLocaleDateString()}
                   </Text>
                )}
             </View>
-            {!isGridView && (
-               <View style={styles.documentMeta}>
-                  <View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
-                     <Text style={[styles.statusText, { color: statusColor }]}>
-                        {document.status}
-                     </Text>
-                  </View>
-                  <Text style={[styles.documentDate, { color: colors.textSecondary }]}>
-                     {new Date(document.created_at).toLocaleDateString()}
+         </View>
+
+         {/* Confidence */}
+         <View style={styles.progressWrapper}>
+            <ProgressBar value={document.confidence_score} />
+         </View>
+
+         {/* Stats */}
+         {isDocumentComplete(document) && !isGridView && (
+            <View style={styles.stats}>
+               <View style={styles.stat}>
+                  <ArrowDown size={12} color={colors.red} strokeWidth={3} />
+                  <Text style={[styles.statText, { color: colors.red }]}>
+                     {document.risky_points.length}
                   </Text>
                </View>
-            )}
-         </View>
 
-         <View style={{ paddingHorizontal: "20%" }}>
-            <ProgressBar value={document.confidence_score} color={colors.primary} />
-         </View>
-
-         {isDocumentComplete(document) && !isGridView && (
-            <View style={styles.documentStats}>
-               <View style={styles.statItem}>
-                  <View style={styles.statTextView}>
-                     <ArrowDown color={colors.red} size={13} strokeWidth={5} />
-                     <Text
-                        style={[styles.statText, { color: colors.red, fontFamily: Fonts.semiBold }]}
-                     >
-                        {document.risky_points.length}
-                     </Text>
-                  </View>
-
-                  <View style={styles.statTextView}>
-                     <ArrowUp color={colors.success} size={13} strokeWidth={5} />
-                     <Text
-                        style={[
-                           styles.statText,
-                           { color: colors.success, fontFamily: Fonts.semiBold },
-                        ]}
-                     >
-                        {document.favourable_points.length}
-                     </Text>
-                  </View>
+               <View style={styles.stat}>
+                  <ArrowUp size={12} color={colors.success} strokeWidth={3} />
+                  <Text style={[styles.statText, { color: colors.success }]}>
+                     {document.favourable_points.length}
+                  </Text>
                </View>
             </View>
          )}
@@ -114,8 +99,21 @@ export const RecentDocumentItem = ({
    )
 }
 
+/* -------------------------------- helpers -------------------------------- */
+
 function isDocumentComplete(document: AnalysisResponse): boolean {
    return document.status === "completed"
+}
+
+const getStatusIcon = (status: string) => {
+   switch (status) {
+      case "completed":
+         return Check
+      case "failed":
+         return X
+      default:
+         return FileText
+   }
 }
 
 const getStatusColor = (status: string, colors: ColorsType) => {
@@ -141,87 +139,82 @@ const getDocumentTypeLabel = (type: string) => {
    return types[type] || type
 }
 
+/* -------------------------------- styles -------------------------------- */
+
 const styles = StyleSheet.create({
-   documentStats: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingTop: 8,
+   container: {
+      borderStyle: "dashed",
+      borderRadius: 12,
+      padding: 10,
+      borderWidth: 1,
+      marginBottom: 10,
    },
-   statText: {
+   gridContainer: {
+      flex: 1,
+   },
+
+   header: {
+      flexDirection: "row",
+      padding: 3,
+      alignItems: "center",
+      gap: 12,
+   },
+   gridHeader: {
+      flexDirection: "column",
+      padding: 3,
+      alignItems: "flex-start",
+   },
+
+   iconWrapper: {
+      width: 38,
+      height: 38,
+      borderRadius: 12,
+      justifyContent: "center",
+      alignItems: "center",
+   },
+
+   info: {
+      flex: 1,
+   },
+
+   title: {
+      fontSize: FontSizes.md,
+      fontFamily: Fonts.medium,
+   },
+
+   subtitle: {
       fontSize: FontSizes.xs,
       fontFamily: Fonts.regular,
+      marginTop: 2,
    },
-   statItem: {
+   infoBtnWrapper: {
+      flex: 1,
+      justifyContent: "flex-end",
+   },
+   infoButton: {
+      padding: 4,
+      alignSelf: "flex-end",
+   },
+
+   progressWrapper: {
+      marginTop: 12,
+      paddingHorizontal: 20,
+   },
+
+   stats: {
+      marginTop: 10,
+      flexDirection: "row",
+      gap: 12,
+   },
+
+   stat: {
       flexDirection: "row",
       alignItems: "center",
       gap: 4,
    },
-   statTextView: {
-      flexDirection: "row",
-      justifyContent: "center",
-      alignItems: "center",
-      gap: 2,
-   },
-   documentHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 2,
-   },
-   gridDocumentHeader: {
-      flexDirection: "column",
-      alignItems: "flex-start",
-      gap: 10,
-   },
-   recentDocumentItem: {
-      borderRadius: 21,
-      padding: 16,
-   },
-   listItem: {
-      marginBottom: 2,
-   },
-   gridItem: {
-      flex: 1,
-   },
-   documentIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: 12,
-      justifyContent: "center",
-      alignItems: "center",
-      marginRight: 12,
-   },
-   documentType: {
-      fontSize: FontSizes.sm,
-      fontFamily: Fonts.regular,
-   },
-   documentInfo: {
-      flex: 1,
-   },
-   documentTitle: {
-      fontSize: FontSizes.md,
-      fontFamily: Fonts.medium,
-      marginBottom: 2,
-   },
-   gridDocumentTitle: {
-      fontSize: FontSizes.sm,
-   },
-   documentMeta: {
-      alignItems: "flex-end",
-   },
-   documentDate: {
+
+   statText: {
       fontSize: FontSizes.xs,
-      fontFamily: Fonts.regular,
-   },
-   statusText: {
-      fontSize: 10,
-      fontFamily: Fonts.medium,
-      textTransform: "capitalize",
-   },
-   statusBadge: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: 5,
-      marginBottom: 4,
+      fontFamily: Fonts.semiBold,
    },
 })

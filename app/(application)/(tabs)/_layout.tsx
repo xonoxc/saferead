@@ -33,10 +33,10 @@ export default function TabLayout() {
          />
 
          <Tabs.Screen
-            name="analyize"
+            name="spaces"
             options={{
-               title: "Analyze",
-               tabBarIcon: props => <Clock {...props} />,
+               title: "Spaces",
+               tabBarIcon: props => <Box {...props} />,
             }}
          />
 
@@ -54,10 +54,10 @@ export default function TabLayout() {
          />
 
          <Tabs.Screen
-            name="spaces"
+            name="analyize"
             options={{
-               title: "Spaces",
-               tabBarIcon: props => <Box {...props} />,
+               title: "Analyze",
+               tabBarIcon: props => <Clock {...props} />,
             }}
          />
 

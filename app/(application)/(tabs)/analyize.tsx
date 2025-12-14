@@ -15,9 +15,8 @@ export default function AnalyzeScreen() {
    const [viewType, setViewType] = useState<ViewType>("list")
 
    const {
-      handleDocumentUpload,
-      selectedDocumentType,
-      setSelectedDocumentType,
+      selectedDocType,
+      setSelectedDocType,
       recentDocuments,
       handleRecentDocumentPress,
       selectedSpace,
@@ -31,23 +30,25 @@ export default function AnalyzeScreen() {
       <View style={{ flex: 1, backgroundColor: colors.background }}>
          {/* Header */}
          {/* hamburder menu ---  upgrade button  --- exit button is space is selected */}
-         <AnalyzeHeader
-            selectedSpace={selectedSpace}
-            onSpaceExitButtonPress={handleSpaceClose}
-            colors={colors}
-         />
-
+         {selectedSpace && (
+            <AnalyzeHeader
+               selectedSpace={selectedSpace}
+               onSpaceExitButtonPress={handleSpaceClose}
+               colors={colors}
+            />
+         )}
          {selectedSpace ? (
             <ChatView />
          ) : (
             <AnalyizeDefaultContent
                colors={colors}
-               ViewType={viewType}
+               viewType={{
+                  value: viewType,
+                  onChange: setViewType,
+               }}
                recentDocuments={recentDocuments}
-               selectedDocType={selectedDocumentType}
-               onSetViewType={setViewType}
-               onDocumentUpload={handleDocumentUpload}
-               onDocumentSelectType={setSelectedDocumentType}
+               selectedDocType={selectedDocType}
+               onDocumentSelectType={setSelectedDocType}
                onRecentDocumentPress={handleRecentDocumentPress}
             />
          )}

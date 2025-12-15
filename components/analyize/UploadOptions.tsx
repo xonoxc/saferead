@@ -17,25 +17,21 @@ export function UploadChip({ onDocumentUpload, onSelect, selectedType }: UploadC
    const { colors } = useTheme()
 
    return (
-      <Animated.View entering={FadeInDown.delay(150)}>
-         <TouchableOpacity
-            onPress={onDocumentUpload}
-            activeOpacity={0.85}
-            style={[
-               styles.chip,
-               {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-               },
-            ]}
-         >
-            <DocumentTypeSelector selectedType={selectedType} onSelect={onSelect} />
+      <Animated.View
+         entering={FadeInDown.delay(150)}
+         style={{
+            alignItems: "center",
+         }}
+      >
+         <TouchableOpacity onPress={onDocumentUpload} activeOpacity={0.85} style={[styles.chip]}>
+            <View style={styles.documentTypeSelector}>
+               <DocumentTypeSelector selectedType={selectedType} onSelect={onSelect} />
+            </View>
 
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
             <View style={[styles.uploadAction, { backgroundColor: colors.primary + "15" }]}>
-               <Upload size={14} color={colors.primary} />
-               <Text style={[styles.text, { color: colors.primary }]}>Upload</Text>
+               <Upload size={20} color={colors.primary} />
             </View>
          </TouchableOpacity>
       </Animated.View>
@@ -47,14 +43,12 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       alignItems: "center",
       gap: 8,
-
       paddingHorizontal: 10,
       paddingVertical: 6,
-
-      borderRadius: 12,
-      borderWidth: 1,
-
-      alignSelf: "flex-start",
+      alignSelf: "center",
+   },
+   documentTypeSelector: {
+      marginTop: 16,
    },
 
    divider: {
@@ -67,14 +61,8 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       alignItems: "center",
       gap: 4,
+      padding: 10,
 
-      paddingHorizontal: 8,
-      paddingVertical: 4,
       borderRadius: 8,
-   },
-
-   text: {
-      fontSize: FontSizes.sm,
-      fontFamily: Fonts.medium,
    },
 })

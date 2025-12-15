@@ -39,7 +39,7 @@ export const RecentDocumentItem = ({
          style={[
             styles.container,
             isGridView && styles.gridContainer,
-            { backgroundColor: colors.card + "10", borderColor: colors.border },
+            { backgroundColor: colors.primary + "10" },
          ]}
       >
          <View style={styles.infoBtnWrapper}>
@@ -50,8 +50,8 @@ export const RecentDocumentItem = ({
 
          {/* Header */}
          <View style={[styles.header, isGridView && styles.gridHeader]}>
-            <View style={[styles.iconWrapper, { backgroundColor: statusColor + "15" }]}>
-               <StatusIcon size={18} color={statusColor} />
+            <View style={[styles.iconWrapper, { backgroundColor: statusColor + "20" }]}>
+               <StatusIcon size={15} color={statusColor} />
             </View>
 
             <View style={styles.info}>
@@ -143,8 +143,7 @@ const getDocumentTypeLabel = (type: string) => {
 
 const styles = StyleSheet.create({
    container: {
-      borderStyle: "dashed",
-      borderRadius: 12,
+      borderRadius: 19,
       padding: 10,
       borderWidth: 1,
       marginBottom: 10,

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { FileText, TrendingUp } from "lucide-react-native"
+import { FileText, TrendingUp, type LucideIcon } from "lucide-react-native"
 import {
    useSharedValue,
    useAnimatedStyle,
@@ -21,6 +21,14 @@ import { useCreateConversationMutation } from "../queries/converstations"
 
 import type { ColorsType } from "../useTheme"
 import type { UpdateSpaceForm } from "../forms/useSpaceHookForm"
+import type { Space } from "@/types"
+
+export type SpaceDetailsStat = {
+   icon: LucideIcon
+   label: string
+   value: number
+   color: string
+}
 
 export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
    const { id } = useLocalSearchParams<{ id: string }>()
@@ -138,20 +146,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       })
    }
 
-   const stats = [
-      {
-         icon: FileText,
-         label: "Documents",
-         value: space?.document_count,
-         color: space?.color,
-      },
-      {
-         icon: TrendingUp,
-         label: "Analyzed",
-         value: space?.recent_documents.length,
-         color: space?.color,
-      },
-   ]
+   const stats = space ? getSpaceStates(space) : []
 
    /*
     *
@@ -179,7 +174,13 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
          showBottomAlert({
             title: "Error",
             message: getErrorMessage(resp.error) || "Failed to update space",
-            actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+            actions: [
+               {
+                  text: "OK",
+                  style: "primary",
+                  onPress: () => {},
+               },
+            ],
          })
 
          return
@@ -227,4 +228,21 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       colors,
       handleUpdateSpace,
    }
+}
+
+function getSpaceStates(space: Space): SpaceDetailsStat[] {
+   return [
+      {
+         icon: FileText,
+         label: "Documents",
+         value: space?.document_count,
+         color: space?.color,
+      },
+      {
+         icon: TrendingUp,
+         label: "Analyzed",
+         value: space?.recent_documents.length,
+         color: space?.color,
+      },
+   ]
 }

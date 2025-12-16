@@ -1,3 +1,4 @@
+import type { SpaceIconName } from "@/constants/spaceform"
 import type { PaginatedResponse } from "./documents.types"
 import type { UserSpaceDocument } from "./spaces.documents.types"
 
@@ -6,7 +7,7 @@ export interface Space {
    title: string
    description: string
    color: string
-   icon: string
+   icon: SpaceIconName
    privacy: "private" | "public"
    is_active: boolean
    is_favorite: boolean

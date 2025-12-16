@@ -1,3 +1,5 @@
+import type { SpaceIconName } from "@/constants/spaceform"
+
 export interface User {
    id: string
    email: string
@@ -111,7 +113,7 @@ export interface Space {
    title: string
    description: string
    color: string
-   icon: string
+   icon: SpaceIconName
    privacy: "private" | "public"
    is_active: boolean
    is_favorite: boolean

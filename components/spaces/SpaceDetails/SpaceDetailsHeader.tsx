@@ -1,24 +1,15 @@
 import React from "react"
 import SpaceIcon from "@/components/spaces/Icon"
 
-import { View, TouchableOpacity, StyleSheet, Text } from "react-native"
-import { Settings, Plus, Heart } from "lucide-react-native"
+import { View, StyleSheet, Text } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
-import { CustomBackBtn } from "@/components"
 import { useTheme } from "@/hooks/useTheme"
 
 import { Fonts, FontSizes } from "@/constants"
 
-import type { SpaceIconName } from "@/constants/spaceform"
 import type { Space } from "@/types"
 
-export default function SpaceDetailHeader({
-   space,
-   onCreateBtnPress,
-   animatedStyle,
-   onFavoritePress,
-   onSettingsPress,
-}: {
+export interface HeaderProps {
    space: Space
    onCreateBtnPress: () => void
    animatedStyle: {
@@ -28,59 +19,42 @@ export default function SpaceDetailHeader({
    }
    onFavoritePress: () => void
    onSettingsPress: () => void
-}) {
+}
+
+export default function SpaceDetailHeader(props: HeaderProps) {
    const { colors } = useTheme()
+   const { space } = props
 
    return (
       <Animated.View
          entering={FadeInDown.delay(100).springify()}
          style={[styles.header, { backgroundColor: colors.background }]}
       >
-         <View style={styles.headerTop}>
-            <CustomBackBtn style={{ borderColor: space.color }} />
-
-            <View style={styles.headerActions}>
-               <TouchableOpacity
-                  style={[styles.settingsButton, { backgroundColor: colors.surface }]}
-                  onPress={onCreateBtnPress}
-               >
-                  <Plus size={20} color={space.color} />
-               </TouchableOpacity>
-               <Animated.View style={animatedStyle}>
-                  <TouchableOpacity
-                     style={[
-                        styles.favoriteButton,
-                        {
-                           backgroundColor: space.is_favorite ? space.color + "20" : colors.surface,
-                        },
-                     ]}
-                     onPress={onFavoritePress}
-                  >
-                     <Heart
-                        size={20}
-                        color={space.color}
-                        fill={space.is_favorite ? space.color : "transparent"}
-                     />
-                  </TouchableOpacity>
-               </Animated.View>
-
-               <TouchableOpacity style={styles.settingsButton} onPress={onSettingsPress}>
-                  <Settings size={20} color={space.color} />
-               </TouchableOpacity>
-            </View>
-         </View>
-
          <View style={[styles.spaceInfo, { backgroundColor: space.color }]}>
-            <View style={[styles.spaceIconLarge, { backgroundColor: colors.background }]}>
-               <SpaceIcon name={space.icon as SpaceIconName} color={space.color} size={50} />
+            <View
+               style={[
+                  styles.spaceIconLarge,
+                  {
+                     backgroundColor: colors.background,
+                  },
+               ]}
+            >
+               <SpaceIcon name={space.icon} color={space.color} size={50} />
             </View>
 
             <View style={styles.spaceMeta}>
                <Text style={[styles.spaceTitle, { color: colors.text }]}>{space.title}</Text>
                <Text style={[styles.spaceDescription, { color: colors.background }]}>
-                  {space.description || "No description provided"}
+                  {space.description ?? "No description provided"}
                </Text>
-               <Text style={[styles.spaceDate, { color: colors.background }]}>
+               <Text
+                  style={[
+                     styles.spaceDate,
+                     {
+                        color: colors.background,
+                     },
+                  ]}
+               >
                   Created {new Date(space.created_at).toLocaleDateString()}
                </Text>
             </View>
@@ -93,30 +67,6 @@ const styles = StyleSheet.create({
    header: {
       paddingHorizontal: 14,
       paddingBottom: 24,
-   },
-   headerTop: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 24,
-   },
-   headerActions: {
-      flexDirection: "row",
-      gap: 12,
-   },
-   favoriteButton: {
-      width: 44,
-      height: 44,
-      borderRadius: 15,
-      justifyContent: "center",
-      alignItems: "center",
-   },
-   settingsButton: {
-      width: 44,
-      height: 44,
-      borderRadius: 15,
-      justifyContent: "center",
-      alignItems: "center",
    },
    spaceInfo: {
       flexDirection: "row",

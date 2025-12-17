@@ -11,83 +11,38 @@ import { DocumentTabCard } from "./DocumentTabCard"
 import { UniversalFilter } from "@/components/filters/UniversalFilters"
 import { documentFilterFields } from "@/constants/filters"
 
-import type { DocumentFilterOptions } from "@/types/docs"
-import type { AnalysisResponse } from "@/types/api/documents.types"
 import { DocumentsEmptyState } from "./DocuementEmptyState"
-import type { SetStateFunction } from "@/types/state"
+import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
 
-interface DocumentTabContentProps {
-   spaceId?: string
-   spaceName?: string
-   isLoading: boolean
-   isRefreshing: boolean
-   isDeleting: boolean
+import type { AnalysisResponse } from "@/types/api/documents.types"
 
-   documents: AnalysisResponse[]
-   error: any
-
-   hasMore: boolean
-   currentFilters: DocumentFilterOptions
-   searchQuery: string
-   showFilter: boolean
-
-   applyFilters: (filters: DocumentFilterOptions) => void
-   setShowFilter: (visible: boolean) => void
-   setSearchQuery: SetStateFunction<string>
-
-   handleDeleteDocument: (id: string) => void
-   handleDocumentSelectPress: (doc: AnalysisResponse) => void
-   handleSearch: (query: string) => void
-   handleRefresh: () => void
-   loadMoreDocuments: () => void
-
-   FallbackStateWrapper: React.ComponentType
-}
-
-export default function DocumentTabContent({
-   documents,
-   error,
-   hasMore,
-   currentFilters,
-   searchQuery,
-   setSearchQuery,
-   applyFilters,
-   showFilter,
-   isLoading,
-   isRefreshing,
-   setShowFilter,
-   handleDeleteDocument,
-   handleDocumentSelectPress,
-   handleSearch,
-   handleRefresh,
-   loadMoreDocuments,
-   isDeleting,
-   FallbackStateWrapper,
-}: DocumentTabContentProps) {
+export default function DocumentTabContent() {
    const { colors } = useTheme()
 
-   const renderDocument = ({ item, index }: { item: AnalysisResponse; index: number }) => (
-      <Animated.View entering={FadeInDown.delay(index * 50 + 300).springify()}>
-         <DocumentTabCard
-            document={item}
-            onPress={() => handleDocumentSelectPress(item)}
-            onDelete={handleDeleteDocument}
-         />
-      </Animated.View>
-   )
+   const {
+      documents,
+      error,
+      isLoading,
+      hasMore,
+      currentFilters,
+      searchQuery,
+      showFilter,
+      isRefreshing,
+      setShowFilter,
+      handleDocumentSelectPress,
+      isDeleting,
+      setSearchQuery,
+      handleDeleteDocument,
+      handleRefresh,
+      handleSearch,
+      loadMoreDocuments,
+      applyFilters,
+      FallbackStateWrapper,
+   } = useDocumentScreen()
 
    const isDocumentsDataAvailable = () => documents.length > 0 && !error
 
    const keyExtractor = (item: AnalysisResponse) => item.id
-
-   const renderFooter = () => {
-      if (!hasMore) return null
-      return (
-         <View style={styles.footerLoader}>
-            <LoadingSpinner />
-         </View>
-      )
-   }
 
    if (isLoading || isDeleting || isRefreshing) return <DocumentTabLoadingState />
 
@@ -105,7 +60,13 @@ export default function DocumentTabContent({
             <FlatList
                data={documents}
                bounces={true}
-               renderItem={renderDocument}
+               renderItem={args =>
+                  renderDocument({
+                     ...args,
+                     handleDocumentSelectPress,
+                     handleDeleteDocument,
+                  })
+               }
                keyExtractor={keyExtractor}
                contentContainerStyle={styles.listContent}
                refreshControl={
@@ -118,7 +79,7 @@ export default function DocumentTabContent({
                }
                onEndReached={loadMoreDocuments}
                onEndReachedThreshold={0.5}
-               ListFooterComponent={renderFooter}
+               ListFooterComponent={() => renderFooter(hasMore)}
                ListEmptyComponent={FallbackStateWrapper}
                showsVerticalScrollIndicator={false}
             />
@@ -138,6 +99,35 @@ export default function DocumentTabContent({
             onApply={applyFilters}
             currentFilters={currentFilters}
          />
+      </View>
+   )
+}
+
+const renderDocument = ({
+   item,
+   index,
+   handleDocumentSelectPress,
+   handleDeleteDocument,
+}: {
+   item: AnalysisResponse
+   index: number
+   handleDocumentSelectPress: (document: AnalysisResponse) => void
+   handleDeleteDocument: (documentId: string) => void
+}) => (
+   <Animated.View entering={FadeInDown.delay(index * 50 + 300).springify()}>
+      <DocumentTabCard
+         document={item}
+         onPress={() => handleDocumentSelectPress(item)}
+         onDelete={handleDeleteDocument}
+      />
+   </Animated.View>
+)
+
+const renderFooter = (hasMore: boolean) => {
+   if (!hasMore) return null
+   return (
+      <View style={styles.footerLoader}>
+         <LoadingSpinner />
       </View>
    )
 }

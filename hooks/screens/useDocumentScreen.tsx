@@ -1,5 +1,4 @@
 import { useDocumentsStore } from "@/store/useDocumentStore"
-import { AnalysisResponse } from "@/types/api/documents.types"
 import { router } from "expo-router"
 import React, { useState } from "react"
 import { View, Text, StyleSheet } from "react-native"
@@ -13,12 +12,14 @@ import { useAnalysisStore } from "@/store/useAnalysisStore"
 import { useSpaceStore } from "@/store/useSpaceStore"
 import { useDrawerAlert } from "../alerts/useAlert"
 
+import type { AnalysisResponse } from "@/types/api/documents.types"
+
 export function useDocumentScreen() {
    const applyFilters = useDocumentsStore(s => s.applyFilters)
    const currentFilters = useDocumentsStore(s => s.currentFilters)
 
-   const [searchQuery, setSearchQuery] = useState("")
-   const [showFilter, setShowFilter] = useState(false)
+   const [searchQuery, setSearchQuery] = useState<string>("")
+   const [showFilter, setShowFilter] = useState<boolean>(false)
    const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
 
    const selectedSpace = useSpaceStore(s => s.selectedSpace)
@@ -65,9 +66,7 @@ export function useDocumentScreen() {
       })
    }
 
-   const handleRefresh = async () => {
-      await refetch()
-   }
+   const handleRefresh = async () => await refetch()
 
    const debouncedSearch = useDebouncedCallback((text: string) => {
       applyFilters({ search: text })

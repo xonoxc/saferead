@@ -4,7 +4,7 @@ import React from "react"
 import { Text, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 
-export default function DocumentTabErrorMessage({ error }: { error: Error }) {
+export default function DocumentTabErrorMessage({ error }: { error: Error | null }) {
    const { colors } = useTheme()
    return (
       <>

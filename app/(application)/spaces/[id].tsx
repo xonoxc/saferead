@@ -53,6 +53,14 @@ export default function SpaceDetailScreen() {
 
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
+         <SpaceDetailTopBar
+            animatedStyle={animatedStyle}
+            space={space}
+            onFavoritePress={handleFavoritePress}
+            onCreateBtnPress={toggleUploadFormVisibilty}
+            onSettingsPress={toggleSheetVisiblity}
+         />
+
          <AnimatedSectionList
             sections={sections}
             stickySectionHeadersEnabled
@@ -66,17 +74,6 @@ export default function SpaceDetailScreen() {
             }}
             renderSectionHeader={({ section }) => {
                switch (section.type) {
-                  case "topbar":
-                     return (
-                        <SpaceDetailTopBar
-                           animatedStyle={animatedStyle}
-                           space={space}
-                           onFavoritePress={handleFavoritePress}
-                           onCreateBtnPress={toggleUploadFormVisibilty}
-                           onSettingsPress={toggleSheetVisiblity}
-                        />
-                     )
-
                   case "documents":
                      if (!section.data.length) return null
 

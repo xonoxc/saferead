@@ -20,21 +20,21 @@ export function SpaceSelector({ spaces, selectedSpace, onSelectSpace }: SpaceSel
       value: space.id,
    }))
 
-   const handleSelect = (item: { label: string; value: string }) => {
-      const space = spaces.find(s => s.id === item.value)
-      if (space) {
-         onSelectSpace(space)
-      }
-   }
-
    return (
       <View style={styles.container}>
          <Text style={[styles.label, { color: colors.text }]}>Select a Space</Text>
-         <DropdownSelector
+
+         <DropdownSelector<string>
             label="Choose a space to chat with"
             options={spaceItems}
-            onSelect={handleSelect}
-            selected={selectedSpace ?? ""}
+            selected={selectedSpace?.id ?? ""}
+            onSelect={spaceId => {
+               const space = spaces.find(s => s.id === spaceId)
+               if (space) {
+                  onSelectSpace(space)
+               }
+            }}
+            triggerText="No Space Selected"
          />
       </View>
    )

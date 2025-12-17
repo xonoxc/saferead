@@ -21,14 +21,26 @@ export default function SpaceDetailTopBar({
       <View style={[styles.topBar, { backgroundColor: colors.background }]}>
          <CustomBackBtn style={{ borderColor: space.color }} />
 
-         <View style={styles.headerActions}>
+         <View
+            style={[
+               styles.headerActions,
+               {
+                  backgroundColor: colors.card,
+                  borderColor: space.color + "33",
+               },
+            ]}
+         >
             <TouchableOpacity onPress={onCreateBtnPress}>
                <Plus size={20} color={space.color} />
             </TouchableOpacity>
 
             <Animated.View style={animatedStyle}>
                <TouchableOpacity onPress={onFavoritePress}>
-                  <Heart size={20} color={space.color} />
+                  <Heart
+                     size={20}
+                     color={space.color}
+                     fill={space.is_favorite ? space.color : undefined}
+                  />
                </TouchableOpacity>
             </Animated.View>
 
@@ -50,7 +62,10 @@ const styles = StyleSheet.create({
       zIndex: 10,
    },
    headerActions: {
+      padding: 10,
+      borderRadius: 10,
+      borderWidth: 1,
       flexDirection: "row",
-      gap: 12,
+      gap: 30,
    },
 })

@@ -10,7 +10,7 @@ export function getSections(
    return [
       {
          type: "topbar",
-         data: [{ kind: "topbar" }],
+         data: [],
       },
       {
          type: "header",

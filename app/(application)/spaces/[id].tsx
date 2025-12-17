@@ -69,17 +69,6 @@ export default function SpaceDetailScreen() {
                   case "topbar":
                      return (
                         <SpaceDetailTopBar
-                           space={space}
-                           animatedStyle={animatedStyle}
-                           onCreateBtnPress={toggleUploadFormVisibilty}
-                           onFavoritePress={handleFavoritePress}
-                           onSettingsPress={toggleSheetVisiblity}
-                        />
-                     )
-
-                  case "header":
-                     return (
-                        <SpaceDetailHeader
                            animatedStyle={animatedStyle}
                            space={space}
                            onFavoritePress={handleFavoritePress}
@@ -104,12 +93,23 @@ export default function SpaceDetailScreen() {
             renderItem={({ item, section }) => {
                switch (item.kind) {
                   case "topbar":
-                     return <View style={{ height: 10 }} />
+                     return <View style={{ height: 1 }} />
 
                   case "stats":
-                     return <SpaceDetailsStats stats={item.stats} colors={colors} />
+                     return (
+                        <>
+                           <SpaceDetailHeader
+                              animatedStyle={animatedStyle}
+                              space={space}
+                              onFavoritePress={handleFavoritePress}
+                              onCreateBtnPress={toggleUploadFormVisibilty}
+                              onSettingsPress={toggleSheetVisiblity}
+                           />
+                           <SpaceDetailsStats stats={item.stats} colors={colors} />
+                        </>
+                     )
 
-                  default:
+                  case "document":
                      return (
                         <UserSpaceDocumentCard
                            document={item}

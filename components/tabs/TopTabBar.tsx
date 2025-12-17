@@ -8,14 +8,13 @@ import { useSpaceStore } from "@/store/useSpaceStore"
 import { Box } from "lucide-react-native"
 import { ScrollView } from "react-native"
 import Animated from "react-native-reanimated"
-import { router } from "expo-router"
 
 type TopTabBarProps = {
    selectedTab: number
    onTabPress: (index: number) => void
 }
 
-const TopTabBar = ({ selectedTab, onTabPress }: TopTabBarProps) => {
+export default function TopTabBar({ selectedTab, onTabPress }: TopTabBarProps) {
    const { colors } = useTheme()
    const { width } = useWindowDimensions()
 
@@ -28,7 +27,6 @@ const TopTabBar = ({ selectedTab, onTabPress }: TopTabBarProps) => {
       { name: "Documents" },
       ...(hasActiveSpace ? [{ name: "Conversations" }, { name: "Files" }] : []),
    ]
-
    const isSingleTab = filteredTab.length === 1
 
    const tabWidth = (width * 0.9) / filteredTab.length
@@ -53,7 +51,7 @@ const TopTabBar = ({ selectedTab, onTabPress }: TopTabBarProps) => {
          ]}
       >
          <View style={styles.headerRow}>
-            <CustomBackBtn iconSize={24} onPress={() => router.back()} />
+            <CustomBackBtn iconSize={30} />
 
             <View style={styles.centerContent}>
                {isSingleTab ? (
@@ -100,6 +98,7 @@ const TopTabBar = ({ selectedTab, onTabPress }: TopTabBarProps) => {
                         height: 36,
                         borderRadius: 12,
                         backgroundColor: colors.primary + "22",
+                        pointerEvents: "none",
                      },
                   ]}
                />
@@ -212,5 +211,3 @@ const styles = StyleSheet.create({
       fontFamily: Fonts.semiBold,
    },
 })
-
-export default TopTabBar

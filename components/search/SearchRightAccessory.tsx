@@ -30,7 +30,7 @@ export default function SearchRightAccessory({
             <TouchableOpacity style={styles.filterBtn} onPress={onFilterPress}>
                <Filter size={18} color={colors.textMuted} />
 
-               {activeFilterCount && activeFilterCount > 0 && (
+               {!!activeFilterCount && activeFilterCount > 0 && (
                   <View style={[styles.filterBadge, { backgroundColor: colors.primary }]}>
                      {activeFilterCount > 1 && (
                         <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>

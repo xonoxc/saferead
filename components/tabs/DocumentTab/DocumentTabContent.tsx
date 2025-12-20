@@ -1,5 +1,4 @@
 import React from "react"
-import DocumentTabSearch from "./DocumentTabSearch"
 
 import { View, StyleSheet, FlatList, RefreshControl } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
@@ -13,6 +12,8 @@ import { documentFilterFields } from "@/constants/filters"
 
 import { DocumentTabCard } from "@/components/tabs/DocumentTab/DocumentTabCard"
 import { DocumentsEmptyState } from "@/components/tabs/DocumentTab/DocuementEmptyState"
+
+import DocumentTabSearch from "@/components/tabs/DocumentTab/DocumentTabSearch"
 import DocumentTabErrorMessage from "@/components/tabs/DocumentTab/DocumentTabErrorMessage"
 import DocumentTabLoadingState from "@/components/tabs/DocumentTab/DocumentTabLoadingState"
 

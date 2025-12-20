@@ -2,8 +2,8 @@ import { Fonts, FontSizes } from "@/constants"
 import { useTheme } from "@/hooks/useTheme"
 import { Search } from "lucide-react-native"
 import { View, StyleSheet } from "react-native"
-import { TextInput } from "../TextInput"
-import SearchRightAccessory from "./SearchRightAccessory"
+import { TextInput } from "@/components/TextInput"
+import SearchRightAccessory from "@/components/search/SearchRightAccessory"
 
 interface SearchHeaderProps {
    searchQuery: string

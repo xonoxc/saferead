@@ -1,6 +1,6 @@
-import type { SpaceDetailsStat } from "@/hooks/screens/useSpaceDetailScreen"
 import type { SectionListData } from "react-native"
-import type { UserSpaceDocument } from "../api/spaces.documents.types"
+import type { SpaceDetailsStat } from "@/hooks/screens/useSpaceDetailScreen"
+import type { UserSpaceDocument } from "@/types/api/spaces.documents.types"
 
 export type TopBarItem = {
    kind: "topbar"

@@ -1,7 +1,7 @@
 import React from "react"
 import { View, StyleSheet } from "react-native"
-import Skeleton from "./Skeleton"
 import { useTheme } from "@/hooks/useTheme"
+import Skeleton from "@/components/skeletons/Skeleton"
 
 const DocumentCardSkeleton = () => {
    const { colors } = useTheme()

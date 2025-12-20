@@ -1,4 +1,4 @@
-import Animated, { FadeInDown } from "react-native-reanimated"
+import { View } from "react-native"
 import SearchBar from "@/components/search/SearchBar"
 
 interface DocumentTabSearchProps {
@@ -13,8 +13,7 @@ export default function DocumentTabSearch({
    setShowFilter,
 }: DocumentTabSearchProps) {
    return (
-      <Animated.View
-         entering={FadeInDown.delay(200).springify()}
+      <View
          style={{
             flexDirection: "row",
             alignItems: "center",
@@ -31,6 +30,6 @@ export default function DocumentTabSearch({
             showFilter
             onFilterPress={() => setShowFilter(true)}
          />
-      </Animated.View>
+      </View>
    )
 }

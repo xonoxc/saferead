@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { passwordValidation } from "./user"
+import { passwordValidation } from "@/utils/validation/user"
 
 export const changePasswordFormSchema = z
    .object({

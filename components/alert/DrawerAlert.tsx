@@ -1,9 +1,11 @@
 import React from "react"
 import { Text, View, TouchableOpacity, StyleSheet } from "react-native"
-import { Drawer } from "../Drawer"
-import { ColorsType, useTheme } from "@/hooks/useTheme"
+import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics"
+import { Drawer } from "@/components/Drawer"
+
+import type { ColorsType } from "@/hooks/useTheme"
 
 type DrawerAlertType = "default" | "info" | "success" | "error" | "roast"
 

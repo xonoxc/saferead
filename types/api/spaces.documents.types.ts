@@ -1,5 +1,5 @@
-import type { Space } from ".."
-import type { PaginatedResponse } from "./documents.types"
+import type { Space } from "@/types"
+import type { PaginatedResponse } from "@/types/api/documents.types"
 
 export interface UserSpaceDocument {
    id: string

@@ -1,6 +1,7 @@
 import { useTheme } from "@/hooks/useTheme"
+import { useActiveFilterCount } from "@/store/useDocumentStore"
 import { Filter, X } from "lucide-react-native"
-import { StyleSheet, TouchableOpacity, View } from "react-native"
+import { StyleSheet, TouchableOpacity, View, Text } from "react-native"
 
 interface SearchRightAccessoryProps {
    searchQuery: string
@@ -16,6 +17,7 @@ export default function SearchRightAccessory({
    onFilterPress,
 }: SearchRightAccessoryProps) {
    const { colors } = useTheme()
+   const activeFilterCount = useActiveFilterCount()
 
    return (
       <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
@@ -27,6 +29,14 @@ export default function SearchRightAccessory({
          {showFilter && onFilterPress && (
             <TouchableOpacity style={styles.filterBtn} onPress={onFilterPress}>
                <Filter size={18} color={colors.textMuted} />
+
+               {activeFilterCount && activeFilterCount > 0 && (
+                  <View style={[styles.filterBadge, { backgroundColor: colors.primary }]}>
+                     {activeFilterCount > 1 && (
+                        <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+                     )}
+                  </View>
+               )}
             </TouchableOpacity>
          )}
       </View>
@@ -47,5 +57,22 @@ const styles = StyleSheet.create({
       paddingHorizontal: 12,
       justifyContent: "center",
       alignItems: "center",
+   },
+   filterBadge: {
+      position: "absolute",
+      top: 6,
+      right: 6,
+      minWidth: 8,
+      height: 8,
+      borderRadius: 999,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: 4,
+   },
+
+   filterBadgeText: {
+      fontSize: 10,
+      fontWeight: "600",
+      color: "white",
    },
 })

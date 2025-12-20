@@ -1,11 +1,11 @@
 import { useTheme } from "@/hooks/useTheme"
 import { View, StyleSheet } from "react-native"
 import Animated, { FadeInUp } from "react-native-reanimated"
-import { CustomBackBtn } from "../CustomBackBtn"
-import { LoadingSpinner } from "../LoadingSpinner"
 import React from "react"
 import { Fonts } from "@/constants"
 import { router } from "expo-router"
+import { LoadingSpinner } from "@/components/LoadingSpinner"
+import { CustomBackBtn } from "@/components/CustomBackBtn"
 
 export function PlansLoadingState() {
    const { colors } = useTheme()

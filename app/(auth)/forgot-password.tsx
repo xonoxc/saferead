@@ -7,11 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/Button"
 import { TextInput } from "@/components/TextInput"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-import { type EmailFormSchema, emailFormSchema } from "@/utils/validation/email"
+import { emailFormSchema } from "@/utils/validation/email"
 import { apiClient } from "@/utils/apiclient"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
 import { useDrawerAlert } from "@/hooks/alerts/useAlert"
+
+import type { EmailFormSchema } from "@/utils/validation/email"
 
 export default function ForgotPasswordScreen() {
    const { colors } = useTheme()

@@ -12,12 +12,12 @@ import Animated, { FadeInDown } from "react-native-reanimated"
 import { useVoice } from "@/hooks/useVoice"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { attempt } from "@/utils/attempt"
-import { CustomBackBtn } from "../CustomBackBtn"
 import { getDocumentShareContent } from "@/constants/share"
-import { LineDivider } from "../LineDivider"
+import { useTheme } from "@/hooks/useTheme"
+import { CustomBackBtn } from "@/components/CustomBackBtn"
+import { LineDivider } from "@/components/LineDivider"
 
-import { useTheme, type ColorsType } from "@/hooks/useTheme"
-
+import type { ColorsType } from "@/hooks/useTheme"
 import type { AnalysisResponse } from "@/types/api/documents.types"
 
 export const DocumentAnalysisView = ({

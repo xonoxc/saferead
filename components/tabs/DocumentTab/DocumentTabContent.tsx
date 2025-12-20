@@ -1,18 +1,20 @@
 import React from "react"
-import DocumentTabLoadingState from "./DocumentTabLoadingState"
-import DocumentTabErrorMessage from "./DocumentTabErrorMessage"
 import DocumentTabSearch from "./DocumentTabSearch"
 
 import { View, StyleSheet, FlatList, RefreshControl } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
+
 import { useTheme } from "@/hooks/useTheme"
+import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
+
 import { LoadingSpinner } from "@/components/LoadingSpinner"
-import { DocumentTabCard } from "./DocumentTabCard"
 import { UniversalFilter } from "@/components/filters/UniversalFilters"
 import { documentFilterFields } from "@/constants/filters"
 
-import { DocumentsEmptyState } from "./DocuementEmptyState"
-import { useDocumentScreen } from "@/hooks/screens/useDocumentScreen"
+import { DocumentTabCard } from "@/components/tabs/DocumentTab/DocumentTabCard"
+import { DocumentsEmptyState } from "@/components/tabs/DocumentTab/DocuementEmptyState"
+import DocumentTabErrorMessage from "@/components/tabs/DocumentTab/DocumentTabErrorMessage"
+import DocumentTabLoadingState from "@/components/tabs/DocumentTab/DocumentTabLoadingState"
 
 import type { AnalysisResponse } from "@/types/api/documents.types"
 
@@ -30,7 +32,6 @@ export default function DocumentTabContent() {
       isRefreshing,
       setShowFilter,
       handleDocumentSelectPress,
-      isDeleting,
       setSearchQuery,
       handleDeleteDocument,
       handleRefresh,
@@ -44,53 +45,66 @@ export default function DocumentTabContent() {
 
    const keyExtractor = (item: AnalysisResponse) => item.id
 
-   if (isLoading || isDeleting || isRefreshing) return <DocumentTabLoadingState />
-
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
+         <DocumentTabErrorMessage error={error} />
+
          <DocumentTabSearch
             searchQuery={searchQuery}
             setShowFilter={setShowFilter}
             handleSearch={handleSearch}
          />
 
-         <DocumentTabErrorMessage error={error} />
+         {(() => {
+            switch (true) {
+               case isDocumentsDataAvailable():
+                  return (
+                     <FlatList
+                        data={documents}
+                        bounces={true}
+                        renderItem={args =>
+                           renderDocument({
+                              ...args,
+                              handleDocumentSelectPress,
+                              handleDeleteDocument,
+                           })
+                        }
+                        keyExtractor={keyExtractor}
+                        contentContainerStyle={styles.listContent}
+                        refreshControl={
+                           <RefreshControl
+                              refreshing={isRefreshing}
+                              onRefresh={handleRefresh}
+                              colors={[colors.primary]}
+                              progressBackgroundColor={colors.background}
+                           />
+                        }
+                        onEndReached={loadMoreDocuments}
+                        onEndReachedThreshold={0.5}
+                        ListFooterComponent={() => renderFooter(hasMore)}
+                        ListEmptyComponent={FallbackStateWrapper}
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="always"
+                     />
+                  )
 
-         {isDocumentsDataAvailable() ? (
-            <FlatList
-               data={documents}
-               bounces={true}
-               renderItem={args =>
-                  renderDocument({
-                     ...args,
-                     handleDocumentSelectPress,
-                     handleDeleteDocument,
-                  })
-               }
-               keyExtractor={keyExtractor}
-               contentContainerStyle={styles.listContent}
-               refreshControl={
-                  <RefreshControl
-                     refreshing={isRefreshing}
-                     onRefresh={handleRefresh}
-                     colors={[colors.primary]}
-                     progressBackgroundColor={colors.background}
-                  />
-               }
-               onEndReached={loadMoreDocuments}
-               onEndReachedThreshold={0.5}
-               ListFooterComponent={() => renderFooter(hasMore)}
-               ListEmptyComponent={FallbackStateWrapper}
-               showsVerticalScrollIndicator={false}
-            />
-         ) : (
-            <DocumentsEmptyState
-               searchControl={{
-                  value: searchQuery,
-                  onChange: setSearchQuery,
-               }}
-            />
-         )}
+               case isLoading && currentFilters.search === searchQuery:
+                  return <DocumentTabLoadingState message="loading..." />
+
+               case isRefreshing:
+                  return <DocumentTabLoadingState message="refreshing documents..." />
+
+               default:
+                  return (
+                     <DocumentsEmptyState
+                        searchControl={{
+                           value: searchQuery,
+                           onChange: setSearchQuery,
+                        }}
+                     />
+                  )
+            }
+         })()}
 
          <UniversalFilter
             fields={documentFilterFields}

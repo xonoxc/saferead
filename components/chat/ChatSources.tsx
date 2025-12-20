@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import { FileCheck2, X } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
-import { Drawer } from "../Drawer"
+import { Drawer } from "@/components/Drawer"
 
 import type { Chats } from "@/hooks/chat/useChat"
 import type { ColorsType } from "@/hooks/useTheme"

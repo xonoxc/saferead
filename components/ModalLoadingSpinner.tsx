@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Modal, StyleSheet } from "react-native"
-import { LoadingSpinner } from "./LoadingSpinner"
+import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { useTheme } from "@/hooks/useTheme"
 
 interface ModalLoadingSpinnerProps {

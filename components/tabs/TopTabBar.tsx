@@ -106,6 +106,7 @@ export default function TopTabBar({ selectedTab, onTabPress }: TopTabBarProps) {
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={{ alignItems: "center", gap: 5 }}
+                  keyboardShouldPersistTaps="always"
                >
                   {filteredTab.map((tab, index) => {
                      const isActive = safeTabIndex === index

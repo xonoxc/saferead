@@ -3,12 +3,12 @@ import { LoadingSpinner } from "@/components/LoadingSpinner"
 
 import { useTheme } from "@/hooks/useTheme"
 
-export default function DocumentTabLoadingState() {
+export default function DocumentTabLoadingState({ message }: { message?: string }) {
    const { colors } = useTheme()
 
    return (
       <View style={{ backgroundColor: colors.background, flex: 1 }}>
-         <LoadingSpinner />
+         <LoadingSpinner loaderMessage={message} />
       </View>
    )
 }

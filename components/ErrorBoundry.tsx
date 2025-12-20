@@ -1,5 +1,5 @@
 import React from "react"
-import ServerErrorScreen from "./ErrorScreen"
+import ServerErrorScreen from "@/components/ErrorScreen"
 
 interface Props {
    children: React.ReactNode

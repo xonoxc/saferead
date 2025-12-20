@@ -2,7 +2,6 @@ import { Fonts, FontSizes } from "@/constants"
 import { useTheme } from "@/hooks/useTheme"
 import { Search } from "lucide-react-native"
 import { View, StyleSheet } from "react-native"
-import Animated, { FadeInDown } from "react-native-reanimated"
 import { TextInput } from "../TextInput"
 import SearchRightAccessory from "./SearchRightAccessory"
 
@@ -24,7 +23,7 @@ export default function SearchBar({
    const { colors } = useTheme()
 
    return (
-      <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.container}>
+      <View style={styles.container}>
          <View style={[styles.searchBar, { borderColor: colors.vio }]}>
             <TextInput
                style={[styles.input, { color: colors.text }]}
@@ -45,7 +44,7 @@ export default function SearchBar({
                clearButtonMode="while-editing"
             />
          </View>
-      </Animated.View>
+      </View>
    )
 }
 

@@ -37,7 +37,7 @@ export function useDocumentScreen() {
 
    const documents = data?.pages.flatMap(page => page.results) ?? []
 
-   const { mutateAsync: deleteDocument, isPending: isDeleting } = useDeleteDocument()
+   const { mutateAsync: deleteDocument } = useDeleteDocument()
 
    const showBottomAlert = useDrawerAlert()
 
@@ -102,7 +102,6 @@ export function useDocumentScreen() {
       isRefreshing: isRefetchingDocs,
       setShowFilter,
       handleDocumentSelectPress,
-      isDeleting,
       handleDeleteDocument,
       handleRefresh,
       handleSearch,

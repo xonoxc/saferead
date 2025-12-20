@@ -49,3 +49,16 @@ export const useDocumentsStore = create<State & Actions>((set, get) => {
       },
    }
 })
+
+export const useActiveFilterCount = () =>
+   useDocumentsStore(state => {
+      const { currentFilters } = state
+
+      return Object.entries(currentFilters).filter(([key, value]) => {
+         if (key === "ordering" || key === "space") return false
+         if (value === undefined || value === null) return false
+         if (Array.isArray(value)) return value.length > 0
+         if (typeof value === "string") return value.trim().length > 0
+         return true
+      }).length
+   })

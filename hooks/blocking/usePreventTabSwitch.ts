@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { BackHandler } from "react-native"
-import { useDrawerAlert } from "../alerts/useAlert"
+
+import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 
 export function usePreventTabSwitch(
    block: boolean,

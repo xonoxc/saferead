@@ -34,7 +34,7 @@ export default function SpacesScreen() {
       handleSpaceSelectPress,
    } = useSpaceScreen()
 
-   if (isLoading) return <LoadingSpinner />
+   if (isLoading) return <LoadingSpinner loaderMessage="Loading spaces..." fontSize="sm" />
 
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>

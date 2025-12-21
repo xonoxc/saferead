@@ -1,13 +1,12 @@
 import { Upload } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { View, TouchableOpacity, StyleSheet, Text } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { Fonts, FontSizes } from "@/constants"
 
 import {
    DocumentTypeSelector,
    type DocumentTypeSelectorProps,
-} from "../documents/DocumentTypeSelector"
+} from "@/components/documents/DocumentTypeSelector"
 
 interface UploadChipProps extends DocumentTypeSelectorProps {
    onDocumentUpload: () => void
@@ -17,21 +16,21 @@ export function UploadChip({ onDocumentUpload, onSelect, selectedType }: UploadC
    const { colors } = useTheme()
 
    return (
-      <Animated.View
-         entering={FadeInDown.delay(150)}
-         style={{
-            alignItems: "center",
-         }}
-      >
+      <Animated.View entering={FadeInDown.delay(150)} style={[styles.chipContainer]}>
+         <View style={styles.documentTypeSelector}>
+            <DocumentTypeSelector selectedType={selectedType} onSelect={onSelect} />
+         </View>
+         <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
          <TouchableOpacity onPress={onDocumentUpload} activeOpacity={0.85} style={[styles.chip]}>
-            <View style={styles.documentTypeSelector}>
-               <DocumentTypeSelector selectedType={selectedType} onSelect={onSelect} />
-            </View>
-
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-
-            <View style={[styles.uploadAction, { backgroundColor: colors.primary + "15" }]}>
-               <Upload size={20} color={colors.primary} />
+            <View
+               style={[
+                  styles.uploadAction,
+                  { backgroundColor: colors.primary + "15", borderColor: colors.primary + "60" },
+               ]}
+            >
+               <Upload size={18} color={colors.primary} />
+               <Text style={{ color: colors.text }}>Upload</Text>
             </View>
          </TouchableOpacity>
       </Animated.View>
@@ -39,30 +38,35 @@ export function UploadChip({ onDocumentUpload, onSelect, selectedType }: UploadC
 }
 
 const styles = StyleSheet.create({
+   chipContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+   },
    chip: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 8,
-      paddingHorizontal: 10,
-      paddingVertical: 6,
+      gap: 14,
+      paddingHorizontal: 4,
+      paddingVertical: 8,
       alignSelf: "center",
    },
    documentTypeSelector: {
       marginTop: 16,
    },
-
    divider: {
       width: 1,
       height: 18,
       opacity: 0.5,
    },
-
    uploadAction: {
+      borderWidth: 1,
       flexDirection: "row",
       alignItems: "center",
-      gap: 4,
-      padding: 10,
+      gap: 10,
+      padding: 14,
 
-      borderRadius: 8,
+      borderRadius: 21,
    },
 })

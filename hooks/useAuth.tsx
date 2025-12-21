@@ -1,12 +1,13 @@
 import { useState, useEffect, createContext, useContext } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
-import { User } from "@/types"
 import { attempt, attemptSync } from "@/utils/attempt"
 import { isWeb } from "@/utils/helpers/platform"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { apiClient } from "@/utils/apiclient"
 import { useUserStore } from "@/store/useUserStore"
+
+import type { User } from "@/types"
 
 interface AuthContextType {
    user: User | null

@@ -4,22 +4,25 @@ import { TouchableOpacity, Text, StyleSheet, type StyleProp, type ViewStyle } fr
 import { LinearGradient } from "expo-linear-gradient"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { Fonts, FontSizes } from "@/constants"
+import type { RoutePath } from "@/types/path"
 
 interface UpgradeButtonProps {
    btnStyles?: StyleProp<ViewStyle>
    text?: string
    renderContent?: () => React.ReactNode
    onPress?: () => void
+   returnTo?: RoutePath
 }
 
 const UpgradeButton: React.FC<UpgradeButtonProps> = ({
    text = "Upgrade",
    renderContent,
    onPress,
+   returnTo,
    btnStyles,
 }) => {
    const router = useRouter()
-   const scale = useSharedValue(1)
+   const scale = useSharedValue<number>(1)
 
    const handlePressIn = () => {
       scale.value = withSpring(0.94, { damping: 15 })
@@ -27,11 +30,22 @@ const UpgradeButton: React.FC<UpgradeButtonProps> = ({
 
    const handlePressOut = () => {
       scale.value = withSpring(1, { damping: 15 })
-      onPress ? onPress() : router.push("/premium")
+      onPress
+         ? onPress()
+         : router.push({
+              pathname: "/premium",
+              params: {
+                 returnTo,
+              },
+           })
    }
 
    const animatedStyle = useAnimatedStyle(() => ({
-      transform: [{ scale: scale.value }],
+      transform: [
+         {
+            scale: scale.value,
+         },
+      ],
    }))
 
    return (

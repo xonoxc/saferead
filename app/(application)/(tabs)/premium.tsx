@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
 import { Check, Sparkles, Shield, Zap, Brain } from "lucide-react-native"
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated"
@@ -6,36 +6,27 @@ import { useTheme } from "@/hooks/useTheme"
 import { Fonts } from "@/constants/Fonts"
 import { CustomBackBtn } from "@/components"
 import { router } from "expo-router"
-import { usePlans } from "@/hooks/queries/plans"
-import type { Plan } from "@/services/plans.service"
 import { PlansLoadingState } from "@/components/plans/PlansLoadingState"
 import { Plansfallback } from "@/components/plans/PlansFallback"
+import usePremiumScreen from "@/hooks/screens/usePremiumScreen"
+
+import type { Plan } from "@/services/plans.service"
 
 export default function PremiumScreen() {
    const { colors } = useTheme()
-   const { data: plansData, isLoading, error } = usePlans()
-   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
 
-   const plans = plansData?.results || []
-   const premiumPlan = plans.find(plan => plan.plan_type === "premium")
+   const { plans, isLoading, error, effectiveSelectedPlan, setSelectedPlan, isCardSelected } =
+      usePremiumScreen()
 
-   const effectiveSelectedPlan = selectedPlan ?? premiumPlan
-   const isCardSelected = (plan: Plan) =>
-      selectedPlan ? selectedPlan.id === plan.id : premiumPlan?.id === plan.id
+   if (isLoading) return <PlansLoadingState />
 
-   if (isLoading) {
-      return <PlansLoadingState />
-   }
-
-   if (error || !plans.length) {
-      return <Plansfallback />
-   }
+   if (error || !plans.length) return <Plansfallback />
 
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
          <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.header}>
             <View style={{ width: "15%" }}>
-               <CustomBackBtn onPress={() => router.back()} />
+               <CustomBackBtn onPress={() => router.push("/analyize")} />
             </View>
          </Animated.View>
 

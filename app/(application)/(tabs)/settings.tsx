@@ -10,6 +10,7 @@ import SettingsThemeDropdown from "@/components/settings/SettingsThemeDropDown"
 import { Fonts, FontSizes } from "@/constants"
 import { UpgradeButton } from "@/components"
 import { Sparkle } from "lucide-react-native"
+import type { RoutePath } from "@/types/path"
 
 export default function SettingsScreen() {
    const { colors, mode, setTheme } = useTheme()
@@ -58,6 +59,7 @@ function UpgradeCard() {
          btnStyles={{
             borderRadius: 12,
          }}
+         returnTo={"/settings" as RoutePath}
          renderContent={() => {
             return (
                <View

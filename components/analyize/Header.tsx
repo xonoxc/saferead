@@ -7,6 +7,7 @@ import { router } from "expo-router"
 
 import type { Space } from "@/types"
 import type { ColorsType } from "@/hooks/useTheme"
+import type { RoutePath } from "@/types/path"
 
 interface AnalyzeHeaderProps {
    selectedSpace?: Space | null
@@ -33,7 +34,7 @@ export default function AnalyzeHeader({
 
             {/* Center: Upgrade */}
             <View style={{ flex: 1, alignItems: "center" }}>
-               <UpgradeButton />
+               <UpgradeButton returnTo={"/analyize" as RoutePath} />
             </View>
 
             {/* Right: Exit only if inside Chat */}

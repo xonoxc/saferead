@@ -1,5 +1,6 @@
 import { useTheme } from "@/hooks/useTheme"
-import { router } from "expo-router"
+import type { RoutePath } from "@/types/path"
+import { router, useLocalSearchParams } from "expo-router"
 import { ChevronLeft, ChevronRight } from "lucide-react-native"
 
 import { TouchableOpacity, StyleSheet, type ViewStyle } from "react-native"
@@ -20,13 +21,20 @@ export function CustomBackBtn({
    direction = "left",
 }: CustomBackBtnProps) {
    const { colors, isDark } = useTheme()
+   const { returnTo } = useLocalSearchParams<{
+      returnTo?: RoutePath
+   }>()
 
    const handlePress = () => {
+      if (returnTo) {
+         router.push(returnTo)
+         return
+      }
       if (onPress) {
          onPress()
-      } else {
-         if (router.canGoBack()) router.back()
+         return
       }
+      if (router.canGoBack()) router.back()
    }
 
    return (

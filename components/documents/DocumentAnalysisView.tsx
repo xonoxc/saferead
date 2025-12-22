@@ -54,7 +54,7 @@ const Header = ({ onBack, analysis }: { onBack: () => void; analysis: AnalysisRe
    const { colors, isDark } = useTheme()
 
    const handleShare = async () => {
-      const result = await attempt(
+      const result = await attempt(() =>
          Share.share({
             message: getDocumentShareContent(analysis),
             title: "Document Analysis Report",

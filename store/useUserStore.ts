@@ -16,7 +16,7 @@ export const useUserStore = create<UserStoreState>(set => ({
    user: null,
    setUser: user => set({ user }),
    clearUser: async () => {
-      await attempt(
+      await attempt(() =>
          Promise.all([
             isWeb()
                ? AsyncStorage.removeItem("access_token")

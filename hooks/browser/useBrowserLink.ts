@@ -10,7 +10,7 @@ export function useBrowserLink() {
    return async function (fileLink?: string) {
       if (!fileLink) return
 
-      const resp = await attempt(openBrowserAsync(fileLink))
+      const resp = await attempt(() => openBrowserAsync(fileLink))
       if (!resp.ok) {
          showAlert({
             type: "error",

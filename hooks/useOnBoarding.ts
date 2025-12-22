@@ -13,7 +13,7 @@ export function useOnboarding() {
    }, [])
 
    const checkOnboardingStatus = async () => {
-      const result = await attempt(AsyncStorage.getItem(ONBOARDING_KEY))
+      const result = await attempt(() => AsyncStorage.getItem(ONBOARDING_KEY))
 
       if (!result.ok) {
          console.error("Error checking onboarding status:", result.error)
@@ -26,7 +26,7 @@ export function useOnboarding() {
    }
 
    const completeOnboarding = async () => {
-      const result = await attempt(AsyncStorage.setItem(ONBOARDING_KEY, "true"))
+      const result = await attempt(() => AsyncStorage.setItem(ONBOARDING_KEY, "true"))
       if (!result.ok) {
          console.error("Error completing onboarding:", result.error)
          return
@@ -35,7 +35,7 @@ export function useOnboarding() {
    }
 
    const resetOnboarding = async () => {
-      const result = await attempt(AsyncStorage.removeItem(ONBOARDING_KEY))
+      const result = await attempt(() => AsyncStorage.removeItem(ONBOARDING_KEY))
       if (!result.ok) {
          console.error("Error resetting onboarding:", result.error)
          return

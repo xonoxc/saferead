@@ -64,7 +64,7 @@ export function useAnalyzeAction() {
          return
       }
 
-      const uploadResult = await attempt(
+      const uploadResult = await attempt(() =>
          uploadDocument({
             document_file: documentFile,
             original_filename: filename,

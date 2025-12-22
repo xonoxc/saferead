@@ -50,7 +50,7 @@ export async function getDocumentById(documentId: string) {
 }
 
 export async function deleteDocument(documentId: string) {
-   return attempt(apiClient.delete(`/scanner/documents/${documentId}/`))
+   return attempt(() => apiClient.delete(`/scanner/documents/${documentId}/`))
 }
 
 export async function getDocumentStats() {

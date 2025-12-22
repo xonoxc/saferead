@@ -3,7 +3,9 @@ import { attempt } from "@/utils/attempt"
 import type { Document } from "@/types"
 
 export async function scanDocument() {
-   const result = await attempt(ImagePicker.launchCameraAsync({ allowsEditing: false, quality: 1 }))
+   const result = await attempt(() =>
+      ImagePicker.launchCameraAsync({ allowsEditing: false, quality: 1 })
+   )
    if (!result.ok) {
       return failure("Failed to launch camera. Please try again.")
    }

@@ -76,7 +76,7 @@ export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDoc
    })
 
    const pickDocument = async () => {
-      const result = await attempt(
+      const result = await attempt(() =>
          DocumentPicker.getDocumentAsync({
             type: "*/*",
             copyToCacheDirectory: true,

@@ -37,7 +37,7 @@ export function useProfileScreen() {
    }))
 
    const onSubmit = async (values: ProfileFormValues) => {
-      const res = await attempt(
+      const res = await attempt(() =>
          updateUser({
             first_name: values.firstName,
             last_name: values.lastName,

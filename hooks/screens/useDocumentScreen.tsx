@@ -42,7 +42,7 @@ export function useDocumentScreen() {
    const showBottomAlert = useDrawerAlert()
 
    const handleDeleteDocument = async (documentId: string) => {
-      const resp = await attempt(deleteDocument(documentId))
+      const resp = await attempt(() => deleteDocument(documentId))
       if (!resp.ok) {
          showBottomAlert({
             type: "error",

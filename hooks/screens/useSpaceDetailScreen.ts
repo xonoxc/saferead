@@ -70,7 +70,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
 
       if (!space) return
 
-      const resp = await attempt(toggleFavouriteSpace.mutateAsync())
+      const resp = await attempt(() => toggleFavouriteSpace.mutateAsync())
       if (!resp.ok) {
          const errorMessage = getErrorMessage(resp.error)
 
@@ -93,7 +93,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
    const handleOpenChat = async () => {
       if (!space) return
 
-      const resp = await attempt(
+      const resp = await attempt(() =>
          createConversationMutation({
             space: space.id,
             title: `${space.title}:{space.id}`,
@@ -120,7 +120,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
    const handlePinDocumentToSpace = async (documentId: string, document_file: string) => {
       if (!space?.id) return
 
-      const resp = await attempt(
+      const resp = await attempt(() =>
          pinDocumentToSpace.mutateAsync({
             id: documentId,
             space: space.id,
@@ -169,7 +169,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
    const handleUpdateSpace = async (data: UpdateSpaceForm) => {
       if (!space?.id) return
 
-      const resp = await attempt(updateSpace(space.id, data))
+      const resp = await attempt(() => updateSpace(space.id, data))
       if (!resp.ok) {
          showBottomAlert({
             title: "Error",

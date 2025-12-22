@@ -42,9 +42,9 @@ type ErrorType = Error | ExpectedError
  * actual attempt function | axios overloaded
  *
  * **/
-export async function attempt<T, E = ErrorType>(fn: AttemptArg<T>): Promise<Result<T, E>> {
+export async function attempt<T, E = ErrorType>(fn: () => AttemptArg<T>): Promise<Result<T, E>> {
    try {
-      const result = await fn
+      const result = await fn()
 
       const data = isAxiosResponse(result) ? result.data : result
 
@@ -71,9 +71,9 @@ function isAxiosResponse<T>(res: any): res is AxiosResponse<T> {
 /*
  * A Synchronous version of attempt function
  * **/
-export function attemptSync<T, E = Error>(fn: T): Result<T, E> {
+export function attemptSync<T, E = Error>(fn: () => T): Result<T, E> {
    try {
-      const data = fn
+      const data = fn()
       return ok(data)
    } catch (error: any) {
       return err(error as E)

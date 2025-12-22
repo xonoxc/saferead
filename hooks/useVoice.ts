@@ -42,7 +42,7 @@ export const useVoice = () => {
       if (recorderState.isRecording) return null
 
       if (permissionStatus !== "granted") {
-         const reqStatus = await attempt(AudioModule.requestRecordingPermissionsAsync())
+         const reqStatus = await attempt(() => AudioModule.requestRecordingPermissionsAsync())
          if (!reqStatus.ok) {
             alert("Failed to request microphone permission. Please check your device settings.")
             return
@@ -57,7 +57,7 @@ export const useVoice = () => {
          setPermissionStatus("granted")
       }
 
-      const audioModeSetAttempt = await attempt(
+      const audioModeSetAttempt = await attempt(() =>
          setAudioModeAsync({
             playsInSilentMode: true,
             allowsRecording: true,
@@ -68,13 +68,13 @@ export const useVoice = () => {
          return null
       }
 
-      const prepRes = await attempt(audioRecorder.prepareToRecordAsync())
+      const prepRes = await attempt(() => audioRecorder.prepareToRecordAsync())
       if (!prepRes.ok) {
          console.error("Failed to prepare audio recorder:", prepRes.error)
          return null
       }
 
-      const res = attemptSync(audioRecorder.record())
+      const res = attemptSync(() => audioRecorder.record())
       if (!res.ok) {
          console.error("Failed to start recording:", res.error)
          return null
@@ -84,7 +84,7 @@ export const useVoice = () => {
    const stopRecording = async () => {
       if (!recorderState.isRecording) return null
 
-      const recordStopAtt = await attempt(audioRecorder.stop())
+      const recordStopAtt = await attempt(() => audioRecorder.stop())
       if (!recordStopAtt.ok) {
          showBottomAlert({
             type: "error",
@@ -117,7 +117,7 @@ export const useVoice = () => {
   } */
 
    const speakText = async (text: string) => {
-      const resp = attemptSync(
+      const resp = attemptSync(() =>
          Speech.speak(text, {
             language: "en-US",
             pitch: 1.0,

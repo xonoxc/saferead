@@ -34,7 +34,7 @@ export default function useChangePassScreen() {
 
    const onSubmit = async (data: ChangePasswordFormSchema) => {
       setIsSubmitting(true)
-      const result = await attempt(apiClient.post("/auth/password/change/", data))
+      const result = await attempt(() => apiClient.post("/auth/password/change/", data))
       setIsSubmitting(false)
 
       if (!result.ok) {

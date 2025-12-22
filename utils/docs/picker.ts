@@ -33,7 +33,7 @@ type PickDocumentResult =
  * Document Picker and Scanner Functions
  * **/
 export async function pickDocument(): Promise<PickDocumentResult> {
-   const result = await attempt(
+   const result = await attempt(() =>
       DocumentPicker.getDocumentAsync({
          type: ["application/pdf", "image/*", "text/*"],
          copyToCacheDirectory: true,

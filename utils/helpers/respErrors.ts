@@ -23,7 +23,7 @@ export function extractValidationErrorMessage(message: string | object): string 
    let data = message
 
    if (typeof message === "string") {
-      const res = attemptSync(JSON.parse(message))
+      const res = attemptSync(() => JSON.parse(message))
       if (!res.ok) {
          return message
       }

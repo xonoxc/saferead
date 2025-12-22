@@ -85,7 +85,7 @@ export default function useChat() {
       setIsTyping(true)
 
       setIsTyping(true)
-      const resp = await attempt(
+      const resp = await attempt(() =>
          getStreamingResponse({ message: content, conversation_id: activeConversationId! })
       )
       if (!resp?.ok) {

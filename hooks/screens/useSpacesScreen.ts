@@ -38,7 +38,7 @@ export default function useSpaceScreen() {
    )
 
    const handleCreateSpace = async (data: SpaceFormData) => {
-      const result = await attempt(createSpace(data as CreateSpaceForm))
+      const result = await attempt(() => createSpace(data as CreateSpaceForm))
       if (!result.ok) {
          showBottomAlert({
             type: "error",
@@ -58,7 +58,7 @@ export default function useSpaceScreen() {
 
    const handleDeleteSpace = (spaceId: string, spaceName: string) => {
       const safeDeleteSpace = async () => {
-         const resp = await attempt(deleteSpace(spaceId))
+         const resp = await attempt(() => deleteSpace(spaceId))
          if (!resp.ok) {
             showBottomAlert({
                type: "error",

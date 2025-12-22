@@ -61,6 +61,18 @@ export async function attempt<T, E = ErrorType>(fn: () => AttemptArg<T>): Promis
       return err(error as E)
    }
 }
+
+/**
+ * andThenAsync function : chains asynchronous Result operations
+ * **/
+export async function andThenAsync<T, E, U>(
+   result: Promise<Result<T, E>> | Result<T, E>,
+   fn: (value: T) => Promise<Result<U, E>>
+): Promise<Result<U, E>> {
+   const resolved = await result
+   if (!resolved.ok) return resolved
+   return fn(resolved.data)
+}
 /*
  * isAxiosResponse function : checks if the response is an AxiosResponse
  * **/
@@ -78,6 +90,17 @@ export function attemptSync<T, E = Error>(fn: () => T): Result<T, E> {
    } catch (error: any) {
       return err(error as E)
    }
+}
+
+/*
+ * this andThen function : chains Result operations
+ * **/
+export function andThen<T, E, U>(
+   result: Result<T, E>,
+   fn: (value: T) => Result<U, E>
+): Result<U, E> {
+   if (!result.ok) return result
+   return fn(result.data)
 }
 
 /*

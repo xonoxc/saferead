@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, StyleSheet } from "react-native"
+import { Pressable, View, StyleSheet } from "react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import UpgradeButton from "@/components/UpgradeButton"
 import { CircleEllipsis, LogOut } from "lucide-react-native"
@@ -28,9 +28,9 @@ export default function AnalyzeHeader({
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
          <View style={styles.innerHeader}>
             {/* Left: Menu */}
-            <TouchableOpacity onPress={handleHamBurgerPress}>
+            <Pressable onPress={handleHamBurgerPress}>
                <CircleEllipsis color={colors.textMuted} size={27} />
-            </TouchableOpacity>
+            </Pressable>
 
             {/* Center: Upgrade */}
             <View style={{ flex: 1, alignItems: "center" }}>
@@ -39,9 +39,9 @@ export default function AnalyzeHeader({
 
             {/* Right: Exit only if inside Chat */}
             {selectedSpace ? (
-               <TouchableOpacity onPress={onSpaceExitButtonPress}>
+               <Pressable onPress={onSpaceExitButtonPress}>
                   <LogOut size={22} color={colors.text} />
-               </TouchableOpacity>
+               </Pressable>
             ) : (
                <View style={{ width: 24 }} />
             )}

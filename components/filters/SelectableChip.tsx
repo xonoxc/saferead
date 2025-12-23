@@ -1,4 +1,4 @@
-import { TouchableOpacity, Text, StyleSheet } from "react-native"
+import { Pressable, Text, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 
@@ -13,7 +13,7 @@ export const SelectableChip = ({
 }) => {
    const { colors } = useTheme()
    return (
-      <TouchableOpacity
+      <Pressable
          onPress={onPress}
          style={[
             styles.chip,
@@ -26,7 +26,7 @@ export const SelectableChip = ({
          <Text style={[styles.chipText, { color: selected ? colors.background : colors.text }]}>
             {label}
          </Text>
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

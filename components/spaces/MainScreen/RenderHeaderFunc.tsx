@@ -1,7 +1,7 @@
 import ViewMode from "../ViewModeSetter"
 import SearchBar from "@/components/search/SearchBar"
 
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
+import { StyleSheet, View, Text, Pressable } from "react-native"
 import { Plus } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 
@@ -37,12 +37,12 @@ export default function SpaceScreenHeader({
             </View>
             <View style={styles.headerIcons}>
                <ViewMode viewMode={viewMode} setViewMode={setViewMode} />
-               <TouchableOpacity
+               <Pressable
                   onPress={() => setCreateModalVisible(true)}
                   style={[styles.createButton, { backgroundColor: colors.primary }]}
                >
                   <Plus size={20} color={colors.background} />
-               </TouchableOpacity>
+               </Pressable>
             </View>
          </View>
 

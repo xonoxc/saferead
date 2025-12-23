@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, Pressable } from "react-native"
 import { Shield, X } from "lucide-react-native"
 
 import { useTheme } from "@/hooks/useTheme"
@@ -41,11 +41,10 @@ export function ProfileActions() {
          <Text style={[styles.sectionTitle, { color: colors.text }]}>Account Actions</Text>
 
          {actions.map(action => (
-            <TouchableOpacity
+            <Pressable
                key={action.title}
                style={[styles.item, { backgroundColor: colors.card, borderColor: colors.border }]}
                onPress={action.onPress}
-               activeOpacity={0.85}
             >
                <View style={[styles.iconWrap, { backgroundColor: action.color + "15" }]}>
                   <action.icon size={18} color={action.color} />
@@ -64,7 +63,7 @@ export function ProfileActions() {
                      {action.description}
                   </Text>
                </View>
-            </TouchableOpacity>
+            </Pressable>
          ))}
       </View>
    )

@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated } from "react-native"
+import { View, Text, StyleSheet, Modal, Animated, Pressable } from "react-native"
 import { Mic, MicOff, X } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
@@ -45,9 +45,9 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       <Modal visible={isVisible} transparent animationType="fade">
          <View style={styles.overlay}>
             <View style={[styles.container, { backgroundColor: colors.card }]}>
-               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+               <Pressable style={styles.closeButton} onPress={onClose}>
                   <X size={24} color={colors.textSecondary} />
-               </TouchableOpacity>
+               </Pressable>
 
                <View style={styles.content}>
                   <Text style={[styles.title, { color: colors.text }]}>Voice Recording</Text>
@@ -61,13 +61,13 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
                         },
                      ]}
                   >
-                     <TouchableOpacity style={styles.recordButtonInner} onPress={onStopRecording}>
+                     <Pressable style={styles.recordButtonInner} onPress={onStopRecording}>
                         {isRecording ? (
                            <MicOff size={40} color="#FFFFFF" />
                         ) : (
                            <Mic size={40} color="#FFFFFF" />
                         )}
-                     </TouchableOpacity>
+                     </Pressable>
                   </Animated.View>
 
                   <Text style={[styles.instruction, { color: colors.textSecondary }]}>

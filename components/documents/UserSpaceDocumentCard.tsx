@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Text, Pressable, StyleSheet } from "react-native"
 import { Calendar, Pin, PinOff, Tag } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
@@ -40,10 +40,9 @@ export function UserSpaceDocumentCard({
    }
 
    return (
-      <TouchableOpacity
+      <Pressable
          style={[styles.card, { backgroundColor: colors.background, borderColor: colors.border }]}
          onPress={handlePress}
-         activeOpacity={0.7}
       >
          <View style={styles.header}>
             <View
@@ -63,13 +62,13 @@ export function UserSpaceDocumentCard({
                </Text>
             </View>
             {onPin && (
-               <TouchableOpacity onPress={handlePinPress} style={styles.pinButton}>
+               <Pressable onPress={handlePinPress} style={styles.pinButton}>
                   {pinned ? (
                      <PinOff size={18} color={spaceColor} />
                   ) : (
                      <Pin size={18} color={spaceColor} />
                   )}
-               </TouchableOpacity>
+               </Pressable>
             )}
          </View>
 
@@ -89,7 +88,7 @@ export function UserSpaceDocumentCard({
                </View>
             )}
          </View>
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

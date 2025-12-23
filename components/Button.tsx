@@ -3,7 +3,7 @@ import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 
 import {
-   TouchableOpacity,
+   Pressable,
    Text,
    StyleSheet,
    ActivityIndicator,
@@ -108,18 +108,13 @@ export const Button: React.FC<ButtonProps> = ({
    }
 
    return (
-      <TouchableOpacity
-         style={getButtonStyle()}
-         onPress={onPress}
-         disabled={disabled || loading}
-         activeOpacity={0.8}
-      >
+      <Pressable style={getButtonStyle()} onPress={onPress} disabled={disabled || loading}>
          {loading ? (
             <ActivityIndicator size="small" color={getLoadingColor()} />
          ) : (
             <Text style={getTextStyle()}>{title}</Text>
          )}
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

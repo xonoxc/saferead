@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, Modal, ScrollView, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Text, Modal, ScrollView, Pressable, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 
 import { SelectField } from "./SelectField"
@@ -93,18 +93,18 @@ export const UniversalFilter = ({
             </ScrollView>
 
             <View style={styles.actions}>
-               <TouchableOpacity
+               <Pressable
                   onPress={handleReset}
                   style={[styles.actionButton, { backgroundColor: colors.primary }]}
                >
                   <Text style={[styles.actionBtnText, { color: colors.background }]}>Reset</Text>
-               </TouchableOpacity>
-               <TouchableOpacity
+               </Pressable>
+               <Pressable
                   onPress={handleApply}
                   style={[styles.actionButton, { backgroundColor: colors.primary }]}
                >
                   <Text style={[styles.actionBtnText, { color: colors.background }]}>Apply</Text>
-               </TouchableOpacity>
+               </Pressable>
             </View>
          </View>
       </Modal>

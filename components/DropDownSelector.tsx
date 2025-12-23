@@ -3,7 +3,7 @@ import {
    View,
    Text,
    Modal,
-   TouchableOpacity,
+   Pressable,
    FlatList,
    ActivityIndicator,
    StyleSheet,
@@ -115,7 +115,7 @@ function DropdownTrigger<T>({
    if (renderTrigger) return <>{renderTrigger(onOpen, selectedOption)}</>
 
    return (
-      <TouchableOpacity
+      <Pressable
          onPress={onOpen}
          style={[
             styles.selector,
@@ -130,7 +130,7 @@ function DropdownTrigger<T>({
             </Text>
          </View>
          <ChevronDown size={20} color={colors.textSecondary} />
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 
@@ -163,8 +163,8 @@ function DropdownSheet<T>({
    const lastOptionIndex = options.length - 1
 
    return (
-      <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1}>
-         <TouchableOpacity
+      <Pressable style={styles.backdrop} onPress={onClose}>
+         <Pressable
             style={[
                styles.sheet,
                {
@@ -173,7 +173,6 @@ function DropdownSheet<T>({
                   shadowColor: colors.shadow,
                },
             ]}
-            activeOpacity={1}
          >
             {loading ? (
                <ActivityIndicator color={colors.primary} />
@@ -195,7 +194,7 @@ function DropdownSheet<T>({
                      }
 
                      return (
-                        <TouchableOpacity
+                        <Pressable
                            onPress={handleSelect}
                            style={[
                               styles.option,
@@ -211,13 +210,13 @@ function DropdownSheet<T>({
                               </Text>
                            </View>
                            {isSelected && <Check size={20} color={colors.primary} />}
-                        </TouchableOpacity>
+                        </Pressable>
                      )
                   }}
                />
             )}
-         </TouchableOpacity>
-      </TouchableOpacity>
+         </Pressable>
+      </Pressable>
    )
 }
 

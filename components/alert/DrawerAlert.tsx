@@ -1,5 +1,5 @@
 import React from "react"
-import { Text, View, TouchableOpacity, StyleSheet } from "react-native"
+import { Text, View, Pressable, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics"
@@ -43,7 +43,7 @@ export function DrawerAlert({ visible, title, message, actions = [] }: DrawerAle
 
             <View style={{ flexDirection: "row", justifyContent: "flex-end", gap: 8 }}>
                {actions.map((action, index) => (
-                  <TouchableOpacity
+                  <Pressable
                      key={index}
                      onPress={async () => {
                         await impactAsync(ImpactFeedbackStyle.Medium)
@@ -64,7 +64,7 @@ export function DrawerAlert({ visible, title, message, actions = [] }: DrawerAle
                      >
                         {action.label}
                      </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                ))}
             </View>
          </View>

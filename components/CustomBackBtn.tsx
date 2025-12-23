@@ -3,7 +3,7 @@ import type { RoutePath } from "@/types/path"
 import { router, useLocalSearchParams } from "expo-router"
 import { ChevronLeft, ChevronRight } from "lucide-react-native"
 
-import { TouchableOpacity, StyleSheet, type ViewStyle } from "react-native"
+import { Pressable, StyleSheet, type ViewStyle } from "react-native"
 
 export type BackBtnDirection = "left" | "right"
 
@@ -38,7 +38,7 @@ export function CustomBackBtn({
    }
 
    return (
-      <TouchableOpacity
+      <Pressable
          onPress={handlePress}
          style={[styles.button, { borderColor: isDark ? colors.border : colors.secondary }, style]}
       >
@@ -47,7 +47,7 @@ export function CustomBackBtn({
          ) : (
             <ChevronRight size={24} color={colors.text} />
          )}
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

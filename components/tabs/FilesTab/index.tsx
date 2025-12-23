@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Text, FlatList, StyleSheet, Pressable } from "react-native"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useTheme } from "@/hooks/useTheme"
 import { EmptyState } from "@/components/EmptyState"
@@ -52,7 +52,7 @@ export default function FilesTab() {
          <View style={styles.spaceTitleContainer}>
             <View style={styles.header}>
                {true && (
-                  <TouchableOpacity
+                  <Pressable
                      style={[
                         styles.addDocumentButton,
                         { backgroundColor: colors.card, borderColor: colors.border },
@@ -70,7 +70,7 @@ export default function FilesTab() {
                      >
                         Add File
                      </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                )}
             </View>
          </View>

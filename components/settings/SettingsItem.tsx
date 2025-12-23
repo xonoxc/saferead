@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from "react-native"
+import { View, Text, StyleSheet, Pressable, Switch } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import type { SettingsItem as Item } from "@/hooks/screens/useSettingsGroup"
 import { Fonts, FontSizes } from "@/constants"
@@ -8,8 +8,7 @@ export default function SettingsItem({ item, isLast }: { item: Item; isLast: boo
    const { colors } = useTheme()
 
    return (
-      <TouchableOpacity
-         activeOpacity={0.7}
+      <Pressable
          onPress={item.onPress}
          style={[
             styles.item,
@@ -40,7 +39,7 @@ export default function SettingsItem({ item, isLast }: { item: Item; isLast: boo
                )
             )}
          </View>
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

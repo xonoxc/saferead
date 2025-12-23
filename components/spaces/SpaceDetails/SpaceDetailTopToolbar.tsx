@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Pressable, StyleSheet } from "react-native"
 
 import Animated from "react-native-reanimated"
 
@@ -30,23 +30,23 @@ export default function SpaceDetailTopBar({
                },
             ]}
          >
-            <TouchableOpacity onPress={onCreateBtnPress}>
+            <Pressable onPress={onCreateBtnPress}>
                <Plus size={20} color={space.color} />
-            </TouchableOpacity>
+            </Pressable>
 
             <Animated.View style={animatedStyle}>
-               <TouchableOpacity onPress={onFavoritePress}>
+               <Pressable onPress={onFavoritePress}>
                   <Heart
                      size={20}
                      color={space.color}
                      fill={space.is_favorite ? space.color : undefined}
                   />
-               </TouchableOpacity>
+               </Pressable>
             </Animated.View>
 
-            <TouchableOpacity onPress={onSettingsPress}>
+            <Pressable onPress={onSettingsPress}>
                <Settings size={20} color={space.color} />
-            </TouchableOpacity>
+            </Pressable>
          </View>
       </View>
    )

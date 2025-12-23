@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Text, Pressable, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 import { X } from "lucide-react-native"
@@ -8,7 +8,7 @@ export const FilterHeader = ({ title, onClose }: { title: string; onClose: () =>
    return (
       <View style={[styles.header, { backgroundColor: colors.background }]}>
          <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-         <TouchableOpacity
+         <Pressable
             onPress={onClose}
             style={[styles.closeBtnContainer, { borderColor: colors.border }]}
          >
@@ -16,7 +16,7 @@ export const FilterHeader = ({ title, onClose }: { title: string; onClose: () =>
             <Text style={[styles.closeBtn, { color: colors.text, borderColor: colors.border }]}>
                Close
             </Text>
-         </TouchableOpacity>
+         </Pressable>
       </View>
    )
 }

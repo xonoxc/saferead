@@ -1,4 +1,4 @@
-import { StyleSheet, View, TouchableOpacity } from "react-native"
+import { StyleSheet, View, Pressable } from "react-native"
 import Animated from "react-native-reanimated"
 import { LayoutGrid, List } from "lucide-react-native"
 import { useSlidingSelector } from "@/hooks/animation/useSlidingSelector"
@@ -33,14 +33,13 @@ export default function ViewMode({ viewMode, setViewMode }: ViewModeProps) {
             const Icon = option === "list" ? List : LayoutGrid
 
             return (
-               <TouchableOpacity
+               <Pressable
                   key={option}
                   onPress={() => setViewMode(option)}
                   style={styles.iconWrapper}
-                  activeOpacity={0.8}
                >
                   <Icon size={20} color={color} />
-               </TouchableOpacity>
+               </Pressable>
             )
          })}
       </View>

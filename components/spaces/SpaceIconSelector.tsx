@@ -1,8 +1,7 @@
 import Animated from "react-native-reanimated"
 
-import { View, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Pressable, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
-
 import { iconMap } from "@/constants/spaceform"
 
 import type { ControllerRenderProps } from "react-hook-form"
@@ -12,7 +11,7 @@ interface IConSelectorProps {
    selectedColor: string
 }
 
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export default function SpaceIconSelector({
    selectedColor,
@@ -26,7 +25,7 @@ export default function SpaceIconSelector({
             const isSelected = value === IconName
 
             return (
-               <AnimatedTouchableOpacity
+               <AnimatedPressable
                   key={IconName}
                   style={[
                      styles.icon,
@@ -42,7 +41,7 @@ export default function SpaceIconSelector({
                   }}
                >
                   <Icon size={24} color={isSelected ? colors.background : selectedColor} />
-               </AnimatedTouchableOpacity>
+               </AnimatedPressable>
             )
          })}
       </View>

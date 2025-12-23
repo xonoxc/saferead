@@ -1,6 +1,6 @@
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { ArrowDown, ArrowUp, FileText, Check, X, Info } from "lucide-react-native"
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native"
+import { Pressable, View, Text, StyleSheet } from "react-native"
 import { ProgressBar } from "../ProgressBar"
 import { type ColorsType, useTheme } from "@/hooks/useTheme"
 
@@ -34,7 +34,7 @@ export const RecentDocumentItem = ({
       })
 
    return (
-      <TouchableOpacity
+      <Pressable
          onPress={onPress}
          style={[
             styles.container,
@@ -43,9 +43,9 @@ export const RecentDocumentItem = ({
          ]}
       >
          <View style={styles.infoBtnWrapper}>
-            <TouchableOpacity onPress={showFullTitle} hitSlop={10} style={styles.infoButton}>
+            <Pressable onPress={showFullTitle} hitSlop={10} style={styles.infoButton}>
                <Info size={16} color={colors.textSecondary} />
-            </TouchableOpacity>
+            </Pressable>
          </View>
 
          {/* Header */}
@@ -95,7 +95,7 @@ export const RecentDocumentItem = ({
                </View>
             </View>
          )}
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

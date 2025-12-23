@@ -13,7 +13,7 @@ import { Drawer } from "../Drawer"
 import {
    View,
    Text,
-   TouchableOpacity,
+   Pressable,
    StyleSheet,
    ScrollView,
    Switch,
@@ -67,9 +67,9 @@ export const SpaceForm = ({
                <Text style={[styles.title, { color: colors.text }]}>
                   {isUpdateMode ? "Update Space" : "Create New Space"}
                </Text>
-               <TouchableOpacity onPress={onCancel}>
+               <Pressable onPress={onCancel}>
                   <Text style={[styles.cancel, { color: colors.primary }]}>Cancel</Text>
-               </TouchableOpacity>
+               </Pressable>
             </View>
 
             <ScrollView
@@ -117,7 +117,7 @@ export const SpaceForm = ({
                      <View style={styles.colorGridContainer}>
                         <View style={styles.grid}>
                            {colors_palette.map(c => (
-                              <TouchableOpacity
+                              <Pressable
                                  key={c}
                                  style={[
                                     styles.color,

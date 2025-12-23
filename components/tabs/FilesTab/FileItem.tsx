@@ -1,6 +1,6 @@
 import { Fonts } from "@/constants"
 import { useTheme } from "@/hooks/useTheme"
-import { Text, StyleSheet, TouchableOpacity } from "react-native"
+import { Text, StyleSheet, Pressable } from "react-native"
 import { useBrowserLink } from "@/hooks/browser/useBrowserLink"
 
 import type { UserSpaceDocument } from "@/types/api/spaces.documents.types"
@@ -16,7 +16,7 @@ export default function FileItem({ item }: { item: UserSpaceDocument }) {
    }
 
    return (
-      <TouchableOpacity
+      <Pressable
          onPress={handleCardPress}
          style={[styles.itemContainer, { backgroundColor: colors.surface }]}
       >
@@ -24,7 +24,7 @@ export default function FileItem({ item }: { item: UserSpaceDocument }) {
          <Text style={[styles.itemSubtitle, { color: colors.secondary }]}>
             {new Date(item.created_at).toLocaleDateString()}
          </Text>
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

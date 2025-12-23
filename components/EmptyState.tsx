@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native"
+import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native"
 import { Button } from "@/components/Button"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 
@@ -87,11 +87,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
                   )}
 
                   {secondaryActionTitle && onSecondaryAction && (
-                     <TouchableOpacity style={styles.secondaryButton} onPress={onSecondaryAction}>
+                     <Pressable style={styles.secondaryButton} onPress={onSecondaryAction}>
                         <Text style={[styles.secondaryButtonText, { color: colors.textSecondary }]}>
                            {secondaryActionTitle}
                         </Text>
-                     </TouchableOpacity>
+                     </Pressable>
                   )}
                </View>
             )}

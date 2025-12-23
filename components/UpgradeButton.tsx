@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router"
 import { Sparkle } from "lucide-react-native"
-import { TouchableOpacity, Text, StyleSheet, type StyleProp, type ViewStyle } from "react-native"
+import { Pressable, Text, StyleSheet, type StyleProp, type ViewStyle } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { Fonts, FontSizes } from "@/constants"
@@ -49,7 +49,7 @@ const UpgradeButton: React.FC<UpgradeButtonProps> = ({
    }))
 
    return (
-      <TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} activeOpacity={0.9}>
+      <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut}>
          <Animated.View style={animatedStyle}>
             <LinearGradient
                colors={["#FC466B", "#3F5EFB"]}
@@ -68,7 +68,7 @@ const UpgradeButton: React.FC<UpgradeButtonProps> = ({
                )}
             </LinearGradient>
          </Animated.View>
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

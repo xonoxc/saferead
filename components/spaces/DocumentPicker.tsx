@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Text, Pressable, StyleSheet } from "react-native"
 import { Controller } from "react-hook-form"
 import { FileUpIcon } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
@@ -16,7 +16,7 @@ export const DocumentPicker = ({ control, errors, onPress }: DocumentPickerProps
 
    return (
       <View>
-         <TouchableOpacity
+         <Pressable
             onPress={onPress}
             style={[styles.picker, { borderColor: colors.border, backgroundColor: colors.card }]}
          >
@@ -39,7 +39,7 @@ export const DocumentPicker = ({ control, errors, onPress }: DocumentPickerProps
                   </View>
                )}
             />
-         </TouchableOpacity>
+         </Pressable>
          {errors.file && <Text style={styles.error}>{errors.file.message}</Text>}
       </View>
    )

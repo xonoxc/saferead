@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native"
+import { View, Text, StyleSheet, Pressable, Image } from "react-native"
 import Animated from "react-native-reanimated"
 import { Camera, User as UserIcon } from "lucide-react-native"
 
@@ -19,11 +19,10 @@ export function ProfileAvatar({ user, animatedStyle, editable = false, onPress }
    return (
       <View style={styles.container}>
          <Animated.View style={animatedStyle}>
-            <TouchableOpacity
+            <Pressable
                style={[styles.avatarWrap, { borderColor: colors.border }]}
                onPress={onPress}
                disabled={!editable}
-               activeOpacity={0.85}
             >
                {user?.avatar ? (
                   <Image source={{ uri: user.avatar }} style={styles.avatar} />
@@ -38,7 +37,7 @@ export function ProfileAvatar({ user, animatedStyle, editable = false, onPress }
                      <Camera size={14} color={colors.background} />
                   </View>
                )}
-            </TouchableOpacity>
+            </Pressable>
          </Animated.View>
 
          <Text style={[styles.name, { color: colors.text }]}>{user?.username}</Text>

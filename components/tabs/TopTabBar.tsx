@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from "react-native"
+import { View, Text, Pressable, StyleSheet, useWindowDimensions } from "react-native"
 import React from "react"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { useTheme } from "@/hooks/useTheme"
@@ -111,7 +111,7 @@ export default function TopTabBar({ selectedTab, onTabPress }: TopTabBarProps) {
                   {filteredTab.map((tab, index) => {
                      const isActive = safeTabIndex === index
                      return (
-                        <TouchableOpacity
+                        <Pressable
                            key={tab.name}
                            style={[
                               styles.tab,
@@ -121,7 +121,6 @@ export default function TopTabBar({ selectedTab, onTabPress }: TopTabBarProps) {
                               },
                            ]}
                            onPress={() => onTabPress(index)}
-                           activeOpacity={0.7}
                         >
                            <Text
                               style={[
@@ -134,7 +133,7 @@ export default function TopTabBar({ selectedTab, onTabPress }: TopTabBarProps) {
                            >
                               {tab.name}
                            </Text>
-                        </TouchableOpacity>
+                        </Pressable>
                      )
                   })}
                </ScrollView>

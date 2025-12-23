@@ -16,7 +16,11 @@ export type ChatContextSources = {
    type: string
 }
 
-export type Chats = { text: string; sender: "user" | "bot"; sources?: ChatContextSources[] }[]
+export type Chats = {
+   text: string
+   sender: "user" | "bot"
+   sources?: ChatContextSources[]
+}[]
 
 export default function useChat() {
    const { colors } = useTheme()
@@ -149,5 +153,6 @@ export default function useChat() {
       handleSend,
       scrollViewRef,
       scrollToBottom,
+      handleScroll,
    }
 }

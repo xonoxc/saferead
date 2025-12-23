@@ -1,6 +1,6 @@
 import { Upload } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
-import { View, TouchableOpacity, StyleSheet, Text } from "react-native"
+import { View, Pressable, StyleSheet, Text } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 
 import {
@@ -22,7 +22,7 @@ export function UploadChip({ onDocumentUpload, onSelect, selectedType }: UploadC
          </View>
          <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-         <TouchableOpacity onPress={onDocumentUpload} activeOpacity={0.85} style={[styles.chip]}>
+         <Pressable onPress={onDocumentUpload} style={[styles.chip]}>
             <View
                style={[
                   styles.uploadAction,
@@ -32,7 +32,7 @@ export function UploadChip({ onDocumentUpload, onSelect, selectedType }: UploadC
                <Upload size={18} color={colors.primary} />
                <Text style={{ color: colors.text }}>Upload</Text>
             </View>
-         </TouchableOpacity>
+         </Pressable>
       </Animated.View>
    )
 }

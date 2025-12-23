@@ -1,11 +1,11 @@
 import React from "react"
-import { View, StyleSheet, TouchableOpacity } from "react-native"
+import { View, StyleSheet, Pressable } from "react-native"
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated"
 import { ArrowLeft } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Button } from "@/components/Button"
 
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 interface OnboardingNavigationProps {
    currentStep: number
@@ -26,7 +26,7 @@ export const OnboardingNavigation: React.FC<OnboardingNavigationProps> = ({
       <Animated.View style={styles.navigationContainer}>
          <View style={styles.navigationButtons}>
             {currentStep > 0 && (
-               <AnimatedTouchableOpacity
+               <AnimatedPressable
                   entering={SlideInRight.springify()}
                   exiting={SlideOutLeft.springify()}
                   style={[
@@ -40,7 +40,7 @@ export const OnboardingNavigation: React.FC<OnboardingNavigationProps> = ({
                   onPress={onPrevious}
                >
                   <ArrowLeft size={20} color={colors.textSecondary} />
-               </AnimatedTouchableOpacity>
+               </AnimatedPressable>
             )}
 
             <View style={styles.nextButtonContainer}>

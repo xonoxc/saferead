@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Text, Pressable, StyleSheet } from "react-native"
 import { FileCheck2, X } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 import { Drawer } from "@/components/Drawer"
@@ -14,7 +14,7 @@ export function ChatSources({ chat, colors }: { chat: Chats[number]; colors: Col
 
    return (
       <>
-         <TouchableOpacity
+         <Pressable
             onPress={() => setDrawerOpen(true)}
             style={[
                styles.button,
@@ -29,7 +29,7 @@ export function ChatSources({ chat, colors }: { chat: Chats[number]; colors: Col
             <Text style={[styles.buttonText, { color: colors.text }]}>
                {chat.sources.length} Sources
             </Text>
-         </TouchableOpacity>
+         </Pressable>
 
          <Drawer visible={isDrawerOpen} enableAbsolute position="bottom">
             <SourceDrawerList
@@ -55,7 +55,7 @@ function SourceDrawerList({
       <View style={styles.drawerContent}>
          <View style={styles.drawerHeader}>
             <Text style={[styles.drawerTitle, { color: colors.text }]}>Sources</Text>
-            <TouchableOpacity
+            <Pressable
                onPress={onClose}
                style={[
                   styles.closeButton,
@@ -67,23 +67,24 @@ function SourceDrawerList({
             >
                <X strokeWidth={2} size={16} color={colors.primary} />
                <Text style={[styles.closeButtonText, { color: colors.primary }]}>Close</Text>
-            </TouchableOpacity>
+            </Pressable>
          </View>
-         {sources.map((doc, i) => (
-            <View
-               key={i}
-               style={[
-                  styles.sourceItem,
-                  {
-                     borderColor: colors.border,
-                     backgroundColor: colors.background,
-                  },
-               ]}
-            >
-               <FileCheck2 size={16} color={colors.textMuted} />
-               <Text style={[styles.sourceText, { color: colors.text }]}>{doc.name}</Text>
-            </View>
-         ))}
+         {sources &&
+            sources.map((doc, i) => (
+               <View
+                  key={i}
+                  style={[
+                     styles.sourceItem,
+                     {
+                        borderColor: colors.border,
+                        backgroundColor: colors.background,
+                     },
+                  ]}
+               >
+                  <FileCheck2 size={16} color={colors.textMuted} />
+                  <Text style={[styles.sourceText, { color: colors.text }]}>{doc.name}</Text>
+               </View>
+            ))}
       </View>
    )
 }

@@ -1,9 +1,9 @@
-import { Chats } from "@/hooks/chat/useChat"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { StyleSheet } from "react-native"
 import { Fonts, FontSizes } from "@/constants"
 
 import type { ColorsType } from "@/hooks/useTheme"
+import type { Chats } from "@/hooks/chat/useChat"
 
 import Markdown from "react-native-markdown-display"
 

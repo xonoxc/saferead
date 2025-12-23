@@ -45,7 +45,11 @@ export default function useSettingsGroups({
                title: "Change Password",
                onPress: () => router.push("/(application)/change_password"),
             },
-            { icon: Shield, title: "Privacy & Security", onPress: () => router.push("/privacy") },
+            {
+               icon: Shield,
+               title: "Privacy & Security",
+               onPress: () => router.push("/privacy"),
+            },
          ],
       },
       {
@@ -56,7 +60,7 @@ export default function useSettingsGroups({
                title: "Language",
                value: "English",
                onPress: () => {
-                  router.push("/language")
+                  //router.push("/language")
                },
             },
             /* {
@@ -78,12 +82,23 @@ export default function useSettingsGroups({
       {
          title: "Support",
          items: [
-            { icon: HelpCircle, title: "Help & Support", onPress: () => router.push("/help") },
+            {
+               icon: HelpCircle,
+               title: "Help & Support",
+               onPress: () => router.push("/help"),
+            },
          ],
       },
       {
          title: "Account Actions",
-         items: [{ icon: LogOut, title: "Sign Out", onPress: handleLogout, danger: true }],
+         items: [
+            {
+               icon: LogOut,
+               title: "Sign Out",
+               onPress: handleLogout,
+               danger: true,
+            },
+         ],
       },
    ]
 }

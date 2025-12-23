@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, TouchableOpacity, Text } from "react-native"
+import { StyleSheet, Pressable, Text } from "react-native"
 import { MessageSquare } from "lucide-react-native"
 import Animated, { useAnimatedStyle, interpolate, withTiming } from "react-native-reanimated"
 import { Fonts, FontSizes } from "@/constants"
@@ -31,14 +31,10 @@ export default function SpaceDetailsOpenChatBtn({
 
    return (
       <Animated.View style={[styles.chatButtonContainer, animatedStyle]}>
-         <TouchableOpacity
-            onPress={onPress}
-            style={[styles.chatButton, { backgroundColor: color }]}
-            activeOpacity={0.8}
-         >
+         <Pressable onPress={onPress} style={[styles.chatButton, { backgroundColor: color }]}>
             <MessageSquare size={28} color={"white"} />
             <Text style={[styles.chatButtonText, { color: "white" }]}>Open in chat</Text>
-         </TouchableOpacity>
+         </Pressable>
       </Animated.View>
    )
 }

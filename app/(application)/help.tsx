@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from "react-native"
+import { View, Text, StyleSheet, ScrollView, Pressable, Linking } from "react-native"
 import {
    ArrowLeft,
    MessageCircle,
@@ -180,11 +180,7 @@ export default function HelpSupportScreen() {
             entering={FadeInRight.delay(index * 100).springify()}
             style={[styles.faqItem, { backgroundColor: colors.card, borderColor: colors.border }]}
          >
-            <TouchableOpacity
-               style={styles.faqHeader}
-               onPress={() => toggleFAQ(item.id)}
-               activeOpacity={0.7}
-            >
+            <Pressable style={styles.faqHeader} onPress={() => toggleFAQ(item.id)}>
                <View style={styles.faqHeaderContent}>
                   <View style={[styles.categoryBadge, { backgroundColor: colors.primary + "15" }]}>
                      <Text style={[styles.categoryText, { color: colors.primary }]}>
@@ -196,7 +192,7 @@ export default function HelpSupportScreen() {
                <Animated.View style={rotateStyle}>
                   <ChevronDown size={20} color={colors.textSecondary} />
                </Animated.View>
-            </TouchableOpacity>
+            </Pressable>
 
             <Animated.View style={[styles.faqAnswer, expandStyle]}>
                <Text style={[styles.faqAnswerText, { color: colors.textSecondary }]}>
@@ -214,12 +210,12 @@ export default function HelpSupportScreen() {
             entering={FadeInDown.delay(100).springify()}
             style={[styles.header, { backgroundColor: colors.background }]}
          >
-            <TouchableOpacity
+            <Pressable
                style={[styles.backButton, { backgroundColor: colors.surface }]}
                onPress={() => router.back()}
             >
                <ArrowLeft size={24} color={colors.text} />
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.headerContent}>
                <Text style={[styles.title, { color: colors.text }]}>Help & Support</Text>
@@ -240,13 +236,12 @@ export default function HelpSupportScreen() {
                         entering={FadeInRight.delay(300 + index * 100).springify()}
                         style={styles.supportOptionWrapper}
                      >
-                        <TouchableOpacity
+                        <Pressable
                            style={[
                               styles.supportOption,
                               { backgroundColor: colors.card, borderColor: colors.border },
                            ]}
                            onPress={option.action}
-                           activeOpacity={0.7}
                         >
                            <View
                               style={[styles.supportIcon, { backgroundColor: option.color + "15" }]}
@@ -266,7 +261,7 @@ export default function HelpSupportScreen() {
                               color={colors.textMuted}
                               style={styles.externalIcon}
                            />
-                        </TouchableOpacity>
+                        </Pressable>
                      </Animated.View>
                   ))}
                </View>
@@ -281,13 +276,12 @@ export default function HelpSupportScreen() {
                         key={index}
                         entering={FadeInRight.delay(600 + index * 100).springify()}
                      >
-                        <TouchableOpacity
+                        <Pressable
                            style={[
                               styles.quickLink,
                               { backgroundColor: colors.card, borderColor: colors.border },
                            ]}
                            onPress={link.action}
-                           activeOpacity={0.7}
                         >
                            <View
                               style={[styles.quickLinkIcon, { backgroundColor: colors.surface }]}
@@ -308,7 +302,7 @@ export default function HelpSupportScreen() {
                               </Text>
                            </View>
                            <ChevronRight size={16} color={colors.textMuted} />
-                        </TouchableOpacity>
+                        </Pressable>
                      </Animated.View>
                   ))}
                </View>
@@ -347,14 +341,14 @@ export default function HelpSupportScreen() {
                         key={category}
                         entering={FadeInRight.delay(800 + index * 50).springify()}
                      >
-                        <TouchableOpacity
+                        <Pressable
                            style={[styles.categoryChip, { backgroundColor: colors.primary + "15" }]}
                            onPress={() => setSearchQuery(category)}
                         >
                            <Text style={[styles.categoryChipText, { color: colors.primary }]}>
                               {category}
                            </Text>
-                        </TouchableOpacity>
+                        </Pressable>
                      </Animated.View>
                   ))}
                </ScrollView>

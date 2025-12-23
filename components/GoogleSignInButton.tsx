@@ -1,5 +1,5 @@
 import React from "react"
-import { TouchableOpacity, Text, StyleSheet, View, ActivityIndicator } from "react-native"
+import { Text, StyleSheet, View, ActivityIndicator, Pressable } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 
@@ -27,7 +27,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
    )
 
    return (
-      <TouchableOpacity
+      <Pressable
          style={[
             styles.button,
             {
@@ -39,7 +39,6 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
          ]}
          onPress={onPress}
          disabled={disabled || loading}
-         activeOpacity={0.8}
       >
          {loading ? (
             <ActivityIndicator size="small" color={colors.textSecondary} />
@@ -49,7 +48,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
                <Text style={[styles.text, { color: colors.text }]}>Continue with Google</Text>
             </>
          )}
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

@@ -1,16 +1,18 @@
-import { StyleSheet, TouchableOpacity, type TouchableOpacityProps } from "react-native"
+import { StyleSheet, Pressable } from "react-native"
 import { ScanSearch } from "lucide-react-native"
 import { useDocumentScan } from "@/hooks/useDocumentScan"
 
-interface ScanBtnProps extends TouchableOpacityProps {}
+import type { PressableProps } from "react-native"
+
+interface ScanBtnProps extends PressableProps {}
 
 export default function ScanBtn(props: ScanBtnProps) {
    const { handleDocumentScan } = useDocumentScan()
 
    return (
-      <TouchableOpacity {...props} style={styles.scanBtn} onPress={handleDocumentScan}>
+      <Pressable {...props} style={styles.scanBtn} onPress={handleDocumentScan}>
          <ScanSearch size={26} color={"black"} />
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

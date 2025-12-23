@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Text, StyleSheet, Pressable } from "react-native"
 import { FileText, Calendar, TriangleAlert as AlertTriangle, Shield } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
@@ -36,10 +36,9 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, o
    }
 
    return (
-      <TouchableOpacity
+      <Pressable
          style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
          onPress={onPress}
-         activeOpacity={0.7}
       >
          <View style={styles.header}>
             <View style={styles.iconContainer}>
@@ -88,7 +87,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, o
             )}
 
             {!document.analysis && onAnalyze && (
-               <TouchableOpacity
+               <Pressable
                   style={[styles.analyzeButton, { backgroundColor: colors.primary }]}
                   onPress={e => {
                      e.stopPropagation()
@@ -98,7 +97,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, o
                   <Text style={[styles.analyzeButtonText, { color: "#FFFFFF" }]}>
                      Analyze Document
                   </Text>
-               </TouchableOpacity>
+               </Pressable>
             )}
          </View>
 
@@ -116,7 +115,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, o
                )}
             </View>
          )}
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

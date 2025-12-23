@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native"
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native"
 import { Controller } from "react-hook-form"
 
 import { Button, TextInput } from "@/components"
@@ -40,9 +40,9 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
          <View style={[styles.container, { backgroundColor: colors.background }]}>
             <View style={styles.header}>
                <Text style={[styles.title, { color: colors.text }]}>Upload Document</Text>
-               <TouchableOpacity onPress={onCancel}>
+               <Pressable onPress={onCancel}>
                   <Text style={[styles.cancel, { color: colors.primary }]}>Cancel</Text>
-               </TouchableOpacity>
+               </Pressable>
             </View>
 
             <ScrollView
@@ -81,7 +81,7 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
                            const Icon = (selectedOption?.icon ?? FileType) as LucideIcon
 
                            return (
-                              <TouchableOpacity
+                              <Pressable
                                  onPress={open}
                                  style={[
                                     styles.picker,
@@ -103,7 +103,7 @@ export const UploadDocumentForm = ({ spaceId, onUploadSuccess, onCancel }: Props
                                     </Text>
                                     <ChevronDown color={colors.accent} size={18} />
                                  </View>
-                              </TouchableOpacity>
+                              </Pressable>
                            )
                         }}
                         options={[

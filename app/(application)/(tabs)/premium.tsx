@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native"
 import { Check, Sparkles, Shield, Zap, Brain } from "lucide-react-native"
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
@@ -102,7 +102,7 @@ export default function PremiumScreen() {
             >
                <View style={styles.pricingCards}>
                   {plans.map(plan => (
-                     <TouchableOpacity
+                     <Pressable
                         key={plan.id}
                         style={[styles.pricingCard, isCardSelected(plan) && styles.selectedCard]}
                         onPress={() => setSelectedPlan(plan)}
@@ -117,7 +117,7 @@ export default function PremiumScreen() {
                                  : `/${plan.billing_cycle.slice(0, 2)}`}
                            </Text>
                         </View>
-                     </TouchableOpacity>
+                     </Pressable>
                   ))}
                </View>
             </Animated.View>
@@ -128,33 +128,33 @@ export default function PremiumScreen() {
                   entering={FadeInDown.delay(1200).springify()}
                   style={styles.ctaSection}
                >
-                  <TouchableOpacity style={styles.upgradeButton}>
+                  <Pressable style={styles.upgradeButton}>
                      <Text style={styles.upgradeButtonText}>
                         Upgrade to {effectiveSelectedPlan.display_name}
                      </Text>
-                  </TouchableOpacity>
+                  </Pressable>
 
                   <Text style={styles.billingInfo}>
                      Auto-renews for ${effectiveSelectedPlan.price}/
                      {effectiveSelectedPlan.billing_cycle} until cancelled
                   </Text>
 
-                  <TouchableOpacity style={styles.restoreButton}>
+                  <Pressable style={styles.restoreButton}>
                      <Text style={styles.restoreText}>Restore subscription</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                </Animated.View>
             )}
 
             {/* Footer */}
             <Animated.View entering={FadeInDown.delay(1400).springify()} style={styles.footer}>
                <View style={styles.footerLinks}>
-                  <TouchableOpacity>
+                  <Pressable>
                      <Text style={styles.footerLink}>Terms</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                   <Text style={styles.footerSeparator}>|</Text>
-                  <TouchableOpacity>
+                  <Pressable>
                      <Text style={styles.footerLink}>Privacy Policy</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                </View>
             </Animated.View>
          </ScrollView>

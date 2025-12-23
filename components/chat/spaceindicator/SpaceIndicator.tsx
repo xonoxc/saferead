@@ -1,5 +1,5 @@
 import React from "react"
-import { Text, TouchableOpacity, StyleSheet } from "react-native"
+import { Text, Pressable, StyleSheet } from "react-native"
 import { Box, ChevronsUpDown } from "lucide-react-native"
 import { useSpaces } from "@/hooks/queries/spaces"
 import { useSpaceStore } from "@/store/useSpaceStore"
@@ -34,7 +34,7 @@ export function SpaceIndicator() {
          onSelect={handleSelect}
          loading={isLoading}
          renderTrigger={(open, selectedOption) => (
-            <TouchableOpacity
+            <Pressable
                onPress={open}
                style={[
                   styles.trigger,
@@ -50,7 +50,7 @@ export function SpaceIndicator() {
                   {selectedOption?.label || selectedSpace?.title}
                </Text>
                <ChevronsUpDown size={18} color={colors.textMuted} />
-            </TouchableOpacity>
+            </Pressable>
          )}
       />
    )

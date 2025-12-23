@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, Pressable } from "react-native"
 import Animated, { FadeInUp } from "react-native-reanimated"
 import { Camera, Upload, MessageCircle, CheckCircle } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
@@ -17,23 +17,23 @@ export const AnalysisDemo: React.FC = () => {
    return (
       <View style={styles.analysisDemo}>
          <View style={styles.uploadOptions}>
-            <TouchableOpacity
+            <Pressable
                style={[styles.uploadOption, { backgroundColor: colors.primary + "15" }]}
                onPress={handleAnalyze}
             >
                <Camera size={24} color={colors.primary} />
                <Text style={[styles.uploadText, { color: colors.primary }]}>Scan</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
+            <Pressable
                style={[styles.uploadOption, { backgroundColor: colors.secondary + "15" }]}
                onPress={handleAnalyze}
             >
                <Upload size={24} color={colors.secondary} />
                <Text style={[styles.uploadText, { color: colors.secondary }]}>Upload</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
+            <Pressable
                style={[styles.uploadOption, { backgroundColor: colors.accent + "15" }]}
                onPress={handleAnalyze}
             >
@@ -46,7 +46,7 @@ export const AnalysisDemo: React.FC = () => {
                >
                   Chat
                </Text>
-            </TouchableOpacity>
+            </Pressable>
 
             {isAnalyzing && (
                <Animated.View

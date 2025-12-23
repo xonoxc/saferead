@@ -1,7 +1,7 @@
 import { useTheme } from "@/hooks/useTheme"
 import { useActiveFilterCount } from "@/store/useDocumentStore"
 import { Filter, X } from "lucide-react-native"
-import { StyleSheet, TouchableOpacity, View, Text } from "react-native"
+import { StyleSheet, Pressable, View, Text } from "react-native"
 
 interface SearchRightAccessoryProps {
    searchQuery: string
@@ -22,12 +22,12 @@ export default function SearchRightAccessory({
    return (
       <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => onSearchChange("")} style={styles.clearBtn}>
+            <Pressable onPress={() => onSearchChange("")} style={styles.clearBtn}>
                <X size={18} color={colors.textMuted} strokeWidth={2.5} />
-            </TouchableOpacity>
+            </Pressable>
          )}
          {showFilter && onFilterPress && (
-            <TouchableOpacity style={styles.filterBtn} onPress={onFilterPress}>
+            <Pressable style={styles.filterBtn} onPress={onFilterPress}>
                <Filter size={18} color={colors.textMuted} />
 
                {!!activeFilterCount && activeFilterCount > 0 && (
@@ -37,7 +37,7 @@ export default function SearchRightAccessory({
                      )}
                   </View>
                )}
-            </TouchableOpacity>
+            </Pressable>
          )}
       </View>
    )

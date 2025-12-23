@@ -1,5 +1,5 @@
 import { Globe, LockIcon } from "lucide-react-native"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Text, Pressable, StyleSheet } from "react-native"
 import { useSlidingSelector } from "@/hooks/animation/useSlidingSelector"
 import { useTheme } from "@/hooks/useTheme"
 import Animated from "react-native-reanimated"
@@ -42,7 +42,7 @@ export default function SpacePrivacySelector({ field: { value, onChange } }: Pri
             const textColor = isSelected ? colors.card : colors.text
 
             return (
-               <TouchableOpacity
+               <Pressable
                   key={option}
                   style={[styles.privacyOption]}
                   onPress={() => onChange(option)}
@@ -57,7 +57,7 @@ export default function SpacePrivacySelector({ field: { value, onChange } }: Pri
                   >
                      {option.charAt(0).toUpperCase() + option.slice(1)}
                   </Text>
-               </TouchableOpacity>
+               </Pressable>
             )
          })}
       </View>

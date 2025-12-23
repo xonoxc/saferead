@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share } from "react-native"
+import { View, Text, StyleSheet, ScrollView, Pressable, Share } from "react-native"
 import {
    Share2,
    Download,
@@ -79,12 +79,12 @@ const Header = ({ onBack, analysis }: { onBack: () => void; analysis: AnalysisRe
             {analysis.original_filename || "Document Analysis"}
          </Text>
          <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
+            <Pressable style={styles.actionButton} onPress={handleShare}>
                <Share2 size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
+            </Pressable>
+            <Pressable style={styles.actionButton}>
                <Download size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
+            </Pressable>
          </View>
       </Animated.View>
    )
@@ -163,7 +163,7 @@ const SummarySection = ({ analysis }: { analysis: AnalysisResponse }) => {
                }}
             />
             <View style={styles.speakBtnContainer}>
-               <TouchableOpacity
+               <Pressable
                   onPress={() => speakText(analysis.summary_text)}
                   style={[styles.speakButton, { backgroundColor: colors.accent }]}
                >
@@ -177,7 +177,7 @@ const SummarySection = ({ analysis }: { analysis: AnalysisResponse }) => {
                   >
                      Listen
                   </Text>
-               </TouchableOpacity>
+               </Pressable>
             </View>
          </View>
          <Text style={[styles.summaryText, { color: colors.textSecondary }]}>
@@ -201,11 +201,11 @@ const RiskyPointsSection = ({ points }: { points: string[] }) => {
             </View>
          ))}
          {points.length > 3 && (
-            <TouchableOpacity onPress={() => setShowAll(!showAll)} style={styles.showMoreButton}>
+            <Pressable onPress={() => setShowAll(!showAll)} style={styles.showMoreButton}>
                <Text style={[styles.showMoreText, { color: colors.primary }]}>
                   {showAll ? "Show Less" : `Show ${points.length - 3} More`}
                </Text>
-            </TouchableOpacity>
+            </Pressable>
          )}
       </Animated.View>
    )
@@ -225,11 +225,11 @@ const FavorablePointsSection = ({ points }: { points: string[] }) => {
             </View>
          ))}
          {points.length > 3 && (
-            <TouchableOpacity onPress={() => setShowAll(!showAll)} style={styles.showMoreButton}>
+            <Pressable onPress={() => setShowAll(!showAll)} style={styles.showMoreButton}>
                <Text style={[styles.showMoreText, { color: colors.primary }]}>
                   {showAll ? "Show Less" : `Show ${points.length - 3} More`}
                </Text>
-            </TouchableOpacity>
+            </Pressable>
          )}
       </Animated.View>
    )

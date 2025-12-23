@@ -1,5 +1,5 @@
 import React from "react"
-import { Text, TouchableOpacity, StyleSheet } from "react-native"
+import { Text, Pressable, StyleSheet } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 
@@ -12,13 +12,12 @@ export const PromptChip = ({ label, onPress }: PromptChipProps) => {
    const { colors } = useTheme()
 
    return (
-      <TouchableOpacity
+      <Pressable
          style={[styles.chip, { backgroundColor: colors.background, borderColor: colors.border }]}
          onPress={() => onPress?.(label)}
-         activeOpacity={0.7}
       >
          <Text style={[styles.text, { color: colors.text }]}>{label}</Text>
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

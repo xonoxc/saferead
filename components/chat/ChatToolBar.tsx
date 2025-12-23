@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, StyleSheet, TextInput } from "react-native"
+import { Pressable, View, StyleSheet, TextInput } from "react-native"
 import { CircleDot, Send } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
@@ -49,7 +49,7 @@ export function ChatToolBar({
                placeholder="Ask a question..."
                placeholderTextColor={colors.textMuted}
             />
-            <TouchableOpacity
+            <Pressable
                style={[styles.sendButton, { backgroundColor: colors.text }]}
                onPress={handleInputSideButtonPress}
                disabled={!message.trim()}
@@ -59,7 +59,7 @@ export function ChatToolBar({
                ) : (
                   <Send size={24} color={colors.background} />
                )}
-            </TouchableOpacity>
+            </Pressable>
          </View>
       </View>
    )

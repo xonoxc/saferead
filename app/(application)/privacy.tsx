@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native"
 import {
    ArrowLeft,
    Shield,
@@ -113,12 +113,12 @@ export default function PrivacyScreen() {
             entering={FadeInDown.delay(100).springify()}
             style={[styles.header, { backgroundColor: colors.background }]}
          >
-            <TouchableOpacity
+            <Pressable
                style={[styles.backButton, { backgroundColor: colors.surface }]}
                onPress={() => router.back()}
             >
                <ArrowLeft size={24} color={colors.text} />
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.headerContent}>
                <Text style={[styles.title, { color: colors.text }]}>Privacy & Security</Text>
@@ -159,7 +159,7 @@ export default function PrivacyScreen() {
                         { backgroundColor: colors.card, borderColor: colors.border },
                      ]}
                   >
-                     <TouchableOpacity
+                     <Pressable
                         style={styles.privacyHeader}
                         onPress={() => toggleSection(section.id)}
                         activeOpacity={0.7}
@@ -186,7 +186,7 @@ export default function PrivacyScreen() {
                               ],
                            }}
                         />
-                     </TouchableOpacity>
+                     </Pressable>
 
                      {expandedSection === section.id && (
                         <Animated.View
@@ -211,7 +211,7 @@ export default function PrivacyScreen() {
                      key={index}
                      entering={FadeInRight.delay(800 + index * 100).springify()}
                   >
-                     <TouchableOpacity
+                     <Pressable
                         style={[
                            styles.controlItem,
                            { backgroundColor: colors.card, borderColor: colors.border },
@@ -255,7 +255,7 @@ export default function PrivacyScreen() {
                            </View>
                         </View>
                         <ChevronRight size={16} color={colors.textMuted} />
-                     </TouchableOpacity>
+                     </Pressable>
                   </Animated.View>
                ))}
             </Animated.View>
@@ -270,14 +270,14 @@ export default function PrivacyScreen() {
                   If you have any questions about our privacy practices or want to exercise your
                   rights, our privacy team is here to help.
                </Text>
-               <TouchableOpacity
+               <Pressable
                   style={[styles.contactButton, { backgroundColor: colors.primary }]}
                   onPress={() => {}}
                >
                   <Text style={[styles.contactButtonText, { color: colors.background }]}>
                      Contact Privacy Team
                   </Text>
-               </TouchableOpacity>
+               </Pressable>
             </Animated.View>
 
             {/* Last Updated */}

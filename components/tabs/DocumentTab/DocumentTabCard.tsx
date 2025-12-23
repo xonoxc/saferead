@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, Pressable } from "react-native"
 import { ArrowDown, ArrowUp, FileText, Trash2 } from "lucide-react-native"
 import { Fonts, FontSizes } from "@/constants"
 import { useDrawerAlert } from "@/hooks/alerts/useAlert"
@@ -37,7 +37,7 @@ export function DocumentTabCard({ document, onPress, onDelete }: DocumentCardPro
    const isDocumentComplete = isDocumentStatusCompleted(document)
 
    return (
-      <TouchableOpacity
+      <Pressable
          style={[
             styles.documentCard,
             {
@@ -64,7 +64,7 @@ export function DocumentTabCard({ document, onPress, onDelete }: DocumentCardPro
                </Text>
             </View>
             <View style={styles.cardActions}>
-               <TouchableOpacity
+               <Pressable
                   style={[styles.actionButton, { backgroundColor: colors.error + "20" }]}
                   onPress={e => {
                      e.stopPropagation()
@@ -72,7 +72,7 @@ export function DocumentTabCard({ document, onPress, onDelete }: DocumentCardPro
                   }}
                >
                   <Trash2 size={16} color={colors.error} />
-               </TouchableOpacity>
+               </Pressable>
             </View>
          </View>
 
@@ -112,7 +112,7 @@ export function DocumentTabCard({ document, onPress, onDelete }: DocumentCardPro
                </View>
             )}
          </View>
-      </TouchableOpacity>
+      </Pressable>
    )
 }
 

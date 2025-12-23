@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from "react-native"
+import { View, Text, StyleSheet, Pressable, useWindowDimensions } from "react-native"
 import { ServerCrash, MessageCircle, TriangleAlert as AlertTriangle } from "lucide-react-native"
 import Animated, {
    FadeInDown,
@@ -230,12 +230,12 @@ export default function ServerErrorScreen({
                      )}
 
                      {showSupportButton && (
-                        <TouchableOpacity style={styles.supportButton} onPress={onContactSupport}>
+                        <Pressable style={styles.supportButton} onPress={onContactSupport}>
                            <MessageCircle size={20} color={colors.textSecondary} />
                            <Text style={[styles.supportText, { color: colors.textSecondary }]}>
                               Contact Support
                            </Text>
-                        </TouchableOpacity>
+                        </Pressable>
                      )}
                   </View>
                </Animated.View>

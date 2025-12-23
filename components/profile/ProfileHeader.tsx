@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity } from "react-native"
+import { StyleSheet, Pressable } from "react-native"
 import { Edit3, X } from "lucide-react-native"
 import Animated, { FadeInDown } from "react-native-reanimated"
 
@@ -21,7 +21,7 @@ export function ProfileHeader({ isEditing, onEdit, onCancel }: Props) {
       >
          <CustomBackBtn />
 
-         <TouchableOpacity
+         <Pressable
             style={[
                styles.editBtn,
                { backgroundColor: isEditing ? colors.error + "15" : colors.primary + "15" },
@@ -33,7 +33,7 @@ export function ProfileHeader({ isEditing, onEdit, onCancel }: Props) {
             ) : (
                <Edit3 size={18} color={colors.primary} />
             )}
-         </TouchableOpacity>
+         </Pressable>
       </Animated.View>
    )
 }

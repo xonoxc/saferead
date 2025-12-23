@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native"
 import { ArrowLeft, Check, Globe } from "lucide-react-native"
 import Animated, {
    FadeInDown,
@@ -128,7 +128,7 @@ export default function LanguageScreen() {
 
       return (
          <Animated.View entering={FadeInRight.delay(index * 50).springify()} style={animatedStyle}>
-            <TouchableOpacity
+            <Pressable
                style={[
                   styles.languageItem,
                   {
@@ -137,7 +137,6 @@ export default function LanguageScreen() {
                   },
                ]}
                onPress={handlePress}
-               activeOpacity={1}
             >
                <View style={styles.languageLeft}>
                   <Text style={styles.flag}>{language.flag}</Text>
@@ -163,7 +162,7 @@ export default function LanguageScreen() {
                      </View>
                   </Animated.View>
                )}
-            </TouchableOpacity>
+            </Pressable>
          </Animated.View>
       )
    }
@@ -175,12 +174,12 @@ export default function LanguageScreen() {
             entering={FadeInDown.delay(100).springify()}
             style={[styles.header, { backgroundColor: colors.background }]}
          >
-            <TouchableOpacity
+            <Pressable
                style={[styles.backButton, { backgroundColor: colors.surface }]}
                onPress={() => router.back()}
             >
                <ArrowLeft size={24} color={colors.text} />
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.headerContent}>
                <Text style={[styles.title, { color: colors.text }]}>Language</Text>

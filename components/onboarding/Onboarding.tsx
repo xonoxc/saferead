@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react"
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, Dimensions, Pressable } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import Animated, {
    FadeInDown,
@@ -126,9 +126,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, onSkip }) =>
                entering={FadeInDown.delay(200).springify()}
                style={styles.skipContainer}
             >
-               <TouchableOpacity onPress={onSkip} style={styles.skipButton}>
+               <Pressable onPress={onSkip} style={styles.skipButton}>
                   <Text style={[styles.skipText, { color: colors.textSecondary }]}>Skip</Text>
-               </TouchableOpacity>
+               </Pressable>
             </Animated.View>
 
             <View style={styles.paginatorContainer}>

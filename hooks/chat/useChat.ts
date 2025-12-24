@@ -28,16 +28,20 @@ export default function useChat() {
    const [message, setMessage] = useState("")
    const [isTyping, setIsTyping] = useState(false)
    const [chatHistory, setChatHistory] = useState<Chats>([])
-   const [_, setShowScrollToBottom] = useState<boolean>(false)
+   const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false)
+   const [isAtBottom, setIsAtBottom] = useState<boolean>(true)
 
    const scrollViewRef = useRef<ScrollView | null>(null)
    const abortControllerRef = useRef<AbortController | null>(null)
+   const hideScrollButtonRef = useRef<number | null>(null)
+   const isUserScrollingRef = useRef<boolean>(false)
 
    const selectedSpace = useSpaceStore(s => s.selectedSpace)
    const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
    const activeConversationId = useSpaceStore(s => s.activeConverstationId)
 
    const showBottomMessage = useDrawerAlert()
+
    const getStreamingResponse = useInstantJSONResponse()
 
    const [isKeyboardVisible, setKeyboardVisible] = useState(KeyboardController.isVisible())
@@ -53,6 +57,15 @@ export default function useChat() {
    )
 
    /*
+    * auto scroll to bottom when new message is added
+    * **/
+   useEffect(() => {
+      if (isAtBottom) {
+         scrollToBottom()
+      }
+   }, [chatHistory.length])
+
+   /*
     * this is to handle the cleanup of the abort controller
     * **/
    useEffect(() => {
@@ -64,10 +77,47 @@ export default function useChat() {
       }
    }, [])
 
+   const showScrollToBottomBtnTemporarily = () => {
+      if (isAtBottom) return
+
+      setShowScrollToBottom(true)
+
+      if (hideScrollButtonRef.current) {
+         clearTimeout(hideScrollButtonRef.current)
+         hideScrollButtonRef.current = null
+      }
+
+      hideScrollButtonRef.current = setTimeout(() => {
+         setShowScrollToBottom(false)
+      }, 3000)
+   }
+
+   const onScrollBeginDrag = () => {
+      isUserScrollingRef.current = true
+      showScrollToBottomBtnTemporarily()
+   }
+
+   const onScrollEndDrag = () => (isUserScrollingRef.current = false)
+
    const handleScroll = (event: any) => {
       const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent
       const isNearBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 100
-      setShowScrollToBottom(!isNearBottom)
+      setIsAtBottom(isNearBottom)
+
+      /*
+       * Hide the scroll to bottom button if we are at the bottom
+       * **/
+      if (isAtBottom) {
+         setShowScrollToBottom(false)
+         return
+      }
+
+      /*
+       *IGNORE non-user initiated scroll events
+       * **/
+      if (!isUserScrollingRef.current) return
+
+      showScrollToBottomBtnTemporarily()
    }
 
    const scrollToBottom = () => {
@@ -167,5 +217,9 @@ export default function useChat() {
       scrollViewRef,
       scrollToBottom,
       handleScroll,
+      showScrollToBottom,
+      showScrollToBottomBtnTemporarily,
+      onScrollBeginDrag,
+      onScrollEndDrag,
    }
 }

@@ -12,6 +12,7 @@ import ChatGreeting from "./ChatGreeting"
 import { TypingBubble } from "./TypingBubble"
 import { ChatToolBar } from "./ChatToolBar"
 import { ChatHistory } from "./ChatHistory"
+import { ScrollToBottomButton } from "./ScrollToBottomButton"
 
 export function ChatView() {
    const {
@@ -26,6 +27,10 @@ export function ChatView() {
       handlePromptSeggestionPress,
       scrollViewRef,
       scrollToBottom,
+      handleScroll,
+      showScrollToBottom,
+      onScrollBeginDrag,
+      onScrollEndDrag,
    } = useChat()
 
    return (
@@ -52,11 +57,21 @@ export function ChatView() {
                   keyboardShouldPersistTaps="handled"
                   showsVerticalScrollIndicator={false}
                   keyboardDismissMode="interactive"
-                  onContentSizeChange={() => scrollToBottom()}
+                  onScrollBeginDrag={onScrollBeginDrag}
+                  onScrollEndDrag={onScrollEndDrag}
+                  scrollEventThrottle={16}
+                  onScroll={handleScroll}
                >
+                  <View style={[styles.header, { backgroundColor: colors.background }]}>
+                     <View style={styles.headerContent}>
+                        <SpaceIndicator />
+                     </View>
+                  </View>
                   {isChatEmpty() ? <ChatGreeting /> : <ChatHistory chatHistory={chatHistory} />}
                   {isTyping && <TypingBubble />}
                </KeyboardAwareScrollView>
+
+               <ScrollToBottomButton onPress={scrollToBottom} visible={showScrollToBottom} />
 
                <ChatToolBar
                   message={message}

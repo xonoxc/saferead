@@ -62,11 +62,6 @@ export function ChatView() {
                   scrollEventThrottle={16}
                   onScroll={handleScroll}
                >
-                  <View style={[styles.header, { backgroundColor: colors.background }]}>
-                     <View style={styles.headerContent}>
-                        <SpaceIndicator />
-                     </View>
-                  </View>
                   {isChatEmpty() ? <ChatGreeting /> : <ChatHistory chatHistory={chatHistory} />}
                   {isTyping && <TypingBubble />}
                </KeyboardAwareScrollView>

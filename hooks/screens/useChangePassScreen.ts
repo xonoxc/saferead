@@ -7,15 +7,13 @@ import { useAuth } from "@/hooks/useAuth"
 import { router } from "expo-router"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useDrawerAlert } from "../alerts/useAlert"
+import { changePasswordFormSchema } from "@/utils/validation/change-password"
 
-import {
-   type ChangePasswordFormSchema,
-   changePasswordFormSchema,
-} from "@/utils/validation/change-password"
+import type { ChangePasswordFormSchema } from "@/utils/validation/change-password"
 
 export default function useChangePassScreen() {
    const { logout } = useAuth()
-   const [isSubmitting, setIsSubmitting] = useState(false)
+   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
    const showBottomAlert = useDrawerAlert()
 

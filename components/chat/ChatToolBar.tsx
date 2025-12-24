@@ -51,8 +51,8 @@ export function ChatToolBar({
             />
             <Pressable
                style={[styles.sendButton, { backgroundColor: colors.text }]}
-               onPress={handleInputSideButtonPress}
-               disabled={!message.trim()}
+               onPressIn={handleInputSideButtonPress}
+               disabled={!message.trim() && !isTyping}
             >
                {isTyping ? (
                   <CircleDot size={24} color={colors.background} />

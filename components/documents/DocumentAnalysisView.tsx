@@ -219,7 +219,7 @@ const FavorablePointsSection = ({ points }: { points: string[] }) => {
       <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.section}>
          <SectionHeader title="Favorable Points" count={points.length} color={colors.success} />
          {points.slice(0, showAll ? points.length : 3).map((p, i) => (
-            <View key={i} style={styles.pointItem}>
+            <View key={`${p}-${i}`} style={styles.pointItem}>
                <CheckCircle size={16} color={colors.success} />
                <Text style={[styles.pointText, { color: colors.textSecondary }]}>{p}</Text>
             </View>

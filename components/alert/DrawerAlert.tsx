@@ -44,7 +44,7 @@ export function DrawerAlert({ visible, title, message, actions = [] }: DrawerAle
             <View style={{ flexDirection: "row", justifyContent: "flex-end", gap: 8 }}>
                {actions.map((action, index) => (
                   <Pressable
-                     key={index}
+                     key={`${action.label}-${index}`}
                      onPress={async () => {
                         await impactAsync(ImpactFeedbackStyle.Medium)
                         action.onPress?.()

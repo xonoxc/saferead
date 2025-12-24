@@ -103,9 +103,13 @@ export const useInstantChatResponse = () => {
 }
 
 export const useInstantJSONResponse = () => {
-   return async function (data: StreamResponseCallbakcParams) {
-      return apiClient.post("/user_space/chatbot/instant-response/", {
-         ...data,
-      })
+   return async function (data: StreamResponseCallbakcParams, abortSignal?: AbortSignal) {
+      return apiClient.post(
+         "/user_space/chatbot/instant-response/",
+         {
+            ...data,
+         },
+         { signal: abortSignal }
+      )
    }
 }

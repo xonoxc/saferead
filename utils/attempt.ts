@@ -28,6 +28,14 @@ function err<E>(error: E): Err<E> {
    return { ok: false, error }
 }
 
+export class AbortError extends Error {
+   name: string = "AbortError"
+}
+
+export function isAbortError(error: unknown): error is AbortError {
+   return error instanceof AbortError
+}
+
 /*
  * AttemptArg : type for the argument of attempt function
  * **/
@@ -36,12 +44,13 @@ type AttemptArg<T> = Promise<T | AxiosResponse<T>>
 /*
  * ErrorType : union type for Error and ExpectedError
  * **/
-type ErrorType = Error | ExpectedError
+type ErrorType = Error | ExpectedError | AbortError
 /*
  *
  * actual attempt function | axios overloaded
  *
  * **/
+
 export async function attempt<T, E = ErrorType>(fn: () => AttemptArg<T>): Promise<Result<T, E>> {
    try {
       const result = await fn()
@@ -52,6 +61,10 @@ export async function attempt<T, E = ErrorType>(fn: () => AttemptArg<T>): Promis
    } catch (error: any) {
       //Axios specific error handling
       if (error instanceof AxiosError) {
+         if (error.code === "ERR_CANCELED") {
+            return err(new AbortError("The operation was aborted.") as E)
+         }
+
          const axiosError = handleAxiosError(error)
          if (axiosError) {
             return err(axiosError as E)

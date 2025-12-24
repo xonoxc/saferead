@@ -27,7 +27,10 @@ export default function SpaceDetailsStats({ stats, colors }: SpaceDetailsStatsPr
          ]}
       >
          {stats.map((stat, index) => (
-            <View key={index} style={[styles.statCard, { backgroundColor: stat.color }]}>
+            <View
+               key={`${stat}-${index}`}
+               style={[styles.statCard, { backgroundColor: stat.color }]}
+            >
                <View style={[styles.statIcon, { backgroundColor: colors.background }]}>
                   <stat.icon size={20} color={stat.color} />
                </View>

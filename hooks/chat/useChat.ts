@@ -5,7 +5,7 @@ import { KeyboardController } from "react-native-keyboard-controller"
 import { useInstantJSONResponse } from "../queries/converstations"
 import { useDrawerAlert } from "../alerts/useAlert"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
-import { attempt } from "@/utils/attempt"
+import { attempt, isAbortError } from "@/utils/attempt"
 import { useKeyBoardVisibility } from "../kayboard/useKeyboardVisiblity"
 import { usePreventTabSwitch } from "../blocking/usePreventTabSwitch"
 import { ScrollView } from "react-native-reanimated/lib/typescript/Animated"
@@ -27,12 +27,10 @@ export default function useChat() {
    const [message, setMessage] = useState("")
    const [isTyping, setIsTyping] = useState(false)
    const [chatHistory, setChatHistory] = useState<Chats>([])
-   const [abortController, setAbortController] = useState<AbortController>(
-      () => new AbortController()
-   )
-   const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false)
+   const [_, setShowScrollToBottom] = useState<boolean>(false)
 
    const scrollViewRef = useRef<ScrollView | null>(null)
+   const abortControllerRef = useRef<AbortController | null>(null)
 
    const selectedSpace = useSpaceStore(s => s.selectedSpace)
    const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
@@ -58,9 +56,12 @@ export default function useChat() {
     * **/
    useEffect(() => {
       return () => {
-         abortController.abort()
+         const activeAbortController = abortControllerRef.current
+         if (activeAbortController) {
+            activeAbortController.abort()
+         }
       }
-   }, [abortController])
+   }, [])
 
    const handleScroll = (event: any) => {
       const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent
@@ -89,10 +90,23 @@ export default function useChat() {
       setIsTyping(true)
 
       setIsTyping(true)
+
+      if (abortControllerRef.current) abortControllerRef.current.abort()
+
+      const abortController = new AbortController()
+      abortControllerRef.current = abortController
+
       const resp = await attempt(() =>
-         getStreamingResponse({ message: content, conversation_id: activeConversationId! })
+         getStreamingResponse(
+            { message: content, conversation_id: activeConversationId! },
+            abortController.signal
+         )
       )
-      if (!resp?.ok) {
+      if (!resp.ok) {
+         if (isAbortError(resp.error)) {
+            return
+         }
+
          const errorMessage = getErrorMessage(resp?.error)
          showBottomMessage({
             type: "error",
@@ -120,14 +134,20 @@ export default function useChat() {
    const isChatEmpty = () => chatHistory.length === 0
 
    const cancelResponse = () => {
-      if (abortController) {
-         abortController.abort("User cancelled the request")
-         setAbortController(new AbortController())
+      console.log("Cancelling response...")
+
+      if (abortControllerRef.current) {
+         console.log("Abort controller found, aborting...")
+         abortControllerRef.current.abort("User cancelled the response")
+         abortControllerRef.current = null
+         console.log("Response aborted.")
          setIsTyping(false)
+         console.log("isTyping set to false")
       }
    }
 
    const handleInputSideButtonPress = () => {
+      console.log("Input side button pressed.")
       if (isTyping) {
          cancelResponse()
       } else {

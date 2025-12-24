@@ -8,7 +8,7 @@ export function getErrorMessage(error: any): string {
    if (error.status >= 400 && error.status < 500) {
       return extractValidationErrorMessage(error.message)
    } else if (error.status === 500) {
-      return "Internal server error, try again later~ 🥺"
+      return "Internal server error, try again later~"
    }
 
    return typeof error.message === "string" ? error.message : "Unexpected error~!"

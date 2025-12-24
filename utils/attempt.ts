@@ -1,9 +1,5 @@
+import { AbortError, ExpectedError, NetworkError, UnknownError } from "@/utils/errors"
 import { AxiosError, type AxiosResponse } from "axios"
-
-export type ExpectedError = {
-   status: number
-   message: string
-}
 
 /*
  *typescript utility for handling async operations with error handling
@@ -26,14 +22,6 @@ function ok<T>(data: T): Ok<T> {
  * **/
 function err<E>(error: E): Err<E> {
    return { ok: false, error }
-}
-
-export class AbortError extends Error {
-   name: string = "AbortError"
-}
-
-export function isAbortError(error: unknown): error is AbortError {
-   return error instanceof AbortError
 }
 
 /*
@@ -61,10 +49,6 @@ export async function attempt<T, E = ErrorType>(fn: () => AttemptArg<T>): Promis
    } catch (error: any) {
       //Axios specific error handling
       if (error instanceof AxiosError) {
-         if (error.code === "ERR_CANCELED") {
-            return err(new AbortError("The operation was aborted.") as E)
-         }
-
          const axiosError = handleAxiosError(error)
          if (axiosError) {
             return err(axiosError as E)
@@ -120,24 +104,22 @@ export function andThen<T, E, U>(
  * handleAxiosError function : handles axios errors and returns a structured error message
  * **/
 
-interface ExpectedAxiosError {
-   status: number
-   message: string
-}
-
-const handleAxiosError = (error: AxiosError): ExpectedAxiosError => {
+const handleAxiosError = (error: AxiosError) => {
    switch (true) {
       case !!error.response:
          return serverError(error)
 
+      case error.code === "ERR_CANCELED":
+         return new AbortError("The operation was aborted.")
+
       case error.code === "ECONNABORTED":
-         return timeoutError()
+         return new AbortError("The operation was aborted due to a timeout.")
 
       case !error.response:
-         return networkError()
+         return new NetworkError("Network error. Please check your connection.")
 
       default:
-         return unknownAxiosError()
+         return new UnknownError("An unexpected error occurred.")
    }
 }
 
@@ -145,41 +127,11 @@ function serverError(error: AxiosError): ExpectedError {
    const response = error.response!
    const contentType = response.headers?.["content-type"]
 
-   if (contentType?.includes("application/json")) {
-      const message =
-         (response.data as any)?.message ||
-         (response.data as any)?.error ||
-         JSON.stringify(response.data)
+   const message = contentType?.includes("application/json")
+      ? (response.data as any)?.message ||
+        (response.data as any)?.error ||
+        JSON.stringify(response.data)
+      : "Internal server error. Please try again later!"
 
-      return {
-         status: response.status,
-         message,
-      }
-   }
-
-   return {
-      status: response.status,
-      message: "Internal server error. Please try again later!",
-   }
-}
-
-function timeoutError(): ExpectedError {
-   return {
-      status: 0,
-      message: "Request timed out. Please try again.",
-   }
-}
-
-function networkError(): ExpectedError {
-   return {
-      status: 0,
-      message: "Network error. Please check your connection.",
-   }
-}
-
-function unknownAxiosError(): ExpectedError {
-   return {
-      status: 0,
-      message: "Unexpected error occurred.",
-   }
+   return new ExpectedError(response.status, message)
 }

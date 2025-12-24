@@ -40,7 +40,7 @@ export default function useChangePassScreen() {
             type: "error",
             title: "Error",
             message: getErrorMessage(result.error) || "Failed to change password",
-            actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+            actions: [{ text: "OK", style: "primary" }],
          })
          return
       }

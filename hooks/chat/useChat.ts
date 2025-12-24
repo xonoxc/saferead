@@ -5,10 +5,11 @@ import { KeyboardController } from "react-native-keyboard-controller"
 import { useInstantJSONResponse } from "../queries/converstations"
 import { useDrawerAlert } from "../alerts/useAlert"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
-import { attempt, isAbortError } from "@/utils/attempt"
+import { attempt } from "@/utils/attempt"
 import { useKeyBoardVisibility } from "../kayboard/useKeyboardVisiblity"
 import { usePreventTabSwitch } from "../blocking/usePreventTabSwitch"
 import { ScrollView } from "react-native-reanimated/lib/typescript/Animated"
+import { isAbortError } from "@/utils/errors"
 
 export type ChatContextSources = {
    id: string
@@ -106,7 +107,6 @@ export default function useChat() {
          if (isAbortError(resp.error)) {
             return
          }
-
          const errorMessage = getErrorMessage(resp?.error)
          showBottomMessage({
             type: "error",
@@ -134,15 +134,10 @@ export default function useChat() {
    const isChatEmpty = () => chatHistory.length === 0
 
    const cancelResponse = () => {
-      console.log("Cancelling response...")
-
       if (abortControllerRef.current) {
-         console.log("Abort controller found, aborting...")
          abortControllerRef.current.abort("User cancelled the response")
          abortControllerRef.current = null
-         console.log("Response aborted.")
          setIsTyping(false)
-         console.log("isTyping set to false")
       }
    }
 

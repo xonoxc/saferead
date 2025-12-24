@@ -58,7 +58,7 @@ export function isUnknownError(error: unknown): error is UnknownError {
 /**
  * expected error
  * **/
-export class ExpectedError extends Error {
+export class APIServerError extends Error {
    status: number
 
    constructor(status: number, message: string) {
@@ -68,6 +68,6 @@ export class ExpectedError extends Error {
    }
 }
 
-export function isExpectedError(error: unknown): error is ExpectedError {
-   return error instanceof ExpectedError
+export function isAPIServerError(error: unknown): error is APIServerError {
+   return error instanceof APIServerError
 }

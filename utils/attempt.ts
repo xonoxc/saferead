@@ -1,4 +1,10 @@
-import { AbortError, ExpectedError, NetworkError, UnknownError } from "@/utils/errors"
+import {
+   AbortError,
+   APIServerError,
+   NetworkError,
+   TimeoutError,
+   UnknownError,
+} from "@/utils/errors"
 import { AxiosError, type AxiosResponse } from "axios"
 
 /*
@@ -32,7 +38,7 @@ type AttemptArg<T> = Promise<T | AxiosResponse<T>>
 /*
  * ErrorType : union type for Error and ExpectedError
  * **/
-type ErrorType = Error | ExpectedError | AbortError
+type ErrorType = Error | APIServerError | AbortError
 /*
  *
  * actual attempt function | axios overloaded
@@ -112,10 +118,10 @@ const handleAxiosError = (error: AxiosError) => {
       case error.code === "ERR_CANCELED":
          return new AbortError("The operation was aborted.")
 
-      case error.code === "ECONNABORTED":
-         return new AbortError("The operation was aborted due to a timeout.")
-
-      case !error.response:
+      case error.code === "ERR_NETWORK":
+         if (error.config?.timeout) {
+            return new TimeoutError("The request timed out. Please try again.")
+         }
          return new NetworkError("Network error. Please check your connection.")
 
       default:
@@ -123,7 +129,7 @@ const handleAxiosError = (error: AxiosError) => {
    }
 }
 
-function serverError(error: AxiosError): ExpectedError {
+function serverError(error: AxiosError): APIServerError {
    const response = error.response!
    const contentType = response.headers?.["content-type"]
 
@@ -133,5 +139,5 @@ function serverError(error: AxiosError): ExpectedError {
         JSON.stringify(response.data)
       : "Internal server error. Please try again later!"
 
-   return new ExpectedError(response.status, message)
+   return new APIServerError(response.status, message)
 }

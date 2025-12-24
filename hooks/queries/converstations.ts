@@ -106,10 +106,8 @@ export const useInstantJSONResponse = () => {
    return async function (data: StreamResponseCallbakcParams, abortSignal?: AbortSignal) {
       return apiClient.post(
          "/user_space/chatbot/instant-response/",
-         {
-            ...data,
-         },
-         { signal: abortSignal }
+         { ...data },
+         { signal: abortSignal, timeout: 10_000 }
       )
    }
 }

@@ -107,6 +107,7 @@ export default function useChat() {
          if (isAbortError(resp.error)) {
             return
          }
+
          const errorMessage = getErrorMessage(resp?.error)
          showBottomMessage({
             type: "error",
@@ -142,7 +143,6 @@ export default function useChat() {
    }
 
    const handleInputSideButtonPress = () => {
-      console.log("Input side button pressed.")
       if (isTyping) {
          cancelResponse()
       } else {
@@ -150,9 +150,7 @@ export default function useChat() {
       }
    }
 
-   const handlePromptSeggestionPress = (text: string) => {
-      handleSend(text)
-   }
+   const handlePromptSeggestionPress = (text: string) => handleSend(text)
 
    return {
       colors,

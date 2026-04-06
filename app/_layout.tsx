@@ -65,7 +65,7 @@ const AppContent = () => {
             <Stack.Screen name="(application)" />
             <Stack.Screen name="+not-found" />
          </Stack>
-         <StatusBar style={isDark ? "light" : "dark"} />
+         <StatusBar style={isDark ? "light" : "dark"} backgroundColor={colors.background} />
       </KeyboardProvider>
    )
 }

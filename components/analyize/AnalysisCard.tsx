@@ -50,9 +50,8 @@ export function AnalysisCard({ document, onPress, colors, index }: AnalysisCardP
                styles.card,
                {
                   backgroundColor: colors.card,
-                  borderColor: colors.border,
-                  opacity: pressed ? 0.8 : 1,
-                  transform: [{ scale: pressed ? 0.98 : 1 }],
+                  borderColor: colors.primaryFaded,
+                  opacity: pressed ? 0.9 : 1,
                },
             ]}
          >
@@ -127,15 +126,15 @@ function getStatusConfig(status: string, colors: ColorsType) {
       case "completed":
          return {
             icon: Check,
-            color: colors.success,
-            bgColor: colors.success + "20",
+            color: colors.primary,
+            bgColor: colors.primaryFaded,
             label: "Completed",
          }
       case "processing":
          return {
             icon: Clock,
-            color: colors.warning,
-            bgColor: colors.warning + "20",
+            color: colors.textMuted,
+            bgColor: colors.surface,
             label: "Processing",
          }
       case "failed":
@@ -156,18 +155,18 @@ function getStatusConfig(status: string, colors: ColorsType) {
 }
 
 function getConfidenceColor(percent: number, colors: ColorsType): string {
-   if (percent >= 80) return colors.success
-   if (percent >= 60) return colors.warning
-   if (percent >= 40) return colors.error
+   if (percent >= 80) return colors.primary
+   if (percent >= 60) return colors.textMuted
+   if (percent >= 40) return colors.textMuted
    return colors.textMuted
 }
 
 const styles = StyleSheet.create({
    card: {
-      borderRadius: 18,
+      borderRadius: 16,
       padding: 14,
-      borderWidth: 1,
-      marginBottom: 12,
+      borderWidth: StyleSheet.hairlineWidth,
+      marginBottom: 10,
    },
    cardHeader: {
       flexDirection: "row",

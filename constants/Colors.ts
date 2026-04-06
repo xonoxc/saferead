@@ -35,9 +35,9 @@ const Colors = {
       warning: "#F59E0B",
       error: "#EF4444",
       errorBackground: "#2F1517",
-      background: "#000000",
-      surface: "#0C0C0C",
-      card: "#141414",
+      background: "#121212",
+      surface: "#18181B", // layer 1
+      card: "#232326",
       text: "#F4F4F5",
       textSecondary: "#A1A1AA",
       textTertiary: "rgba(255, 255, 255, 0.5)",

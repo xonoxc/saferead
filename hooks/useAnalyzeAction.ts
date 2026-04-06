@@ -19,7 +19,6 @@ export function useAnalyzeAction() {
    const { user } = useAuth()
    const showBottomAlert = useDrawerAlert()
    const { invalidateQueries } = useInvalidator()
-
    const setAnalysisResult = useAnalysisStore(s => s.setAnalysisResult)
 
    async function handleAnalyzeDocument(document: AnalyzeDocument, docType: DocumentType) {

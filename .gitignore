@@ -72,3 +72,6 @@ yarn-error.*
 *.tsbuildinfo
 bun*
 expo-env.d.ts
+
+
+AGENTS.md

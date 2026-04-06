@@ -23,9 +23,7 @@ export function SpaceIndicator() {
       icon: <Box color={colors.text} size={18} />,
    }))
 
-   const handleSelect = (space: Space) => {
-      setSelectedSpace(space)
-   }
+   const handleSelect = (space: Space) => setSelectedSpace(space)
 
    return (
       <DropdownSelector<Space>

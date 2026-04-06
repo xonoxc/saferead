@@ -29,7 +29,7 @@ export default function RecentDocumentListings({
 
    onRecentDocumentPress,
 }: RecentDocumentListingProps) {
-   const { selectedDocType, setSelectedDocType, handleDocumentUpload } = useDocUpload()
+   const { selectedDocType, setSelectedDocType, handleDocumentPick, handleAnalyze } = useDocUpload()
    /*
     *
     * rendering the recent document item
@@ -47,7 +47,8 @@ export default function RecentDocumentListings({
          <UploadChip
             selectedType={selectedDocType}
             onSelect={setSelectedDocType}
-            onDocumentUpload={handleDocumentUpload}
+            onDocumentUpload={handleDocumentPick}
+            onAnalyze={handleAnalyze}
          />
 
          <View style={styles.viewToggle}>

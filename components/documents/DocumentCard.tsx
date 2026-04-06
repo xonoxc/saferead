@@ -1,7 +1,7 @@
 import React from "react"
 import { View, Text, StyleSheet, Pressable } from "react-native"
 import { FileText, Calendar, TriangleAlert as AlertTriangle, Shield } from "lucide-react-native"
-import { useTheme } from "@/hooks/useTheme"
+import { useTheme, type ColorsType } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 
 import type { Document } from "@/types"
@@ -12,21 +12,21 @@ interface DocumentCardProps {
    onAnalyze?: () => void
 }
 
+const getRiskColor = (colors: ColorsType, risk: string | undefined) => {
+   switch (risk) {
+      case "high":
+         return colors.error
+      case "medium":
+         return colors.warning
+      case "low":
+         return colors.success
+      default:
+         return colors.textMuted
+   }
+}
+
 export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, onAnalyze }) => {
    const { colors } = useTheme()
-
-   const getRiskColor = (risk: string | undefined) => {
-      switch (risk) {
-         case "high":
-            return colors.error
-         case "medium":
-            return colors.warning
-         case "low":
-            return colors.success
-         default:
-            return colors.textMuted
-      }
-   }
 
    const formatFileSize = (bytes: number) => {
       const sizes = ["B", "KB", "MB", "GB"]
@@ -68,12 +68,17 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress, o
                   <View style={styles.riskIndicator}>
                      <AlertTriangle
                         size={14}
-                        color={getRiskColor(document.analysis.riskAssessment?.overallRisk)}
+                        color={getRiskColor(colors, document.analysis.riskAssessment?.overallRisk)}
                      />
                      <Text
                         style={[
                            styles.riskText,
-                           { color: getRiskColor(document.analysis.riskAssessment?.overallRisk) },
+                           {
+                              color: getRiskColor(
+                                 colors,
+                                 document.analysis.riskAssessment?.overallRisk
+                              ),
+                           },
                         ]}
                      >
                         {document.analysis.riskAssessment?.overallRisk || "Unknown"} Risk

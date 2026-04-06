@@ -3,8 +3,9 @@ import { useDrawerAlert } from "./alerts/useAlert"
 import { pickDocument } from "@/utils/docs/picker"
 import { useAuth } from "./useAuth"
 import { useAnalyzeAction } from "./useAnalyzeAction"
-import { toast } from "@backpackapp-io/react-native-toast"
 import { useAnalysisStore } from "@/store/useAnalysisStore"
+import type { AnalyzeDocument } from "@/types/docs"
+import type { DocumentType } from "@/components/documents/DocumentTypeSelector"
 
 export function useDocUpload() {
    const { user } = useAuth()
@@ -15,7 +16,9 @@ export function useDocUpload() {
    const selectedDocType = useAnalysisStore(s => s.selectedDocumentType)
    const setSelectedDocType = useAnalysisStore(s => s.setSelectedDocumentType)
 
-   const handleDocumentUpload = async () => {
+   const setIsAnalyzing = useAnalysisStore(s => s.setIsAnalyzing)
+
+   const handleDocumentPick = async (): Promise<AnalyzeDocument | null> => {
       if (!user) {
          showBottomAlert({
             type: "error",
@@ -29,12 +32,12 @@ export function useDocUpload() {
                },
             ],
          })
-         return
+         return null
       }
 
       const result = await pickDocument()
       if (!result.ok) {
-         if (result.canceled) return
+         if (result.canceled) return null
          showBottomAlert({
             type: "error",
             title: "Error",
@@ -47,18 +50,22 @@ export function useDocUpload() {
                },
             ],
          })
-         return
+         return null
       }
 
-      const id = toast.loading("Analyzing document...")
+      return result.data
+   }
 
-      await handleAnalyzeDocument(result.data, selectedDocType)
+   const handleAnalyze = async (document: AnalyzeDocument, docType: DocumentType) => {
+      setIsAnalyzing(true)
+      await handleAnalyzeDocument(document, docType)
 
-      toast.dismiss(id)
+      setIsAnalyzing(false)
    }
 
    return {
-      handleDocumentUpload,
+      handleDocumentPick,
+      handleAnalyze,
       selectedDocType,
       setSelectedDocType,
    }

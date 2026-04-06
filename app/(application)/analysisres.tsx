@@ -2,10 +2,12 @@ import { DocumentAnalysisView } from "@/components/documents/DocumentAnalysisVie
 import { useTheme } from "@/hooks/useTheme"
 import { useAnalysisStore } from "@/store/useAnalysisStore"
 import { router } from "expo-router"
-import { View, Text, SafeAreaView } from "react-native"
+import { View, Text } from "react-native"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 export default function DocumentAnalyisResultScreen() {
    const { colors } = useTheme()
+   const insets = useSafeAreaInsets()
    const analysisResult = useAnalysisStore(s => s.analysisResult)
 
    const handleBackPress = () => router.back()
@@ -13,9 +15,9 @@ export default function DocumentAnalyisResultScreen() {
    if (!analysisResult) return <Fallback />
 
    return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top }}>
          <DocumentAnalysisView onBack={handleBackPress} analysis={analysisResult} />
-      </SafeAreaView>
+      </View>
    )
 }
 

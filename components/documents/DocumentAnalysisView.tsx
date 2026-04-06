@@ -48,8 +48,6 @@ export const DocumentAnalysisView = ({
    )
 }
 
-/** ─── Internal Components ─────────────────────── **/
-
 const Header = ({ onBack, analysis }: { onBack: () => void; analysis: AnalysisResponse }) => {
    const { colors, isDark } = useTheme()
 

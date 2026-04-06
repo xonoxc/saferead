@@ -2,7 +2,6 @@ import React from "react"
 import Animated from "react-native-reanimated"
 import SpaceDetailHeader from "@/components/spaces/SpaceDetails/SpaceDetailsHeader"
 import SpaceDetailsStats from "@/components/spaces/SpaceDetails/SpaceDetailsStats"
-import SpaceDetailsOpenChatBtn from "@/components/spaces/SpaceDetails/SpaceDetailsOpenChatBtn"
 
 import { SectionList, StyleSheet, View, Text } from "react-native"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
@@ -14,9 +13,11 @@ import { useSpaceDetailsScreen } from "@/hooks/screens/useSpaceDetailScreen"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
 import { getSections } from "@/components/spaces/SpaceDetails/getSections"
+import SpaceDetailTopBar from "@/components/spaces/SpaceDetails/SpaceDetailTopToolbar"
+import { useHideOnScroll } from "@/hooks/animation/useHideOnScroll"
+import { OpenInChatButton } from "@/components/spaces/SpaceDetails/OpenInChatBtn"
 
 import type { SpaceItem, SpaceSection } from "@/types/screens/spacedetailtscreen"
-import SpaceDetailTopBar from "@/components/spaces/SpaceDetails/SpaceDetailTopToolbar"
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList<SpaceItem, SpaceSection>)
 
@@ -28,18 +29,22 @@ export default function SpaceDetailScreen() {
       stats,
       pinnedDocuments,
       recentDocuments,
-      animatedStyle,
       isSheetVisible,
-      isChatBtnVisible,
+      headerTransformAnimatedStyle,
       isUploadDocFormVisible,
       toggleSheetVisiblity,
       toggleUploadFormVisibilty,
       handleOpenChat,
       handleFavoritePress,
       handleUpdateSpace,
-      handleDocumentListScroll,
       handlePinDocumentToSpace: togglePinnedStatus,
    } = useSpaceDetailsScreen({ colors })
+
+   const {
+      animatedStyle: OpenInChatBtnStyle,
+      handleDocumentListScroll,
+      isSubjectVisible,
+   } = useHideOnScroll()
 
    if (!space) {
       return (
@@ -54,7 +59,7 @@ export default function SpaceDetailScreen() {
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
          <SpaceDetailTopBar
-            animatedStyle={animatedStyle}
+            animatedStyle={headerTransformAnimatedStyle}
             space={space}
             onFavoritePress={handleFavoritePress}
             onCreateBtnPress={toggleUploadFormVisibilty}
@@ -96,7 +101,7 @@ export default function SpaceDetailScreen() {
                      return (
                         <>
                            <SpaceDetailHeader
-                              animatedStyle={animatedStyle}
+                              animatedStyle={headerTransformAnimatedStyle}
                               space={space}
                               onFavoritePress={handleFavoritePress}
                               onCreateBtnPress={toggleUploadFormVisibilty}
@@ -119,13 +124,12 @@ export default function SpaceDetailScreen() {
             }}
          />
 
-         {isChatBtnVisible && (
-            <SpaceDetailsOpenChatBtn
-               onPress={handleOpenChat}
-               color={space.color}
-               visibility={isChatBtnVisible}
-            />
-         )}
+         <OpenInChatButton
+            handleOpenChat={handleOpenChat}
+            space={space}
+            isSubjectVisible={isSubjectVisible}
+            animatedStyle={OpenInChatBtnStyle}
+         />
 
          {isUploadDocFormVisible && (
             <UploadDocumentForm

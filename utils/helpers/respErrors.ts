@@ -61,7 +61,7 @@ export function extractValidationErrorMessage(message: string | object): string 
       }
    }
 
-   return "Unknown validation error. Please try again~ 🥺"
+   return "Unknown validation error. Please try again~"
 }
 
 function formatFieldName(field: string): string {

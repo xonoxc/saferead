@@ -6,6 +6,7 @@ import { useTheme, type ThemeMode } from "@/hooks/useTheme"
 
 export default function SettingsThemeDropdown() {
    const { mode, setTheme, colors } = useTheme()
+
    return (
       <DropdownSelector
          label="THEME"

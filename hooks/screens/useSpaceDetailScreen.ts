@@ -1,12 +1,6 @@
 import { useState } from "react"
 import { FileText, TrendingUp, type LucideIcon } from "lucide-react-native"
-import {
-   useSharedValue,
-   useAnimatedStyle,
-   withSpring,
-   useAnimatedScrollHandler,
-   withTiming,
-} from "react-native-reanimated"
+import { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { usePinDocumentMutation, useSpaces, useToggleFavoriteSpace } from "@/hooks/queries/spaces"
 import { updateSpace } from "@/services/space.service"
@@ -32,8 +26,6 @@ export type SpaceDetailsStat = {
 
 export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
    const { id } = useLocalSearchParams<{ id: string }>()
-   const isChatBtnVisible = useSharedValue(1)
-   const prevScrollY = useSharedValue(0)
    const { data: spaces } = useSpaces()
    const router = useRouter()
 
@@ -59,7 +51,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
    const pinnedDocuments = space?.recent_documents.filter(doc => doc.is_pinned)
    const recentDocuments = space?.recent_documents.filter(doc => !doc.is_pinned)
 
-   const animatedStyle = useAnimatedStyle(() => ({
+   const headerTransformAnimatedStyle = useAnimatedStyle(() => ({
       transform: [{ scale: scale.value }],
    }))
 
@@ -193,20 +185,6 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       toggleSheetVisiblity()
    }
 
-   const handleDocumentListScroll = useAnimatedScrollHandler({
-      onScroll: event => {
-         const currentY = event.contentOffset.y
-         const deltaY = currentY - prevScrollY.value
-
-         if (deltaY > 5) {
-            isChatBtnVisible.value = withTiming(0, { duration: 200 })
-         } else if (deltaY < -5) {
-            isChatBtnVisible.value = withTiming(1, { duration: 200 })
-         }
-         prevScrollY.value = currentY
-      },
-   })
-
    return {
       space,
       stats,
@@ -218,10 +196,8 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       isSheetVisible,
       isUploadDocFormVisible,
       isCreatingConversation,
-      isChatBtnVisible,
       setSheetVisible,
-      handleDocumentListScroll,
-      animatedStyle,
+      headerTransformAnimatedStyle,
       toggleSheetVisiblity,
       toggleUploadFormVisibilty,
       router,

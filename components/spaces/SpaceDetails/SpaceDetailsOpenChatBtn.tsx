@@ -1,34 +1,24 @@
 import React from "react"
 import { StyleSheet, Pressable, Text } from "react-native"
 import { MessageSquare } from "lucide-react-native"
-import Animated, { useAnimatedStyle, interpolate, withTiming } from "react-native-reanimated"
+import Animated from "react-native-reanimated"
 import { Fonts, FontSizes } from "@/constants"
 
 import type { SharedValue } from "react-native-reanimated"
+import type { OpenInChatBtnAnimatedStyleProps } from "@/components/spaces/SpaceDetails/OpenInChatBtn"
 
 interface SpaceDetailsOpenChatBtnProps {
    onPress?: () => void
    color: string
    visibility: SharedValue<number>
+   animatedStyle: OpenInChatBtnAnimatedStyleProps
 }
 
 export default function SpaceDetailsOpenChatBtn({
    onPress,
    color,
-   visibility,
+   animatedStyle,
 }: SpaceDetailsOpenChatBtnProps) {
-   const animatedStyle = useAnimatedStyle(() => {
-      const opacity = withTiming(visibility.value, { duration: 200 })
-      const translateY = withTiming(interpolate(visibility.value, [0, 1], [50, 0], "clamp"), {
-         duration: 200,
-      })
-
-      return {
-         opacity,
-         transform: [{ translateY }],
-      }
-   }, [])
-
    return (
       <Animated.View style={[styles.chatButtonContainer, animatedStyle]}>
          <Pressable onPress={onPress} style={[styles.chatButton, { backgroundColor: color }]}>

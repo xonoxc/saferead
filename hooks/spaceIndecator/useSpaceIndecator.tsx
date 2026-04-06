@@ -14,7 +14,7 @@ export function useSpaceIndecator() {
 
    const selectedSpace = useSpaceStore(s => s.selectedSpace)
    const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
-   const isHeaderSpaceIndecatorEnabled = useSpaceStore(s => s.isHeaderSpaceIndicatorEnabled)
+   const isHeaderSpaceIndecatorEnabled = useSpaceStore(s => s.selectedSpace)
 
    const animatedSpaceIndecatorStyles = useAnimatedStyle(() => ({
       opacity: withTiming(isHeaderSpaceIndecatorEnabled ? 1 : 0, {

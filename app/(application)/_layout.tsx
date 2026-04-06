@@ -2,8 +2,7 @@ import { useTheme } from "@/hooks/useTheme"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Redirect, Stack } from "expo-router"
 import { useState } from "react"
-import { View } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { CustomBackBtn } from "@/components"
 import { useAuth } from "@/hooks/useAuth"
 import { createApplicationMutationCache } from "@/config/mutationCache"
@@ -11,6 +10,7 @@ import { createApplicationMutationCache } from "@/config/mutationCache"
 export default function ApplicationLayout() {
    const { colors } = useTheme()
    const insets = useSafeAreaInsets()
+
    /*
     * Global queryCLient instance for the application
     * **/
@@ -33,11 +33,10 @@ export default function ApplicationLayout() {
 
    return (
       <QueryClientProvider client={queryClient}>
-         <View
+         <SafeAreaView
             style={{
                flex: 1,
                backgroundColor: colors.background,
-               paddingTop: Math.max(insets.top, 16),
                paddingBottom: Math.max(insets.bottom, 16),
             }}
          >
@@ -116,7 +115,7 @@ export default function ApplicationLayout() {
                   }}
                />
             </Stack>
-         </View>
+         </SafeAreaView>
       </QueryClientProvider>
    )
 }

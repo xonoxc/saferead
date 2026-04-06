@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
    },
    listContent: {
       paddingHorizontal: 16,
-      paddingBottom: 100,
+      paddingBottom: 24,
    },
    feedHeader: {
       paddingTop: 20,
@@ -105,15 +105,15 @@ const styles = StyleSheet.create({
    },
    emptyState: {
       alignItems: "center",
-      paddingVertical: 48,
+      paddingVertical: 32,
    },
    emptyIcon: {
-      width: 72,
-      height: 72,
-      borderRadius: 36,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
       justifyContent: "center",
       alignItems: "center",
-      marginBottom: 16,
+      marginBottom: 12,
    },
    emptyTitle: {
       fontSize: FontSizes.lg,

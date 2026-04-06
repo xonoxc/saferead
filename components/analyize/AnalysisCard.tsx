@@ -1,5 +1,12 @@
+import React, { useEffect } from "react"
 import { View, Text, StyleSheet, Pressable } from "react-native"
-import Animated, { FadeInRight } from "react-native-reanimated"
+import Animated, {
+   FadeInRight,
+   useAnimatedStyle,
+   useSharedValue,
+   withSpring,
+   withTiming,
+} from "react-native-reanimated"
 import { Check, X, FileText, Clock, ChevronRight, Share2, Download, Eye } from "lucide-react-native"
 
 import { Fonts, FontSizes } from "@/constants"
@@ -13,9 +20,35 @@ interface AnalysisCardProps {
    index: number
 }
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
+
 export function AnalysisCard({ document, onPress, colors, index }: AnalysisCardProps) {
-   const statusConfig = getStatusConfig(document.status, colors)
+   const statusConfig = getStatusConfig(document.status, colors, document.confidence_score)
    const confidencePercent = Math.round(document.confidence_score * 100)
+
+   const progressAnim = useSharedValue(0)
+
+   React.useEffect(() => {
+      progressAnim.value = withTiming(confidencePercent, { duration: 800 })
+   }, [confidencePercent, progressAnim])
+
+   const progressStyle = useAnimatedStyle(() => ({
+      width: `${progressAnim.value}%`,
+   }))
+
+   const scaleAnim = useSharedValue(1)
+
+   const handlePressIn = () => {
+      scaleAnim.value = withSpring(0.97, { damping: 15, stiffness: 300 })
+   }
+
+   const handlePressOut = () => {
+      scaleAnim.value = withSpring(1, { damping: 15, stiffness: 300 })
+   }
+
+   const cardAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scaleAnim.value }],
+   }))
 
    const getRelativeTime = (dateString: string) => {
       const date = new Date(dateString)
@@ -43,15 +76,21 @@ export function AnalysisCard({ document, onPress, colors, index }: AnalysisCardP
    }
 
    return (
-      <Animated.View entering={FadeInRight.delay(index * 50).springify()}>
-         <Pressable
+      <Animated.View
+         entering={FadeInRight.delay(index * 60)
+            .springify()
+            .damping(15)}
+      >
+         <AnimatedPressable
             onPress={onPress}
-            style={({ pressed }) => [
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            style={[
                styles.card,
+               cardAnimatedStyle,
                {
                   backgroundColor: colors.card,
-                  borderColor: colors.primaryFaded,
-                  opacity: pressed ? 0.9 : 1,
+                  borderColor: "rgba(255, 255, 255, 0.06)",
                },
             ]}
          >
@@ -81,103 +120,111 @@ export function AnalysisCard({ document, onPress, colors, index }: AnalysisCardP
                   </Text>
                </View>
                <View style={[styles.confidenceBar, { backgroundColor: colors.surface }]}>
-                  <View
-                     style={[
-                        styles.confidenceFill,
-                        {
-                           width: `${confidencePercent}%`,
-                           backgroundColor: getConfidenceColor(confidencePercent, colors),
-                        },
-                     ]}
-                  />
+                  <Animated.View style={[styles.confidenceFill, progressStyle]} />
                </View>
             </View>
 
             <View style={styles.actions}>
                <Pressable
-                  style={[styles.actionBtn, { backgroundColor: colors.surface }]}
+                  style={({ pressed }) => [
+                     styles.actionBtn,
+                     styles.actionPrimary,
+                     {
+                        backgroundColor: pressed
+                           ? colors.primaryFaded
+                           : "rgba(255, 255, 255, 0.08)",
+                        borderColor: pressed ? colors.primary : "rgba(255, 255, 255, 0.04)",
+                     },
+                  ]}
                   onPress={e => e.stopPropagation()}
                >
-                  <Eye size={14} color={colors.textSecondary} />
-                  <Text style={[styles.actionText, { color: colors.textSecondary }]}>View</Text>
+                  <Eye size={14} color={colors.text} />
+                  <Text style={[styles.actionText, { color: colors.text }]}>View</Text>
                </Pressable>
                <Pressable
-                  style={[styles.actionBtn, { backgroundColor: colors.surface }]}
+                  style={({ pressed }) => [
+                     styles.actionBtn,
+                     {
+                        backgroundColor: pressed ? "rgba(255, 255, 255, 0.05)" : "transparent",
+                        borderColor: "rgba(255, 255, 255, 0.03)",
+                     },
+                  ]}
                   onPress={e => e.stopPropagation()}
                >
-                  <Download size={14} color={colors.textSecondary} />
+                  <Download size={14} color={colors.textMuted} />
                   <Text style={[styles.actionText, { color: colors.textSecondary }]}>Export</Text>
                </Pressable>
                <Pressable
-                  style={[styles.actionBtn, { backgroundColor: colors.surface }]}
+                  style={({ pressed }) => [
+                     styles.actionBtn,
+                     {
+                        backgroundColor: pressed ? "rgba(255, 255, 255, 0.05)" : "transparent",
+                        borderColor: "rgba(255, 255, 255, 0.03)",
+                     },
+                  ]}
                   onPress={e => e.stopPropagation()}
                >
-                  <Share2 size={14} color={colors.textSecondary} />
+                  <Share2 size={14} color={colors.textMuted} />
                   <Text style={[styles.actionText, { color: colors.textSecondary }]}>Share</Text>
                </Pressable>
             </View>
-         </Pressable>
+         </AnimatedPressable>
       </Animated.View>
    )
 }
 
-function getStatusConfig(status: string, colors: ColorsType) {
+function getStatusConfig(status: string, colors: ColorsType, confidence: number) {
+   const percent = Math.round(confidence * 100)
+
    switch (status) {
       case "completed":
          return {
             icon: Check,
-            color: colors.primary,
-            bgColor: colors.primaryFaded,
+            color: percent >= 80 ? "#22C55E" : "#F59E0B",
+            bgColor: percent >= 80 ? "rgba(34, 197, 94, 0.15)" : "rgba(245, 158, 11, 0.15)",
             label: "Completed",
          }
       case "processing":
          return {
             icon: Clock,
-            color: colors.textMuted,
-            bgColor: colors.surface,
+            color: colors.textSecondary,
+            bgColor: "rgba(255, 255, 255, 0.06)",
             label: "Processing",
          }
       case "failed":
          return {
             icon: X,
-            color: colors.error,
-            bgColor: colors.error + "20",
+            color: "#EF4444",
+            bgColor: "rgba(239, 68, 68, 0.15)",
             label: "Failed",
          }
       default:
          return {
             icon: FileText,
             color: colors.textMuted,
-            bgColor: colors.surface,
+            bgColor: "rgba(255, 255, 255, 0.04)",
             label: "Pending",
          }
    }
 }
 
-function getConfidenceColor(percent: number, colors: ColorsType): string {
-   if (percent >= 80) return colors.primary
-   if (percent >= 60) return colors.textMuted
-   if (percent >= 40) return colors.textMuted
-   return colors.textMuted
-}
-
 const styles = StyleSheet.create({
    card: {
-      borderRadius: 16,
-      padding: 14,
-      borderWidth: StyleSheet.hairlineWidth,
-      marginBottom: 10,
+      borderRadius: 18,
+      padding: 16,
+      borderWidth: 1,
+      marginBottom: 12,
    },
    cardHeader: {
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
-      marginBottom: 12,
+      marginBottom: 14,
    },
    statusBadge: {
-      width: 32,
-      height: 32,
-      borderRadius: 10,
+      width: 36,
+      height: 36,
+      borderRadius: 12,
       justifyContent: "center",
       alignItems: "center",
    },
@@ -191,33 +238,34 @@ const styles = StyleSheet.create({
    docMeta: {
       fontSize: FontSizes.xxs,
       fontFamily: Fonts.regular,
-      marginTop: 2,
+      marginTop: 3,
    },
    confidenceSection: {
-      marginBottom: 12,
+      marginBottom: 14,
    },
    confidenceHeader: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 6,
+      marginBottom: 8,
    },
    confidenceLabel: {
       fontSize: FontSizes.xs,
       fontFamily: Fonts.regular,
    },
    confidenceValue: {
-      fontSize: FontSizes.sm,
-      fontFamily: Fonts.semiBold,
+      fontSize: FontSizes.lg,
+      fontFamily: Fonts.bold,
    },
    confidenceBar: {
-      height: 4,
-      borderRadius: 2,
+      height: 6,
+      borderRadius: 3,
       overflow: "hidden",
    },
    confidenceFill: {
       height: "100%",
-      borderRadius: 2,
+      borderRadius: 3,
+      backgroundColor: "#22C55E",
    },
    actions: {
       flexDirection: "row",
@@ -228,9 +276,13 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: 4,
-      paddingVertical: 8,
-      borderRadius: 10,
+      gap: 6,
+      paddingVertical: 10,
+      borderRadius: 12,
+      borderWidth: 1,
+   },
+   actionPrimary: {
+      borderWidth: 1,
    },
    actionText: {
       fontSize: FontSizes.xxs,

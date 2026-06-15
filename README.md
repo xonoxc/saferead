@@ -173,17 +173,6 @@ saferead/
 
 ---
 
-## Screenshots
-
-<p align="center">
-  <img src="assets/ss/1.png" width="200" alt="Dashboard" />
-  <img src="assets/ss/2.png" width="200" alt="Document Analysis" />
-  <img src="assets/ss/3.png" width="200" alt="Spaces" />
-  <img src="assets/ss/4.png" width="200" alt="Chat" />
-</p>
-
----
-
 ## Linting and Formatting
 
 This project uses [ESLint](https://eslint.org/) with the Expo recommended configuration and [Prettier](https://prettier.io/) for code formatting.

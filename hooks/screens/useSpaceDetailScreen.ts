@@ -2,7 +2,13 @@ import { useState } from "react"
 import { FileText, TrendingUp, type LucideIcon } from "lucide-react-native"
 import { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated"
 import { useLocalSearchParams, useRouter } from "expo-router"
-import { usePinDocumentMutation, useSpaces, useToggleFavoriteSpace } from "@/hooks/queries/spaces"
+import {
+   usePinDocumentMutation,
+   useSpace,
+   useSpaceConversation,
+   useSpaceDocuments,
+   useToggleFavoriteSpace,
+} from "@/hooks/queries/spaces"
 import { updateSpace } from "@/services/space.service"
 import { useSpaceStore } from "@/store/useSpaceStore"
 
@@ -11,11 +17,10 @@ import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { useQueryClient } from "@tanstack/react-query"
 import { useDrawerAlert } from "../alerts/useAlert"
 
-import { useCreateConversationMutation } from "../queries/converstations"
-
 import type { ColorsType } from "../useTheme"
 import type { UpdateSpaceForm } from "../forms/useSpaceHookForm"
 import type { Space } from "@/types"
+import type { UserSpaceDocument } from "@/types/api/spaces.documents.types"
 
 export type SpaceDetailsStat = {
    icon: LucideIcon
@@ -26,7 +31,6 @@ export type SpaceDetailsStat = {
 
 export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
    const { id } = useLocalSearchParams<{ id: string }>()
-   const { data: spaces } = useSpaces()
    const router = useRouter()
 
    const setSpace = useSpaceStore(s => s.setSelectedSpace)
@@ -40,16 +44,27 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
    const [isSheetVisible, setSheetVisible] = useState(false)
    const [isUploadDocFormVisible, setIsUploadDocFormVisible] = useState(false)
 
-   const flattendSpaces = spaces?.pages.flatMap(page => page.results) ?? []
-   const space = flattendSpaces.find(s => s.id === id)
+   /*
+    * Fetch the space directly rather than hunting for it in the paginated list,
+    * which never resolved for spaces beyond the first page.
+    * **/
+   const { data: space, isLoading: isLoadingSpace } = useSpace(id)
 
    const toggleFavouriteSpace = useToggleFavoriteSpace(space?.id as string)
    const pinDocumentToSpace = usePinDocumentMutation()
 
-   const { createConversationMutation, isCreatingConversation } = useCreateConversationMutation()
+   const { resolveConversation, isResolvingConversation } = useSpaceConversation()
 
-   const pinnedDocuments = space?.recent_documents.filter(doc => doc.is_pinned)
-   const recentDocuments = space?.recent_documents.filter(doc => !doc.is_pinned)
+   /*
+    * Read from the documents endpoint instead of the space payload's
+    * recent_documents, which is capped at five - so a sixth upload looked like
+    * it had silently failed.
+    * **/
+   const { data: documentPages, isLoading: isLoadingDocuments } = useSpaceDocuments(id)
+   const documents = documentPages?.pages.flatMap(page => page.results) ?? []
+
+   const pinnedDocuments = documents.filter(doc => doc.is_pinned)
+   const recentDocuments = documents.filter(doc => !doc.is_pinned)
 
    const headerTransformAnimatedStyle = useAnimatedStyle(() => ({
       transform: [{ scale: scale.value }],
@@ -82,22 +97,22 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       })
    }
 
+   /*
+    * Open the space's existing chat thread, creating one only the first time.
+    * This previously created a brand new conversation on every tap, so the
+    * transcript appeared to vanish each time chat was reopened.
+    * **/
    const handleOpenChat = async () => {
       if (!space) return
 
-      const resp = await attempt(() =>
-         createConversationMutation({
-            space: space.id,
-            title: `${space.title}:{space.id}`,
-         })
-      )
+      const resp = await attempt(() => resolveConversation(space.id))
 
       if (!resp.ok) {
          const errorMessage = getErrorMessage(resp.error)
          showBottomAlert({
             type: "error",
             title: "Error",
-            message: errorMessage || "Failed to create conversation",
+            message: errorMessage || "Failed to open chat for this space",
             actions: [{ text: "OK", style: "primary", onPress: () => {} }],
          })
          return
@@ -138,7 +153,7 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       })
    }
 
-   const stats = space ? getSpaceStates(space) : []
+   const stats = space ? getSpaceStates(space, documents) : []
 
    /*
     *
@@ -195,7 +210,10 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       handleOpenChat,
       isSheetVisible,
       isUploadDocFormVisible,
-      isCreatingConversation,
+      isResolvingConversation,
+      isLoadingSpace,
+      isLoadingDocuments,
+      documents,
       setSheetVisible,
       headerTransformAnimatedStyle,
       toggleSheetVisiblity,
@@ -206,19 +224,22 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
    }
 }
 
-function getSpaceStates(space: Space): SpaceDetailsStat[] {
+function getSpaceStates(space: Space, documents: UserSpaceDocument[]): SpaceDetailsStat[] {
    return [
       {
          icon: FileText,
          label: "Documents",
-         value: space?.document_count,
-         color: space?.color,
+         value: space.document_count,
+         color: space.color,
       },
       {
+         // "Indexed" counts documents whose text has been extracted and
+         // embedded, which is what makes them answerable in chat. This used to
+         // report recent_documents.length, which is just a five-item preview.
          icon: TrendingUp,
-         label: "Analyzed",
-         value: space?.recent_documents.length,
-         color: space?.color,
+         label: "Indexed",
+         value: documents.filter(doc => doc.processing_status === "ready").length,
+         color: space.color,
       },
    ]
 }

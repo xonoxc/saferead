@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native"
 import { Fonts, FontSizes } from "@/constants"
-import Animated, { FadeInDown } from "react-native-reanimated"
+import { Spacing, Radii, elevation, withAlpha } from "@/constants/Design"
+import { FadeInView } from "@/components/motion"
 
 import type { LucideIcon } from "lucide-react-native"
 import type { ColorsType } from "@/hooks/useTheme"
@@ -15,70 +16,86 @@ interface SpaceDetailsStatsProps {
    colors: ColorsType
 }
 
+/*
+ * Stat cards sit on the theme surface with the space colour applied only as a
+ * tint behind the icon.
+ *
+ * Filling the whole card with the space colour meant theme text was drawn over
+ * an arbitrary hue - unreadable on the lighter palette entries like #FFEAA7.
+ * **/
 export default function SpaceDetailsStats({ stats, colors }: SpaceDetailsStatsProps) {
    return (
-      <Animated.View
-         entering={FadeInDown.delay(200).springify()}
-         style={[
-            styles.statsContainer,
-            {
-               backgroundColor: colors.background,
-            },
-         ]}
-      >
-         {stats.map((stat, index) => (
-            <View
-               key={`${stat}-${index}`}
-               style={[styles.statCard, { backgroundColor: stat.color }]}
-            >
-               <View style={[styles.statIcon, { backgroundColor: colors.background }]}>
-                  <stat.icon size={20} color={stat.color} />
-               </View>
-               <Text style={[styles.statValue, { color: colors.text }]}>{stat.value}</Text>
-               <Text style={[styles.statLabel, { color: colors.text }]}>{stat.label}</Text>
-            </View>
-         ))}
-      </Animated.View>
+      <View style={styles.statsContainer}>
+         {stats.map((stat, index) => {
+            const accent = stat.color || colors.primary
+
+            return (
+               <FadeInView key={`${stat.label}-${index}`} index={index} delay={80} style={styles.statSlot}>
+                  <View
+                     style={[
+                        styles.statCard,
+                        {
+                           backgroundColor: colors.card,
+                           borderColor: colors.border,
+                        },
+                        elevation(colors, 1),
+                     ]}
+                  >
+                     <View
+                        style={[styles.statIcon, { backgroundColor: withAlpha(accent, 0.14) }]}
+                     >
+                        <stat.icon size={18} color={accent} />
+                     </View>
+                     <View style={styles.statText}>
+                        <Text style={[styles.statValue, { color: colors.text }]}>
+                           {stat.value ?? 0}
+                        </Text>
+                        <Text style={[styles.statLabel, { color: colors.textMuted }]}>
+                           {stat.label}
+                        </Text>
+                     </View>
+                  </View>
+               </FadeInView>
+            )
+         })}
+      </View>
    )
 }
 
 const styles = StyleSheet.create({
    statsContainer: {
       flexDirection: "row",
-      paddingHorizontal: 20,
-      gap: 12,
-      marginBottom: 20,
-      borderRadius: 30,
+      paddingHorizontal: Spacing.md,
+      gap: Spacing.sm,
+      marginBottom: Spacing.md,
+   },
+   statSlot: {
+      flex: 1,
    },
    statCard: {
-      flex: 1,
-      backgroundColor: "#FFFFFF",
-      borderRadius: 30,
-      padding: 16,
+      flexDirection: "row",
       alignItems: "center",
+      gap: Spacing.xs,
+      borderRadius: Radii.md,
+      padding: Spacing.sm,
       borderWidth: 1,
-      elevation: 2,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
    },
    statIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: 15,
+      width: 36,
+      height: 36,
+      borderRadius: Radii.xs,
       justifyContent: "center",
       alignItems: "center",
-      marginBottom: 8,
+   },
+   statText: {
+      flex: 1,
    },
    statValue: {
-      fontSize: FontSizes.xl,
+      fontSize: FontSizes.lg,
       fontFamily: Fonts.bold,
-      marginBottom: 4,
    },
    statLabel: {
       fontSize: FontSizes.xs,
       fontFamily: Fonts.regular,
-      textAlign: "center",
    },
 })

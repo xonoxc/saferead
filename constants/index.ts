@@ -5,3 +5,5 @@ export * from "./server"
 export * from "./Fonts"
 
 export * from "./Document"
+
+export * from "./Design"

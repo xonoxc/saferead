@@ -1,15 +1,9 @@
 import React from "react"
 import { useTheme } from "@/hooks/useTheme"
-import { Fonts, FontSizes } from "@/constants"
+import { Fonts, FontSizes, Radii } from "@/constants"
+import { PressableScale } from "@/components/motion"
 
-import {
-   Pressable,
-   Text,
-   StyleSheet,
-   ActivityIndicator,
-   type StyleProp,
-   type ViewStyle,
-} from "react-native"
+import { Text, StyleSheet, ActivityIndicator, type StyleProp, type ViewStyle } from "react-native"
 
 interface ButtonProps {
    title: string
@@ -80,8 +74,13 @@ export const Button: React.FC<ButtonProps> = ({
       let textColor = colors.text
 
       switch (variant) {
+         /*
+          * Filled variants need a colour guaranteed to contrast with the fill.
+          * These used colors.background, which only happened to work while the
+          * primary colour was pure black or white.
+          * **/
          case "primary":
-            textColor = colors.background
+            textColor = colors.onPrimary
             break
          case "secondary":
             textColor = colors.background
@@ -100,6 +99,7 @@ export const Button: React.FC<ButtonProps> = ({
    const getLoadingColor = () => {
       switch (variant) {
          case "primary":
+            return colors.onPrimary
          case "secondary":
             return colors.background
          default:
@@ -108,19 +108,25 @@ export const Button: React.FC<ButtonProps> = ({
    }
 
    return (
-      <Pressable style={getButtonStyle()} onPress={onPress} disabled={disabled || loading}>
+      <PressableScale
+         style={getButtonStyle()}
+         onPress={onPress}
+         disabled={disabled || loading}
+         accessibilityRole="button"
+         accessibilityState={{ disabled: disabled || loading, busy: loading }}
+      >
          {loading ? (
             <ActivityIndicator size="small" color={getLoadingColor()} />
          ) : (
             <Text style={getTextStyle()}>{title}</Text>
          )}
-      </Pressable>
+      </PressableScale>
    )
 }
 
 const styles = StyleSheet.create({
    button: {
-      borderRadius: 20,
+      borderRadius: Radii.md,
       alignItems: "center",
       justifyContent: "center",
    },

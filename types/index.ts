@@ -1,5 +1,3 @@
-import type { SpaceIconName } from "@/constants/spaceform"
-
 export interface User {
    id: string
    email: string
@@ -108,22 +106,14 @@ export interface SubscriptionPlan {
    collaborators: number
 }
 
-export interface Space {
-   id: string
-   title: string
-   description: string
-   color: string
-   icon: SpaceIconName
-   privacy: "private" | "public"
-   is_active: boolean
-   is_favorite: boolean
-   document_count: number
-   recent_documents: any[]
-   user_username: string
-   created_at: string
-   updated_at: string
-   last_accessed: string
-}
+/*
+ * Space lives in types/api/spaces.types.ts, which mirrors the API response.
+ *
+ * A second copy used to be declared here and the two had already drifted - this
+ * one typed recent_documents as any[] and was missing conversation_count - so
+ * whichever a file imported changed what type checking would catch.
+ * **/
+export type { Space, SpaceStats, PaginatedSpaces } from "./api/spaces.types"
 
 export interface VoiceNote {
    id: string

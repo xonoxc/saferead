@@ -1,12 +1,29 @@
-import { createConversation, getConversations } from "@/services/conversation.service"
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query"
+import {
+   createConversation,
+   getConversations,
+   getConversationMessages,
+} from "@/services/conversation.service"
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query"
 
 import { apiClient, getAccessToken } from "@/utils/apiclient"
 import { serverURL } from "@/constants"
 import { fetch } from "expo/fetch"
 
-import type { PaginatedConverSationResponse } from "@/types/api/conversations.types"
+import type {
+   PaginatedConverSationResponse,
+   PaginatedConversationMessages,
+} from "@/types/api/conversations.types"
 import type { ConversationFilterOptions } from "@/types/conversations"
+import type { ChatContextSources } from "@/hooks/chat/useChat"
+
+export type ChatbotResponse = {
+   response: string
+   confidence_score: number
+   processing_time: number
+   referenced_documents?: ChatContextSources[]
+   user_message_id: string
+   ai_message_id: string
+}
 
 export const useCreateConversationMutation = () => {
    const mutation = useMutation({
@@ -102,12 +119,31 @@ export const useInstantChatResponse = () => {
    }
 }
 
+/*
+ * A grounded answer means a vector search plus a Gemini generation, which
+ * regularly runs past ten seconds on a large space. The old 10s ceiling
+ * surfaced healthy requests as "failed to get response from bot".
+ * **/
+const CHAT_RESPONSE_TIMEOUT_MS = 90_000
+
 export const useInstantJSONResponse = () => {
    return async function (data: StreamResponseCallbakcParams, abortSignal?: AbortSignal) {
-      return apiClient.post(
+      return apiClient.post<ChatbotResponse>(
          "/user_space/chatbot/instant-response/",
          { ...data },
-         { signal: abortSignal, timeout: 10_000 }
+         { signal: abortSignal, timeout: CHAT_RESPONSE_TIMEOUT_MS }
       )
    }
+}
+
+/*
+ * Message history for a conversation, oldest first, so reopening a space chat
+ * restores the transcript instead of starting blank.
+ * **/
+export const useConversationMessages = (conversationId: string | null) => {
+   return useQuery<PaginatedConversationMessages>({
+      queryKey: ["conversations", conversationId, "messages"],
+      queryFn: () => getConversationMessages(conversationId as string),
+      enabled: !!conversationId,
+   })
 }

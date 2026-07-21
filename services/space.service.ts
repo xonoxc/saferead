@@ -4,6 +4,8 @@ import { buildFileUploadFormData } from "@/utils/helpers/files"
 import type { ReactNativeFile } from "@/types/file"
 import type { SpaceDataParam } from "@/utils/validation/space"
 import type { SpaceFilterOptions } from "@/types/spaces"
+import type { Space } from "@/types/api/spaces.types"
+import type { Conversation } from "@/types/api/conversations.types"
 
 /*
  * User Space API Functions
@@ -17,8 +19,30 @@ export async function getSpaces(page?: number, filters: SpaceFilterOptions = {})
    return resp.data
 }
 
+/*
+ * Fetch a single space by id.
+ *
+ * Screens used to locate a space by scanning the paginated list, which meant
+ * anything past the first page could not be opened at all.
+ * **/
+export async function getSpace(spaceId: string) {
+   const resp = await apiClient.get<Space>(`/user_space/spaces/${spaceId}/`)
+   return resp.data
+}
+
 export async function createSpace(data: SpaceDataParam) {
    return apiClient.post("/user_space/spaces/", data)
+}
+
+/*
+ * Get the space's current chat thread, creating one only if it has never been
+ * chatted with. Returns the same thread on subsequent calls so history persists.
+ * **/
+export async function getOrCreateSpaceConversation(spaceId: string) {
+   const resp = await apiClient.post<Conversation>(
+      `/user_space/spaces/${spaceId}/active-conversation/`
+   )
+   return resp.data
 }
 
 export async function deleteSpace(spaceId: string) {

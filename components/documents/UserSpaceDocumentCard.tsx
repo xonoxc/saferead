@@ -1,17 +1,24 @@
 import React from "react"
-import { View, Text, Pressable, StyleSheet } from "react-native"
-import { Calendar, Pin, PinOff, Tag } from "lucide-react-native"
+import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native"
+import { Calendar, Pin, PinOff, Tag, CircleCheck, TriangleAlert, Clock } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { Spacing, Radii, elevation, withAlpha } from "@/constants/Design"
 import { getFileIcon } from "@/utils/helpers/files"
 import { useBrowserLink } from "@/hooks/browser/useBrowserLink"
+import { FadeInView, PressableScale } from "@/components/motion"
 
-import type { UserSpaceDocument } from "@/types/api/spaces.documents.types"
+import type { ColorsType } from "@/hooks/useTheme"
+import type {
+   UserSpaceDocument,
+   DocumentProcessingStatus,
+} from "@/types/api/spaces.documents.types"
 
 interface UserSpaceDocumentCardProps {
    pinned?: boolean
    document: UserSpaceDocument
    spaceColor?: string
+   index?: number
    onPin?: (documentId: string, documentFile: string) => void
 }
 
@@ -19,6 +26,7 @@ export function UserSpaceDocumentCard({
    document,
    spaceColor,
    onPin,
+   index = 0,
    pinned = false,
 }: UserSpaceDocumentCardProps) {
    const { colors } = useTheme()
@@ -40,123 +48,192 @@ export function UserSpaceDocumentCard({
    }
 
    return (
-      <Pressable
-         style={[styles.card, { backgroundColor: colors.background, borderColor: colors.border }]}
-         onPress={handlePress}
-      >
-         <View style={styles.header}>
-            <View
-               style={[
-                  styles.iconContainer,
-                  { backgroundColor: cardColor + "20", borderColor: cardColor + "30" },
-               ]}
-            >
-               <FileIcon size={24} color={cardColor} />
-            </View>
-            <View style={styles.titleContainer}>
-               <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
-                  {document.display_name}
-               </Text>
-               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                  {document.file_size}
-               </Text>
-            </View>
-            {onPin && (
-               <Pressable onPress={handlePinPress} style={styles.pinButton}>
-                  {pinned ? (
-                     <PinOff size={18} color={spaceColor} />
-                  ) : (
-                     <Pin size={18} color={spaceColor} />
-                  )}
-               </Pressable>
-            )}
-         </View>
+      <FadeInView index={index} style={styles.wrapper}>
+         <PressableScale
+            style={[
+               styles.card,
+               { backgroundColor: colors.card, borderColor: colors.border },
+               elevation(colors, 1),
+            ]}
+            onPress={handlePress}
+            accessibilityRole="button"
+            accessibilityLabel={`Open ${document.display_name || document.effective_name}`}
+         >
+            <View style={styles.header}>
+               <View
+                  style={[
+                     styles.iconContainer,
+                     {
+                        backgroundColor: withAlpha(cardColor, 0.13),
+                        borderColor: withAlpha(cardColor, 0.2),
+                     },
+                  ]}
+               >
+                  <FileIcon size={22} color={cardColor} />
+               </View>
 
-         <View style={styles.footer}>
-            <View style={styles.dateContainer}>
-               <Calendar size={14} color={colors.textMuted} />
-               <Text style={[styles.date, { color: colors.textMuted }]}>
-                  {new Date(document.created_at).toLocaleDateString()}
-               </Text>
-            </View>
-            {document.tags && document.tags.length > 0 && (
-               <View style={styles.tagsContainer}>
-                  <Tag size={14} color={colors.textMuted} />
-                  <Text style={[styles.tagText, { color: colors.textMuted }]}>
-                     {document.tags.slice(0, 2).join(", ")}
+               <View style={styles.titleContainer}>
+                  <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+                     {document.display_name || document.effective_name}
+                  </Text>
+                  <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+                     {document.file_size}
                   </Text>
                </View>
-            )}
-         </View>
-      </Pressable>
+
+               {onPin && (
+                  <Pressable onPress={handlePinPress} style={styles.pinButton} hitSlop={8}>
+                     {pinned ? (
+                        <PinOff size={17} color={cardColor} />
+                     ) : (
+                        <Pin size={17} color={colors.textMuted} />
+                     )}
+                  </Pressable>
+               )}
+            </View>
+
+            <View style={[styles.footer, { borderTopColor: colors.borderLight }]}>
+               <View style={styles.dateContainer}>
+                  <Calendar size={13} color={colors.textMuted} />
+                  <Text style={[styles.date, { color: colors.textMuted }]}>
+                     {new Date(document.created_at).toLocaleDateString()}
+                  </Text>
+
+                  {document.tags?.length > 0 && (
+                     <>
+                        <Tag size={13} color={colors.textMuted} style={styles.tagIcon} />
+                        <Text style={[styles.date, { color: colors.textMuted }]}>
+                           {document.tags.slice(0, 2).join(", ")}
+                        </Text>
+                     </>
+                  )}
+               </View>
+
+               {/*
+                * Surfacing indexing state matters: until a document reaches
+                * "ready" it cannot be answered from in chat, and previously
+                * there was no way to tell that from the UI.
+                * **/}
+               <ProcessingBadge status={document.processing_status} colors={colors} />
+            </View>
+         </PressableScale>
+      </FadeInView>
+   )
+}
+
+function ProcessingBadge({
+   status,
+   colors,
+}: {
+   status: DocumentProcessingStatus
+   colors: ColorsType
+}) {
+   const config = {
+      ready: {
+         label: "Ready",
+         color: colors.success,
+         background: colors.successBackground,
+         icon: <CircleCheck size={12} color={colors.success} />,
+      },
+      processing: {
+         label: "Indexing",
+         color: colors.primary,
+         background: colors.primaryFaded,
+         icon: <ActivityIndicator size="small" color={colors.primary} />,
+      },
+      pending: {
+         label: "Queued",
+         color: colors.textMuted,
+         background: colors.surface,
+         icon: <Clock size={12} color={colors.textMuted} />,
+      },
+      failed: {
+         label: "Failed",
+         color: colors.error,
+         background: colors.errorBackground,
+         icon: <TriangleAlert size={12} color={colors.error} />,
+      },
+   }[status]
+
+   if (!config) return null
+
+   return (
+      <View style={[styles.badge, { backgroundColor: config.background }]}>
+         {config.icon}
+         <Text style={[styles.badgeText, { color: config.color }]}>{config.label}</Text>
+      </View>
    )
 }
 
 const styles = StyleSheet.create({
+   wrapper: {
+      paddingHorizontal: Spacing.md,
+   },
    card: {
-      borderRadius: 16,
-      padding: 16,
-      marginVertical: 8,
-      borderBottomWidth: 1,
-      elevation: 1,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 2,
+      borderRadius: Radii.md,
+      padding: Spacing.sm,
+      marginVertical: Spacing.xxs + 2,
+      borderWidth: 1,
    },
    header: {
       flexDirection: "row",
       alignItems: "center",
    },
    iconContainer: {
-      width: 48,
-      height: 48,
-      borderRadius: 12,
+      width: 44,
+      height: 44,
+      borderRadius: Radii.sm,
       justifyContent: "center",
       alignItems: "center",
-      marginRight: 16,
+      marginRight: Spacing.sm,
       borderWidth: 1,
    },
    titleContainer: {
       flex: 1,
    },
    title: {
-      fontSize: FontSizes.md,
+      fontSize: FontSizes.sm,
       fontFamily: Fonts.semiBold,
-      marginBottom: 4,
+      marginBottom: 2,
    },
    subtitle: {
-      fontSize: FontSizes.sm,
+      fontSize: FontSizes.xs,
       fontFamily: Fonts.regular,
    },
    footer: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginTop: 16,
-      paddingTop: 12,
-      borderTopWidth: 1,
-      borderTopColor: "#00000010",
+      marginTop: Spacing.sm,
+      paddingTop: Spacing.xs,
+      borderTopWidth: StyleSheet.hairlineWidth,
    },
    dateContainer: {
       flexDirection: "row",
       alignItems: "center",
+      flexShrink: 1,
    },
    date: {
       fontSize: FontSizes.xs,
       fontFamily: Fonts.regular,
-      marginLeft: 6,
+      marginLeft: Spacing.xxs + 1,
    },
-   tagsContainer: {
+   tagIcon: {
+      marginLeft: Spacing.xs,
+   },
+   badge: {
       flexDirection: "row",
       alignItems: "center",
+      gap: Spacing.xxs,
+      paddingHorizontal: Spacing.xs,
+      paddingVertical: 4,
+      borderRadius: Radii.pill,
    },
-   tagText: {
-      fontSize: FontSizes.xs,
-      fontFamily: Fonts.regular,
-      marginLeft: 6,
+   badgeText: {
+      fontSize: 11,
+      fontFamily: Fonts.medium,
    },
    pinButton: {
-      padding: 8,
+      padding: Spacing.xs,
    },
 })

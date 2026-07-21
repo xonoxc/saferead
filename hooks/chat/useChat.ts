@@ -2,7 +2,8 @@ import { useSpaceStore } from "@/store/useSpaceStore"
 import { useTheme } from "../useTheme"
 import { useEffect, useRef, useState } from "react"
 import { KeyboardController } from "react-native-keyboard-controller"
-import { useInstantJSONResponse } from "../queries/converstations"
+import { useInstantJSONResponse, useConversationMessages } from "../queries/converstations"
+import { useSpaceConversation } from "../queries/spaces"
 import { useDrawerAlert } from "../alerts/useAlert"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
@@ -30,6 +31,7 @@ export default function useChat() {
    const [chatHistory, setChatHistory] = useState<Chats>([])
    const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false)
    const [isAtBottom, setIsAtBottom] = useState<boolean>(true)
+   const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false)
 
    const scrollViewRef = useRef<ScrollView | null>(null)
    const abortControllerRef = useRef<AbortController | null>(null)
@@ -39,10 +41,78 @@ export default function useChat() {
    const selectedSpace = useSpaceStore(s => s.selectedSpace)
    const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
    const activeConversationId = useSpaceStore(s => s.activeConverstationId)
+   const setActiveConversationId = useSpaceStore(s => s.setActiveConverstationId)
 
    const showBottomMessage = useDrawerAlert()
 
    const getStreamingResponse = useInstantJSONResponse()
+   const { resolveConversation } = useSpaceConversation()
+
+   /*
+    * Make sure the conversation we send messages to actually belongs to the
+    * space that is currently selected. Picking a space from the chat dropdown
+    * only changed selectedSpace, so messages kept going to whichever
+    * conversation was resolved first - or to none at all.
+    * **/
+   useEffect(() => {
+      if (!selectedSpace?.id) return
+
+      let cancelled = false
+
+      const syncConversation = async () => {
+         setIsLoadingHistory(true)
+
+         const resp = await attempt(() => resolveConversation(selectedSpace.id))
+
+         if (cancelled) return
+
+         if (!resp.ok) {
+            setIsLoadingHistory(false)
+            showBottomMessage({
+               type: "error",
+               title: "Error",
+               message: getErrorMessage(resp.error) || "Could not open chat for this space",
+               actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+            })
+            return
+         }
+
+         setActiveConversationId(resp.data.id)
+      }
+
+      syncConversation()
+
+      return () => {
+         cancelled = true
+      }
+      // Deliberately keyed on the space alone. The alert and mutation helpers are
+      // recreated on render, so depending on them would re-resolve the
+      // conversation on every render rather than only when the space changes.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [selectedSpace?.id])
+
+   /*
+    * Restore the transcript for whichever conversation is active.
+    * **/
+   const { data: history, isFetching: isFetchingHistory } =
+      useConversationMessages(activeConversationId)
+
+   useEffect(() => {
+      if (!activeConversationId) {
+         setChatHistory([])
+         return
+      }
+
+      if (isFetchingHistory || !history) return
+
+      setChatHistory(
+         history.results.map(message => ({
+            text: message.content,
+            sender: message.message_type === "user" ? ("user" as const) : ("bot" as const),
+         }))
+      )
+      setIsLoadingHistory(false)
+   }, [activeConversationId, history, isFetchingHistory])
 
    const [isKeyboardVisible, setKeyboardVisible] = useState(KeyboardController.isVisible())
    useKeyBoardVisibility(setKeyboardVisible)
@@ -135,6 +205,20 @@ export default function useChat() {
       const content = (overrideMessage ?? message).trim()
       if (!content) return
 
+      /*
+       * Without a resolved conversation the request would be sent with an
+       * undefined id and rejected by the server, so surface it here instead.
+       * **/
+      if (!activeConversationId) {
+         showBottomMessage({
+            type: "error",
+            title: "No space selected",
+            message: "Pick a space before asking a question.",
+            actions: [{ text: "OK", style: "primary", onPress: () => {} }],
+         })
+         return
+      }
+
       const userMessage = { text: content, sender: "user" as const }
       setChatHistory(prev => [...prev, userMessage])
       setMessage("")
@@ -149,7 +233,7 @@ export default function useChat() {
 
       const resp = await attempt(() =>
          getStreamingResponse(
-            { message: content, conversation_id: activeConversationId! },
+            { message: content, conversation_id: activeConversationId },
             abortController.signal
          )
       )
@@ -208,6 +292,7 @@ export default function useChat() {
       setMessage,
       isChatEmpty,
       isTyping,
+      isLoadingHistory: isLoadingHistory || isFetchingHistory,
       chatHistory,
       setChatHistory,
       handleInputSideButtonPress,

@@ -162,7 +162,6 @@ export default function PrivacyScreen() {
                      <Pressable
                         style={styles.privacyHeader}
                         onPress={() => toggleSection(section.id)}
-                        activeOpacity={0.7}
                      >
                         <View style={styles.privacyHeaderLeft}>
                            <View
@@ -217,7 +216,6 @@ export default function PrivacyScreen() {
                            { backgroundColor: colors.card, borderColor: colors.border },
                         ]}
                         onPress={control.action}
-                        activeOpacity={0.7}
                      >
                         <View style={styles.controlLeft}>
                            <View

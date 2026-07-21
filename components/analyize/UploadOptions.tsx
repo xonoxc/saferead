@@ -15,7 +15,7 @@ import type {
 } from "@/components/documents/DocumentTypeSelector"
 import type { AnalyzeDocument } from "@/types/docs"
 
-interface UploadChipProps extends DocumentTypeSelectorProps {
+export interface UploadChipProps extends DocumentTypeSelectorProps {
    onDocumentUpload: () => Promise<AnalyzeDocument | null>
    onAnalyze: (document: AnalyzeDocument, type: DocumentType) => void
 }

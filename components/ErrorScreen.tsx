@@ -124,7 +124,6 @@ export default function ServerErrorScreen({
                            backgroundColor: colors.warning + "20",
                            left: Math.random() * screenWidth,
                            top: Math.random() * screenHeight,
-                           animationDelay: `${index * 200}ms`,
                         },
                      ]}
                   />

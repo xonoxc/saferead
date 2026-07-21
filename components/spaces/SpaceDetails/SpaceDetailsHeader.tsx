@@ -2,10 +2,12 @@ import React from "react"
 import SpaceIcon from "@/components/spaces/Icon"
 
 import { View, StyleSheet, Text } from "react-native"
-import Animated, { FadeInDown } from "react-native-reanimated"
+import { LinearGradient } from "expo-linear-gradient"
 import { useTheme } from "@/hooks/useTheme"
 
 import { Fonts, FontSizes } from "@/constants"
+import { Spacing, Radii, withAlpha } from "@/constants/Design"
+import { FadeInView } from "@/components/motion"
 
 import type { Space } from "@/types"
 
@@ -21,85 +23,92 @@ export interface HeaderProps {
    onSettingsPress: () => void
 }
 
+/*
+ * Space identity block.
+ *
+ * The space colour appears as a soft gradient wash and on the icon tile only,
+ * so the title and description keep theme text colours and stay legible on any
+ * space colour. Previously the description was drawn in colors.background over
+ * the raw space colour, which vanished on pale colours.
+ * **/
 export default function SpaceDetailHeader(props: HeaderProps) {
    const { colors } = useTheme()
    const { space } = props
 
    return (
-      <Animated.View
-         entering={FadeInDown.delay(100).springify()}
-         style={[styles.header, { backgroundColor: colors.background }]}
-      >
-         <View style={[styles.spaceInfo, { backgroundColor: space.color }]}>
+      <FadeInView delay={40} style={styles.header}>
+         <LinearGradient
+            colors={[withAlpha(space.color, 0.18), withAlpha(space.color, 0.02)]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.spaceInfo, { borderColor: colors.border }]}
+         >
             <View
                style={[
                   styles.spaceIconLarge,
                   {
-                     backgroundColor: colors.background,
+                     backgroundColor: colors.card,
+                     borderColor: withAlpha(space.color, 0.25),
                   },
                ]}
             >
-               <SpaceIcon name={space.icon} color={space.color} size={50} />
+               <SpaceIcon name={space.icon} color={space.color} size={34} />
             </View>
 
             <View style={styles.spaceMeta}>
-               <Text style={[styles.spaceTitle, { color: colors.text }]}>{space.title}</Text>
-               <Text style={[styles.spaceDescription, { color: colors.background }]}>
-                  {space.description ?? "No description provided"}
+               <Text style={[styles.spaceTitle, { color: colors.text }]} numberOfLines={2}>
+                  {space.title}
                </Text>
                <Text
-                  style={[
-                     styles.spaceDate,
-                     {
-                        color: colors.background,
-                     },
-                  ]}
+                  style={[styles.spaceDescription, { color: colors.textSecondary }]}
+                  numberOfLines={2}
                >
+                  {space.description || "No description provided"}
+               </Text>
+               <Text style={[styles.spaceDate, { color: colors.textMuted }]}>
                   Created {new Date(space.created_at).toLocaleDateString()}
                </Text>
             </View>
-         </View>
-      </Animated.View>
+         </LinearGradient>
+      </FadeInView>
    )
 }
 
 const styles = StyleSheet.create({
    header: {
-      paddingHorizontal: 14,
-      paddingBottom: 24,
+      paddingHorizontal: Spacing.md,
+      paddingBottom: Spacing.md,
    },
    spaceInfo: {
       flexDirection: "row",
-      padding: 16,
-      borderRadius: 30,
+      padding: Spacing.md,
+      borderRadius: Radii.lg,
       alignItems: "center",
-      justifyContent: "flex-start",
       width: "100%",
+      borderWidth: 1,
    },
    spaceIconLarge: {
-      width: 100,
-      height: 100,
-      borderRadius: 20,
+      width: 62,
+      height: 62,
+      borderRadius: Radii.md,
       justifyContent: "center",
       alignItems: "center",
-      marginRight: 20,
-   },
-   spaceEmojiLarge: {
-      fontSize: 40,
+      marginRight: Spacing.md,
+      borderWidth: 1,
    },
    spaceMeta: {
       flex: 1,
    },
    spaceTitle: {
-      fontSize: FontSizes.xxl,
+      fontSize: FontSizes.xl,
       fontFamily: Fonts.bold,
-      marginBottom: 4,
+      marginBottom: 3,
    },
    spaceDescription: {
       fontSize: FontSizes.sm,
-      fontFamily: Fonts.semiBold,
-      marginBottom: 8,
-      lineHeight: 20,
+      fontFamily: Fonts.regular,
+      marginBottom: Spacing.xxs,
+      lineHeight: 19,
    },
    spaceDate: {
       fontSize: FontSizes.xs,

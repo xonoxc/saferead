@@ -1,10 +1,11 @@
 import React from "react"
 
-import { View } from "react-native"
+import { View, StyleSheet } from "react-native"
 import { ChatBubble } from "./ChatBubble"
 import { ChatSources } from "./ChatSources"
 
 import { useTheme } from "@/hooks/useTheme"
+import { Spacing } from "@/constants/Design"
 
 import type { Chats } from "@/hooks/chat/useChat"
 
@@ -15,8 +16,13 @@ export function ChatHistory({ chatHistory }: { chatHistory: Chats }) {
       <>
          {chatHistory.map((chat, index) => {
             return (
-               <View key={index} style={{ marginBottom: 12, flex: 1 }}>
-                  <ChatBubble chat={chat} index={index} colors={colors} />
+               <View key={index} style={styles.row}>
+                  <ChatBubble
+                     chat={chat}
+                     index={index}
+                     colors={colors}
+                     totalCount={chatHistory.length}
+                  />
 
                   {chat.sender === "bot" && <ChatSources colors={colors} chat={chat} />}
                </View>
@@ -25,3 +31,9 @@ export function ChatHistory({ chatHistory }: { chatHistory: Chats }) {
       </>
    )
 }
+
+const styles = StyleSheet.create({
+   row: {
+      marginBottom: Spacing.xs,
+   },
+})

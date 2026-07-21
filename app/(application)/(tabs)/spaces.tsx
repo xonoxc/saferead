@@ -9,6 +9,8 @@ import SpacesFallback from "@/components/spaces/MainScreen/SpaceFallback"
 import SpaceScreenHeader from "@/components/spaces/MainScreen/RenderHeaderFunc"
 import { UniversalFilter } from "@/components/filters/UniversalFilters"
 import { spaceFilterFields } from "@/constants/filters"
+import { Spacing } from "@/constants/Design"
+import { SpacesScreenSkeleton } from "@/components/skeletons"
 
 export default function SpacesScreen() {
    const { colors } = useTheme()
@@ -34,7 +36,11 @@ export default function SpacesScreen() {
       handleSpaceSelectPress,
    } = useSpaceScreen()
 
-   if (isLoading) return <LoadingSpinner loaderMessage="Loading spaces..." fontSize="sm" />
+   /*
+    * A skeleton that mirrors the real layout reads as faster than a spinner,
+    * because the shell is already in place when content lands.
+    * **/
+   if (isLoading) return <SpacesScreenSkeleton />
 
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -53,10 +59,12 @@ export default function SpacesScreen() {
             key={viewMode}
             numColumns={viewMode === "grid" ? 2 : 1}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
-            renderItem={({ item }) => (
+            contentContainerStyle={styles.listContent}
+            columnWrapperStyle={viewMode === "grid" ? styles.gridColumn : undefined}
+            renderItem={({ item, index }) => (
                <SpaceList
                   space={item}
+                  index={index}
                   viewMode={viewMode}
                   onDelete={handleDeleteSpace}
                   onSpaceSelect={handleSpaceSelectPress}
@@ -108,6 +116,19 @@ export default function SpacesScreen() {
 const styles = StyleSheet.create({
    container: {
       flex: 1,
+   },
+   listContent: {
+      paddingTop: Spacing.xs,
+      paddingBottom: 110,
+      flexGrow: 1,
+   },
+   /*
+    * Cards carry their own left margin, so the row only needs to keep the
+    * trailing gutter symmetrical.
+    * **/
+   gridColumn: {
+      justifyContent: "flex-start",
+      paddingRight: Spacing.md,
    },
    modalOverlay: {
       justifyContent: "center",

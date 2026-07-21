@@ -9,6 +9,8 @@ export interface SpaceListProps {
    viewMode: "list" | "grid"
    onDelete: (id: string, name: string) => void
    onSpaceSelect: (space: Space) => void
+   /* Row position, used to stagger the entrance animation. */
+   index?: number
 }
 
 export function SpaceList({ viewMode, ...props }: SpaceListProps) {

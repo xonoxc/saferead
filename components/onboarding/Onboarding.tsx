@@ -100,25 +100,35 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, onSkip }) =>
       }
    }, [currentStep, translateX])
 
-   const animatedGradientStyle = useAnimatedStyle(() => {
-      return {
-         backgroundColor: withTiming(currentStepData.gradient[0], { duration: 300 }),
-      }
-   })
+   /*
+    * Cross-fade the wash when the step changes.
+    *
+    * The animated layer used to set backgroundColor to the step's full opaque
+    * gradient colour, so the translucent LinearGradient layered on top had
+    * nothing to blend with and the top 60% of the screen rendered as a solid
+    * slab of colour. Only the gradient should paint; this layer just fades.
+    * **/
+   const animatedGradientStyle = useAnimatedStyle(() => ({
+      opacity: withTiming(1, { duration: 300 }),
+   }))
 
    return (
       <GestureHandlerRootView>
          <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <Animated.View style={[styles.backgroundGradient, animatedGradientStyle]}>
+            <Animated.View
+               key={currentStep}
+               style={[styles.backgroundGradient, animatedGradientStyle]}
+               pointerEvents="none"
+            >
                <LinearGradient
                   colors={[
-                     currentStepData.gradient[0] + "20",
-                     currentStepData.gradient[1] + "10",
+                     currentStepData.gradient[0] + "2E",
+                     currentStepData.gradient[1] + "14",
                      "transparent",
                   ]}
                   style={StyleSheet.absoluteFill}
                   start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
+                  end={{ x: 0.9, y: 1 }}
                />
             </Animated.View>
 

@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
       position: "relative",
    },
    backgroundElements: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
    },
    floatingElement: {
       position: "absolute",

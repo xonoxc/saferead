@@ -2,6 +2,7 @@ import React from "react"
 import { View, StyleSheet, ScrollView } from "react-native"
 import Skeleton from "./Skeleton"
 import { useTheme } from "@/hooks/useTheme"
+import { TAB_BAR_CLEARANCE } from "@/constants/Design"
 
 const SpacesScreenSkeleton = () => {
    const { colors } = useTheme()
@@ -9,7 +10,7 @@ const SpacesScreenSkeleton = () => {
    return (
       <ScrollView
          style={[styles.container, { backgroundColor: colors.background }]}
-         contentContainerStyle={{ paddingBottom: 120 }}
+         contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE }}
          showsVerticalScrollIndicator={false}
       >
          <View style={styles.headerContainer}>

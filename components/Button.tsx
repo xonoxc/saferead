@@ -27,7 +27,7 @@ export const Button: React.FC<ButtonProps> = ({
    const { colors } = useTheme()
 
    const getButtonStyle = (): StyleProp<ViewStyle> => {
-      const baseStyle = [styles.button] as { [key: string]: unknown }[]
+      const baseStyle: ViewStyle[] = [styles.button]
 
       switch (size) {
          case "small":
@@ -67,7 +67,13 @@ export const Button: React.FC<ButtonProps> = ({
          baseStyle.push(styles.fullWidth)
       }
 
-      return baseStyle
+      /*
+       * Flattened rather than returned as an array: expo-router's <Link asChild>
+       * clones its child and rejects array styles, and the welcome screen wraps
+       * this button in exactly that. Flattening here fixes every caller instead
+       * of asking each one to remember.
+       * **/
+      return StyleSheet.flatten(baseStyle)
    }
 
    const getTextStyle = () => {

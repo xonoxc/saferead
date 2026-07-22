@@ -56,11 +56,7 @@ export default function ChatGreeting() {
             <View style={styles.iconWrap}>
                {/* Slow breathing halo keeps the empty state feeling alive without demanding attention */}
                <Animated.View
-                  style={[
-                     styles.halo,
-                     { backgroundColor: withAlpha(accent, 0.35) },
-                     haloStyle,
-                  ]}
+                  style={[styles.halo, { backgroundColor: withAlpha(accent, 0.35) }, haloStyle]}
                />
                <View style={[styles.iconTile, { backgroundColor: withAlpha(accent, 0.14) }]}>
                   <Sparkles size={26} color={accent} />

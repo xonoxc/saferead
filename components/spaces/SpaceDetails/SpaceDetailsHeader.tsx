@@ -9,16 +9,19 @@ import { Fonts, FontSizes } from "@/constants"
 import { Spacing, Radii, withAlpha } from "@/constants/Design"
 import { FadeInView } from "@/components/motion"
 
+import type { ViewStyle } from "react-native"
+import type { AnimatedStyle } from "react-native-reanimated"
 import type { Space } from "@/types"
 
 export interface HeaderProps {
    space: Space
    onCreateBtnPress: () => void
-   animatedStyle: {
-      transform: {
-         scale: number
-      }[]
-   }
+   /*
+    * Reanimated hands back an opaque style handle rather than a plain object,
+    * so the prop is typed by what the library produces instead of by the shape
+    * the worklet happens to return today.
+    * **/
+   animatedStyle: AnimatedStyle<ViewStyle>
    onFavoritePress: () => void
    onSettingsPress: () => void
 }

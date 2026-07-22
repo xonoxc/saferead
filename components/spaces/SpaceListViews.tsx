@@ -47,10 +47,7 @@ export function SpaceListView({
             accessibilityLabel={`Open space ${space.title}`}
          >
             <View
-               style={[
-                  styles.listIconContainer,
-                  { backgroundColor: withAlpha(space.color, 0.14) },
-               ]}
+               style={[styles.listIconContainer, { backgroundColor: withAlpha(space.color, 0.14) }]}
             >
                <SpaceIcon name={space.icon as SpaceIconName} size={22} color={space.color} />
             </View>

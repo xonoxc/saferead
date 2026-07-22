@@ -1,45 +1,67 @@
-import { StyleSheet } from "react-native"
+import { View, StyleSheet } from "react-native"
 import { ScanSearch } from "lucide-react-native"
+
 import { useDocumentScan } from "@/hooks/useDocumentScan"
 import { useTheme } from "@/hooks/useTheme"
-import { Radii, elevation } from "@/constants/Design"
+import { Radii, TabBar, elevation } from "@/constants/Design"
 import { PressableScale } from "@/components/motion"
-
-import type { PressableProps } from "react-native"
-
-interface ScanBtnProps extends PressableProps {}
 
 /*
  * The centre tab action.
  *
- * This was a hardcoded white circle with a black glyph, which disappeared
- * entirely against the light theme's white background. It now uses the brand
- * colour so it reads as the primary action in either theme.
+ * It is a sibling of the normal tabs inside the bar rather than a tab button,
+ * so it sizes itself instead of inheriting the tab layout. The previous version
+ * relied on `flex: 1` plus a negative `top` inside a tab slot, which meant its
+ * size changed with the number of tabs and it drifted out of alignment.
  * **/
-export default function ScanBtn(props: ScanBtnProps) {
+export default function ScanBtn() {
    const { handleDocumentScan } = useDocumentScan()
    const { colors } = useTheme()
 
    return (
-      <PressableScale
-         {...props}
-         style={[styles.scanBtn, { backgroundColor: colors.primary }, elevation(colors, 2)]}
-         onPress={handleDocumentScan}
-         accessibilityRole="button"
-         accessibilityLabel="Scan a document"
-      >
-         <ScanSearch size={26} color={colors.onPrimary} />
-      </PressableScale>
+      <View style={styles.slot}>
+         <PressableScale
+            style={[
+               styles.button,
+               {
+                  backgroundColor: colors.primary,
+                  /*
+                   * A ring in the page colour separates the raised action from
+                   * the bar beneath it, so it reads as sitting above the bar
+                   * rather than as a coloured blob stuck to it.
+                   * **/
+                  borderColor: colors.background,
+               },
+               elevation(colors, 3),
+            ]}
+            onPress={handleDocumentScan}
+            accessibilityRole="button"
+            accessibilityLabel="Scan a document"
+         >
+            <ScanSearch size={26} color={colors.onPrimary} strokeWidth={2.2} />
+         </PressableScale>
+      </View>
    )
 }
 
 const styles = StyleSheet.create({
-   scanBtn: {
-      padding: 21,
-      borderRadius: Radii.lg,
-      top: -10,
+   slot: {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
+      height: TabBar.height,
+      /* The button lifts out of this slot, so the slot itself must not eat
+       * taps meant for the screen behind it. */
+      pointerEvents: "box-none",
+   },
+   button: {
+      width: TabBar.actionSize,
+      height: TabBar.actionSize,
+      borderRadius: Radii.pill,
+      borderWidth: 4,
+      alignItems: "center",
+      justifyContent: "center",
+      /* Ride above the bar so the action reads as primary. */
+      marginBottom: TabBar.actionLift * 2,
    },
 })

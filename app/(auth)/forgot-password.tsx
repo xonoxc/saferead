@@ -99,7 +99,9 @@ export default function ForgotPasswordScreen() {
                      <Text style={[styles.footerText, { color: colors.textSecondary }]}>
                         Remember your password?{" "}
                         <Link href="/(auth)/login" asChild>
-                           <Text style={[styles.link, { color: colors.primary }]}>Sign In</Text>
+                           <Text style={StyleSheet.flatten([styles.link, { color: colors.primary }])}>
+                           Sign In
+                        </Text>
                         </Link>
                      </Text>
                   </View>

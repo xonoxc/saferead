@@ -1,7 +1,10 @@
 import { useSpaceStore } from "@/store/useSpaceStore"
 import { useTheme } from "../useTheme"
 import { useEffect, useRef, useState } from "react"
-import { KeyboardController } from "react-native-keyboard-controller"
+import {
+   KeyboardController,
+   type KeyboardAwareScrollViewRef,
+} from "react-native-keyboard-controller"
 import { useInstantJSONResponse, useConversationMessages } from "../queries/converstations"
 import { useSpaceConversation } from "../queries/spaces"
 import { useDrawerAlert } from "../alerts/useAlert"
@@ -9,7 +12,6 @@ import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
 import { useKeyBoardVisibility } from "../kayboard/useKeyboardVisiblity"
 import { usePreventTabSwitch } from "../blocking/usePreventTabSwitch"
-import { ScrollView } from "react-native-reanimated/lib/typescript/Animated"
 import { isAbortError } from "@/utils/errors"
 
 export type ChatContextSources = {
@@ -33,7 +35,7 @@ export default function useChat() {
    const [isAtBottom, setIsAtBottom] = useState<boolean>(true)
    const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false)
 
-   const scrollViewRef = useRef<ScrollView | null>(null)
+   const scrollViewRef = useRef<KeyboardAwareScrollViewRef | null>(null)
    const abortControllerRef = useRef<AbortController | null>(null)
    const hideScrollButtonRef = useRef<number | null>(null)
    const isUserScrollingRef = useRef<boolean>(false)

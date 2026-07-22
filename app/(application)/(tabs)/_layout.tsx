@@ -1,34 +1,31 @@
 import { Tabs } from "expo-router"
 import { Home, Settings, Box, Clock } from "lucide-react-native"
-import { useTheme } from "@/hooks/useTheme"
-import { getTabBarStyles } from "@/utils/helpers/tabs"
-import { useTabStore } from "@/store/tab"
-import ScanBtn from "@/components/ScanBtn"
 
+import { useTheme } from "@/hooks/useTheme"
+import { BottomTabBar } from "@/components/tabs/BottomTabBar"
+
+/*
+ * Icons are declared once here and rendered by the custom bar, so the bar stays
+ * a presentation concern and this file stays the single place that says which
+ * screens exist and what they are called.
+ * **/
 export default function TabLayout() {
    const { colors } = useTheme()
-   const tabVisible = useTabStore(s => s.tabVisible)
 
    return (
       <Tabs
+         tabBar={props => <BottomTabBar {...props} />}
          screenOptions={{
             animation: "shift",
             headerShown: false,
-            tabBarActiveTintColor: colors.text,
-            tabBarShowLabel: false,
             sceneStyle: { flex: 1, backgroundColor: colors.background },
-            tabBarHideOnKeyboard: true,
-            tabBarStyle: {
-               ...getTabBarStyles(colors),
-               display: tabVisible ? "flex" : "none",
-            },
          }}
       >
          <Tabs.Screen
             name="index"
             options={{
                title: "Home",
-               tabBarIcon: props => <Home {...props} />,
+               tabBarIcon: ({ color, size }) => <Home color={color} size={size} strokeWidth={2} />,
             }}
          />
 
@@ -36,16 +33,14 @@ export default function TabLayout() {
             name="spaces"
             options={{
                title: "Spaces",
-               tabBarIcon: props => <Box {...props} />,
+               tabBarIcon: ({ color, size }) => <Box color={color} size={size} strokeWidth={2} />,
             }}
          />
 
-         {/* central scan btn */}
+         {/* Rendered by the bar as the raised centre action, not as a tab. */}
          <Tabs.Screen
             name="scan"
-            options={{
-               tabBarButton: ({ style }) => <ScanBtn style={style} />,
-            }}
+            options={{ title: "Scan" }}
             listeners={{
                tabPress: e => {
                   e.preventDefault()
@@ -57,23 +52,20 @@ export default function TabLayout() {
             name="analyize"
             options={{
                title: "Analyze",
-               tabBarIcon: props => <Clock {...props} />,
+               tabBarIcon: ({ color, size }) => <Clock color={color} size={size} strokeWidth={2} />,
             }}
          />
 
-         {/*this is premium screen but only conditionally visible so we dont*/}
-         {/*so we don't want it to be visible in the tabs */}
-         <Tabs.Screen
-            name="premium"
-            options={{
-               href: null,
-            }}
-         />
+         {/* Reachable by route, but deliberately absent from the bar. */}
+         <Tabs.Screen name="premium" options={{ href: null }} />
+
          <Tabs.Screen
             name="settings"
             options={{
                title: "Settings",
-               tabBarIcon: props => <Settings {...props} />,
+               tabBarIcon: ({ color, size }) => (
+                  <Settings color={color} size={size} strokeWidth={2} />
+               ),
             }}
          />
       </Tabs>

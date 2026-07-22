@@ -3,6 +3,7 @@ import Animated, { FadeInDown } from "react-native-reanimated"
 import { FileText, Upload } from "lucide-react-native"
 
 import { Fonts, FontSizes } from "@/constants"
+import { TAB_BAR_CLEARANCE } from "@/constants/Design"
 import { AnalysisCard } from "./AnalysisCard"
 import { UploadChip } from "./UploadOptions"
 import { useDocUpload } from "@/hooks/useDocUpload"
@@ -83,7 +84,9 @@ const styles = StyleSheet.create({
    },
    listContent: {
       paddingHorizontal: 16,
-      paddingBottom: 24,
+      /* The feed scrolls under the floating tab bar, so the last card needs
+       * room or it sits permanently behind it. */
+      paddingBottom: TAB_BAR_CLEARANCE,
    },
    feedHeader: {
       paddingTop: 20,

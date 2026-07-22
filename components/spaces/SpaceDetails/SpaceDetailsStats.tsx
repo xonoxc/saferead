@@ -30,7 +30,12 @@ export default function SpaceDetailsStats({ stats, colors }: SpaceDetailsStatsPr
             const accent = stat.color || colors.primary
 
             return (
-               <FadeInView key={`${stat.label}-${index}`} index={index} delay={80} style={styles.statSlot}>
+               <FadeInView
+                  key={`${stat.label}-${index}`}
+                  index={index}
+                  delay={80}
+                  style={styles.statSlot}
+               >
                   <View
                      style={[
                         styles.statCard,
@@ -41,9 +46,7 @@ export default function SpaceDetailsStats({ stats, colors }: SpaceDetailsStatsPr
                         elevation(colors, 1),
                      ]}
                   >
-                     <View
-                        style={[styles.statIcon, { backgroundColor: withAlpha(accent, 0.14) }]}
-                     >
+                     <View style={[styles.statIcon, { backgroundColor: withAlpha(accent, 0.14) }]}>
                         <stat.icon size={18} color={accent} />
                      </View>
                      <View style={styles.statText}>

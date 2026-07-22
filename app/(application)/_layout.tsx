@@ -33,7 +33,15 @@ export default function ApplicationLayout() {
 
    return (
       <QueryClientProvider client={queryClient}>
+         {/*
+          * SafeAreaView applies its edges additively, so the explicit
+          * paddingBottom below was being stacked on top of the bottom inset -
+          * on a device with a home indicator that is roughly 68pt of dead space
+          * under the tab bar. Turning the bottom edge off leaves exactly the
+          * one gap this padding intends.
+          * **/}
          <SafeAreaView
+            edges={{ top: "additive", left: "additive", right: "additive", bottom: "off" }}
             style={{
                flex: 1,
                backgroundColor: colors.background,

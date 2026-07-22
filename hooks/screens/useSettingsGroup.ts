@@ -1,7 +1,7 @@
 import type { User } from "@/types"
 import { Globe, Shield, HelpCircle, LogOut, KeyRound, User as UserIcon } from "lucide-react-native"
 import type { ThemeMode } from "@/hooks/useTheme"
-import type { Router } from "expo-router"
+import type { ImperativeRouter } from "expo-router"
 
 export type SettingsItem = {
    icon: React.ComponentType<any>
@@ -25,7 +25,7 @@ export default function useSettingsGroups({
    user: User | null
    mode: string
    setTheme: (theme: ThemeMode) => void
-   router: Router
+   router: ImperativeRouter
    handleLogout: () => void
 }): SettingsGroup[] {
    return [

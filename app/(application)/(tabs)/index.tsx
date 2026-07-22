@@ -4,6 +4,7 @@ import { useTheme } from "@/hooks/useTheme"
 import { useAuth } from "@/hooks/useAuth"
 import { useDocumentStats } from "@/hooks/useDocumentStats"
 import { useTabHideScroll } from "@/hooks/useTabHideScroll"
+import { TAB_BAR_CLEARANCE } from "@/constants/Design"
 
 import { HomeScreenSkeleton } from "@/components/skeletons"
 import HomeScreenErrorFallback from "@/components/home/HomeScreenErrorFallback"
@@ -38,7 +39,7 @@ export default function HomeScreen() {
             paddingVertical: 20,
             backgroundColor: colors.background,
          }}
-         contentContainerStyle={{ paddingBottom: 120 }}
+         contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE }}
          bounces
          showsVerticalScrollIndicator={false}
          refreshControl={

@@ -65,7 +65,11 @@ const AppContent = () => {
             <Stack.Screen name="(application)" />
             <Stack.Screen name="+not-found" />
          </Stack>
-         <StatusBar style={isDark ? "light" : "dark"} backgroundColor={colors.background} />
+         {/*
+          * Android is always edge-to-edge from SDK 54 on, so the status bar is
+          * permanently translucent and `backgroundColor` no longer exists.
+          * **/}
+         <StatusBar style={isDark ? "light" : "dark"} />
       </KeyboardProvider>
    )
 }

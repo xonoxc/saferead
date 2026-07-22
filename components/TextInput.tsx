@@ -7,8 +7,6 @@ import {
    type StyleProp,
    type TextStyle,
    type ViewStyle,
-   type NativeSyntheticEvent,
-   type TextInputFocusEventData,
    Pressable,
 } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
@@ -41,12 +39,17 @@ export const TextInput: React.FC<TextInputProps> = ({
 
    const showToggle = rest.secureTextEntry && !rest.multiline
 
-   const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+   /*
+    * The focus/blur event shape is owned by react-native and has changed
+    * between releases, so infer it from the underlying component's props
+    * rather than naming a concrete event type that goes stale on upgrade.
+    * **/
+   const handleBlur: NonNullable<TextInputProps["onBlur"]> = e => {
       setIsFocused(false)
       rest.onBlur?.(e)
    }
 
-   const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+   const handleFocus: NonNullable<TextInputProps["onFocus"]> = e => {
       setIsFocused(true)
       rest.onFocus?.(e)
    }

@@ -9,7 +9,7 @@ import Animated, {
    FadeInDown,
 } from "react-native-reanimated"
 import { useAnalysisStore } from "@/store/useAnalysisStore"
-import { useTheme } from "@react-navigation/native"
+import { useTheme } from "@/hooks/useTheme"
 
 export function FloatingUploadButton({ handleUploadPress }: { handleUploadPress: () => void }) {
    const { colors } = useTheme()

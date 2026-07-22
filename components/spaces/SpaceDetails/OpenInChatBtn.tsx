@@ -1,13 +1,14 @@
 import SpaceDetailsOpenChatBtn from "@/components/spaces/SpaceDetails/SpaceDetailsOpenChatBtn"
 import type { Space } from "@/types"
-import type { SharedValue } from "react-native-reanimated"
+import type { ViewStyle } from "react-native"
+import type { AnimatedStyle, SharedValue } from "react-native-reanimated"
 
-export type OpenInChatBtnAnimatedStyleProps = {
-   opacity: number
-   transform: {
-      translateY: number
-   }[]
-}
+/*
+ * Reanimated hands back an opaque style handle rather than a plain object, so
+ * the prop is typed by what the library produces instead of by the shape the
+ * worklet happens to return today.
+ * **/
+export type OpenInChatBtnAnimatedStyleProps = AnimatedStyle<ViewStyle>
 
 export interface OpenInChatButtonProps {
    handleOpenChat: () => void

@@ -136,7 +136,9 @@ export default function RegisterScreen() {
                   <Text style={[styles.footerText, { color: colors.textSecondary }]}>
                      Already have an account?{" "}
                      <Link href="/(auth)/login" asChild>
-                        <Text style={[styles.link, { color: colors.primary }]}>Sign in</Text>
+                        <Text style={StyleSheet.flatten([styles.link, { color: colors.primary }])}>
+                           Sign in
+                        </Text>
                      </Link>
                   </Text>
                </View>

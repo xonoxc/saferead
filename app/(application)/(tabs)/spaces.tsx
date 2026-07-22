@@ -9,7 +9,7 @@ import SpacesFallback from "@/components/spaces/MainScreen/SpaceFallback"
 import SpaceScreenHeader from "@/components/spaces/MainScreen/RenderHeaderFunc"
 import { UniversalFilter } from "@/components/filters/UniversalFilters"
 import { spaceFilterFields } from "@/constants/filters"
-import { Spacing } from "@/constants/Design"
+import { Spacing, TAB_BAR_CLEARANCE } from "@/constants/Design"
 import { SpacesScreenSkeleton } from "@/components/skeletons"
 
 export default function SpacesScreen() {
@@ -90,7 +90,7 @@ export default function SpacesScreen() {
          {createModalVisible && (
             <View
                style={[
-                  StyleSheet.absoluteFillObject,
+                  StyleSheet.absoluteFill,
                   styles.modalOverlay,
                   { backgroundColor: colors.background },
                ]}
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
    },
    listContent: {
       paddingTop: Spacing.xs,
-      paddingBottom: 110,
+      paddingBottom: TAB_BAR_CLEARANCE,
       flexGrow: 1,
    },
    /*

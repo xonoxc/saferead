@@ -8,15 +8,10 @@
       "scheme": "com.saferead.app",
       "userInterfaceStyle": "automatic",
       "backgroundColor": "#000000",
-      "splash": {
-         "image": "./assets/images/splash.png",
-         "backgroundColor": "#000000"
-      },
       "experiments": {
          "reactCompiler": true,
          "typedRoutes": true
       },
-      "newArchEnabled": true,
       "ios": {
          "supportsTablet": true,
          "bundleIdentifier": "com.saferead.andro",
@@ -34,7 +29,22 @@
          "expo-font",
          "expo-web-browser",
          "expo-audio",
-         "expo-build-properties"
+         "expo-build-properties",
+         "expo-secure-store",
+         [
+            "expo-splash-screen",
+            {
+               "image": "./assets/images/splash.png",
+               "imageWidth": 200,
+               "resizeMode": "contain",
+               "backgroundColor": "#FFFFFF",
+               "dark": {
+                  "image": "./assets/images/splash.png",
+                  "backgroundColor": "#0B0C10"
+               }
+            }
+         ],
+         "expo-asset"
       ],
       "extra": {
          "router": {},
@@ -44,8 +54,7 @@
       },
       "android": {
          "softwareKeyboardLayoutMode": "pan",
-         "package": "com.saferead.android",
-         "edgeToEdgeEnabled": false
+         "package": "com.saferead.android"
       }
    }
 }

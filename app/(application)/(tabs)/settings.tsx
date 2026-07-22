@@ -8,6 +8,7 @@ import SettingsGroup from "@/components/settings/SettingsGroup"
 import useSettingsGroups from "@/hooks/screens/useSettingsGroup"
 import SettingsThemeDropdown from "@/components/settings/SettingsThemeDropDown"
 import { Fonts, FontSizes } from "@/constants"
+import { TAB_BAR_CLEARANCE } from "@/constants/Design"
 import { UpgradeButton } from "@/components"
 import { Sparkle } from "lucide-react-native"
 import type { RoutePath } from "@/types/path"
@@ -28,7 +29,7 @@ export default function SettingsScreen() {
    return (
       <ScrollView
          style={[styles.container, { backgroundColor: colors.background }]}
-         contentContainerStyle={{ paddingBottom: 120 }}
+         contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE }}
          showsVerticalScrollIndicator={false}
       >
          <View style={styles.header}>

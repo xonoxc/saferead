@@ -31,6 +31,32 @@ export const Radii = {
 } as const
 
 /*
+ * Bottom tab bar geometry.
+ *
+ * The bar floats over the content rather than sitting in the layout flow, so
+ * its size is not discoverable from the tree. Every screen that scrolls under
+ * it has to reserve `clearance` at the end of its content, and previously each
+ * one guessed its own number (110, 120, 130...), which is why the last row was
+ * clipped on some screens and swimming in space on others.
+ * **/
+export const TabBar = {
+   /* The floating pill itself. */
+   height: 64,
+   /* Gap between the pill and the left/right screen edges. */
+   inset: 16,
+   /* Gap between the pill and whatever sits below it. */
+   gap: 12,
+   radius: 32,
+   /* Diameter of the raised centre action. */
+   actionSize: 58,
+   /* How far the centre action rides above the pill. */
+   actionLift: 18,
+} as const
+
+/* What a scrolling screen must reserve so its last row clears the bar. */
+export const TAB_BAR_CLEARANCE = TabBar.height + TabBar.gap + TabBar.actionLift + Spacing.lg
+
+/*
  * Motion.
  *
  * Durations stay short: entrances should feel like the UI is keeping up with

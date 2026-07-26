@@ -3,7 +3,7 @@ import { Sparkle } from "lucide-react-native"
 import { Pressable, Text, StyleSheet, type StyleProp, type ViewStyle } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
-import { Fonts, FontSizes } from "@/constants"
+import { Fonts, FontSizes, Motion } from "@/constants"
 import type { RoutePath } from "@/types/path"
 
 interface UpgradeButtonProps {
@@ -25,11 +25,11 @@ const UpgradeButton: React.FC<UpgradeButtonProps> = ({
    const scale = useSharedValue<number>(1)
 
    const handlePressIn = () => {
-      scale.value = withSpring(0.94, { damping: 15 })
+      scale.value = withSpring(Motion.pressScale, Motion.springQuick)
    }
 
    const handlePressOut = () => {
-      scale.value = withSpring(1, { damping: 15 })
+      scale.value = withSpring(1, Motion.springQuick)
       onPress
          ? onPress()
          : router.push({

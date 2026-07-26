@@ -7,6 +7,7 @@ import {
    getSpaceStats as getSpaceStatsApi,
    getOrCreateSpaceConversation,
    toggleFavoriteSpace as toggleFavoriteSpaceApi,
+   deleteSpaceDocument as deleteSpaceDocumentApi,
    pinDocumentToSpace,
    type PinDocumetToSpaceMethodParams,
 } from "@/services/space.service"
@@ -14,6 +15,23 @@ import {
 import type { PaginatedSpaceDocuments } from "@/types/api/spaces.documents.types"
 import type { PaginatedSpaces, Space, SpaceStats } from "@/types/api/spaces.types"
 import type { SpaceFilterOptions } from "@/types/spaces"
+
+/*
+ * Text extraction + embedding runs on a Celery worker, so an upload responds
+ * `pending` and only reaches `ready` a few seconds later. Nothing pushes that
+ * transition to the client: without polling, a freshly uploaded document sits
+ * at "pending" until the user manually leaves the space and comes back, which
+ * is what made indexing feel like it never finished.
+ *
+ * Tighter than the analysis poll in queries/docs.ts because indexing is the
+ * shorter job - typically a few seconds - so a 3s tick would often be the only
+ * thing standing between "uploaded" and "ready".
+ */
+export const INDEXING_IN_PROGRESS_STATUSES = ["pending", "processing"]
+export const INDEXING_POLL_INTERVAL_MS = 1500
+
+export const isIndexingInProgress = (status: unknown): boolean =>
+   typeof status === "string" && INDEXING_IN_PROGRESS_STATUSES.includes(status)
 
 export const useSpaces = (filters?: SpaceFilterOptions, enabled = true) => {
    return useInfiniteQuery<PaginatedSpaces>({
@@ -64,6 +82,19 @@ export const useSpaceDocuments = (spaceId: string, enabled = true) => {
       },
       initialPageParam: 1,
       enabled: enabled && !!spaceId,
+      /*
+       * Poll only while something is actually being indexed, then stop. A flat
+       * interval would keep waking the app up for a list that never changes.
+       */
+      refetchInterval: query => {
+         const pages = query.state.data?.pages
+         if (!pages) return false
+
+         const waiting = pages.some(page =>
+            page.results.some(doc => isIndexingInProgress(doc.processing_status))
+         )
+         return waiting ? INDEXING_POLL_INTERVAL_MS : false
+      },
    })
 }
 
@@ -98,6 +129,26 @@ export const useToggleFavoriteSpace = (spaceId: string) => {
       mutationFn: () => toggleFavoriteSpaceApi(spaceId),
       meta: {
          invalidatedQueries: [["spaces", spaceId], ["spaces"]],
+      },
+   })
+}
+
+/*
+ * Delete a document from a space.
+ *
+ * Invalidates the space's document list and its summary counts as well as the
+ * spaces list, since document_count is shown on the space card too.
+ * **/
+export const useDeleteSpaceDocument = (spaceId: string) => {
+   return useMutation({
+      mutationFn: (documentId: string) => deleteSpaceDocumentApi(documentId),
+      meta: {
+         invalidatedQueries: [
+            ["spaces", spaceId, "documents"],
+            ["spaces", spaceId, "stats"],
+            ["spaces", "detail", spaceId],
+            ["spaces"],
+         ],
       },
    })
 }

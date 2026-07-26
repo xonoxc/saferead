@@ -48,7 +48,16 @@ export function useAnalysis() {
       router.push("/analysisres")
    }
 
-   const handleSpaceClose = () => setSelectedSpace(null)
+   /*
+    * Exit the chat: return to the space detail screen instead of dropping
+    * into the analytics tab.
+    * **/
+   const handleSpaceClose = () => {
+      if (selectedSpace?.id) {
+         router.push(`/spaces/${selectedSpace.id}`)
+      }
+      setSelectedSpace(null)
+   }
 
    return {
       user,

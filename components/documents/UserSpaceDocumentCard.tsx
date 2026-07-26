@@ -1,6 +1,15 @@
 import React from "react"
 import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native"
-import { Calendar, Pin, PinOff, Tag, CircleCheck, TriangleAlert, Clock } from "lucide-react-native"
+import {
+   Calendar,
+   Pin,
+   PinOff,
+   Tag,
+   CircleCheck,
+   TriangleAlert,
+   Clock,
+   Trash2,
+} from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
 import { Spacing, Radii, elevation, withAlpha } from "@/constants/Design"
@@ -20,12 +29,16 @@ interface UserSpaceDocumentCardProps {
    spaceColor?: string
    index?: number
    onPin?: (documentId: string, documentFile: string) => void
+   onDelete?: (document: UserSpaceDocument) => void
+   isDeleting?: boolean
 }
 
 export function UserSpaceDocumentCard({
    document,
    spaceColor,
    onPin,
+   onDelete,
+   isDeleting = false,
    index = 0,
    pinned = false,
 }: UserSpaceDocumentCardProps) {
@@ -81,15 +94,34 @@ export function UserSpaceDocumentCard({
                   </Text>
                </View>
 
-               {onPin && (
-                  <Pressable onPress={handlePinPress} style={styles.pinButton} hitSlop={8}>
-                     {pinned ? (
-                        <PinOff size={17} color={cardColor} />
-                     ) : (
-                        <Pin size={17} color={colors.textMuted} />
-                     )}
-                  </Pressable>
-               )}
+               <View style={styles.actions}>
+                  {onPin && (
+                     <Pressable onPress={handlePinPress} style={styles.iconButton} hitSlop={8}>
+                        {pinned ? (
+                           <PinOff size={17} color={cardColor} />
+                        ) : (
+                           <Pin size={17} color={colors.textMuted} />
+                        )}
+                     </Pressable>
+                  )}
+
+                  {onDelete && (
+                     <Pressable
+                        onPress={() => onDelete(document)}
+                        style={styles.iconButton}
+                        hitSlop={8}
+                        disabled={isDeleting}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Remove ${document.display_name || document.effective_name} from this space`}
+                     >
+                        {isDeleting ? (
+                           <ActivityIndicator size="small" color={colors.textMuted} />
+                        ) : (
+                           <Trash2 size={17} color={colors.textMuted} />
+                        )}
+                     </Pressable>
+                  )}
+               </View>
             </View>
 
             <View style={[styles.footer, { borderTopColor: colors.borderLight }]}>
@@ -233,7 +265,11 @@ const styles = StyleSheet.create({
       fontSize: 11,
       fontFamily: Fonts.medium,
    },
-   pinButton: {
+   actions: {
+      flexDirection: "row",
+      alignItems: "center",
+   },
+   iconButton: {
       padding: Spacing.xs,
    },
 })

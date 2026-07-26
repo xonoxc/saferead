@@ -28,8 +28,6 @@ export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDoc
    } = useForm<FormData>({
       resolver: zodResolver(schema),
       defaultValues: {
-         displayName: "",
-         documentType: "",
          file: undefined,
       },
    })
@@ -41,11 +39,14 @@ export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDoc
             name: data.file.name,
             type: data.file.mimeType || "application/octet-stream",
          }
+         /*
+          * Only the file is sent. The server reads the extension for
+          * document_type and the filename for display_name, so there is nothing
+          * here for the two to disagree about.
+          * **/
          return addDocumentToSpace({
             space: spaceId,
             document_file: file,
-            display_name: data.displayName,
-            document_type: data.documentType,
          })
       },
       onSuccess: async () => {
@@ -53,8 +54,8 @@ export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDoc
 
          showBottomAlert({
             type: "success",
-            title: "Upload Successful",
-            message: "Your document has been uploaded successfully.",
+            title: "Upload started",
+            message: "Your document is uploading and will be ready to chat with shortly.",
             actions: [{ text: "OK", style: "primary", onPress: () => {} }],
          })
       },
@@ -98,8 +99,7 @@ export function useUploadDocumentForm({ spaceId, onUploadSuccess }: UseUploadDoc
          return
       }
 
-      setValue("file", file)
-      setValue("displayName", file.name ?? "")
+      setValue("file", file, { shouldValidate: true })
    }
 
    const onSubmit = (data: FormData) => mutation.mutate(data)

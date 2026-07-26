@@ -1,7 +1,11 @@
+import React, { useState } from "react"
 import { Pressable, View, StyleSheet, TextInput } from "react-native"
 import { CircleDot, Send } from "lucide-react-native"
+import Animated, { FadeIn } from "react-native-reanimated"
+
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
+import { Spacing, Radii, withAlpha } from "@/constants/Design"
 import { PromptSuggestionBar } from "./promptChips/PromptSuggestionBar"
 
 export function ChatToolBar({
@@ -20,44 +24,63 @@ export function ChatToolBar({
    handlePromptSeggestionPress: (text: string) => void
 }) {
    const { colors } = useTheme()
+   const [isFocused, setIsFocused] = useState(false)
+
+   const hasText = message.trim().length > 0
+   const canSend = hasText && !isTyping
 
    return (
-      <View
-         style={[
-            styles.inputContainer,
-            {
-               backgroundColor: colors.background,
-            },
-         ]}
-      >
-         <View style={styles.promptSuggestionBarContainer}>
-            {isChatEmpty() && <PromptSuggestionBar onPromptSelect={handlePromptSeggestionPress} />}
-         </View>
+      <View style={[styles.inputContainer, { backgroundColor: colors.background }]}>
+         {isChatEmpty() && (
+            <Animated.View entering={FadeIn} style={styles.promptSuggestionBarContainer}>
+               <PromptSuggestionBar onPromptSelect={handlePromptSeggestionPress} />
+            </Animated.View>
+         )}
 
-         <View style={styles.bottomBarWrapper}>
+         <View
+            style={[
+               styles.composerWrapper,
+               {
+                  borderColor: isFocused ? colors.primary : colors.border,
+                  backgroundColor: colors.card,
+               },
+            ]}
+         >
             <TextInput
                style={[
                   styles.input,
                   {
                      color: colors.text,
-                     borderColor: colors.border,
-                     backgroundColor: colors.surface,
                   },
                ]}
                value={message}
                onChangeText={setMessage}
+               onFocus={() => setIsFocused(true)}
+               onBlur={() => setIsFocused(false)}
                placeholder="Ask a question..."
                placeholderTextColor={colors.textMuted}
+               multiline
+               maxLength={5000}
+               editable={!isTyping}
             />
+
             <Pressable
-               style={[styles.sendButton, { backgroundColor: colors.text }]}
-               onPressIn={handleInputSideButtonPress}
-               disabled={!message.trim() && !isTyping}
+               style={[
+                  styles.sendButton,
+                  {
+                     backgroundColor: canSend ? colors.primary : withAlpha(colors.primary, 0.4),
+                  },
+               ]}
+               onPress={handleInputSideButtonPress}
+               disabled={!canSend}
+               accessibilityRole="button"
+               accessibilityLabel={isTyping ? "Cancel message" : "Send message"}
+               accessibilityHint={isTyping ? "Stop generating response" : "Send your message"}
             >
                {isTyping ? (
-                  <CircleDot size={24} color={colors.background} />
+                  <CircleDot size={20} color="white" />
                ) : (
-                  <Send size={24} color={colors.background} />
+                  <Send size={20} color="white" />
                )}
             </Pressable>
          </View>
@@ -67,38 +90,38 @@ export function ChatToolBar({
 
 const styles = StyleSheet.create({
    inputContainer: {
-      flexDirection: "column",
-      justifyContent: "space-around",
-      gap: 8,
-      padding: 13,
-      paddingBottom: 35,
-   },
-   bottomBarWrapper: {
-      flex: 1,
-      flexDirection: "row",
-      alignItems: "center",
+      paddingHorizontal: Spacing.md,
+      paddingVertical: Spacing.md,
+      paddingBottom: Spacing.xxl,
+      gap: Spacing.md,
    },
    promptSuggestionBarContainer: {
+      paddingBottom: Spacing.xs,
+   },
+   composerWrapper: {
       flexDirection: "row",
-      justifyContent: "space-between",
-      paddingBottom: 10,
+      alignItems: "flex-end",
+      borderWidth: 1,
+      borderRadius: Radii.lg,
+      paddingHorizontal: Spacing.sm,
+      paddingVertical: Spacing.xs,
+      gap: Spacing.sm,
    },
    input: {
       flex: 1,
-      borderRadius: 15,
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      marginRight: 12,
-      minHeight: 50,
       fontSize: FontSizes.md,
       fontFamily: Fonts.regular,
+      paddingVertical: Spacing.sm,
+      paddingHorizontal: Spacing.xs,
+      minHeight: 40,
+      maxHeight: 100,
    },
    sendButton: {
-      width: 48,
-      height: 48,
-      borderRadius: 16,
-      padding: 10,
+      width: 36,
+      height: 36,
+      borderRadius: Radii.md,
       justifyContent: "center",
       alignItems: "center",
+      marginBottom: Spacing.xs,
    },
 })

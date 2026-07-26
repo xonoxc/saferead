@@ -9,7 +9,7 @@ import Animated, {
 } from "react-native-reanimated"
 import { Check, X, FileText, Clock, ChevronRight, Share2, Download, Eye } from "lucide-react-native"
 
-import { Fonts, FontSizes } from "@/constants"
+import { Fonts, FontSizes, Motion } from "@/constants"
 import type { ColorsType } from "@/hooks/useTheme"
 import type { AnalysisResponse } from "@/types/api/documents.types"
 
@@ -39,11 +39,11 @@ export function AnalysisCard({ document, onPress, colors, index }: AnalysisCardP
    const scaleAnim = useSharedValue(1)
 
    const handlePressIn = () => {
-      scaleAnim.value = withSpring(0.97, { damping: 15, stiffness: 300 })
+      scaleAnim.value = withSpring(Motion.pressScale, Motion.springQuick)
    }
 
    const handlePressOut = () => {
-      scaleAnim.value = withSpring(1, { damping: 15, stiffness: 300 })
+      scaleAnim.value = withSpring(1, Motion.springQuick)
    }
 
    const cardAnimatedStyle = useAnimatedStyle(() => ({

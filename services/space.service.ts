@@ -66,10 +66,15 @@ export async function getSpaceStats(spaceId: string) {
    return resp.data
 }
 
+/*
+ * `document_type` and `display_name` are optional: omit them and the server
+ * derives both from the uploaded file. They remain accepted for callers that
+ * genuinely want to override the guess.
+ * **/
 export async function addDocumentToSpace(data: {
    space: string
    document_file: ReactNativeFile | File | Blob
-   document_type: string
+   document_type?: string
    display_name?: string
    is_pinned?: boolean
    notes?: string
@@ -92,6 +97,17 @@ export async function addDocumentToSpace(data: {
          "Content-Type": "multipart/form-data",
       },
    })
+}
+
+/*
+ * Remove a document from its space.
+ *
+ * The server's pre_delete signal queues removal of the document's chunks from
+ * the space's ChromaDB collection, so the assistant stops citing a document
+ * the moment it disappears from the list.
+ * **/
+export async function deleteSpaceDocument(documentId: string) {
+   return apiClient.delete(`/user_space/documents/${documentId}/`)
 }
 
 /*

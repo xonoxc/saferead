@@ -11,6 +11,7 @@ import {
 } from "@/hooks/queries/spaces"
 import { updateSpace } from "@/services/space.service"
 import { useSpaceStore } from "@/store/useSpaceStore"
+import { Motion } from "@/constants/Design"
 
 import { attempt } from "@/utils/attempt"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
@@ -71,8 +72,13 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
    }))
 
    const handleFavoritePress = async () => {
-      scale.value = withSpring(0.9, {}, () => {
-         scale.value = withSpring(1)
+      /*
+       * A brief press-in and release, not a bounce: the empty config here used
+       * Reanimated's defaults (damping 10), which overshoot hard, and 0.9 made
+       * the icon visibly pop.
+       */
+      scale.value = withSpring(Motion.pressScale, Motion.springQuick, () => {
+         scale.value = withSpring(1, Motion.springQuick)
       })
 
       if (!space) return

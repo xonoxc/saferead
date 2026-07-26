@@ -1,5 +1,5 @@
 import React from "react"
-import { View, StyleSheet, KeyboardAvoidingView } from "react-native"
+import { View, StyleSheet } from "react-native"
 import { SpaceIndicator } from "./spaceindicator/SpaceIndicator"
 
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
@@ -13,7 +13,15 @@ import { TypingBubble } from "./TypingBubble"
 import { ChatToolBar } from "./ChatToolBar"
 import { ChatHistory } from "./ChatHistory"
 import { ScrollToBottomButton } from "./ScrollToBottomButton"
+import { Spacing } from "@/constants/Design"
 
+/*
+ * Space chat UI.
+ *
+ * The header moved to the analyze tab (removed upgrade button).
+ * Focus is on the message area: space selector at the top, history in the middle,
+ * smooth composer at the bottom with multiline grow + focus state.
+ * **/
 export function ChatView() {
    const {
       colors,
@@ -35,24 +43,20 @@ export function ChatView() {
 
    return (
       <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>
-         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-            <KeyboardAvoidingView
-               style={{ flex: 1 }}
-               behavior={isIOS() ? "padding" : "height"}
-               keyboardVerticalOffset={isKeyboardVisible ? 0 : 90}
-            >
-               <View style={[styles.header, { backgroundColor: colors.background }]}>
-                  <View style={styles.headerContent}>
-                     <SpaceIndicator />
-                  </View>
+         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["left", "right"]}>
+            <View style={{ flex: 1 }}>
+               {/* Space selector inline with the chat area */}
+               <View style={[styles.selector, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+                  <SpaceIndicator />
                </View>
 
+               {/* Message history with smart scrolling */}
                <KeyboardAwareScrollView
                   ref={scrollViewRef}
                   contentContainerStyle={{
-                     paddingHorizontal: 12,
-                     paddingTop: 6,
-                     paddingBottom: 100,
+                     paddingHorizontal: Spacing.sm,
+                     paddingTop: Spacing.xs,
+                     paddingBottom: 16,
                   }}
                   keyboardShouldPersistTaps="handled"
                   showsVerticalScrollIndicator={false}
@@ -66,33 +70,28 @@ export function ChatView() {
                   {isTyping && <TypingBubble />}
                </KeyboardAwareScrollView>
 
+               {/* Scroll-to-bottom when history is long */}
                <ScrollToBottomButton onPress={scrollToBottom} visible={showScrollToBottom} />
 
+               {/* Composer: always visible, grows with text */}
                <ChatToolBar
                   message={message}
                   setMessage={setMessage}
                   isTyping={isTyping}
                   isChatEmpty={isChatEmpty}
                   handleInputSideButtonPress={handleInputSideButtonPress}
-                  handlePromptSeggestionPress={text => handlePromptSeggestionPress(text)}
+                  handlePromptSeggestionPress={handlePromptSeggestionPress}
                />
-            </KeyboardAvoidingView>
+            </View>
          </SafeAreaView>
       </Animated.View>
    )
 }
 
 const styles = StyleSheet.create({
-   container: {
-      flex: 1,
-   },
-   header: {
-      paddingHorizontal: 14,
-      paddingTop: 20,
-   },
-   headerContent: {
-      flexDirection: "row",
-      justifyContent: "center",
-      alignItems: "center",
+   selector: {
+      paddingHorizontal: Spacing.md,
+      paddingVertical: Spacing.sm,
+      borderBottomWidth: 1,
    },
 })

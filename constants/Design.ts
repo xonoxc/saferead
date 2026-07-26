@@ -67,23 +67,36 @@ export const Motion = {
    fast: 180,
    base: 260,
    slow: 380,
-   stagger: 55,
-   /* A gentle spring for pressable feedback and shared transitions. */
+   stagger: 35,
+   /*
+    * Springs below are tuned to a damping ratio of ~1.0 (critically damped),
+    * which means they settle without overshooting.
+    *
+    *    ratio = damping / (2 * sqrt(stiffness * mass))
+    *
+    * Anything below ~0.9 visibly bounces past its target and back. These were
+    * previously 0.73 and 0.58, which read as playful rather than considered -
+    * on a screen full of cards and chips the overshoot compounds and the whole
+    * UI wobbles. Keep the ratio at ~1.0 when retuning: raise stiffness to make
+    * a spring faster, and raise damping to match, rather than dropping damping.
+    */
+
+   /* Pressable feedback and shared transitions. ratio 0.98 */
    spring: {
-      damping: 18,
-      stiffness: 190,
+      damping: 26,
+      stiffness: 220,
       mass: 0.8,
    },
-   /* Snappier spring for small elements like chips and icons. */
+   /* Small elements like chips and icons - faster, still no overshoot. ratio 1.01 */
    springQuick: {
-      damping: 15,
-      stiffness: 280,
-      mass: 0.6,
+      damping: 26,
+      stiffness: 300,
+      mass: 0.55,
    },
    /* How far a card travels on entrance. */
-   riseDistance: 14,
+   riseDistance: 10,
    /* Scale applied while a control is held down. */
-   pressScale: 0.97,
+   pressScale: 0.98,
 } as const
 
 /*

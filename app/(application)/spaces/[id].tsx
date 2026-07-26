@@ -11,6 +11,8 @@ import { UserSpaceDocumentCard } from "@/components/documents/UserSpaceDocumentC
 
 import { useSpaceDetailsScreen } from "@/hooks/screens/useSpaceDetailScreen"
 import { useTheme } from "@/hooks/useTheme"
+import { useDeleteSpaceDocument } from "@/hooks/queries/spaces"
+import { useDrawerAlert } from "@/hooks/alerts/useAlert"
 import { Fonts, FontSizes } from "@/constants"
 import { getSections } from "@/components/spaces/SpaceDetails/getSections"
 import SpaceDetailTopBar from "@/components/spaces/SpaceDetails/SpaceDetailTopToolbar"
@@ -23,6 +25,7 @@ const AnimatedSectionList = Animated.createAnimatedComponent(SectionList<SpaceIt
 
 export default function SpaceDetailScreen() {
    const { colors } = useTheme()
+   const showAlert = useDrawerAlert()
 
    const {
       space,
@@ -39,6 +42,28 @@ export default function SpaceDetailScreen() {
       handleUpdateSpace,
       handlePinDocumentToSpace: togglePinnedStatus,
    } = useSpaceDetailsScreen({ colors })
+
+   const deleteDocument = useDeleteSpaceDocument(space?.id || "")
+
+   const handleDeleteDocument = async (doc: any) => {
+      showAlert({
+         type: "info",
+         title: `Remove ${doc.display_name || doc.effective_name}?`,
+         message: "It will be removed from your space and the search index.",
+         actions: [
+            {
+               text: "Cancel",
+               onPress: () => {},
+               style: "secondary",
+            },
+            {
+               text: "Remove",
+               onPress: () => deleteDocument.mutate(doc.id),
+               style: "destructive",
+            },
+         ],
+      })
+   }
 
    const {
       animatedStyle: OpenInChatBtnStyle,
@@ -118,6 +143,8 @@ export default function SpaceDetailScreen() {
                            pinned={section.type === "documents" && section.pinned}
                            spaceColor={space.color}
                            onPin={togglePinnedStatus}
+                           onDelete={handleDeleteDocument}
+                           isDeleting={deleteDocument.isPending && deleteDocument.variables === item.id}
                         />
                      )
                }

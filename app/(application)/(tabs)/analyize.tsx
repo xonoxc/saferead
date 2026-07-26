@@ -36,7 +36,6 @@ export default function AnalyzeScreen() {
             <AnalyzeHeader
                selectedSpace={selectedSpace}
                onSpaceExitButtonPress={handleSpaceClose}
-               colors={colors}
             />
          )}
          {selectedSpace ? (

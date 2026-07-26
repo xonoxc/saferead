@@ -1,5 +1,10 @@
 import React from "react"
-import Animated, { FadeInDown, FadeIn, type AnimatedStyle } from "react-native-reanimated"
+import Animated, {
+   Easing,
+   FadeInDown,
+   FadeIn,
+   type AnimatedStyle,
+} from "react-native-reanimated"
 import { type StyleProp, type ViewStyle } from "react-native"
 
 import { Motion } from "@/constants/Design"
@@ -35,8 +40,21 @@ export function FadeInView({
    const staggerSteps = Math.min(index, MAX_STAGGER_STEPS)
    const totalDelay = delay + staggerSteps * Motion.stagger
 
+   /*
+    * Deliberately eased rather than sprung. `.springify()` overshoots its
+    * resting position and settles back, and with a staggered list every row
+    * did that in sequence - the effect read as the screen wobbling into place.
+    * A decelerating curve arrives once and stops, which is what makes the
+    * entrance feel composed instead of bouncy.
+    *
+    * The initial offset is set explicitly because FadeInDown otherwise travels
+    * a fixed 25px, ignoring the riseDistance token.
+    */
    const entering = rise
-      ? FadeInDown.duration(duration).delay(totalDelay).springify().damping(Motion.spring.damping)
+      ? FadeInDown.duration(duration)
+           .delay(totalDelay)
+           .easing(Easing.out(Easing.cubic))
+           .withInitialValues({ transform: [{ translateY: Motion.riseDistance }] })
       : FadeIn.duration(duration).delay(totalDelay)
 
    return (

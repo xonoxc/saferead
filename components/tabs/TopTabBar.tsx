@@ -116,18 +116,17 @@ export default function TopTabBar({ selectedTab, onTabPress }: TopTabBarProps) {
                            style={[
                               styles.tab,
                               {
-                                 width: 120,
                                  backgroundColor: isActive ? colors.primary : colors.card,
                               },
                            ]}
                            onPress={() => onTabPress(index)}
                         >
                            <Text
+                              numberOfLines={1}
                               style={[
                                  styles.tabText,
                                  {
                                     color: isActive ? colors.background : colors.textMuted,
-                                    fontFamily: isActive ? Fonts.bold : Fonts.regular,
                                  },
                               ]}
                            >
@@ -199,8 +198,16 @@ const styles = StyleSheet.create({
       fontFamily: Fonts.bold,
       maxWidth: "100%",
    },
+   /*
+    * Sized to its label rather than a hard 120px. "Conversations" in semi-bold
+    * overflowed that box and wrapped to a second line, and the width jumped
+    * whenever a tab became active because the label also switched weight.
+    * The weight is constant now - active state is carried by colour alone.
+    * **/
    tab: {
-      padding: 10,
+      paddingVertical: 10,
+      paddingHorizontal: 18,
+      minWidth: 110,
       borderRadius: 12,
       marginHorizontal: 1,
       alignItems: "center",

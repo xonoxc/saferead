@@ -141,7 +141,15 @@ export function elevation(colors: ColorsType, level: 0 | 1 | 2 | 3 = 1) {
  * Space colours come from the server as opaque hex, which is far too heavy to
  * sit behind text or fill an icon tile.
  * **/
-export function withAlpha(hexColor: string, alpha: number): string {
+export function withAlpha(hexColor: string | null | undefined, alpha: number): string {
+   /*
+    * A space saved before `color` had a default, or any payload where the field
+    * comes back null, used to throw here on `.replace` - and because the result
+    * feeds native views like LinearGradient, the failure surfaced as a crash on
+    * whichever screen happened to render that space rather than as a bad colour.
+    * **/
+   if (typeof hexColor !== "string" || !hexColor) return "transparent"
+
    const hex = hexColor.replace("#", "")
 
    if (hex.length !== 6) return hexColor

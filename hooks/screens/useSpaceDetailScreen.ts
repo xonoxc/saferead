@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { FileText, TrendingUp, type LucideIcon } from "lucide-react-native"
-import { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated"
+import { useSharedValue, useAnimatedStyle, withSequence, withSpring } from "react-native-reanimated"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import {
    usePinDocumentMutation,
@@ -73,13 +73,25 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
 
    const handleFavoritePress = async () => {
       /*
-       * A brief press-in and release, not a bounce: the empty config here used
-       * Reanimated's defaults (damping 10), which overshoot hard, and 0.9 made
-       * the icon visibly pop.
+       * A brief press-in and release, not a bounce.
+       *
+       * This has to be a sequence, not a spring with a completion callback that
+       * assigns back to `scale`. Assigning to a shared value cancels whatever
+       * animation is already on it and runs that animation's callback - so a
+       * callback which itself assigns to `scale` re-enters the setter and
+       * recurses until the stack blows.
+       *
+       * The callback form survived here for a while only because it was tuned
+       * to 0.9 with Reanimated's soft defaults, which take enough frames that
+       * the callback lands on a later frame instead of inside the setter. At
+       * pressScale (0.98) with a stiff critically-damped spring the travel is
+       * small enough to settle within the first frame, which is what turned it
+       * into "Maximum call stack size exceeded" on the first tap.
        */
-      scale.value = withSpring(Motion.pressScale, Motion.springQuick, () => {
-         scale.value = withSpring(1, Motion.springQuick)
-      })
+      scale.value = withSequence(
+         withSpring(Motion.pressScale, Motion.springQuick),
+         withSpring(1, Motion.springQuick)
+      )
 
       if (!space) return
 

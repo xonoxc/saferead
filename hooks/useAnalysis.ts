@@ -49,14 +49,23 @@ export function useAnalysis() {
    }
 
    /*
-    * Exit the chat: return to the space detail screen instead of dropping
-    * into the analytics tab.
+    * Exit the chat: return to the space you were chatting with, instead of
+    * dropping into the analytics tab.
+    *
+    * `navigate` rather than `push` because chat is usually opened *from* the
+    * space screen - pushing would stack a second copy of it every round trip,
+    * so backing out of a few chats left a pile of identical screens to walk
+    * back through. `navigate` returns to the existing one when it is already
+    * in the stack, and pushes only when it is not.
     * **/
    const handleSpaceClose = () => {
-      if (selectedSpace?.id) {
-         router.push(`/spaces/${selectedSpace.id}`)
-      }
+      const spaceId = selectedSpace?.id
+
       setSelectedSpace(null)
+
+      if (spaceId) {
+         router.navigate(`/spaces/${spaceId}`)
+      }
    }
 
    return {

@@ -6,11 +6,13 @@ import Animated, {
    FadeInRight,
    useSharedValue,
    useAnimatedStyle,
+   withSequence,
    withSpring,
 } from "react-native-reanimated"
 import { router } from "expo-router"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { Motion } from "@/constants/Design"
 import SearchBar from "@/components/search/SearchBar"
 
 interface Language {
@@ -120,9 +122,11 @@ export default function LanguageScreen() {
       }))
 
       const handlePress = () => {
-         scale.value = withSpring(0.95, {}, () => {
-            scale.value = withSpring(1)
-         })
+         /* Sequence, not a completion callback - see the note in useSpaceDetailScreen. */
+         scale.value = withSequence(
+            withSpring(Motion.pressScale, Motion.springQuick),
+            withSpring(1, Motion.springQuick)
+         )
          handleLanguageSelect(language.code)
       }
 

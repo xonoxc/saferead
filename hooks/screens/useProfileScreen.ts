@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated"
+import { useSharedValue, useAnimatedStyle, withSequence, withSpring } from "react-native-reanimated"
+import { Motion } from "@/constants/Design"
 
 import { useAuth } from "@/hooks/useAuth"
 import { useDrawerAlert } from "@/hooks/alerts/useAlert"
@@ -68,9 +69,11 @@ export function useProfileScreen() {
    const handleAvatarPress = () => {
       if (!isEditing) return
 
-      scale.value = withSpring(0.9, {}, () => {
-         scale.value = withSpring(1)
-      })
+      /* Sequence, not a completion callback - see the note in useSpaceDetailScreen. */
+      scale.value = withSequence(
+         withSpring(Motion.pressScale, Motion.springQuick),
+         withSpring(1, Motion.springQuick)
+      )
 
       alert({
          title: "Change Profile Photo",

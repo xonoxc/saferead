@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router"
-import { Home, Settings, Box, Clock } from "lucide-react-native"
+import { Home, Settings, Box, FileSignature } from "lucide-react-native"
 
 import { useTheme } from "@/hooks/useTheme"
 import { BottomTabBar } from "@/components/tabs/BottomTabBar"
@@ -30,10 +30,12 @@ export default function TabLayout() {
          />
 
          <Tabs.Screen
-            name="spaces"
+            name="contracts"
             options={{
-               title: "Spaces",
-               tabBarIcon: ({ color, size }) => <Box color={color} size={size} strokeWidth={2} />,
+               title: "Contracts",
+               tabBarIcon: ({ color, size }) => (
+                  <FileSignature color={color} size={size} strokeWidth={2} />
+               ),
             }}
          />
 
@@ -49,14 +51,23 @@ export default function TabLayout() {
          />
 
          <Tabs.Screen
-            name="analyize"
+            name="spaces"
             options={{
-               title: "Analyze",
-               tabBarIcon: ({ color, size }) => <Clock color={color} size={size} strokeWidth={2} />,
+               title: "Spaces",
+               tabBarIcon: ({ color, size }) => <Box color={color} size={size} strokeWidth={2} />,
             }}
          />
 
-         {/* Reachable by route, but deliberately absent from the bar. */}
+         {/*
+          * Reachable by route, deliberately absent from the bar.
+          *
+          * `analyize` is the scan history. It lost its tab slot to Contracts
+          * when the product's centre of gravity moved from one-off scans to the
+          * portfolio - five tabs plus a raised centre action is already one too
+          * many, and scan history is now reached from the home screen's recent
+          * activity, which is where people look for it anyway.
+          * **/}
+         <Tabs.Screen name="analyize" options={{ href: null }} />
          <Tabs.Screen name="premium" options={{ href: null }} />
 
          <Tabs.Screen

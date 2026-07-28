@@ -8,6 +8,7 @@ import Animated, {
 import { type StyleProp, type ViewStyle } from "react-native"
 
 import { Motion } from "@/constants/Design"
+import { isWeb } from "@/utils/helpers/platform"
 
 interface FadeInViewProps {
    children: React.ReactNode
@@ -56,6 +57,24 @@ export function FadeInView({
            .easing(Easing.out(Easing.cubic))
            .withInitialValues({ transform: [{ translateY: Motion.riseDistance }] })
       : FadeIn.duration(duration).delay(totalDelay)
+
+   /*
+    * No entrance animation on web, and this is a correctness fix rather than a
+    * taste one.
+    *
+    * Reanimated's entering animations set the element to `opacity: 0` up front
+    * and rely on the animation driver to bring it back. On web that driver
+    * does not reliably start for a screen mounted during a hard page load —
+    * the element is left at `opacity: 0, translateY: 25` permanently, and the
+    * content is simply never visible. It reproduces on the home screen: the
+    * DOM is fully populated and the page renders blank.
+    *
+    * A failed animation has to degrade to *no animation*, never to *no
+    * content*. Native is unaffected and keeps the staggered entrance.
+    * **/
+   if (isWeb()) {
+      return <Animated.View style={style}>{children}</Animated.View>
+   }
 
    return (
       <Animated.View entering={entering} style={style}>

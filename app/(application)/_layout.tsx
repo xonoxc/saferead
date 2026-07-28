@@ -97,6 +97,20 @@ export default function ApplicationLayout() {
                />
 
                <Stack.Screen
+                  name="contracts/[id]"
+                  options={{
+                     headerShown: false,
+                  }}
+               />
+
+               <Stack.Screen
+                  name="contracts/new"
+                  options={{
+                     headerShown: false,
+                  }}
+               />
+
+               <Stack.Screen
                   name="help"
                   options={{
                      headerShown: false,

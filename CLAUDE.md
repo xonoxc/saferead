@@ -43,8 +43,8 @@ Env: `sample.env` → `.env`. Only `EXPO_PUBLIC_*` vars reach the client.
 | Path | Holds |
 |---|---|
 | `app/(auth)/` | welcome, login, register, forgot/reset password |
-| `app/(application)/(tabs)/` | index (home), analyize, scan, spaces, premium, settings |
-| `app/(application)/` | analysisres, profile, spaces/[id], help, language, privacy, change_password, scan_menu_screen |
+| `app/(application)/(tabs)/` | index (home), contracts, scan, spaces, settings; analyize + premium are `href: null` (routable, no tab) |
+| `app/(application)/` | analysisres, profile, spaces/[id], contracts/[id], contracts/new, help, language, privacy, change_password, scan_menu_screen |
 | `components/<feature>/` | feature-scoped UI: chat, spaces, documents, home, analyize, onboarding, profile, settings, tabs, filters, skeletons, motion |
 | `hooks/queries/` | react-query hooks (docs, spaces, converstations, plans) |
 | `hooks/screens/` | per-screen logic hooks — screens stay thin |
@@ -111,7 +111,40 @@ icon with the colour (red-vs-amber is exactly the pair colour-blind users cannot
 distinguish) and treats `is_missing` and `span_verified: false` as first-class states
 rather than folding them into "low".
 
-**Motion** — `Motion.spring` / `Motion.springQuick` are tuned to a damping ratio of ~1.0
+**Home is a command centre, not a report.** `app/(application)/(tabs)/index.tsx` used to show
+total documents / completed / failed / avg confidence — four true numbers that change nothing.
+It now answers "what needs me today?" and orders content by how fast it decays: attention hero
+(overdue + closing deadlines + critical clauses), money both directions, portfolio size as
+context, deadlines, then recent scans last. A user with **no org** gets a different screen
+entirely (`WorkspacePitch`) — an empty command centre showing four zeroes would be accurate and
+useless.
+
+**Contracts client** — `types/api/contracts.types.ts` mirrors the DRF serializers with the
+`choices` unions spelled out; `services/contracts.service.ts` holds the HTTP; `hooks/queries/
+contracts.ts` has the hooks. `useCurrentOrg()` is the gate every contracts screen checks —
+"no org yet" is a normal state (the API returns an empty list, not a 403), and `OrgSetupPrompt`
+handles it. Extraction is polled at `EXTRACTION_POLL_INTERVAL_MS` (5s, longer than the 3s scan
+poll — extraction walks 12 clause types and takes 20-60s), gated on status so a settled list
+stops waking the app.
+
+**A contract needs a `source_document`.** Extraction reads `SpaceDocument.extracted_text`, so
+`contracts/new.tsx` requires picking a space document and disables Create until one is chosen —
+without it the row sits at "Queued for analysis" forever.
+
+**Dates** — `utils/helpers/dates.ts`. `parseApiDate` exists because `new Date("2027-03-12")` is
+UTC midnight, which renders as the *previous day* in any negative UTC offset; a due date showing
+a day early is worse than none. Deadline UI always sorts and colours on `action_by_date`, never
+`event_date` — a renewal 65 days out needing 90 days notice is already 25 days late, and
+`DeadlineRow` is built to make exactly that visible.
+
+**Motion** — **never write `entering={FadeInDown…}` directly; use `<FadeInView>`.** Reanimated
+sets the element to `opacity: 0` up front and relies on its driver to bring it back, and on web
+that driver does not reliably start for a screen mounted during a hard page load — content stays
+invisible permanently. `FadeInView` skips `entering` on web for that reason. A failed animation
+must degrade to *no animation*, never *no content*. (~23 older files still use the raw API and
+are still affected.)
+
+`Motion.spring` / `Motion.springQuick` are tuned to a damping ratio of ~1.0
 (`damping / (2 * sqrt(stiffness * mass))`), i.e. they settle without overshooting. Keep
 that ratio when retuning: make a spring faster by raising stiffness *and* damping together,
 never by lowering damping. Always use the tokens rather than inline `withSpring(x, {...})` —
@@ -141,10 +174,12 @@ Spaces: `/user_space/spaces/` (+ `/{id}/documents/`, `/{id}/stats/`, `/{id}/togg
 Chat: `/user_space/conversations/`, `/user_space/messages/?conversation=<id>`,
 `POST /user_space/chatbot/instant-response/`
 Plans: `GET /plans/`
-Contracts (backend built, no client yet): `/contracts/organizations/` (+ `/{id}/members/`,
-`/{id}/invite/`, `/{id}/stats/`), `/contracts/contracts/` (+ `/{id}/reextract/`,
-`/{id}/actions/`, `/expiring/`, `/missing-protections/`), `/contracts/obligations/`
-(+ `/summary/`), `/contracts/events/` (+ `/upcoming/`), `/contracts/counterparties/`
+Contracts: `/contracts/organizations/` (+ `/{id}/members/`, `/{id}/invite/`, `/{id}/stats/`),
+`/contracts/contracts/` (+ `/{id}/reextract/`, `/{id}/actions/`, `/expiring/`,
+`/missing-protections/`), `/contracts/obligations/` (+ `/summary/`), `/contracts/events/`
+(+ `/upcoming/`), `/contracts/counterparties/`. All org-scoped server-side: the org comes from
+the `X-Org` header when sent, otherwise from the caller's single membership — so a one-org user
+never passes it.
 
 Backend pagination is PageNumberPagination, `PAGE_SIZE: 10`.
 

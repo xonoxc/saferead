@@ -37,7 +37,9 @@ export default function RegisterScreen() {
          setErrorMessage(response.message)
          return
       }
-      router.push("/(auth)/login")
+      /* Registration signs you in when the backend hands back a token; only
+       * fall back to Sign In when it did not. */
+      router.replace(response.signedIn ? "/(application)/(tabs)" : "/(auth)/login")
    }
 
    return (
@@ -51,7 +53,7 @@ export default function RegisterScreen() {
             <View style={styles.header}>
                <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
                <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                  Join LegalAssist today
+                  Join SafeRead today
                </Text>
             </View>
 

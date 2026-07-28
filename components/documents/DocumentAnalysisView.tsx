@@ -91,6 +91,7 @@ const Header = ({ onBack, analysis }: { onBack: () => void; analysis: AnalysisRe
 const StatusCard = ({ analysis }: { analysis: AnalysisResponse }) => {
    const { colors, isDark } = useTheme()
    const riskColor = getRiskColor(analysis, colors)
+   const statusColor = getStatusColor(analysis.status, colors)
 
    return (
       <Animated.View
@@ -107,10 +108,10 @@ const StatusCard = ({ analysis }: { analysis: AnalysisResponse }) => {
             <View
                style={[
                   styles.statusBadge,
-                  { backgroundColor: riskColor + "20", borderColor: colors.border },
+                  { backgroundColor: statusColor + "20", borderColor: colors.border },
                ]}
             >
-               <Text style={[styles.statusText, { color: riskColor }]}>
+               <Text style={[styles.statusText, { color: statusColor }]}>
                   {analysis.status.toUpperCase()}
                </Text>
             </View>
@@ -273,6 +274,29 @@ const Info = ({ label, value }: { label: string; value: string }) => {
          <Text style={[styles.infoValue, { color: colors.text }]}>{value}</Text>
       </View>
    )
+}
+
+/*
+ * Colour for the *pipeline status* - completed / processing / failed.
+ *
+ * Deliberately a separate scale from risk. Both badges used to be painted with
+ * `getRiskColor`, so a finished analysis of a risky document rendered
+ * "COMPLETED" in the same alarm red as "HIGH RISK" sitting directly beneath
+ * it. Two different questions - did the scan work, and is the document
+ * dangerous - must not share an answer colour.
+ * **/
+const getStatusColor = (status: string, colors: ColorsType) => {
+   switch (status?.toLowerCase()) {
+      case "completed":
+         return colors.success
+      case "failed":
+         return colors.error
+      case "pending":
+      case "processing":
+         return colors.info
+      default:
+         return colors.textSecondary
+   }
 }
 
 /*

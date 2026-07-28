@@ -9,6 +9,7 @@ import { Button } from "@/components/Button"
 import { TextInput } from "@/components/TextInput"
 import { ErrorMessage } from "@/components/ErrorMessage"
 import { Fonts, FontSizes } from "@/constants/Fonts"
+import { SOCIAL_AUTH_ENABLED } from "@/constants/server"
 import { type LoginFormSchema, loginFormSchema } from "@/utils/validation/login"
 
 export default function LoginScreen() {
@@ -74,13 +75,16 @@ export default function LoginScreen() {
                   </Text>
                </View>
 
-               <View style={styles.divider}>
-                  <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-                  <Text style={[styles.dividerText, { color: colors.textMuted }]}>
-                     or continue with
-                  </Text>
-                  <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-               </View>
+               {/* Only when there is actually something to continue with. */}
+               {SOCIAL_AUTH_ENABLED && (
+                  <View style={styles.divider}>
+                     <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+                     <Text style={[styles.dividerText, { color: colors.textMuted }]}>
+                        or continue with
+                     </Text>
+                     <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+                  </View>
+               )}
 
                <Controller
                   control={control}

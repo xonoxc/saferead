@@ -20,6 +20,7 @@ import { DrawerAlertRenderer } from "@/hooks/alerts/useAlert"
 import useNetworkStatus from "@/hooks/net/useNetworkStatus"
 import { OfflineScreen } from "@/components/OfflineScreen"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { useLocaleStore } from "@/store/useLocaleStore"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -36,6 +37,17 @@ const AppContent = () => {
    const [isAppLoading, setIsAppLoading] = useState(true)
    const isOffline = useNetworkStatus()
 
+   /*
+    * Read the saved currency/language before anything renders prices or copy,
+    * so a user who chose ₹ never sees a frame of $ first.
+    * **/
+   const hydrateLocale = useLocaleStore(s => s.hydrate)
+   const isLocaleHydrated = useLocaleStore(s => s.isHydrated)
+
+   useEffect(() => {
+      hydrateLocale()
+   }, [hydrateLocale])
+
    useEffect(() => {
       if (!fontsLoaded) return
 
@@ -47,7 +59,7 @@ const AppContent = () => {
       }
    }, [isThemeLoading, fontsLoaded])
 
-   if (isAppLoading || isThemeLoading) return null
+   if (isAppLoading || isThemeLoading || !isLocaleHydrated) return null
 
    if (isOffline) {
       return <OfflineScreen />

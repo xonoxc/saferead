@@ -26,6 +26,9 @@ interface AuthContextType {
    }) => Promise<{
       success: boolean
       message: string
+      /* False when the backend registered the account but issued no usable
+       * token — the caller must fall back to the Sign In screen. */
+      signedIn?: boolean
    }>
    logout: () => Promise<{
       success: boolean
@@ -234,7 +237,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       password2: string
       username: string
    }) => {
-      const result = await attempt(() => apiClient.post("/auth/registration/", data))
+      /*
+       * `/auth/registration/` already returns a usable auth token. Discarding
+       * it and routing to Sign In made every new account type its password a
+       * second time to reach a screen it had just earned. Consume the key the
+       * same way `login` does, so registration lands signed in.
+       * **/
+      const result = await attempt<{ key: string }>(() =>
+         apiClient.post("/auth/registration/", data)
+      )
       if (!result.ok) {
          return {
             success: false,
@@ -242,10 +253,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
          }
       }
 
-      return {
-         success: true,
-         message: "Registration successful",
+      const token = result.data.key
+      if (!token) {
+         /* Older/other backends can register without issuing a key. Treat that
+          * as success and let the caller send them to Sign In. */
+         return { success: true, message: "Registration successful", signedIn: false }
       }
+
+      const accessTokenSetAttempt = await attempt(() => setSecureItem("access_token", token))
+      if (!accessTokenSetAttempt.ok) {
+         return { success: true, message: "Registration successful", signedIn: false }
+      }
+
+      const resp = await attempt<User>(() =>
+         apiClient.get("/auth/user/", {
+            headers: { Authorization: `token ${token}` },
+         })
+      )
+      if (!resp.ok) {
+         return { success: true, message: "Registration successful", signedIn: false }
+      }
+
+      await setSecureItem("user_data", JSON.stringify(resp.data))
+      setUser(resp.data)
+
+      return { success: true, message: "Registration successful", signedIn: true }
    }
 
    const updateUser = async (userData: Partial<User>) => {

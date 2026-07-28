@@ -70,7 +70,14 @@ export const useDeleteDocument = () => {
    return useMutation({
       mutationFn: deleteDocumentApi,
       meta: {
-         invalidatedQueries: [["documents"]],
+         /*
+          * `documentStats` too: the home screen renders entirely off the stats
+          * query, and deleting a scan changes every number in it (counts and
+          * the average confidence). Invalidating only the list left home
+          * showing totals that included a document the user had just removed
+          * until the 5-minute staleTime expired.
+          * **/
+         invalidatedQueries: [["documents"], ["documentStats"]],
       },
    })
 }

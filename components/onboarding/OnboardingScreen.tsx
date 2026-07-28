@@ -1,10 +1,8 @@
 import React, { memo } from "react"
-import { View, Text, StyleSheet, Dimensions } from "react-native"
+import { View, Text, StyleSheet, useWindowDimensions } from "react-native"
 import Animated, { FadeInUp, FadeInDown } from "react-native-reanimated"
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants/Fonts"
-
-const { width: screenWidth } = Dimensions.get("window")
 
 interface OnboardingScreenProps {
    item: {
@@ -19,6 +17,14 @@ interface OnboardingScreenProps {
 
 export const OnboardingScreen: React.FC<OnboardingScreenProps> = memo(({ item }) => {
    const { colors } = useTheme()
+   /*
+    * Hook, not `Dimensions.get()` at module scope: the module-scope read runs
+    * once at import, so a slide kept whatever width the window had at startup.
+    * On a device that had not settled its layout yet - or after a rotation -
+    * the pages were sized wrong and the text clipped until some interaction
+    * forced a re-render.
+    * **/
+   const { width: screenWidth } = useWindowDimensions()
 
    return (
       <View style={[styles.content, { width: screenWidth }]}>

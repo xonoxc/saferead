@@ -1,5 +1,5 @@
 import React from "react"
-import { Dimensions } from "react-native"
+import { useWindowDimensions } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
    useAnimatedStyle,
@@ -8,9 +8,6 @@ import Animated, {
    withSpring,
    type SharedValue,
 } from "react-native-reanimated"
-
-const { width: screenWidth } = Dimensions.get("window")
-const swipeThreshold = screenWidth * 0.2
 
 interface OnboardingGestureProps {
    children: React.ReactNode
@@ -29,6 +26,11 @@ export const OnboardingGesture: React.FC<OnboardingGestureProps> = ({
    onPrevious,
    translateX,
 }) => {
+   /* Read per render, so the threshold tracks the window instead of freezing
+    * at whatever it was when this module was first imported. */
+   const { width: screenWidth } = useWindowDimensions()
+   const swipeThreshold = screenWidth * 0.2
+
    const pan = Gesture.Pan()
       .onUpdate(event => {
          translateX.value = event.translationX

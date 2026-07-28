@@ -9,11 +9,24 @@ import { router } from "expo-router"
 import { PlansLoadingState } from "@/components/plans/PlansLoadingState"
 import { Plansfallback } from "@/components/plans/PlansFallback"
 import usePremiumScreen from "@/hooks/screens/usePremiumScreen"
+import { formatMoney, formatMoneyCompact, billingSuffix } from "@/utils/helpers/money"
+import { useActiveLanguage } from "@/store/useLocaleStore"
 
 import type { Plan } from "@/services/plans.service"
 
+/* The server already priced the plan; these just unpack its answer. */
+const moneyParts = (plan: Plan) => ({
+   amount: plan.display_price,
+   currency: plan.display_currency,
+   symbol: plan.display_currency_symbol,
+   digits: plan.display_currency_digits,
+})
+
 export default function PremiumScreen() {
    const { colors } = useTheme()
+   const language = useActiveLanguage()
+
+   const moneyOf = (plan: Plan) => formatMoneyCompact(moneyParts(plan), language)
 
    const { plans, isLoading, error, effectiveSelectedPlan, setSelectedPlan, isCardSelected } =
       usePremiumScreen()
@@ -109,14 +122,23 @@ export default function PremiumScreen() {
                      >
                         <Text style={styles.planName}>{plan.display_name}</Text>
                         <View style={styles.priceContainer}>
-                           <Text style={styles.currency}>$</Text>
-                           <Text style={styles.price}>{parseFloat(plan.price).toFixed(0)}</Text>
+                           <Text style={styles.currency}>{moneyOf(plan).symbol}</Text>
+                           <Text style={styles.price}>{moneyOf(plan).value}</Text>
                            <Text style={styles.period}>
-                              {plan.billing_cycle === "free"
-                                 ? ""
-                                 : `/${plan.billing_cycle.slice(0, 2)}`}
+                              {billingSuffix(plan.billing_cycle)}
                            </Text>
                         </View>
+                        {/*
+                         * Say so when the number is converted rather than a
+                         * real local price. A user comparing this to what
+                         * their card is actually charged deserves to know
+                         * which of the two they are looking at.
+                         * **/}
+                        {plan.display_is_estimated && (
+                           <Text style={styles.estimateNote}>
+                              approx. · billed in {plan.currency}
+                           </Text>
+                        )}
                      </Pressable>
                   ))}
                </View>
@@ -135,8 +157,11 @@ export default function PremiumScreen() {
                   </Pressable>
 
                   <Text style={styles.billingInfo}>
-                     Auto-renews for ${effectiveSelectedPlan.price}/
+                     Auto-renews for {formatMoney(moneyParts(effectiveSelectedPlan))}/
                      {effectiveSelectedPlan.billing_cycle} until cancelled
+                     {effectiveSelectedPlan.display_is_estimated
+                        ? ` · charged in ${effectiveSelectedPlan.currency}`
+                        : ""}
                   </Text>
 
                   <Pressable style={styles.restoreButton}>
@@ -420,6 +445,12 @@ const styles = StyleSheet.create({
       fontSize: 16,
       fontFamily: Fonts.regular,
       color: "#CCCCCC",
+   },
+   estimateNote: {
+      fontSize: 11,
+      fontFamily: Fonts.regular,
+      color: "#9AA3B2",
+      marginTop: 2,
    },
    ctaSection: {
       alignItems: "center",

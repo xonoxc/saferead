@@ -143,6 +143,13 @@ export default function ApplicationLayout() {
                      headerShown: false,
                   }}
                />
+
+               <Stack.Screen
+                  name="currency"
+                  options={{
+                     headerShown: false,
+                  }}
+               />
             </Stack>
          </SafeAreaView>
       </QueryClientProvider>

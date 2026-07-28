@@ -33,12 +33,16 @@ export function MoneyRow({ summary, onPressOutgoing, onPressIncoming }: MoneyRow
          <MoneyCard
             label="We owe"
             amount={summary.we_owe_total}
+            currency={summary.we_owe_currency}
+            extraCurrencies={summary.we_owe_breakdown.length - 1}
             direction="out"
             onPress={onPressOutgoing}
          />
          <MoneyCard
             label="We're owed"
             amount={summary.they_owe_total}
+            currency={summary.they_owe_currency}
+            extraCurrencies={summary.they_owe_breakdown.length - 1}
             direction="in"
             onPress={onPressIncoming}
          />
@@ -49,11 +53,16 @@ export function MoneyRow({ summary, onPressOutgoing, onPressIncoming }: MoneyRow
 function MoneyCard({
    label,
    amount,
+   currency,
+   extraCurrencies,
    direction,
    onPress,
 }: {
    label: string
    amount: string
+   currency: string
+   /* How many other currencies sit behind this figure. */
+   extraCurrencies: number
    direction: "in" | "out"
    onPress: () => void
 }) {
@@ -72,7 +81,7 @@ function MoneyCard({
       <PressableScale
          onPress={onPress}
          accessibilityRole="button"
-         accessibilityLabel={`${label} ${formatMoney(amount)}`}
+         accessibilityLabel={`${label} ${formatMoney(amount, currency)}`}
          style={StyleSheet.flatten([
             styles.card,
             { backgroundColor: colors.card, borderColor: colors.border },
@@ -83,8 +92,18 @@ function MoneyCard({
             <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
          </View>
          <Text numberOfLines={1} style={[styles.amount, { color: colors.text }]}>
-            {formatMoney(amount)}
+            {formatMoney(amount, currency)}
          </Text>
+         {/*
+          * Say when the headline is only part of the picture. Silently showing
+          * the largest currency would read as the whole total, which is the
+          * same lie the old cross-currency SUM told, just prettier.
+          * **/}
+         {extraCurrencies > 0 && (
+            <Text style={[styles.more, { color: colors.textMuted }]}>
+               +{extraCurrencies} more {extraCurrencies === 1 ? "currency" : "currencies"}
+            </Text>
+         )}
       </PressableScale>
    )
 }
@@ -114,6 +133,10 @@ const styles = StyleSheet.create({
       ...Type.title,
       fontFamily: Fonts.bold,
       includeFontPadding: false,
+   },
+   more: {
+      ...Type.micro,
+      fontFamily: Fonts.medium,
    },
 })
 

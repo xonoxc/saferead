@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react"
-import { View, Text, StyleSheet, Dimensions, Pressable } from "react-native"
+import { View, Text, StyleSheet, useWindowDimensions, Pressable } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import Animated, {
    FadeInDown,
@@ -17,7 +17,6 @@ import { OnboardingNavigation } from "./OnboardingNavigation"
 import { OnboardingGesture } from "./OnboardingGesture"
 import { WelcomeDemo, AnalysisDemo, RiskDemo, SpacesDemo, CompletionDemo } from "./demos"
 
-const { height: screenHeight } = Dimensions.get("window")
 
 const steps = [
    {
@@ -79,6 +78,7 @@ interface OnboardingProps {
 
 export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, onSkip }) => {
    const { colors } = useTheme()
+   const { height: windowHeight } = useWindowDimensions()
    const [currentStep, setCurrentStep] = useState(0)
    const translateX = useSharedValue(0)
 
@@ -117,7 +117,11 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, onSkip }) =>
          <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Animated.View
                key={currentStep}
-               style={[styles.backgroundGradient, animatedGradientStyle]}
+               style={[
+                  styles.backgroundGradient,
+                  { height: windowHeight * 0.6 },
+                  animatedGradientStyle,
+               ]}
                pointerEvents="none"
             >
                <LinearGradient
@@ -173,12 +177,14 @@ const styles = StyleSheet.create({
       flex: 1,
       position: "relative",
    },
+   /* Height is applied at the call site from `useWindowDimensions()` - a
+    * StyleSheet is evaluated once at import, so a fraction of the window read
+    * here would freeze at whatever the window was on first load. */
    backgroundGradient: {
       position: "absolute",
       top: 0,
       left: 0,
       right: 0,
-      height: screenHeight * 0.6,
    },
    skipContainer: {
       position: "absolute",

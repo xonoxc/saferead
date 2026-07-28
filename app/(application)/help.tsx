@@ -107,7 +107,7 @@ export default function HelpSupportScreen() {
          title: "Email Support",
          description: "Send us a detailed message",
          action: () => {
-            Linking.openURL("mailto:support@legalassist.com")
+            Linking.openURL("mailto:support@saferead.app")
          },
          color: colors.secondary,
       },
@@ -126,7 +126,7 @@ export default function HelpSupportScreen() {
       {
          icon: Book,
          title: "User Guide",
-         description: "Complete guide to using LegalAssist",
+         description: "Complete guide to using SafeRead",
          action: () => {},
       },
       {

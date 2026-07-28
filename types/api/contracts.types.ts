@@ -290,9 +290,27 @@ export interface ContractDetail extends ContractListItem {
 
 /* --------------------------------------------------------- aggregates --- */
 
+export interface CurrencyTotal {
+   currency: string
+   amount: string
+}
+
+/*
+ * Obligation money is denominated by the *contract*, not by the reader.
+ * A €50,000 payable is €50,000 whatever currency the user prefers to browse
+ * in, so these are never converted to the display currency — they are grouped
+ * by their own currency instead. `*_total` is the largest single currency,
+ * `*_currency` names it, and `*_is_mixed` says whether there is more behind it.
+ * **/
 export interface ObligationSummary {
    we_owe_total: string
+   we_owe_currency: string
+   we_owe_is_mixed: boolean
+   we_owe_breakdown: CurrencyTotal[]
    they_owe_total: string
+   they_owe_currency: string
+   they_owe_is_mixed: boolean
+   they_owe_breakdown: CurrencyTotal[]
    overdue_count: number
    due_next_30_days: number
    /* An obligation nobody owns is an invitation to add a seat. */

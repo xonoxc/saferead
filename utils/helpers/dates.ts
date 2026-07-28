@@ -14,6 +14,8 @@
  *    a day early is worse than no date at all, so these parse explicitly.
  * **/
 
+import { getActiveLanguage } from "@/store/useLocaleStore"
+
 const MS_PER_DAY = 86_400_000
 
 const MONTHS = [
@@ -136,26 +138,66 @@ export function formatMoney(
 
    if (value === null || value === undefined || Number.isNaN(value)) return "—"
 
-   const symbol = CURRENCY_SYMBOLS[currency?.toUpperCase()] ?? `${currency} `
+   const code = (currency || "USD").toUpperCase()
    const abs = Math.abs(value)
 
-   if (abs >= 1_000_000) return `${symbol}${trim(value / 1_000_000)}M`
-   if (abs >= 10_000) return `${symbol}${trim(value / 1000)}k`
+   /*
+    * Intl, not a symbol table.
+    *
+    * There used to be a hand-written map of seven currencies here, and any
+    * code outside it rendered as "SEK 1.2k". Intl already knows every ISO
+    * code, and it also knows that symbols are not universally prefixed -
+    * "1,2 Mio. €" in German, "$1.2M" in English - which no amount of
+    * `${symbol}${number}` string-building can express.
+    * **/
+   /*
+    * Scale here rather than asking for `notation: "compact"`.
+    *
+    * Hermes honours compact notation for plain numbers but ignores it under
+    * `style: "currency"` while still applying `maximumFractionDigits` - which
+    * is how "€50,000.0" appeared, a stray digit rather than the "€50K" that
+    * was asked for. Doing the division ourselves is predictable everywhere.
+    * **/
+   let scaled = value
+   let unit = ""
+   if (abs >= 1_000_000) {
+      scaled = value / 1_000_000
+      unit = "M"
+   } else if (abs >= 10_000) {
+      scaled = value / 1000
+      unit = "k"
+   }
 
-   return `${symbol}${Math.round(value).toLocaleString()}`
-}
+   try {
+      const parts = new Intl.NumberFormat(getActiveLanguage(), {
+         style: "currency",
+         currency: code,
+         /*
+          * `minimumFractionDigits: 0` is required, not tidy-up. Currency style
+          * defaults the minimum to the currency's own precision (2 for EUR),
+          * and when that minimum exceeds the maximum Intl raises the minimum
+          * to match - which rendered a round 50 as "€50.0k".
+          * **/
+         minimumFractionDigits: 0,
+         maximumFractionDigits: unit ? 1 : 0,
+      }).formatToParts(scaled)
 
-/* One decimal place, but no trailing ".0". */
-function trim(n: number): string {
-   return (Math.round(n * 10) / 10).toString()
-}
+      /*
+       * The unit goes after the number, not at the end of the string: the
+       * symbol trails the amount in plenty of locales ("1,2 Mio. €"), and
+       * `${formatted}${unit}` would render "1,2 €M" there.
+       * **/
+      const numeric = new Set(["integer", "group", "decimal", "fraction"])
+      let lastNumeric = -1
+      parts.forEach((part, i) => {
+         if (numeric.has(part.type)) lastNumeric = i
+      })
 
-const CURRENCY_SYMBOLS: Record<string, string> = {
-   USD: "$",
-   EUR: "€",
-   GBP: "£",
-   INR: "₹",
-   JPY: "¥",
-   AUD: "A$",
-   CAD: "C$",
+      return parts
+         .map((part, i) => (i === lastNumeric ? part.value + unit : part.value))
+         .join("")
+   } catch {
+      /* Unknown code, or a runtime without the ICU data for it. */
+      return `${code} ${Math.round(value).toLocaleString()}${unit}`
+   }
 }

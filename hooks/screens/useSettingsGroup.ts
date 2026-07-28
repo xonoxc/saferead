@@ -1,7 +1,18 @@
 import type { User } from "@/types"
-import { Globe, Shield, HelpCircle, LogOut, KeyRound, User as UserIcon } from "lucide-react-native"
+import {
+   Globe,
+   Shield,
+   HelpCircle,
+   LogOut,
+   KeyRound,
+   User as UserIcon,
+   Coins,
+} from "lucide-react-native"
 import type { ThemeMode } from "@/hooks/useTheme"
 import type { ImperativeRouter } from "expo-router"
+import { useActiveCurrency, useActiveLanguage } from "@/store/useLocaleStore"
+import { useTranslation } from "@/i18n"
+import { languageLabel } from "@/constants/languages"
 
 export type SettingsItem = {
    icon: React.ComponentType<any>
@@ -28,13 +39,19 @@ export default function useSettingsGroups({
    router: ImperativeRouter
    handleLogout: () => void
 }): SettingsGroup[] {
+   /* Read live so the row reflects a change made on the picker the moment the
+    * user comes back, without the settings screen having to refetch anything. */
+   const { t } = useTranslation()
+   const currency = useActiveCurrency()
+   const language = useActiveLanguage()
+
    return [
       {
-         title: "Account",
+         title: t("settings.account"),
          items: [
             {
                icon: UserIcon,
-               title: "Profile",
+               title: t("settings.profile"),
                value: `${user?.username}`,
                onPress: () => {
                   router.push("/profile")
@@ -42,26 +59,30 @@ export default function useSettingsGroups({
             },
             {
                icon: KeyRound,
-               title: "Change Password",
+               title: t("settings.changePassword"),
                onPress: () => router.push("/(application)/change_password"),
             },
             {
                icon: Shield,
-               title: "Privacy & Security",
+               title: t("settings.privacySecurity"),
                onPress: () => router.push("/privacy"),
             },
          ],
       },
       {
-         title: "Preferences",
+         title: t("settings.preferences"),
          items: [
             {
                icon: Globe,
-               title: "Language",
-               value: "English",
-               onPress: () => {
-                  //router.push("/language")
-               },
+               title: t("settings.language"),
+               value: languageLabel(language),
+               onPress: () => router.push("/language"),
+            },
+            {
+               icon: Coins,
+               title: t("settings.currency"),
+               value: currency,
+               onPress: () => router.push("/currency"),
             },
             /* {
                icon: Volume2,
@@ -80,21 +101,21 @@ export default function useSettingsGroups({
          ],
       },
       {
-         title: "Support",
+         title: t("settings.support"),
          items: [
             {
                icon: HelpCircle,
-               title: "Help & Support",
+               title: t("settings.helpSupport"),
                onPress: () => router.push("/help"),
             },
          ],
       },
       {
-         title: "Account Actions",
+         title: t("settings.accountActions"),
          items: [
             {
                icon: LogOut,
-               title: "Sign Out",
+               title: t("settings.signOut"),
                onPress: handleLogout,
                danger: true,
             },

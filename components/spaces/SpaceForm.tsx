@@ -58,8 +58,18 @@ export const SpaceForm = ({
 
    const selectedColor = useWatch({ control, name: "color" }) ?? colors.text
 
+   /*
+    * Only after an attempt - showing "Space name is required" on a form the
+    * user has not tried to submit yet is nagging, not helping.
+    * **/
+   const submitError = formState.isSubmitted
+      ? Object.values(formState.errors)
+           .map(e => e?.message)
+           .find((m): m is string => typeof m === "string")
+      : undefined
+
    return (
-      <Drawer enableAbsolute={useDrawer} visible>
+      <Drawer enableAbsolute={useDrawer} visible scrollable={false}>
          <View
             style={[extraContainerStyles, styles.container, { backgroundColor: colors.background }]}
          >
@@ -76,6 +86,7 @@ export const SpaceForm = ({
                style={styles.content}
                showsVerticalScrollIndicator={false}
                contentContainerStyle={{ paddingBottom: 100 }}
+               keyboardShouldPersistTaps="handled"
                bounces={true}
             >
                <Controller
@@ -97,7 +108,7 @@ export const SpaceForm = ({
                   name="description"
                   render={({ field: { onChange, onBlur, value } }) => (
                      <TextInput
-                        label="Description"
+                        label="Description (optional)"
                         value={value ?? ""}
                         onChangeText={onChange}
                         onBlur={onBlur}
@@ -171,6 +182,16 @@ export const SpaceForm = ({
             </ScrollView>
 
             <View style={styles.footer}>
+               {/*
+                * The blocking error, repeated next to the button that is
+                * blocked. The per-field message alone is not enough: the only
+                * required field is the first one, so by the time you have
+                * scrolled down to "Create Space" its error is off-screen and
+                * a rejected submit looks like a dead button.
+                * **/}
+               {submitError && (
+                  <Text style={[styles.submitError, { color: colors.error }]}>{submitError}</Text>
+               )}
                <Button
                   title={
                      formState.isSubmitting
@@ -254,6 +275,12 @@ const styles = StyleSheet.create({
    footer: {
       padding: 20,
       paddingBottom: 40,
+      gap: 8,
+   },
+   submitError: {
+      fontSize: FontSizes.sm,
+      fontFamily: Fonts.medium,
+      textAlign: "center",
    },
    privacyContainer: {
       flexDirection: "row",

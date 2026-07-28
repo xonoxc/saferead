@@ -142,7 +142,7 @@ export default function HomeScreen() {
                   <PortfolioStrip
                      stats={stats}
                      onPressContracts={() => router.push("/(application)/(tabs)/contracts")}
-                     onPressSeats={() => router.push("/(application)/(tabs)/settings")}
+                     onPressSeats={() => router.push("/(application)/contracts/members")}
                   />
                )}
 

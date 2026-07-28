@@ -83,6 +83,7 @@ export default function ContractsScreen() {
             keyExtractor={item => item.id}
             onScroll={handleScroll}
             scrollEventThrottle={16}
+            style={styles.listContainer}
             contentContainerStyle={[
                styles.list,
                contracts.length === 0 && styles.listEmpty,
@@ -229,7 +230,9 @@ const styles = StyleSheet.create({
       alignItems: "center",
       justifyContent: "center",
    },
+   filterList: { flexGrow: 0 },
    filterRow: {
+      alignItems: "center",
       paddingHorizontal: Spacing.lg,
       paddingBottom: Spacing.sm,
       gap: Spacing.xs,
@@ -244,6 +247,7 @@ const styles = StyleSheet.create({
       ...Type.caption,
       fontFamily: Fonts.semiBold,
    },
+   listContainer: { flex: 1 },
    list: {
       paddingHorizontal: Spacing.lg,
       gap: Spacing.sm,

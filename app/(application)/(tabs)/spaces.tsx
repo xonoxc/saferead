@@ -131,8 +131,13 @@ const styles = StyleSheet.create({
       paddingRight: Spacing.md,
    },
    modalOverlay: {
-      justifyContent: "center",
-      alignItems: "center",
+      /*
+       * No centring here. The form is a full-height sheet, and
+       * `justifyContent: center` + `alignItems: center` on an absoluteFill
+       * parent sizes it to its content and floats it in the middle, which
+       * pushed the footer - and so the "Create Space" button and every
+       * validation message under it - off the bottom of the screen.
+       * **/
       padding: 14,
       zIndex: 100,
    },

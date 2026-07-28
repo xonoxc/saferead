@@ -16,6 +16,13 @@ interface DrawerProps {
    visible: boolean
    enableAbsolute?: boolean
    position?: "bottom" | "full"
+   /*
+    * Opt out of the built-in ScrollView. A child that scrolls its own body and
+    * pins a footer (SpaceForm) must not be wrapped in another ScrollView: a
+    * `flex: 1` child inside scrollable content has no bounded height to fill,
+    * so the body collapses and the footer is pushed off-screen.
+    * **/
+   scrollable?: boolean
 }
 
 const absoluteStyles: ViewStyle = {
@@ -39,6 +46,7 @@ export const Drawer: React.FC<DrawerProps> = ({
    visible = true,
    enableAbsolute,
    position,
+   scrollable = true,
 }) => {
    const { colors } = useTheme()
 
@@ -65,14 +73,18 @@ export const Drawer: React.FC<DrawerProps> = ({
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
          >
-            <ScrollView
-               style={{ flex: 1 }}
-               showsVerticalScrollIndicator={false}
-               contentContainerStyle={{ flexGrow: 1 }}
-               keyboardShouldPersistTaps="handled"
-            >
+            {scrollable ? (
+               <ScrollView
+                  style={{ flex: 1 }}
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{ flexGrow: 1 }}
+                  keyboardShouldPersistTaps="handled"
+               >
+                  <View style={{ flex: 1 }}>{children}</View>
+               </ScrollView>
+            ) : (
                <View style={{ flex: 1 }}>{children}</View>
-            </ScrollView>
+            )}
          </KeyboardAvoidingView>
       </Animated.View>
    )

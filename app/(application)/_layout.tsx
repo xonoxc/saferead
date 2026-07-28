@@ -111,6 +111,13 @@ export default function ApplicationLayout() {
                />
 
                <Stack.Screen
+                  name="contracts/members"
+                  options={{
+                     headerShown: false,
+                  }}
+               />
+
+               <Stack.Screen
                   name="help"
                   options={{
                      headerShown: false,

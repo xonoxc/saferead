@@ -160,6 +160,15 @@ function FilterRow({
          data={options}
          keyExtractor={o => o.value ?? "all"}
          showsHorizontalScrollIndicator={false}
+         /*
+          * `flexGrow: 0` is load-bearing. ScrollView - which FlatList renders -
+          * carries `flexGrow: 1` in its own base style, so a horizontal one
+          * dropped into a flex column has no intrinsic height and splits the
+          * free space with the list below it. The chips then stretch to that
+          * height, because a row content container aligns `stretch` by default.
+          * Pin the row to its content and centre the chips inside it.
+          * **/
+         style={styles.filterList}
          contentContainerStyle={styles.filterRow}
          renderItem={({ item }) => {
             const selected = active === item.value

@@ -12,6 +12,7 @@ import {
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, Radii, Spacing, Type } from "@/constants"
 import { Eye, EyeOff } from "lucide-react-native"
+import { withAlpha } from "@/constants/Design"
 
 interface TextInputProps extends React.ComponentProps<typeof RNTextInput> {
    label?: string
@@ -69,14 +70,23 @@ export const TextInput: React.FC<TextInputProps> = ({
                   /*
                    * White/card while idle rather than the grey surface, so a
                    * form of inputs does not read as a stack of disabled
-                   * fields. Focus is then carried by the border colour alone
-                   * plus a faint ring, which is enough now that the border is
+                   * fields. Focus is then carried by the border colour plus a
+                   * faint primary wash, which is enough now that the border is
                    * 1px and high-contrast.
+                   *
+                   * The wash replaces what used to be a shadow "focus ring".
+                   * Toggling shadow* on a View that contains a TextInput makes
+                   * Android rebuild that view's rendering layer, and the
+                   * ReactEditText inside loses focus as it does - which fired
+                   * onBlur, cleared isFocused, removed the shadow, and let the
+                   * field take focus again, ping-ponging between the fields
+                   * until the keyboard gave up and closed. Keep focus styling
+                   * to properties that only repaint (colours), never ones that
+                   * re-create the layer (shadow*, elevation, transform).
                    * **/
-                  backgroundColor: colors.card,
+                  backgroundColor: isFocused && !error ? focusWash(colors.primary) : colors.card,
                   borderColor,
                },
-               isFocused && !error && { shadowColor: colors.primary, ...focusRing },
             ]}
          >
             {leftAccessory && <View style={styles.leftIcon}>{leftAccessory}</View>}
@@ -89,7 +99,12 @@ export const TextInput: React.FC<TextInputProps> = ({
                      color: colors.text,
                   },
                   rest.multiline && { textAlignVertical: "top" },
-                  !rest.editable && { opacity: 0.5 },
+                  /*
+                   * `editable === false`, not `!editable` - editable is
+                   * undefined on every call site that does not opt out, and
+                   * `!undefined` dimmed every field in the app to 50%.
+                   * **/
+                  rest.editable === false && { opacity: 0.5 },
                   rest.style,
                ]}
                secureTextEntry={showToggle && hide}
@@ -116,14 +131,10 @@ export const TextInput: React.FC<TextInputProps> = ({
    )
 }
 
-/* A soft halo on the focused field, in place of thickening the border - a
- * border that changes width on focus shifts the text inside it by a pixel. */
-const focusRing = {
-   shadowOpacity: 0.18,
-   shadowRadius: 6,
-   shadowOffset: { width: 0, height: 0 },
-   elevation: 0,
-} as const
+/* A barely-there tint of the primary on the focused field, in place of
+ * thickening the border - a border that changes width on focus shifts the text
+ * inside it by a pixel. */
+const focusWash = (primary: string) => withAlpha(primary, 0.08)
 
 const styles = StyleSheet.create({
    container: {

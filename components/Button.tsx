@@ -1,6 +1,6 @@
 import React from "react"
 import { useTheme } from "@/hooks/useTheme"
-import { Fonts, FontSizes, Radii } from "@/constants"
+import { Fonts, Radii, Type } from "@/constants"
 import { PressableScale } from "@/components/motion"
 
 import { Text, StyleSheet, ActivityIndicator, type StyleProp, type ViewStyle } from "react-native"
@@ -8,7 +8,7 @@ import { Text, StyleSheet, ActivityIndicator, type StyleProp, type ViewStyle } f
 interface ButtonProps {
    title: string
    onPress: (() => void) | undefined
-   variant?: "primary" | "secondary" | "outline" | "ghost"
+   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger"
    size?: "small" | "medium" | "large"
    loading?: boolean
    disabled?: boolean
@@ -45,17 +45,35 @@ export const Button: React.FC<ButtonProps> = ({
             baseStyle.push({ backgroundColor: colors.primary })
             break
          case "secondary":
-            baseStyle.push({ backgroundColor: colors.secondary })
+            /*
+             * A filled neutral rather than near-black. Two solid dark buttons
+             * side by side both read as "the main action"; a tinted surface
+             * with a hairline border is unambiguously the lesser one.
+             * **/
+            baseStyle.push({
+               backgroundColor: colors.surface,
+               borderWidth: StyleSheet.hairlineWidth,
+               borderColor: colors.border,
+            })
             break
          case "outline":
             baseStyle.push({
                backgroundColor: "transparent",
-               borderWidth: 2,
-               borderColor: colors.primary,
+               /*
+                * 1px, not 2. A 2px ring is heavier than the filled button it
+                * sits beside, which inverts the visual hierarchy it is meant
+                * to express.
+                * **/
+               borderWidth: 1,
+               borderColor: colors.borderStrong,
             })
             break
          case "ghost":
             baseStyle.push({ backgroundColor: "transparent" })
+            break
+         case "danger":
+            /* Destructive actions - delete a contract, remove a seat. */
+            baseStyle.push({ backgroundColor: colors.error })
             break
       }
 
@@ -89,13 +107,21 @@ export const Button: React.FC<ButtonProps> = ({
             textColor = colors.onPrimary
             break
          case "secondary":
-            textColor = colors.background
+            textColor = colors.text
             break
          case "outline":
-            textColor = colors.primary
+            /*
+             * Neutral text in a neutral ring. Colouring the label primary made
+             * an outline button look like a third brand-coloured control on a
+             * screen that already has one.
+             * **/
+            textColor = colors.text
             break
          case "ghost":
             textColor = colors.primary
+            break
+         case "danger":
+            textColor = "#FFFFFF"
             break
       }
 
@@ -106,8 +132,11 @@ export const Button: React.FC<ButtonProps> = ({
       switch (variant) {
          case "primary":
             return colors.onPrimary
+         case "danger":
+            return "#FFFFFF"
          case "secondary":
-            return colors.background
+         case "outline":
+            return colors.text
          default:
             return colors.primary
       }
@@ -132,31 +161,38 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
    button: {
-      borderRadius: Radii.md,
+      borderRadius: Radii.sm,
       alignItems: "center",
       justifyContent: "center",
+      flexDirection: "row",
    },
    small: {
-      paddingHorizontal: 16,
+      paddingHorizontal: 14,
       paddingVertical: 8,
       minHeight: 36,
    },
    medium: {
-      paddingHorizontal: 20,
+      paddingHorizontal: 18,
       paddingVertical: 12,
-      minHeight: 48,
+      minHeight: 46,
    },
    large: {
       paddingHorizontal: 24,
-      paddingVertical: 16,
-      minHeight: 56,
+      paddingVertical: 15,
+      minHeight: 52,
    },
    fullWidth: {
       width: "100%",
    },
    text: {
       fontFamily: Fonts.semiBold,
-      fontSize: FontSizes.md,
+      ...Type.body,
+      /*
+       * Slightly tightened from the raw type token. Button labels are one or
+       * two words on a single line, so the paragraph leading in Type.body just
+       * pads the control vertically for no benefit.
+       * **/
+      lineHeight: 20,
       textAlign: "center",
    },
 })

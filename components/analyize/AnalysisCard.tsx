@@ -90,7 +90,7 @@ export function AnalysisCard({ document, onPress, colors, index }: AnalysisCardP
                cardAnimatedStyle,
                {
                   backgroundColor: colors.card,
-                  borderColor: "rgba(255, 255, 255, 0.06)",
+                  borderColor: colors.border,
                },
             ]}
          >
@@ -130,10 +130,8 @@ export function AnalysisCard({ document, onPress, colors, index }: AnalysisCardP
                      styles.actionBtn,
                      styles.actionPrimary,
                      {
-                        backgroundColor: pressed
-                           ? colors.primaryFaded
-                           : "rgba(255, 255, 255, 0.08)",
-                        borderColor: pressed ? colors.primary : "rgba(255, 255, 255, 0.04)",
+                        backgroundColor: pressed ? colors.primaryFaded : colors.surface,
+                        borderColor: pressed ? colors.primary : colors.border,
                      },
                   ]}
                   onPress={e => e.stopPropagation()}
@@ -145,8 +143,8 @@ export function AnalysisCard({ document, onPress, colors, index }: AnalysisCardP
                   style={({ pressed }) => [
                      styles.actionBtn,
                      {
-                        backgroundColor: pressed ? "rgba(255, 255, 255, 0.05)" : "transparent",
-                        borderColor: "rgba(255, 255, 255, 0.03)",
+                        backgroundColor: pressed ? colors.surface : "transparent",
+                        borderColor: colors.border,
                      },
                   ]}
                   onPress={e => e.stopPropagation()}
@@ -158,8 +156,8 @@ export function AnalysisCard({ document, onPress, colors, index }: AnalysisCardP
                   style={({ pressed }) => [
                      styles.actionBtn,
                      {
-                        backgroundColor: pressed ? "rgba(255, 255, 255, 0.05)" : "transparent",
-                        borderColor: "rgba(255, 255, 255, 0.03)",
+                        backgroundColor: pressed ? colors.surface : "transparent",
+                        borderColor: colors.border,
                      },
                   ]}
                   onPress={e => e.stopPropagation()}
@@ -173,36 +171,54 @@ export function AnalysisCard({ document, onPress, colors, index }: AnalysisCardP
    )
 }
 
+/*
+ * Status chip colours.
+ *
+ * Previously hardcoded hexes plus `rgba(255, 255, 255, 0.06)` chip
+ * backgrounds. The white-alpha fills silently assumed a dark theme, so on a
+ * light background the Processing and Pending chips were white on near-white
+ * and effectively invisible. Everything now comes from the palette, which
+ * means both themes are correct by construction rather than by luck.
+ * **/
 function getStatusConfig(status: string, colors: ColorsType, confidence: number) {
    const percent = Math.round(confidence * 100)
 
    switch (status) {
       case "completed":
-         return {
-            icon: Check,
-            color: percent >= 80 ? "#22C55E" : "#F59E0B",
-            bgColor: percent >= 80 ? "rgba(34, 197, 94, 0.15)" : "rgba(245, 158, 11, 0.15)",
-            label: "Completed",
-         }
+         /* A completed analysis the model was unsure about is not a clean
+          * green tick - the confidence split is the honest signal. */
+         return percent >= 80
+            ? {
+                 icon: Check,
+                 color: colors.success,
+                 bgColor: colors.successBackground,
+                 label: "Completed",
+              }
+            : {
+                 icon: Check,
+                 color: colors.warning,
+                 bgColor: colors.warningBackground,
+                 label: "Completed",
+              }
       case "processing":
          return {
             icon: Clock,
             color: colors.textSecondary,
-            bgColor: "rgba(255, 255, 255, 0.06)",
+            bgColor: colors.surface,
             label: "Processing",
          }
       case "failed":
          return {
             icon: X,
-            color: "#EF4444",
-            bgColor: "rgba(239, 68, 68, 0.15)",
+            color: colors.error,
+            bgColor: colors.errorBackground,
             label: "Failed",
          }
       default:
          return {
             icon: FileText,
             color: colors.textMuted,
-            bgColor: "rgba(255, 255, 255, 0.04)",
+            bgColor: colors.surface,
             label: "Pending",
          }
    }

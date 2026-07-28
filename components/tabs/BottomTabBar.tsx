@@ -5,8 +5,8 @@ import * as Haptics from "expo-haptics"
 
 import { useTheme } from "@/hooks/useTheme"
 import { useTabStore } from "@/store/tab"
-import { Fonts, FontSizes } from "@/constants/Fonts"
-import { Motion, Radii, Spacing, TabBar, elevation } from "@/constants/Design"
+import { Fonts } from "@/constants/Fonts"
+import { Motion, Radii, Spacing, TabBar, Type, elevation } from "@/constants/Design"
 import ScanBtn from "@/components/ScanBtn"
 
 import type { ColorsType } from "@/hooks/useTheme"
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
       bottom: 6,
       left: Spacing.xxs,
       right: Spacing.xxs,
-      borderRadius: Radii.md,
+      borderRadius: Radii.sm,
       pointerEvents: "none",
    },
    itemContent: {
@@ -235,8 +235,7 @@ const styles = StyleSheet.create({
       pointerEvents: "none",
    },
    label: {
-      fontSize: FontSizes.xs - 2,
-      letterSpacing: 0.1,
+      ...Type.micro,
       includeFontPadding: false,
    },
 })

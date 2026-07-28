@@ -207,7 +207,7 @@ export default function ServerErrorScreen({
                         We&apos;re working to restore normal service as quickly as possible. Please
                         try again in a few minutes.
                      </Text>
-                     <View style={styles.statusTime}>
+                     <View style={[styles.statusTime, { borderTopColor: colors.border }]}>
                         <Text style={[styles.statusTimeText, { color: colors.textMuted }]}>
                            Estimated fix time: 5-10 minutes
                         </Text>
@@ -241,7 +241,7 @@ export default function ServerErrorScreen({
 
                {/* Footer */}
                <Animated.View entering={FadeInDown.delay(1100).springify()}>
-                  <View style={styles.footer}>
+                  <View style={[styles.footer, { borderTopColor: colors.border }]}>
                      <Text style={[styles.footerText, { color: colors.textMuted }]}>
                         Error ID: {Date.now().toString(36).toUpperCase()}
                      </Text>
@@ -380,8 +380,7 @@ const styles = StyleSheet.create({
    },
    statusTime: {
       paddingTop: 8,
-      borderTopWidth: 1,
-      borderTopColor: "rgba(255,255,255,0.1)",
+      borderTopWidth: StyleSheet.hairlineWidth,
    },
    statusTimeText: {
       fontSize: FontSizes.xs,
@@ -406,8 +405,7 @@ const styles = StyleSheet.create({
    footer: {
       marginTop: 24,
       paddingTop: 16,
-      borderTopWidth: 1,
-      borderTopColor: "rgba(255,255,255,0.1)",
+      borderTopWidth: StyleSheet.hairlineWidth,
    },
    footerText: {
       fontSize: FontSizes.xs,

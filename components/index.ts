@@ -21,4 +21,6 @@ export * from "./ErrorMessage"
 
 export * from "./CustomBackBtn"
 
+export * from "./RiskBadge"
+
 export * from "./onboarding"

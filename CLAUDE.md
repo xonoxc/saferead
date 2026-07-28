@@ -89,8 +89,27 @@ reads `meta.invalidatedQueries` off a mutation and invalidates those keys. Add
 (imperative alerts), `tab.ts` (`useTabStore`).
 
 **Theming** — `hooks/useTheme.tsx` → `{ colors }`, modes `light | dark | system`.
-Palette in `constants/Colors.ts`; spacing/radii/motion/elevation in `constants/Design.ts`
-(`elevation(colors, level)`, `withAlpha(hex, alpha)`, `TAB_BAR_CLEARANCE`).
+Palette in `constants/Colors.ts`; spacing/radii/type/motion/elevation in
+`constants/Design.ts` (`Type`, `riskColors(colors, level)`, `RISK_LABELS`,
+`elevation(colors, level)`, `withAlpha(hex, alpha)`, `TAB_BAR_CLEARANCE`).
+
+**The palette has one governing rule: chrome is desaturated so colour means something.**
+Findings carry a four-level risk scale, and that scale is the most important thing on any
+contract screen. The old indigo-violet brand with teal accents meant a `critical` flag had
+to compete with decoration to be noticed. So: near-neutral surfaces, one ink-navy primary
+for actions, saturation reserved for the risk ramp (`riskLow/Medium/High/Critical` +
+`…Background`, plus `unverified`) and status. The legacy decorative keys (`vio`, `blueg`,
+`red`, `emerald`) still exist for compatibility but are now aliases into the real palette
+— **do not reintroduce standalone hues.**
+
+`Type` is a full text style per role (size + lineHeight + tracking), not a bare size.
+`FontSizes` still exists and still works; prefer `Type` for anything that wraps, because
+unset leading is what made the plain-English clause paragraphs look cramped.
+
+`components/RiskBadge.tsx` is the only sanctioned way to draw a risk level. It pairs an
+icon with the colour (red-vs-amber is exactly the pair colour-blind users cannot
+distinguish) and treats `is_missing` and `span_verified: false` as first-class states
+rather than folding them into "low".
 
 **Motion** — `Motion.spring` / `Motion.springQuick` are tuned to a damping ratio of ~1.0
 (`damping / (2 * sqrt(stiffness * mass))`), i.e. they settle without overshooting. Keep
@@ -122,8 +141,15 @@ Spaces: `/user_space/spaces/` (+ `/{id}/documents/`, `/{id}/stats/`, `/{id}/togg
 Chat: `/user_space/conversations/`, `/user_space/messages/?conversation=<id>`,
 `POST /user_space/chatbot/instant-response/`
 Plans: `GET /plans/`
+Contracts (backend built, no client yet): `/contracts/organizations/` (+ `/{id}/members/`,
+`/{id}/invite/`, `/{id}/stats/`), `/contracts/contracts/` (+ `/{id}/reextract/`,
+`/{id}/actions/`, `/expiring/`, `/missing-protections/`), `/contracts/obligations/`
+(+ `/summary/`), `/contracts/events/` (+ `/upcoming/`), `/contracts/counterparties/`
 
 Backend pagination is PageNumberPagination, `PAGE_SIZE: 10`.
+
+Analysis responses now carry a `disclaimer` string. Render it wherever analysis is shown —
+it is served with the payload precisely so no screen has to remember to hardcode it.
 
 ## Gotchas
 

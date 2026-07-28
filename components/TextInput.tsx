@@ -10,7 +10,7 @@ import {
    Pressable,
 } from "react-native"
 import { useTheme } from "@/hooks/useTheme"
-import { Fonts, FontSizes } from "@/constants"
+import { Fonts, Radii, Spacing, Type } from "@/constants"
 import { Eye, EyeOff } from "lucide-react-native"
 
 interface TextInputProps extends React.ComponentProps<typeof RNTextInput> {
@@ -54,19 +54,29 @@ export const TextInput: React.FC<TextInputProps> = ({
       rest.onFocus?.(e)
    }
 
-   const borderColor = error ? colors.error : isFocused ? colors.primary : colors.border
+   const borderColor = error ? colors.error : isFocused ? colors.primary : colors.borderLight
 
    return (
       <View style={[styles.container, containerStyle]}>
-         {label && <Text style={[styles.label, { color: colors.text }, labelStyle]}>{label}</Text>}
+         {label && (
+            <Text style={[styles.label, { color: colors.textSecondary }, labelStyle]}>{label}</Text>
+         )}
 
          <View
             style={[
                styles.inputWrapper,
                {
-                  backgroundColor: colors.surface,
+                  /*
+                   * White/card while idle rather than the grey surface, so a
+                   * form of inputs does not read as a stack of disabled
+                   * fields. Focus is then carried by the border colour alone
+                   * plus a faint ring, which is enough now that the border is
+                   * 1px and high-contrast.
+                   * **/
+                  backgroundColor: colors.card,
                   borderColor,
                },
+               isFocused && !error && { shadowColor: colors.primary, ...focusRing },
             ]}
          >
             {leftAccessory && <View style={styles.leftIcon}>{leftAccessory}</View>}
@@ -106,44 +116,58 @@ export const TextInput: React.FC<TextInputProps> = ({
    )
 }
 
+/* A soft halo on the focused field, in place of thickening the border - a
+ * border that changes width on focus shifts the text inside it by a pixel. */
+const focusRing = {
+   shadowOpacity: 0.18,
+   shadowRadius: 6,
+   shadowOffset: { width: 0, height: 0 },
+   elevation: 0,
+} as const
+
 const styles = StyleSheet.create({
    container: {
-      marginVertical: 4,
+      marginVertical: Spacing.xxs,
       flex: 1,
    },
    label: {
-      fontSize: FontSizes.xs,
+      ...Type.caption,
       fontFamily: Fonts.medium,
-      marginBottom: 4,
+      marginBottom: 6,
    },
    inputWrapper: {
-      borderWidth: 2,
-      borderRadius: 15,
-      paddingHorizontal: 12,
-      paddingVertical: 4,
+      /*
+       * 1px, not 2. A 2px border around every field is the single heaviest
+       * line on a form, and at 15px radius it read as a rounded button rather
+       * than something you type into.
+       * **/
+      borderWidth: 1,
+      borderRadius: Radii.sm,
+      paddingHorizontal: Spacing.sm,
+      paddingVertical: Spacing.xxs,
       flexDirection: "row",
       alignItems: "center",
-      minHeight: 52,
+      minHeight: 48,
    },
    input: {
       flex: 1,
-      fontSize: FontSizes.sm,
+      ...Type.body,
       fontFamily: Fonts.regular,
-      paddingHorizontal: 8,
+      paddingHorizontal: Spacing.xxs,
       paddingVertical: 10,
    },
    leftIcon: {
-      marginRight: 4,
+      marginRight: Spacing.xxs,
    },
    rightIcon: {
-      marginLeft: 4,
+      marginLeft: Spacing.xxs,
    },
    eyeIcon: {
-      marginLeft: 8,
+      marginLeft: Spacing.xs,
    },
    error: {
-      fontSize: FontSizes.sm,
-      fontFamily: Fonts.regular,
+      ...Type.caption,
+      fontFamily: Fonts.medium,
       marginTop: 6,
    },
 })

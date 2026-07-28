@@ -116,7 +116,19 @@ export default function LoginScreen() {
 
                <View style={styles.forgotPasswordContainer}>
                   <Link href={"/(auth)/forgot-password" as RelativePathString} asChild>
-                     <Text style={{ color: "skyblue" }}>Forgot Password?</Text>
+                     {/*
+                      * Flattened, not an array: <Link asChild> clones its
+                      * child and rejects array styles - the same trap
+                      * documented in components/Button.tsx.
+                      * **/}
+                     <Text
+                        style={StyleSheet.flatten([
+                           styles.forgotPassword,
+                           { color: colors.forgotPassword },
+                        ])}
+                     >
+                        Forgot Password?
+                     </Text>
                   </Link>
                </View>
 
@@ -199,5 +211,9 @@ const styles = StyleSheet.create({
    },
    forgotPasswordContainer: {
       alignSelf: "flex-end",
+   },
+   forgotPassword: {
+      fontFamily: Fonts.medium,
+      fontSize: FontSizes.sm,
    },
 })

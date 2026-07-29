@@ -79,9 +79,15 @@ function singular(noun: string): string {
    return noun
 }
 
-/* Whether a facility is included at all, for a tick-vs-cross column. */
-export function featureIsIncluded(value: unknown): boolean {
-   if (typeof value === "boolean") return value
+/*
+ * Whether a facility counts as included, for the tick-vs-dash column.
+ *
+ * `meta` is what carries polarity: `ads_enabled: false` is a *benefit*, so
+ * without it the paid tiers render their best selling point — "Ad-free" — with
+ * a dash beside it, which reads as "you don't get this".
+ * **/
+export function featureIsIncluded(value: unknown, meta?: PlanFeatureMeta): boolean {
+   if (typeof value === "boolean") return meta?.benefit_when_off ? !value : value
    if (value === "unlimited") return true
    if (typeof value === "number") return value > 0
    if (Array.isArray(value)) return value.length > 0

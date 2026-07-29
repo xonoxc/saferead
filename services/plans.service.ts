@@ -67,6 +67,12 @@ export interface PlanFeatureMeta {
    on_card: boolean
    on_label: string
    off_label: string
+   /*
+    * This flag being *off* is the benefit — `ads_enabled` is the only one so
+    * far. Polarity cannot be inferred from the value, so the tick column has to
+    * be told, or a paid tier renders "Ad-free" as a struck-through row.
+    * **/
+   benefit_when_off: boolean
 }
 
 export interface PlanFeatureSection {

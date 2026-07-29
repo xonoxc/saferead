@@ -57,8 +57,20 @@ function isLeft(direction: BackBtnDirection): boolean {
 
 const styles = StyleSheet.create({
    button: {
+      /*
+       * Sizes to the chevron, never to its parent.
+       *
+       * Without this the button stretches to full width in any flex column -
+       * the default `alignItems: stretch` - which drew a bordered box across
+       * the whole pricing header. Fixed here rather than in each caller
+       * because a 24px icon in a full-bleed bordered box is never what anyone
+       * wanted; nine call sites would otherwise each have to remember.
+       * **/
+      alignSelf: "flex-start",
       padding: 8,
       borderRadius: 12,
       borderWidth: 2,
+      alignItems: "center",
+      justifyContent: "center",
    },
 })

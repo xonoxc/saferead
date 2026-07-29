@@ -53,6 +53,7 @@ export default function usePremiumScreen() {
       selectPlan: (plan: Plan) => setSelectedId(plan.id),
       isSelected: (plan: Plan) => selectedPlan?.id === plan.id,
       isCurrent: (plan: Plan) => !!currentPlanId && currentPlanId === plan.id,
+      currentPlanId,
       contactPlan,
       openContact: setContactPlan,
       closeContact: () => setContactPlan(null),

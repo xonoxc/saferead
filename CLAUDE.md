@@ -101,6 +101,17 @@ A plan with `pricing_mode: "contact"` has **no price** — `planHeadlinePrice` r
 "Custom pricing" and the CTA opens `ContactSalesForm`, which posts to `/plans/enquiry/`.
 Never render a contact tier's `display_price`: it is `0.00`, which reads as "Free".
 
+**The pricing screen is a selector plus one detail panel**, not a list of cards —
+`PlanSelector` (compact price row, sits directly above what it drives) and `PlanDetail`
+(hero → headline stats → capabilities → full audit by section). Three passes over the same
+catalogue, narrowing as they go.
+
+**Flag polarity is a server field, not something the client can infer.** `ads_enabled:
+false` is a *benefit*, so `catalog.Feature.benefit_when_off` is served as
+`benefit_when_off` and `featureIsIncluded(value, meta)` reads it. Without it the paid
+tiers render "Ad-free" with a dash beside it — their best selling point shown as something
+you do not get.
+
 `components/plans/UpgradeCard.tsx` (Settings) renders the live featured plan and returns
 `null` when there is no paid tier — it replaced a magenta→indigo `LinearGradient` whose
 two hues appear nowhere in the palette, and a hardcoded "Upgrade to Pro" that advertised a
@@ -175,6 +186,21 @@ that driver does not reliably start for a screen mounted during a hard page load
 invisible permanently. `FadeInView` skips `entering` on web for that reason. A failed animation
 must degrade to *no animation*, never *no content*. (~23 older files still use the raw API and
 are still affected.)
+
+**Animating from a boolean prop needs a shared value, not a closure.** This project builds
+with the React Compiler (`transform.reactCompiler`), which memoises worklet closures — so
+`useAnimatedStyle(() => ({ color: withTiming(selected ? a : b) }))` captures `selected`
+once and never sees it change, and `useDerivedValue(() => withTiming(...))` restarts its
+timing from wherever it had reached on every render. Both leave a selected/unselected pair
+stranded mid-transition. The form that holds: `useSharedValue` + a `useEffect` on the prop
+that assigns `progress.value`, with the style reading only `progress.value`
+(`components/plans/PlanSelector.tsx`).
+
+**A `PressableScale` in a horizontal `ScrollView` row stretches; its child does not.** The
+row aligns `stretch`, so every pressable is as tall as the tallest card, while an inner
+view sizes to its own content — leaving a dead strip of tap target below the shorter ones
+that looks like a broken button. Give the inner card `flex: 1` so the visible surface *is*
+the tap target.
 
 `Motion.spring` / `Motion.springQuick` are tuned to a damping ratio of ~1.0
 (`damping / (2 * sqrt(stiffness * mass))`), i.e. they settle without overshooting. Keep

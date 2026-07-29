@@ -6,7 +6,8 @@ import { useTheme } from "@/hooks/useTheme"
 import usePremiumScreen from "@/hooks/screens/usePremiumScreen"
 import { Button, CustomBackBtn } from "@/components"
 import { FadeInView } from "@/components/motion"
-import { PlanCard } from "@/components/plans/PlanCard"
+import { PlanSelector } from "@/components/plans/PlanSelector"
+import { PlanDetail } from "@/components/plans/PlanDetail"
 import { ContactSalesForm } from "@/components/plans/ContactSalesForm"
 import { PlansLoadingState } from "@/components/plans/PlansLoadingState"
 import { Plansfallback } from "@/components/plans/PlansFallback"
@@ -14,17 +15,19 @@ import { Fonts, Spacing, Type, TAB_BAR_CLEARANCE } from "@/constants"
 import { isContactPlan } from "@/utils/helpers/plans"
 
 /*
- * Pricing.
+ * Pricing: pick a tier, read everything about it.
  *
- * The previous version of this screen was hardcoded to a dark background with
- * white text, gold accents and a teal tick — none of them from the palette, and
- * unreadable in light mode, which is the default. It also hardcoded which
- * eleven features to list, so a tier's real limits and its advertised ones were
- * two separate sources of truth that could disagree.
+ * Two rewrites' worth of history is worth keeping. The original was hardcoded
+ * to a dark background with gold accents and a teal tick — none from the
+ * palette, unreadable in light mode — and hardcoded which eleven features to
+ * list, so a tier's real limits and its advertised ones were separate sources
+ * of truth. The replacement fixed both but flattened the layout into a list of
+ * cards, which lost the thing that actually worked: one tier at a time, in
+ * depth, with a selector to switch between them.
  *
- * Both are server-owned now: the tiers come from `/plans/`, and what each one
- * advertises comes from `/plans/features/` — the same catalogue the Django
- * admin edits. Adding a limit is a server change, not a release.
+ * So this restores that shape — selector on top, full detail below — on the
+ * server-owned data. `/plans/` gives the tiers, `/plans/features/` gives the
+ * catalogue the detail panel renders from, and neither is baked in here.
  * **/
 export default function PremiumScreen() {
    const { colors } = useTheme()
@@ -36,8 +39,8 @@ export default function PremiumScreen() {
       error,
       selectedPlan,
       selectPlan,
-      isSelected,
       isCurrent,
+      currentPlanId,
       contactPlan,
       openContact,
       closeContact,
@@ -45,6 +48,8 @@ export default function PremiumScreen() {
 
    if (isLoading) return <PlansLoadingState />
    if (error || !plans.length) return <Plansfallback />
+
+   const showCta = selectedPlan && !isCurrent(selectedPlan) && selectedPlan.plan_type !== "free"
 
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -57,7 +62,7 @@ export default function PremiumScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={[styles.content, { paddingBottom: TAB_BAR_CLEARANCE }]}
          >
-            <FadeInView delay={80} style={styles.hero}>
+            <FadeInView delay={60} style={styles.hero}>
                <Text style={[styles.eyebrow, { color: colors.textMuted }]}>PLANS</Text>
                <Text style={[styles.title, { color: colors.text }]}>
                   Know what you&apos;re signing
@@ -68,22 +73,26 @@ export default function PremiumScreen() {
                </Text>
             </FadeInView>
 
-            <View style={styles.cards}>
-               {plans.map((plan, index) => (
-                  <FadeInView key={plan.id} index={index}>
-                     <PlanCard
-                        plan={plan}
-                        sections={sections}
-                        selected={isSelected(plan)}
-                        isCurrent={isCurrent(plan)}
-                        onPress={() => selectPlan(plan)}
-                     />
-                  </FadeInView>
-               ))}
+            <FadeInView delay={120}>
+               <PlanSelector
+                  plans={plans}
+                  selectedId={selectedPlan?.id}
+                  currentId={currentPlanId}
+                  onSelect={selectPlan}
+               />
+            </FadeInView>
+
+            <View style={styles.detail}>
+               {selectedPlan && <PlanDetail plan={selectedPlan} sections={sections} />}
             </View>
 
-            {selectedPlan && !isCurrent(selectedPlan) && selectedPlan.plan_type !== "free" && (
-               <View style={styles.cta}>
+            {showCta && (
+               /*
+                * Keyed on the plan so the call to action re-enters with the
+                * detail above it. Without the key the label swaps in place
+                * while everything around it fades, which reads as a glitch.
+                * **/
+               <FadeInView key={selectedPlan.id} delay={240} style={styles.cta}>
                   {isContactPlan(selectedPlan) ? (
                      <>
                         <Button
@@ -114,7 +123,7 @@ export default function PremiumScreen() {
                         </Text>
                      </>
                   )}
-               </View>
+               </FadeInView>
             )}
          </ScrollView>
 
@@ -131,11 +140,13 @@ const styles = StyleSheet.create({
       paddingBottom: Spacing.xs,
    },
    scroll: { flex: 1 },
-   content: {
-      paddingHorizontal: Spacing.lg,
-      gap: Spacing.md,
-   },
-   hero: { gap: 2 },
+   /*
+    * No horizontal padding here — the selector row bleeds to the screen edge so
+    * its last card can sit half-off, which is what tells you it scrolls. Every
+    * other block sets its own gutter.
+    * **/
+   content: { gap: Spacing.md },
+   hero: { gap: 2, paddingHorizontal: Spacing.lg },
    eyebrow: {
       ...Type.overline,
       fontFamily: Fonts.semiBold,
@@ -150,8 +161,8 @@ const styles = StyleSheet.create({
       fontFamily: Fonts.regular,
       marginTop: Spacing.xxs,
    },
-   cards: { gap: Spacing.sm },
-   cta: { gap: Spacing.xs, marginTop: Spacing.xs },
+   detail: { paddingHorizontal: Spacing.lg },
+   cta: { gap: Spacing.xs, paddingHorizontal: Spacing.lg },
    ctaNote: {
       flexDirection: "row",
       alignItems: "center",

@@ -71,10 +71,12 @@ export default function useSpaceScreen() {
       }
 
       showBottomAlert({
-         title: "Delete Space",
-         message: `Are you sure you want to delete "${spaceName}"?`,
+         type: "error",
+         title: "Delete space",
+         message: `"${spaceName}" and the documents inside it will be removed. This cannot be undone.`,
+         suppressKey: "delete-space",
          actions: [
-            { text: "Cancel", style: "primary", onPress: () => {} },
+            { text: "Cancel", style: "ghost", onPress: () => {} },
             {
                text: "Delete",
                style: "destructive",

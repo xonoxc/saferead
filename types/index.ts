@@ -6,6 +6,16 @@ export interface User {
    last_name?: string
    avatar?: string
    subscriptionTier: "free" | "pro" | "enterprise"
+   /*
+    * The plan this account is actually on, straight from `/auth/user/`.
+    *
+    * `subscriptionTier` above is scaffold left from the original template and
+    * is not served by the API — it cannot tell two paid tiers apart anyway,
+    * which is exactly what the pricing screen needs in order to mark one as
+    * current. Prefer these two.
+    * **/
+   active_plan?: string | null
+   active_plan_name?: string | null
    preferences: UserPreferences
    createdAt: string
    updatedAt: string

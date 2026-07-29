@@ -21,10 +21,12 @@ export function DocumentTabCard({ document, onPress, onDelete }: DocumentCardPro
 
    const handleDelete = () => {
       showBottomAlert({
-         title: "Delete Document",
-         message: "Are you sure you want to delete this document?",
+         type: "error",
+         title: "Delete document",
+         message: "This document and its analysis will be removed. This cannot be undone.",
+         suppressKey: "delete-document",
          actions: [
-            { text: "Cancel", style: "secondary", onPress: () => {} },
+            { text: "Cancel", style: "ghost", onPress: () => {} },
             {
                text: "Delete",
                style: "destructive",

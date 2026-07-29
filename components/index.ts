@@ -1,4 +1,3 @@
-export { default as UpgradeButton } from "./UpgradeButton"
 
 export * from "./chat"
 export * from "./Button"

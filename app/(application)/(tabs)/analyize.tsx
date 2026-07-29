@@ -1,30 +1,25 @@
-import React, { useState } from "react"
-import { useAnalysis } from "@/hooks/useAnalysis"
-import { ChatView } from "@/components/chat"
+import React from "react"
 import { View } from "react-native"
+
+import { useAnalysis } from "@/hooks/useAnalysis"
 import { useTheme } from "@/hooks/useTheme"
 import { useDocumentStats } from "@/hooks/useDocumentStats"
 
 import { AnalyzeScreenSkeleton } from "@/components/skeletons"
-import AnalyzeHeader from "@/components/analyize/Header"
 import { AnalyticsPanel } from "@/components/analyize/AnalyticsPanel"
 import { AnalysisFeed } from "@/components/analyize/AnalysisFeed"
 
-import type { ViewType } from "@/types/view"
-
+/*
+ * Scan history.
+ *
+ * This screen used to be two screens wearing one route: the analysis feed, and
+ * — whenever a space happened to be selected — the whole chat UI instead. Chat
+ * now has its own tab, so this is only ever the feed.
+ * **/
 export default function AnalyzeScreen() {
-   const { colors, isDark } = useTheme()
-   const [viewType, setViewType] = useState<ViewType>("list")
+   const { colors } = useTheme()
 
-   const {
-      selectedDocType,
-      setSelectedDocType,
-      recentDocuments,
-      handleRecentDocumentPress,
-      selectedSpace,
-      isRecentDocumentsLoading,
-      handleSpaceClose,
-   } = useAnalysis()
+   const { recentDocuments, handleRecentDocumentPress, isRecentDocumentsLoading } = useAnalysis()
 
    const { stats } = useDocumentStats()
 
@@ -32,24 +27,12 @@ export default function AnalyzeScreen() {
 
    return (
       <View style={{ flex: 1, backgroundColor: colors.background }}>
-         {selectedSpace && (
-            <AnalyzeHeader
-               selectedSpace={selectedSpace}
-               onSpaceExitButtonPress={handleSpaceClose}
-            />
-         )}
-         {selectedSpace ? (
-            <ChatView />
-         ) : (
-            <View style={{ flex: 1 }}>
-               <AnalyticsPanel colors={colors} stats={stats} />
-               <AnalysisFeed
-                  colors={colors}
-                  documents={recentDocuments}
-                  onDocumentPress={handleRecentDocumentPress}
-               />
-            </View>
-         )}
+         <AnalyticsPanel colors={colors} stats={stats} />
+         <AnalysisFeed
+            colors={colors}
+            documents={recentDocuments}
+            onDocumentPress={handleRecentDocumentPress}
+         />
       </View>
    )
 }

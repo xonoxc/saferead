@@ -39,8 +39,28 @@ export default function SpacesScreen() {
    /*
     * A skeleton that mirrors the real layout reads as faster than a spinner,
     * because the shell is already in place when content lands.
+    *
+    * The real header sits above it rather than being skeletonised: it is chrome
+    * that does not depend on the request, and it carries the only route to
+    * Settings from this tab — which a skeleton returned in place of the whole
+    * screen would take away for as long as the load lasts.
     * **/
-   if (isLoading) return <SpacesScreenSkeleton />
+   if (isLoading) {
+      return (
+         <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <SpaceScreenHeader
+               colors={colors}
+               viewMode={viewMode}
+               setViewMode={setViewMode}
+               searchQuery={searchQuery}
+               setShowFilter={setShowFilter}
+               setSearchQuery={setSearchQuery}
+               setCreateModalVisible={setCreateModalVisible}
+            />
+            <SpacesScreenSkeleton />
+         </View>
+      )
+   }
 
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>

@@ -4,6 +4,16 @@ import Skeleton from "./Skeleton"
 import { useTheme } from "@/hooks/useTheme"
 import { TAB_BAR_CLEARANCE } from "@/constants/Design"
 
+/*
+ * The space list, mid-load.
+ *
+ * It used to skeletonise the header too, and the screen returned it *instead*
+ * of the whole layout. But the header does not depend on the request — and it
+ * carries the search field, the create button and the only route to Settings
+ * from this tab, all of which were unavailable for as long as the load took.
+ * The screen now renders the real header above this, so drawing a grey
+ * placeholder over the top of it would just be a duplicate.
+ * **/
 const SpacesScreenSkeleton = () => {
    const { colors } = useTheme()
 
@@ -13,20 +23,6 @@ const SpacesScreenSkeleton = () => {
          contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE }}
          showsVerticalScrollIndicator={false}
       >
-         <View style={styles.headerContainer}>
-            <View style={styles.header}>
-               <Skeleton width={120} height={32} borderRadius={8} />
-               <View style={styles.headerIcons}>
-                  <Skeleton width={24} height={24} borderRadius={4} />
-                  <Skeleton width={24} height={24} borderRadius={4} />
-                  <Skeleton width={36} height={36} borderRadius={12} />
-               </View>
-            </View>
-            <View style={styles.searchContainer}>
-               <Skeleton width="100%" height={40} borderRadius={8} />
-            </View>
-         </View>
-
          <View style={styles.listContainer}>
             {[...Array(5)].map((_, index) => (
                <Skeleton
@@ -46,28 +42,9 @@ const styles = StyleSheet.create({
    container: {
       flex: 1,
    },
-   headerContainer: {
-      paddingHorizontal: 20,
-      paddingTop: 16,
-      paddingBottom: 8,
-   },
-   header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 16,
-   },
-   headerIcons: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-   },
-   searchContainer: {
-      paddingVertical: 8,
-   },
    listContainer: {
       paddingHorizontal: 20,
-      paddingTop: 16,
+      paddingTop: 8,
    },
 })
 

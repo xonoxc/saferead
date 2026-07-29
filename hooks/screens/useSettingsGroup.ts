@@ -7,7 +7,9 @@ import {
    KeyRound,
    User as UserIcon,
    Coins,
+   BellRing,
 } from "lucide-react-native"
+import { resetSuppressedAlerts, useAlertStore } from "@/store/useAlertStore"
 import type { ThemeMode } from "@/hooks/useTheme"
 import type { ImperativeRouter } from "expo-router"
 import { useActiveCurrency, useActiveLanguage } from "@/store/useLocaleStore"
@@ -44,6 +46,14 @@ export default function useSettingsGroups({
    const { t } = useTranslation()
    const currency = useActiveCurrency()
    const language = useActiveLanguage()
+
+   /*
+    * "Don't ask me again" is only safe to offer if it is reversible — otherwise
+    * one stray tap permanently removes the confirmation in front of a delete.
+    * The row is hidden while nothing is silenced, so it does not sit in the
+    * list as a setting with nothing to do.
+    * **/
+   const silencedCount = Object.keys(useAlertStore(s => s.suppressed)).length
 
    return [
       {
@@ -84,6 +94,16 @@ export default function useSettingsGroups({
                value: currency,
                onPress: () => router.push("/currency"),
             },
+            ...(silencedCount
+               ? [
+                    {
+                       icon: BellRing,
+                       title: "Restore hidden prompts",
+                       value: `${silencedCount} hidden`,
+                       onPress: () => resetSuppressedAlerts(),
+                    },
+                 ]
+               : []),
             /* {
                icon: Volume2,
                title: "Text-to-Speech",

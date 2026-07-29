@@ -1,6 +1,54 @@
 import type { FilterField } from "@/types/filter"
 
 /*
+ * Contracts filters.
+ *
+ * Contract *type* is deliberately absent: it already has a chip row above the
+ * list, and offering the same filter twice lets the two disagree. Only the
+ * fields the DRF viewset actually accepts are listed - `status`,
+ * `extraction_status` and `ordering` - so nothing here silently no-ops.
+ * **/
+export const contractFilterFields: FilterField[] = [
+   {
+      key: "status",
+      label: "Status",
+      type: "select",
+      options: [
+         { value: "", label: "Any status" },
+         { value: "draft", label: "Draft" },
+         { value: "in_review", label: "In review" },
+         { value: "active", label: "Active" },
+         { value: "expired", label: "Expired" },
+         { value: "terminated", label: "Terminated" },
+      ],
+   },
+   {
+      key: "extraction_status",
+      label: "Analysis",
+      type: "select",
+      options: [
+         { value: "", label: "Any" },
+         { value: "completed", label: "Analysed" },
+         { value: "processing", label: "Analysing" },
+         { value: "pending", label: "Queued" },
+         { value: "failed", label: "Failed" },
+         { value: "unsupported", label: "Not supported" },
+      ],
+   },
+   {
+      key: "ordering",
+      label: "Sort by",
+      type: "select",
+      options: [
+         { value: "-created_at", label: "Newest first" },
+         { value: "created_at", label: "Oldest first" },
+         { value: "term_end_date", label: "Ending soonest" },
+         { value: "-total_value", label: "Highest value" },
+      ],
+   },
+]
+
+/*
  *
  * this is a like a config for the spaces filters
  * **/

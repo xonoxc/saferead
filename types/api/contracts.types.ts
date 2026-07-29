@@ -356,6 +356,7 @@ export interface LogActionRequest {
 export interface ContractFilterOptions {
    contract_type?: ContractType
    status?: ContractStatus
+   extraction_status?: ExtractionStatus
    counterparty?: string
    search?: string
    ordering?: string

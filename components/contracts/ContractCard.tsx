@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet } from "react-native"
-import { AlertTriangle, Building2, CalendarClock, Loader, Ban } from "lucide-react-native"
+import { View, Text, StyleSheet, Pressable } from "react-native"
+import { AlertTriangle, Building2, CalendarClock, Loader, Ban, Trash2 } from "lucide-react-native"
 
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, Radii, Spacing, Type, elevation } from "@/constants"
@@ -7,10 +7,7 @@ import { PressableScale } from "@/components/motion"
 import { RiskBadge } from "@/components/RiskBadge"
 import { formatMoney, formatRelativeDeadline, daysUntil } from "@/utils/helpers/dates"
 
-import {
-   CONTRACT_TYPE_SHORT,
-   type ContractListItem,
-} from "@/types/api/contracts.types"
+import { CONTRACT_TYPE_SHORT, type ContractListItem } from "@/types/api/contracts.types"
 
 /*
  * One contract in the portfolio list.
@@ -25,83 +22,106 @@ import {
 interface ContractCardProps {
    contract: ContractListItem
    onPress: () => void
+   onDelete?: () => void
 }
 
-export function ContractCard({ contract, onPress }: ContractCardProps) {
+export function ContractCard({ contract, onPress, onDelete }: ContractCardProps) {
    const { colors } = useTheme()
 
    const expiringDays = daysUntil(contract.term_end_date)
    /* "Soon" is 60 days: below that, a 30-day notice period is already tight. */
    const isExpiringSoon = expiringDays !== null && expiringDays >= 0 && expiringDays <= 60
 
+   /*
+    * The delete control is a *sibling* of the card, laid over it, not a child.
+    *
+    * Nesting a pressable inside a pressable renders `<button>` inside
+    * `<button>` on web, which is invalid HTML and logs a hydration error. It
+    * also makes the hit test ambiguous on every platform. Overlaying keeps the
+    * whole card tappable while the trash owns its own corner.
+    * **/
    return (
-      <PressableScale
-         onPress={onPress}
-         accessibilityRole="button"
-         accessibilityLabel={`${contract.title || "Untitled contract"}, ${
-            contract.counterparty_name ?? "no counterparty"
-         }`}
-         style={StyleSheet.flatten([
-            styles.card,
-            { backgroundColor: colors.card, borderColor: colors.border },
-            elevation(colors, 1),
-         ])}
-      >
-         <View style={styles.topRow}>
-            <View style={styles.identity}>
-               {contract.counterparty_name ? (
-                  <View style={styles.counterpartyRow}>
-                     <Building2 size={12} color={colors.textMuted} strokeWidth={2.2} />
-                     <Text
-                        numberOfLines={1}
-                        style={[styles.counterparty, { color: colors.textSecondary }]}
-                     >
-                        {contract.counterparty_name}
-                     </Text>
-                  </View>
-               ) : null}
+      <View style={styles.wrapper}>
+         <PressableScale
+            onPress={onPress}
+            accessibilityRole="button"
+            accessibilityLabel={`${contract.title || "Untitled contract"}, ${
+               contract.counterparty_name ?? "no counterparty"
+            }`}
+            style={StyleSheet.flatten([
+               styles.card,
+               { backgroundColor: colors.card, borderColor: colors.border },
+               elevation(colors, 1),
+            ])}
+         >
+            <View style={[styles.topRow, !!onDelete && styles.topRowWithDelete]}>
+               <View style={styles.identity}>
+                  {contract.counterparty_name ? (
+                     <View style={styles.counterpartyRow}>
+                        <Building2 size={12} color={colors.textMuted} strokeWidth={2.2} />
+                        <Text
+                           numberOfLines={1}
+                           style={[styles.counterparty, { color: colors.textSecondary }]}
+                        >
+                           {contract.counterparty_name}
+                        </Text>
+                     </View>
+                  ) : null}
 
-               <Text numberOfLines={2} style={[styles.title, { color: colors.text }]}>
-                  {contract.title || "Untitled contract"}
-               </Text>
-            </View>
-
-            <View style={[styles.typeChip, { backgroundColor: colors.surface }]}>
-               <Text style={[styles.typeChipText, { color: colors.textSecondary }]}>
-                  {CONTRACT_TYPE_SHORT[contract.contract_type] ?? contract.contract_type}
-               </Text>
-            </View>
-         </View>
-
-         <ExtractionNotice status={contract.extraction_status} />
-
-         <View style={styles.metaRow}>
-            {contract.extraction_status === "completed" && (
-               <RiskBadge level={contract.highest_risk} size="small" />
-            )}
-
-            {contract.total_value ? (
-               <Text style={[styles.meta, { color: colors.textSecondary }]}>
-                  {formatMoney(contract.total_value, contract.currency)}
-               </Text>
-            ) : null}
-
-            {contract.open_obligation_count ? (
-               <Text style={[styles.meta, { color: colors.textSecondary }]}>
-                  {contract.open_obligation_count} open
-               </Text>
-            ) : null}
-
-            {isExpiringSoon && (
-               <View style={styles.expiring}>
-                  <CalendarClock size={12} color={colors.riskHigh} strokeWidth={2.4} />
-                  <Text style={[styles.meta, { color: colors.riskHigh }]}>
-                     {formatRelativeDeadline(contract.term_end_date)}
+                  <Text numberOfLines={2} style={[styles.title, { color: colors.text }]}>
+                     {contract.title || "Untitled contract"}
                   </Text>
                </View>
-            )}
-         </View>
-      </PressableScale>
+
+               <View style={[styles.typeChip, { backgroundColor: colors.surface }]}>
+                  <Text style={[styles.typeChipText, { color: colors.textSecondary }]}>
+                     {CONTRACT_TYPE_SHORT[contract.contract_type] ?? contract.contract_type}
+                  </Text>
+               </View>
+            </View>
+
+            <ExtractionNotice status={contract.extraction_status} />
+
+            <View style={styles.metaRow}>
+               {contract.extraction_status === "completed" && (
+                  <RiskBadge level={contract.highest_risk} size="small" />
+               )}
+
+               {contract.total_value ? (
+                  <Text style={[styles.meta, { color: colors.textSecondary }]}>
+                     {formatMoney(contract.total_value, contract.currency)}
+                  </Text>
+               ) : null}
+
+               {contract.open_obligation_count ? (
+                  <Text style={[styles.meta, { color: colors.textSecondary }]}>
+                     {contract.open_obligation_count} open
+                  </Text>
+               ) : null}
+
+               {isExpiringSoon && (
+                  <View style={styles.expiring}>
+                     <CalendarClock size={12} color={colors.riskHigh} strokeWidth={2.4} />
+                     <Text style={[styles.meta, { color: colors.riskHigh }]}>
+                        {formatRelativeDeadline(contract.term_end_date)}
+                     </Text>
+                  </View>
+               )}
+            </View>
+         </PressableScale>
+
+         {onDelete && (
+            <Pressable
+               onPress={onDelete}
+               hitSlop={10}
+               style={styles.deleteOverlay}
+               accessibilityRole="button"
+               accessibilityLabel={`Remove ${contract.title || "this contract"}`}
+            >
+               <Trash2 size={16} color={colors.textMuted} strokeWidth={2} />
+            </Pressable>
+         )}
+      </View>
    )
 }
 
@@ -168,6 +188,15 @@ const styles = StyleSheet.create({
    title: {
       ...Type.subheading,
       fontFamily: Fonts.semiBold,
+   },
+   wrapper: { position: "relative" },
+   /* Keeps the type chip clear of the overlaid delete control. */
+   topRowWithDelete: { paddingRight: Spacing.lg },
+   deleteOverlay: {
+      position: "absolute",
+      top: Spacing.sm,
+      right: Spacing.sm,
+      padding: 2,
    },
    typeChip: {
       paddingHorizontal: Spacing.xs,

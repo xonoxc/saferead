@@ -11,7 +11,6 @@ import { useDrawerAlert } from "../alerts/useAlert"
 import { getErrorMessage } from "@/utils/helpers/respErrors"
 import { attempt } from "@/utils/attempt"
 import { useKeyBoardVisibility } from "../kayboard/useKeyboardVisiblity"
-import { usePreventTabSwitch } from "../blocking/usePreventTabSwitch"
 import { isAbortError } from "@/utils/errors"
 
 export type ChatContextSources = {
@@ -41,7 +40,6 @@ export default function useChat() {
    const isUserScrollingRef = useRef<boolean>(false)
 
    const selectedSpace = useSpaceStore(s => s.selectedSpace)
-   const setSelectedSpace = useSpaceStore(s => s.setSelectedSpace)
    const activeConversationId = useSpaceStore(s => s.activeConverstationId)
    const setActiveConversationId = useSpaceStore(s => s.setActiveConverstationId)
 
@@ -120,13 +118,12 @@ export default function useChat() {
    useKeyBoardVisibility(setKeyboardVisible)
 
    /*
-    * this is to prevent the users from leaving the screen when in chat mode
+    * Chat used to trap you: leaving raised a "are you sure you want to leave?"
+    * confirmation, because chat was a mode layered over the scan-history tab
+    * with no way back except a bespoke exit button. It is a tab now — switching
+    * away from a tab is not a decision that needs confirming, and the
+    * conversation is on the server, so nothing is lost by leaving.
     * **/
-   usePreventTabSwitch(
-      !!selectedSpace?.id,
-      () => setSelectedSpace(null),
-      "You are in a space chat. Are you sure you want to leave?"
-   )
 
    /*
     * auto scroll to bottom when new message is added
@@ -290,6 +287,7 @@ export default function useChat() {
 
    return {
       colors,
+      selectedSpace,
       message,
       setMessage,
       isChatEmpty,

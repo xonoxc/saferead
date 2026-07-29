@@ -1,9 +1,12 @@
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import {
+   createSalesEnquiry,
+   getPlanFeatureCatalog,
    getPlans,
    getSupportedCurrencies,
    type PlansResponse,
    type CurrenciesResponse,
+   type PlanFeatureCatalog,
 } from "@/services/plans.service"
 import { useActiveCurrency } from "@/store/useLocaleStore"
 
@@ -30,4 +33,23 @@ export const useSupportedCurrencies = () =>
       queryFn: getSupportedCurrencies,
       /* This list changes on deploys, not on user actions. */
       staleTime: 24 * 60 * 60 * 1000,
+   })
+
+/*
+ * The catalogue of what a plan can limit — labels, units and which section each
+ * facility belongs to. Not keyed on currency: it describes the *shape* of a
+ * plan, not its price.
+ * **/
+export const usePlanFeatureCatalog = (enabled = true) =>
+   useQuery<PlanFeatureCatalog>({
+      queryKey: ["plan-features"],
+      queryFn: getPlanFeatureCatalog,
+      enabled,
+      /* Changes when an admin edits the catalogue, i.e. rarely. */
+      staleTime: 60 * 60 * 1000,
+   })
+
+export const useCreateSalesEnquiry = () =>
+   useMutation({
+      mutationFn: createSalesEnquiry,
    })

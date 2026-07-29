@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native"
-import { ScanSearch } from "lucide-react-native"
+import { ScanLine } from "lucide-react-native"
 
 import { useDocumentScan } from "@/hooks/useDocumentScan"
 import { useTheme } from "@/hooks/useTheme"
@@ -38,7 +38,15 @@ export default function ScanBtn() {
             accessibilityRole="button"
             accessibilityLabel="Scan a document"
          >
-            <ScanSearch size={26} color={colors.onPrimary} strokeWidth={2.2} />
+            {/*
+             * Sized against the *inner* circle, not the button: a 4px ring in
+             * the page colour eats 8px of the 54px diameter, so a 26px glyph
+             * was floating in the middle of a 46px well and reading as an
+             * undersized icon in an oversized button. ScanSearch also packed a
+             * frame and a magnifier into that space — one shape survives the
+             * scale, two do not.
+             * **/}
+            <ScanLine size={30} color={colors.onPrimary} strokeWidth={2.2} />
          </PressableScale>
       </View>
    )
@@ -58,7 +66,7 @@ const styles = StyleSheet.create({
       width: TabBar.actionSize,
       height: TabBar.actionSize,
       borderRadius: Radii.pill,
-      borderWidth: 4,
+      borderWidth: 3,
       alignItems: "center",
       justifyContent: "center",
       /* Ride above the bar so the action reads as primary. */

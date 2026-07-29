@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { View } from "react-native"
 
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
@@ -11,17 +11,19 @@ import { TypingBubble } from "./TypingBubble"
 import { ChatToolBar } from "./ChatToolBar"
 import { ChatHistory } from "./ChatHistory"
 import { ScrollToBottomButton } from "./ScrollToBottomButton"
+import { UploadDocumentForm } from "@/components/spaces/UploadDocumentForm"
 import { Spacing } from "@/constants/Design"
 
 /*
  * Space chat UI.
  *
- * Chrome lives entirely in AnalyzeHeader above this - menu, space pill, exit -
+ * Chrome lives entirely in the Chat tab's header above this - the space pill -
  * so everything here is the conversation itself: history, then the composer.
  * **/
 export function ChatView() {
    const {
       colors,
+      selectedSpace,
       message,
       setMessage,
       isTyping,
@@ -36,6 +38,8 @@ export function ChatView() {
       onScrollBeginDrag,
       onScrollEndDrag,
    } = useChat()
+
+   const [isUploadVisible, setUploadVisible] = useState(false)
 
    return (
       <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>
@@ -72,10 +76,25 @@ export function ChatView() {
                   isChatEmpty={isChatEmpty}
                   handleInputSideButtonPress={handleInputSideButtonPress}
                   handlePromptSeggestionPress={handlePromptSeggestionPress}
+                  onAttachPress={selectedSpace ? () => setUploadVisible(true) : undefined}
                />
             </View>
+
+            {/*
+             * Uploading here adds the document to the space, which is what the
+             * assistant retrieves from - so the file becomes context for the
+             * conversation rather than an attachment on a single message. It
+             * still has to be indexed before it can be answered from, which the
+             * form's own success message says.
+             * **/}
+            {isUploadVisible && selectedSpace && (
+               <UploadDocumentForm
+                  spaceId={selectedSpace.id}
+                  onUploadSuccess={() => setUploadVisible(false)}
+                  onCancel={() => setUploadVisible(false)}
+               />
+            )}
          </SafeAreaView>
       </Animated.View>
    )
 }
-

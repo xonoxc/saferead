@@ -1,11 +1,11 @@
 import React, { useState } from "react"
 import { Pressable, View, StyleSheet, TextInput } from "react-native"
-import { CircleDot, Send } from "lucide-react-native"
+import { CircleDot, Paperclip, Send } from "lucide-react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
 
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, FontSizes } from "@/constants"
-import { Spacing, Radii, withAlpha } from "@/constants/Design"
+import { Spacing, Radii, TAB_BAR_CLEARANCE, withAlpha } from "@/constants/Design"
 import { PromptSuggestionBar } from "./promptChips/PromptSuggestionBar"
 
 export function ChatToolBar({
@@ -15,6 +15,7 @@ export function ChatToolBar({
    isChatEmpty,
    handleInputSideButtonPress,
    handlePromptSeggestionPress,
+   onAttachPress,
 }: {
    message: string
    setMessage: (text: string) => void
@@ -22,6 +23,8 @@ export function ChatToolBar({
    isChatEmpty: () => boolean
    handleInputSideButtonPress: () => void
    handlePromptSeggestionPress: (text: string) => void
+   /* Absent when there is no space to attach *to*. */
+   onAttachPress?: () => void
 }) {
    const { colors } = useTheme()
    const [isFocused, setIsFocused] = useState(false)
@@ -46,6 +49,25 @@ export function ChatToolBar({
                },
             ]}
          >
+            {/*
+             * Adds a document to the space being chatted with, so the next
+             * question can be answered from it. It sits in the composer rather
+             * than only on the space screen because the moment you discover a
+             * document is missing is the moment you ask about it.
+             * **/}
+            {onAttachPress && (
+               <Pressable
+                  onPress={onAttachPress}
+                  style={styles.attachButton}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Add a document to this space"
+                  accessibilityHint="Uploads a file the assistant can answer from"
+               >
+                  <Paperclip size={20} color={colors.textMuted} strokeWidth={2.2} />
+               </Pressable>
+            )}
+
             <TextInput
                style={[
                   styles.input,
@@ -92,7 +114,12 @@ const styles = StyleSheet.create({
    inputContainer: {
       paddingHorizontal: Spacing.md,
       paddingVertical: Spacing.md,
-      paddingBottom: Spacing.xxl,
+      /*
+       * Chat is a tab now, so the floating tab bar sits over this composer
+       * rather than being hidden for the duration of the conversation. Reserve
+       * its clearance or the send button ends up underneath it.
+       * **/
+      paddingBottom: TAB_BAR_CLEARANCE,
       gap: Spacing.md,
    },
    promptSuggestionBarContainer: {
@@ -115,6 +142,13 @@ const styles = StyleSheet.create({
       paddingHorizontal: Spacing.xs,
       minHeight: 40,
       maxHeight: 100,
+   },
+   attachButton: {
+      width: 36,
+      height: 36,
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: Spacing.xs,
    },
    sendButton: {
       width: 36,

@@ -92,18 +92,33 @@ Things that are shipped and wrong today. Verified live on 2026-07-23.
   are exhausted.
   **Done when:** a forced transient failure shows `processing`, not `failed`, between attempts.
 
+- [x] **T-09 — An anonymous scan cannot be saved** *(found by T-11, fixed 2026-07-29)*
+  `../saferead_backend/user_plan/utils.py`, `scanner/tests.py`
+  `DocumentScan.user` is `null=True` and the model calls the anonymous scan "the free front
+  door", but `track_document_scan` fires on every insert and hands `instance.user` to
+  `track_usage`, which writes a `UserUsage` row whose `user_id` is NOT NULL — so
+  `DocumentScan.objects.create(user=None, ...)` raised an IntegrityError. Resolved in favour
+  of the model's stated intent: `track_usage` now returns early for `None`/anonymous rather
+  than the field losing `null=True`. Anonymous use is throttled, not quota'd — there is
+  nothing to key a quota on without an account.
+  **Done when:** creating a `DocumentScan` with no user either works or is rejected by the
+  model, not by a signal three apps away — with a test either way.
+
 ## Phase 1 — Tests and CI
 
-No safety net exists: every `tests.py` is empty scaffolding.
+Corrected 2026-07-29: tests were *not* all empty scaffolding — `llm/tests.py` and
+`contracts/tests.py` already held real suites, but nothing could run them (see T-10). The
+gap in Phases 1 is now the apps below plus CI, not the harness.
 
-- [ ] **T-10 — Backend test harness + first real test**
-  `../saferead_backend/pyproject.toml`, `llm/tests/`
-  Add pytest + pytest-django. Port the provider-capability tests already written during the
-  Unlimited-OCR work (stub `requests`, assert vision-only providers never get generation
-  calls, assert payload shape).
+- [x] **T-10 — Backend test harness + first real test**
+  `../saferead_backend/pyproject.toml`, `llm/tests.py`, `config/test_settings.py`
+  Added pytest + pytest-django. Ported the provider-capability tests (stub `requests`,
+  assert vision-only providers never get generation calls, assert payload shape).
+  Kept the suite in `llm/tests.py` rather than a `llm/tests/` package — one `tests.py` per
+  app is the convention the rest of the repo (and T-11/T-12) already follows.
   **Done when:** `uv run pytest` passes with >0 real assertions.
 
-- [ ] **T-11 — Test the scan pipeline against a fake provider**
+- [x] **T-11 — Test the scan pipeline against a fake provider**
   `../saferead_backend/scanner/tests.py`
   Register a fake provider in `PROVIDER_TYPES`, upload a fixture, assert the analysis is
   persisted. No network, no API keys.
@@ -239,6 +254,46 @@ Newest last. One line per completed run: date, task, outcome.
   Not done, and why: T-34 (key rotation is yours to do), T-35 (IAP-or-remove is a product
   call), T-36 (needs a hosted policy + your disclosures), T-13/T-14 (workflows can be written
   but "green on a push" needs a push), T-10/11/12 (test harness — next), T-24.
+- 2026-07-29 — T-10 — pytest + pytest-django added (`[dependency-groups] dev`,
+  `[tool.pytest.ini_options]` collecting `tests.py` so pytest and `manage.py test` see one
+  suite). 13 new provider-capability tests in `llm/tests.py`: the router skips vision-only and
+  embeddings-only providers for generation instead of trying and burning their cool-off slot,
+  and `UnlimitedOCRProvider` posts the OpenAI-protocol vision body it is supposed to
+  (`requests.post` stubbed — endpoint, model, `temperature: 0.0`, data-URI image part,
+  Authorization only when keyed, `is_configured` off the URL not a key).
+  **The real unblock was the database:** `django.env` points `POSTGRES_HOST` at the Compose
+  service `db`, so a host `pytest` died in connection setup — 64 already-written
+  `contracts/tests.py` tests had never been runnable. `config/test_settings.py` (sqlite
+  in-memory) fixes it; a root `conftest.py` does *not*, because pytest-django runs
+  `django.setup()` before initial conftests load. Verified: `uv run pytest` → **106 passed**
+  offline, no keys, no Docker. Mutation-checked both new areas — dropping the
+  `supports_generation` filter and changing the OCR temperature each fail a test.
+- 2026-07-29 — T-11 — 10 tests in `scanner/tests.py` driving `analyze_document_task` end to
+  end against `FakeAnalysisProvider`, registered in `PROVIDER_TYPES`/`PROVIDER_DEFAULTS` and
+  selected via `LLM_PROVIDER_ORDER`, with `get_router(refresh=True)` on both sides. Real
+  router, real provider construction, real LangChain chain (`chat_model` returns a
+  `RunnableLambda`), real JSON extraction and sanitisation — only the model is canned.
+  Covers: analysis persisted to the row; the document text and the readable type label
+  actually reaching the prompt; fenced/prose-wrapped JSON parsed; an unparseable reply
+  completing at low confidence rather than failing; a too-short document never reaching the
+  model; the T-07 state machine (`processing` while retries remain, `failed` once exhausted,
+  via `push_request`); a deleted row reported not raised; and the post-commit dispatch firing
+  once on create and not on an ordinary save. Verified: **116 passed** in 7.7s, and 10 passed
+  with `OPENROUTER_API_KEY=`/`GEMINI_API_KEY=`/`OPENAI_API_KEY=` blanked — no network, no
+  Redis, no Docker. Mutation-checked three ways (drop `risky_points` on save, send an empty
+  `document_content`, and the earlier provider mutations) — each fails a test.
+  Found → **T-09**: `user_plan` usage tracking makes `DocumentScan.user=None` unsavable even
+  though the field is nullable.
+- 2026-07-29 — T-09 — `track_usage` returns early for a `None`/anonymous user instead of
+  trying to write a `UserUsage` row it cannot key. Guarded in the shared function rather than
+  at its eleven call sites — only `track_usage` knows the row needs an owner, and a guard per
+  caller would have left the next one to rediscover this. Kept `DocumentScan.user` nullable:
+  the model's own comment makes the anonymous scan deliberate product behaviour, and dropping
+  `null=True` would have meant a migration to contradict it. 3 tests in `scanner/tests.py` —
+  an anonymous scan saves *and* analyses, it records no usage, and a signed-in scan still
+  records both `documents_scanned` and `analysis_generated` (the guard must not switch
+  quota tracking off for everyone). Verified: **119 passed**; reverting the guard fails
+  exactly the two anonymous tests.
 - 2026-07-23 — health check — scan (text + image), spaces, and RAG chat all pass; frontend
   `tsc --noEmit` clean. **Correction:** space RAG is *not* broken — Gemini embeddings are on a
   separate quota from the 429'd generation model, verified with 3 indexed chunks and a

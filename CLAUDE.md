@@ -43,7 +43,7 @@ Env: `sample.env` → `.env`. Only `EXPO_PUBLIC_*` vars reach the client.
 | Path | Holds |
 |---|---|
 | `app/(auth)/` | welcome, login, register, forgot/reset password |
-| `app/(application)/(tabs)/` | index (home), contracts, scan, spaces, settings; analyize + premium are `href: null` (routable, no tab) |
+| `app/(application)/(tabs)/` | index (home), contracts, scan, spaces, chat; analyize + premium + settings are `href: null` (routable, no tab) |
 | `app/(application)/` | analysisres, profile, spaces/[id], contracts/[id], contracts/new, help, language, privacy, change_password, scan_menu_screen |
 | `components/<feature>/` | feature-scoped UI: chat, spaces, documents, home, analyize, onboarding, profile, settings, tabs, filters, skeletons, motion |
 | `hooks/queries/` | react-query hooks (docs, spaces, converstations, plans) |
@@ -87,6 +87,38 @@ reads `meta.invalidatedQueries` off a mutation and invalidates those keys. Add
 (selectedSpace, activeConverstationId — note the misspelling, it is load-bearing),
 `useDocumentStore` (+ `useActiveFilterCount`), `useAnalysisStore`, `useAlertStore`
 (imperative alerts), `tab.ts` (`useTabStore`).
+
+**Plans are entirely server-described.** `/plans/` gives the tiers; `/plans/features/`
+gives the *catalogue* — every facility a plan can limit, with its label, unit and section,
+straight from `user_plan/catalog.py`. `premium.tsx` renders from both, so a limit added in
+the Django admin appears in the app with no client release. Nothing about a tier is
+hardcoded here any more: which one is pushed is `is_featured`, what a card advertises is
+the catalogue's `on_card` flag, and `utils/helpers/plans.ts` (`planHeadlinePrice`,
+`describeFeature`, `featureIsIncluded`) is the only place that turns a feature value into
+words.
+
+A plan with `pricing_mode: "contact"` has **no price** — `planHeadlinePrice` returns
+"Custom pricing" and the CTA opens `ContactSalesForm`, which posts to `/plans/enquiry/`.
+Never render a contact tier's `display_price`: it is `0.00`, which reads as "Free".
+
+`components/plans/UpgradeCard.tsx` (Settings) renders the live featured plan and returns
+`null` when there is no paid tier — it replaced a magenta→indigo `LinearGradient` whose
+two hues appear nowhere in the palette, and a hardcoded "Upgrade to Pro" that advertised a
+plan the server need not have.
+
+**Alerts** — `useDrawerAlert()` → `showAlert(options)`; `DrawerAlertRenderer` (root) draws the
+sheet plus a tap-to-cancel scrim, and mounts `DrawerAlert` *per alert* rather than toggling
+`visible`, so the checkbox never arrives pre-ticked from the previous alert.
+
+Passing `suppressKey` adds a "Don't ask me again" checkbox. Suppression is per **operation**
+(`delete-contract`, `delete-space`, `delete-document`), persisted as one JSON blob under the
+`suppressed_alerts` AsyncStorage key and hydrated once at mount. A suppressed alert is not
+dropped — it is *answered*, by running its **last** action. Every call site orders actions the
+same way (escape hatch first, the thing you came to do last), and silently skipping instead
+would turn "don't ask me again" into "silently refuse to delete". Alerts with no key can never
+be silenced, which is right: a one-off error must not teach the app to stay quiet about the
+next, different error. Settings grows a "Restore hidden prompts" row while anything is hidden
+(`resetSuppressedAlerts`) — a permanently-removed delete confirmation is not acceptable.
 
 **Theming** — `hooks/useTheme.tsx` → `{ colors }`, modes `light | dark | system`.
 Palette in `constants/Colors.ts`; spacing/radii/type/motion/elevation in
@@ -161,9 +193,34 @@ stops waking the app.
 
 **Chat** — `hooks/chat/useChat.ts` owns the whole space-chat flow: resolves the active
 conversation (`useSpaceConversation`), loads history (`useConversationMessages`), sends via
-`useInstantJSONResponse` (90s timeout, AbortController), blocks tab switching while
-responding. `useInstantChatResponse` is the streaming variant (fetch + ReadableStream) —
-currently unused by `useChat`, which uses the JSON one.
+`useInstantJSONResponse` (90s timeout, AbortController). `useInstantChatResponse` is the
+streaming variant (fetch + ReadableStream) — currently unused by `useChat`, which uses the
+JSON one.
+
+**The tab bar holds four labelled tabs plus the raised scan action, and that is the
+ceiling.** At six slots on a 375pt screen each item gets ~55pt, which truncates
+"Contracts". When Chat took a slot, Settings gave one up — it is a place you visit and
+leave, not one of the four you work in — so it is `href: null` and reached through
+`components/settings/SettingsButton.tsx`, which sits in the header of **all four** tabs.
+Adding a fifth labelled tab means taking one away.
+
+**Screen chrome must not live inside a conditional branch.** `SettingsButton` is the only
+route out of the tab set, and it first shipped inside each screen's success branch — so
+Contracts, which early-returns `OrgSetupPrompt` when the user has no org (the state every
+new account starts in), had no way to reach Settings at all, and Spaces lost it for the
+duration of every load. Both now render the real header above the empty/loading body.
+`SpacesScreenSkeleton` no longer draws a header for the same reason: the header does not
+depend on the request.
+
+**Chat is its own tab** (`app/(application)/(tabs)/chat.tsx`), not a mode of another screen.
+It used to live inside `analyize`, appearing only once `selectedSpace` was set from somewhere
+else — an assistant with no address, which also hid the tab bar and needed a bespoke exit
+button and a "are you sure you want to leave?" confirmation to escape. The tab now owns that
+question itself: no space selected renders a picker, a space selected renders the header pill
+(`SpaceIndicator`, switches spaces) plus a back control (clears the selection). The composer
+carries a paperclip that uploads into the selected space via `UploadDocumentForm` — a document
+added there becomes retrieval context, not a per-message attachment. `ChatToolBar` reserves
+`TAB_BAR_CLEARANCE` because the floating bar is no longer hidden during chat.
 
 ## API surface used (see backend OKF for the server side)
 
@@ -173,7 +230,8 @@ Spaces: `/user_space/spaces/` (+ `/{id}/documents/`, `/{id}/stats/`, `/{id}/togg
 `/{id}/active-conversation/`), `/user_space/documents/` (create multipart, `/{id}/toggle_pin/`)
 Chat: `/user_space/conversations/`, `/user_space/messages/?conversation=<id>`,
 `POST /user_space/chatbot/instant-response/`
-Plans: `GET /plans/`
+Plans: `GET /plans/`, `GET /plans/currencies/`, `GET /plans/features/`,
+`POST /plans/enquiry/`
 Contracts: `/contracts/organizations/` (+ `/{id}/members/`, `/{id}/invite/`, `/{id}/stats/`),
 `/contracts/contracts/` (+ `/{id}/reextract/`, `/{id}/actions/`, `/expiring/`,
 `/missing-protections/`), `/contracts/obligations/` (+ `/summary/`), `/contracts/events/`

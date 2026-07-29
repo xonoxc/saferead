@@ -1,5 +1,6 @@
 import ViewMode from "../ViewModeSetter"
 import SearchBar from "@/components/search/SearchBar"
+import { SettingsButton } from "@/components/settings/SettingsButton"
 
 import { StyleSheet, View, Text, Pressable } from "react-native"
 import { Plus } from "lucide-react-native"
@@ -40,9 +41,13 @@ export default function SpaceScreenHeader({
                <Pressable
                   onPress={() => setCreateModalVisible(true)}
                   style={[styles.createButton, { backgroundColor: colors.primary }]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Create a space"
                >
                   <Plus size={20} color={colors.background} />
                </Pressable>
+
+               <SettingsButton />
             </View>
          </View>
 

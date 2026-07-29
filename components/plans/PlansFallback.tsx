@@ -11,7 +11,7 @@ export function Plansfallback() {
       <View style={[styles.container, { backgroundColor: colors.background }]}>
          <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.header}>
             <View style={{ width: "15%" }}>
-               <CustomBackBtn onPress={() => router.push("/analyize")} />
+               <CustomBackBtn onPress={() => router.back()} />
             </View>
          </Animated.View>
          <View style={styles.errorContainer}>

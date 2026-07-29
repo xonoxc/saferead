@@ -139,7 +139,11 @@ export function useSpaceDetailsScreen({ colors }: { colors: ColorsType }) {
       setSpace(space)
       setActiveConverstationId(resp.data.id)
 
-      router.push("/(application)/(tabs)/analyize")
+      /*
+       * `navigate`, not `push`: Chat is a tab, and pushing a tab route from a
+       * stack screen stacks a second copy of it on every visit.
+       * **/
+      router.navigate("/(application)/(tabs)/chat")
    }
 
    const handlePinDocumentToSpace = async (documentId: string, document_file: string) => {

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { View, Text, StyleSheet, Pressable } from "react-native"
-import { ChevronDown, ChevronUp, Quote, PenLine, ShieldOff } from "lucide-react-native"
+import { ChevronDown, ChevronUp, Quote, PenLine } from "lucide-react-native"
 
 import { useTheme } from "@/hooks/useTheme"
 import { Fonts, Radii, Spacing, Type, riskColors } from "@/constants"
@@ -34,20 +34,26 @@ export function ClauseCard({ clause, defaultExpanded = false }: ClauseCardProps)
    const { colors } = useTheme()
    const [expanded, setExpanded] = useState(defaultExpanded)
 
-   const risk = riskColors(colors, clause.is_missing ? "high" : clause.risk_level)
    const label = CLAUSE_TYPE_LABELS[clause.clause_type] ?? clause.clause_type_display
 
    const hasDetail = !!clause.extracted_text || !!clause.suggested_redline
 
+   /*
+    * The rail is drawn only where it changes a decision.
+    *
+    * It used to run down every card in the palette's risk colour, which made a
+    * clause list read as a row of identical warning stripes — and a marker
+    * that appears on all twelve clauses tells you nothing about any of them.
+    * Standard and worth-knowing clauses carry their level in the badge alone;
+    * the margin stays quiet so the ones that need negotiating own it.
+    * **/
+   const railed =
+      clause.is_missing || clause.risk_level === "high" || clause.risk_level === "critical"
+   const rail = riskColors(colors, clause.is_missing ? "high" : clause.risk_level).fg
+
    return (
       <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-         {/*
-          * A colour bar rather than a tinted card background. Tinting the whole
-          * surface makes a list of clauses read as a stack of alerts; a 3px
-          * edge marker keeps the severity scannable down the left margin while
-          * the text stays on a neutral surface where it is legible.
-          * **/}
-         <View style={[styles.riskEdge, { backgroundColor: risk.fg }]} />
+         {railed && <View style={[styles.riskEdge, { backgroundColor: rail }]} />}
 
          <Pressable
             onPress={() => hasDetail && setExpanded(v => !v)}
@@ -56,8 +62,16 @@ export function ClauseCard({ clause, defaultExpanded = false }: ClauseCardProps)
             accessibilityState={{ expanded }}
             style={styles.body}
          >
+            {/*
+             * Title and severity share one line. They were stacked, which cost
+             * a third of the card's height to say two words and pushed the
+             * summary — the part worth reading — below the fold on a list.
+             * **/}
             <View style={styles.header}>
-               <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
+               <Text style={[styles.label, { color: colors.text }]} numberOfLines={2}>
+                  {label}
+               </Text>
+               <RiskBadge level={clause.risk_level} isMissing={clause.is_missing} size="small" />
                {hasDetail &&
                   (expanded ? (
                      <ChevronUp size={16} color={colors.textMuted} />
@@ -66,35 +80,30 @@ export function ClauseCard({ clause, defaultExpanded = false }: ClauseCardProps)
                   ))}
             </View>
 
-            <View style={styles.badgeRow}>
-               <RiskBadge
-                  level={clause.risk_level}
-                  isMissing={clause.is_missing}
-                  size="small"
-               />
-               {/*
-                * Shown *in addition to* the risk badge, not instead of it: a
-                * high-risk finding whose citation could not be verified is
-                * still high risk, and hiding one fact behind the other would
-                * misrepresent both.
-                * **/}
-               {!clause.is_missing && !clause.span_verified && (
-                  <RiskBadge level={null} unverified size="small" />
-               )}
-            </View>
+            {/*
+             * A missing clause needs no icon of its own — the badge already
+             * says "Not present" over a CircleSlash. Stating absence three
+             * times (badge, icon, sentence) made the finding look automated
+             * rather than considered.
+             * **/}
+            <Text style={[styles.plain, { color: colors.textSecondary }]}>
+               {clause.plain_english ||
+                  (clause.is_missing
+                     ? `This agreement has no ${label.toLowerCase()} clause.`
+                     : "No summary available for this clause.")}
+            </Text>
 
-            {clause.is_missing ? (
-               <View style={styles.missingRow}>
-                  <ShieldOff size={13} color={colors.riskHigh} strokeWidth={2.2} />
-                  <Text style={[styles.missingText, { color: colors.textSecondary }]}>
-                     {clause.plain_english ||
-                        `This agreement has no ${label.toLowerCase()} clause.`}
-                  </Text>
+            {/*
+             * Shown *in addition to* the risk badge, not instead of it: a
+             * high-risk finding whose citation could not be verified is still
+             * high risk, and hiding one fact behind the other would
+             * misrepresent both. It sits under the summary as the footnote it
+             * is, so the header row stays a title and one verdict.
+             * **/}
+            {!clause.is_missing && !clause.span_verified && (
+               <View style={styles.footnote}>
+                  <RiskBadge level={null} unverified size="small" />
                </View>
-            ) : (
-               <Text style={[styles.plain, { color: colors.textSecondary }]}>
-                  {clause.plain_english || "No summary available for this clause."}
-               </Text>
             )}
          </Pressable>
 
@@ -147,7 +156,7 @@ export function ClauseCard({ clause, defaultExpanded = false }: ClauseCardProps)
 
 const styles = StyleSheet.create({
    card: {
-      borderRadius: Radii.md,
+      borderRadius: Radii.sm,
       borderWidth: StyleSheet.hairlineWidth,
       overflow: "hidden",
    },
@@ -158,15 +167,19 @@ const styles = StyleSheet.create({
       bottom: 0,
       width: 3,
    },
+   /*
+    * Padding is `sm`, and the left inset is held at `sm + 3` whether or not the
+    * rail is drawn — text that shifts 3px between neighbouring cards reads as a
+    * misalignment, which is exactly the sloppiness a dense list exposes.
+    * **/
    body: {
-      padding: Spacing.md,
-      paddingLeft: Spacing.md + 3,
-      gap: Spacing.xs,
+      padding: Spacing.sm,
+      paddingLeft: Spacing.sm + 3,
+      gap: 6,
    },
    header: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
       gap: Spacing.xs,
    },
    label: {
@@ -174,30 +187,18 @@ const styles = StyleSheet.create({
       fontFamily: Fonts.semiBold,
       flex: 1,
    },
-   badgeRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      flexWrap: "wrap",
-      gap: Spacing.xxs,
-   },
    plain: {
       ...Type.bodySmall,
       fontFamily: Fonts.regular,
    },
-   missingRow: {
+   footnote: {
       flexDirection: "row",
-      alignItems: "flex-start",
-      gap: 6,
-   },
-   missingText: {
-      ...Type.bodySmall,
-      fontFamily: Fonts.regular,
-      flex: 1,
+      marginTop: 2,
    },
    detail: {
-      paddingHorizontal: Spacing.md,
-      paddingLeft: Spacing.md + 3,
-      paddingBottom: Spacing.md,
+      paddingHorizontal: Spacing.sm,
+      paddingLeft: Spacing.sm + 3,
+      paddingBottom: Spacing.sm,
       gap: Spacing.sm,
    },
    quoteBlock: {

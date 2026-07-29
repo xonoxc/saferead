@@ -7,11 +7,10 @@ import { useQueryClient } from "@tanstack/react-query"
 import SettingsGroup from "@/components/settings/SettingsGroup"
 import useSettingsGroups from "@/hooks/screens/useSettingsGroup"
 import SettingsThemeDropdown from "@/components/settings/SettingsThemeDropDown"
-import { Fonts, FontSizes } from "@/constants"
+import { Fonts, FontSizes, Spacing } from "@/constants"
 import { TAB_BAR_CLEARANCE } from "@/constants/Design"
-import { UpgradeButton } from "@/components"
-import { Sparkle } from "lucide-react-native"
-import type { RoutePath } from "@/types/path"
+import { CustomBackBtn } from "@/components"
+import { UpgradeCard } from "@/components/plans/UpgradeCard"
 
 export default function SettingsScreen() {
    const { colors, mode, setTheme } = useTheme()
@@ -32,11 +31,16 @@ export default function SettingsScreen() {
          contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE }}
          showsVerticalScrollIndicator={false}
       >
+         {/*
+          * Settings is no longer a tab, so it needs its own way back. Reached
+          * from the gear on Home — see the tab layout for why it moved.
+          * **/}
          <View style={styles.header}>
+            <CustomBackBtn onPress={() => router.back()} />
             <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
          </View>
 
-         <View style={{ paddingHorizontal: 2, margin: 20 }}>
+         <View style={styles.upgrade}>
             <UpgradeCard />
          </View>
 
@@ -54,52 +58,6 @@ export default function SettingsScreen() {
    )
 }
 
-function UpgradeCard() {
-   return (
-      <UpgradeButton
-         btnStyles={{
-            borderRadius: 12,
-         }}
-         returnTo={"/settings" as RoutePath}
-         renderContent={() => {
-            return (
-               <View
-                  style={{
-                     alignItems: "flex-start",
-                     height: 100,
-                     justifyContent: "center",
-                  }}
-               >
-                  <View>
-                     <Sparkle color="white" size={19} />
-                     <Text
-                        style={{
-                           fontFamily: Fonts.bold,
-                           fontSize: FontSizes.sm,
-                           color: "white",
-                        }}
-                     >
-                        Upgrade to Pro
-                     </Text>
-                  </View>
-
-                  <Text
-                     style={{
-                        fontFamily: Fonts.regular,
-                        fontSize: FontSizes.xs,
-                        color: "rgba(255,255,255,0.85)",
-                        marginTop: 2,
-                     }}
-                  >
-                     Get unlimited analysis, deeper insights, and priority processing
-                  </Text>
-               </View>
-            )
-         }}
-      />
-   )
-}
-
 const styles = StyleSheet.create({
    container: {
       flex: 1,
@@ -107,6 +65,12 @@ const styles = StyleSheet.create({
    header: {
       padding: 20,
       paddingBottom: 0,
+      gap: Spacing.sm,
+      alignItems: "flex-start",
+   },
+   upgrade: {
+      paddingHorizontal: 20,
+      paddingTop: 20,
    },
    title: {
       fontSize: FontSizes.xxxl,

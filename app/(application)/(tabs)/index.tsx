@@ -16,6 +16,7 @@ import {
 import { Fonts, Radii, Spacing, Type, TAB_BAR_CLEARANCE } from "@/constants"
 import { FadeInView, PressableScale } from "@/components/motion"
 
+import { SettingsButton } from "@/components/settings/SettingsButton"
 import { AttentionHero, type AttentionItem } from "@/components/home/AttentionHero"
 import { MoneyRow } from "@/components/home/MoneyRow"
 import { PortfolioStrip } from "@/components/home/PortfolioStrip"
@@ -170,11 +171,15 @@ function Greeting({ username, orgName }: { username?: string; orgName: string | 
    const { colors } = useTheme()
 
    return (
-      <FadeInView delay={80} style={styles.greeting}>
-         <Text style={[styles.eyebrow, { color: colors.textMuted }]}>
-            {orgName ? orgName.toUpperCase() : "WELCOME BACK"}
-         </Text>
-         <Text style={[styles.name, { color: colors.text }]}>{username ?? "there"}</Text>
+      <FadeInView delay={80} style={styles.greetingRow}>
+         <View style={styles.greeting}>
+            <Text style={[styles.eyebrow, { color: colors.textMuted }]}>
+               {orgName ? orgName.toUpperCase() : "WELCOME BACK"}
+            </Text>
+            <Text style={[styles.name, { color: colors.text }]}>{username ?? "there"}</Text>
+         </View>
+
+         <SettingsButton />
       </FadeInView>
    )
 }
@@ -284,7 +289,13 @@ const styles = StyleSheet.create({
       paddingTop: Spacing.xs,
       gap: Spacing.lg,
    },
-   greeting: { gap: 2 },
+   greetingRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: Spacing.sm,
+   },
+   greeting: { flex: 1, gap: 2 },
    eyebrow: {
       ...Type.overline,
       fontFamily: Fonts.semiBold,

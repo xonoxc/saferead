@@ -1,4 +1,6 @@
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+
+import { useOrgStore } from "@/store/useOrgStore"
 
 import {
    createContract,
@@ -61,26 +63,99 @@ export const useOrganizations = () =>
       staleTime: 5 * 60 * 1000,
    })
 
+/*
+ * The workspace the user is working in, and the list of the ones they could
+ * switch to.
+ *
+ * Two things here are load-bearing, and both were previously wrong.
+ *
+ * **A failed query is not an empty one.** `hasOrg` used to be
+ * `!isLoading && !!org`, which is false when the request *errored* just as
+ * surely as when the account genuinely has no workspace — so every network
+ * blip rendered `OrgSetupPrompt`, told the user they had no workspace, and
+ * invited them to create one. They did, repeatedly. The database ended up with
+ * duplicate workspaces per user, created by someone who had one all along and
+ * was being told otherwise by a screen that could not tell a timeout from an
+ * empty list. `hasOrg` is now answerable only once the query has actually
+ * succeeded, and `isError` is surfaced so callers show a retry instead.
+ *
+ * **`results[0]` is not a selection.** The backend orders by name, so the
+ * "current" workspace was whichever sorted first alphabetically — stable, but
+ * arbitrary, and it made a second workspace unreachable. The stored choice wins
+ * when it still resolves to a workspace the user belongs to; falling back to
+ * the first entry covers the first run and the case where a saved workspace
+ * has since been left or deleted.
+ * **/
 export const useCurrentOrg = () => {
-   const { data, isLoading, error, refetch } = useOrganizations()
-   const org = data?.results?.[0] ?? null
+   const { data, isLoading, isSuccess, isError, error, refetch } = useOrganizations()
+   const { selectedOrgId, hydrated } = useOrgStore()
+
+   const organizations = data?.results ?? []
+   const selected = selectedOrgId
+      ? (organizations.find(candidate => candidate.id === selectedOrgId) ?? null)
+      : null
+   const org = selected ?? organizations[0] ?? null
 
    return {
       org,
       orgId: org?.id ?? null,
-      /* Distinguishes "still loading" from "genuinely has no org". */
-      hasOrg: !isLoading && !!org,
-      isLoading,
+      organizations,
+      /* True only when the server confirmed one. Never inferred from silence. */
+      hasOrg: isSuccess && !!org,
+      /* True only when the server confirmed the *absence* of one. */
+      needsOrg: isSuccess && organizations.length === 0,
+      isLoading: isLoading || !hydrated,
+      isError,
       error,
       refetch,
    }
 }
 
-export const useCreateOrganization = () =>
-   useMutation({
+/*
+ * Switching workspaces.
+ *
+ * Every contracts query is keyed without the org id, because the server infers
+ * the org from the request — so switching has to clear those caches or the new
+ * workspace renders the previous one's contracts. Removing rather than
+ * invalidating: invalidation keeps showing stale data while it refetches, and
+ * showing one workspace's agreements under another's name is the one mistake
+ * this feature must never make.
+ * **/
+export const useSwitchOrg = () => {
+   const queryClient = useQueryClient()
+   const selectOrg = useOrgStore(state => state.selectOrg)
+
+   return async (orgId: string | null) => {
+      await selectOrg(orgId)
+
+      for (const key of ORG_SCOPED_QUERY_KEYS) {
+         queryClient.removeQueries({ queryKey: [key] })
+      }
+   }
+}
+
+/* Everything the server resolves through the caller's current org. */
+const ORG_SCOPED_QUERY_KEYS = [
+   "contracts",
+   "obligations",
+   "events",
+   "counterparties",
+   "benchmarks",
+] as const
+
+export const useCreateOrganization = () => {
+   const switchOrg = useSwitchOrg()
+
+   return useMutation({
       mutationFn: createOrganization,
+      /* Land in the workspace you just made. Creating one and staying in
+       * another reads as the button having done nothing. */
+      onSuccess: async created => {
+         if (created?.id) await switchOrg(created.id)
+      },
       meta: { invalidatedQueries: [["organizations"]] },
    })
+}
 
 export const useOrgMembers = (orgId: string | null) =>
    useQuery({

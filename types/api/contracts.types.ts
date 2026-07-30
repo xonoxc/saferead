@@ -21,15 +21,35 @@ export const CONTRACT_TYPES = [
    "vendor",
    "employment",
    "lease",
+   "sale_deed",
+   "settlement",
+   "affidavit",
+   "poa",
+   "loan",
    "other",
 ] as const
 export type ContractType = (typeof CONTRACT_TYPES)[number]
 
 /*
- * Phase 1 extracts four types only. Anything else is marked `unsupported`
- * rather than run through a taxonomy that does not fit it.
+ * Mirrors `Contract.SUPPORTED_TYPES` in the backend. Anything else is marked
+ * `unsupported` rather than run through a taxonomy that does not fit it.
+ *
+ * Deeds are here because the first lineup was a B2B SaaS one, and the
+ * documents an Indian consumer uploads are deeds — a sale deed was being
+ * classified `lease` purely because `sale_deed` was not an option. The types
+ * below the line are named but not extracted: being able to say "this is an
+ * affidavit" is what lets the app refuse it honestly.
  * **/
-export const SUPPORTED_CONTRACT_TYPES: ContractType[] = ["msa", "sow", "nda", "vendor"]
+export const SUPPORTED_CONTRACT_TYPES: ContractType[] = [
+   "msa",
+   "sow",
+   "nda",
+   "vendor",
+   "employment",
+   "lease",
+   "sale_deed",
+   "settlement",
+]
 
 export const CONTRACT_TYPE_LABELS: Record<ContractType, string> = {
    msa: "Master Services Agreement",
@@ -37,7 +57,12 @@ export const CONTRACT_TYPE_LABELS: Record<ContractType, string> = {
    nda: "Non-Disclosure Agreement",
    vendor: "Vendor Agreement",
    employment: "Employment Agreement",
-   lease: "Lease",
+   lease: "Lease or Rent Agreement",
+   sale_deed: "Sale Deed or Conveyance",
+   settlement: "Settlement or Compromise Deed",
+   affidavit: "Affidavit",
+   poa: "Power of Attorney",
+   loan: "Loan Agreement",
    other: "Other",
 }
 
@@ -49,6 +74,11 @@ export const CONTRACT_TYPE_SHORT: Record<ContractType, string> = {
    vendor: "Vendor",
    employment: "Employment",
    lease: "Lease",
+   sale_deed: "Sale Deed",
+   settlement: "Settlement",
+   affidavit: "Affidavit",
+   poa: "PoA",
+   loan: "Loan",
    other: "Other",
 }
 
@@ -64,6 +94,12 @@ export const CONTRACT_STATUS_LABELS: Record<ContractStatus, string> = {
 
 export type ExtractionStatus = "pending" | "processing" | "completed" | "failed" | "unsupported"
 
+/*
+ * Mirrors `ContractClause.CLAUSE_TYPES`. Which of these a given contract is
+ * asked about is decided server-side, per contract type — a sale deed is
+ * scored on consideration and title, never on IP ownership — so the client
+ * only needs to be able to label whatever comes back.
+ * **/
 export const CLAUSE_TYPES = [
    "payment_terms",
    "ip_ownership",
@@ -77,6 +113,20 @@ export const CLAUSE_TYPES = [
    "warranty",
    "force_majeure",
    "assignment",
+   "consideration",
+   "title_warranty",
+   "encumbrance",
+   "possession",
+   "stamp_duty",
+   "jurisdiction",
+   "witness_attestation",
+   "security_deposit",
+   "lock_in",
+   "notice_period",
+   "maintenance",
+   "mutual_release",
+   "custody_maintenance",
+   "default_remedy",
 ] as const
 export type ClauseType = (typeof CLAUSE_TYPES)[number]
 
@@ -93,6 +143,20 @@ export const CLAUSE_TYPE_LABELS: Record<ClauseType, string> = {
    warranty: "Warranty",
    force_majeure: "Force majeure",
    assignment: "Assignment",
+   consideration: "Consideration and price",
+   title_warranty: "Title and ownership",
+   encumbrance: "Freedom from encumbrances",
+   possession: "Possession and handover",
+   stamp_duty: "Stamp duty and registration costs",
+   jurisdiction: "Governing law and jurisdiction",
+   witness_attestation: "Witnesses and attestation",
+   security_deposit: "Security deposit",
+   lock_in: "Lock-in period",
+   notice_period: "Notice period",
+   maintenance: "Maintenance and utilities",
+   mutual_release: "Mutual release of claims",
+   custody_maintenance: "Custody and maintenance",
+   default_remedy: "Default and remedies",
 }
 
 export type RiskLevel = "low" | "medium" | "high" | "critical"

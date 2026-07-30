@@ -9,3 +9,4 @@ export * from "./DeadlineRow"
 export * from "./SectionHeader"
 
 export * from "./EmptyState"
+export * from "./WorkspaceSwitcher"

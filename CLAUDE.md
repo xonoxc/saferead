@@ -167,8 +167,34 @@ useless.
 contracts.ts` has the hooks. `useCurrentOrg()` is the gate every contracts screen checks —
 "no org yet" is a normal state (the API returns an empty list, not a 403), and `OrgSetupPrompt`
 handles it. Extraction is polled at `EXTRACTION_POLL_INTERVAL_MS` (5s, longer than the 3s scan
-poll — extraction walks 12 clause types and takes 20-60s), gated on status so a settled list
+poll — extraction walks a clause set and takes 20-60s), gated on status so a settled list
 stops waking the app.
+
+**`hasOrg` and `needsOrg` are different questions, and conflating them cost real data.**
+`hasOrg` used to be `!isLoading && !!org`, which is false when the request *errored* exactly
+as it is when the account has none — so a network blip rendered `OrgSetupPrompt`, told users
+they had no workspace, and invited them to make one. They did, repeatedly; the duplicates are
+still in the database. Only `needsOrg` (the server confirmed zero) may show the setup prompt
+or `WorkspacePitch`; `isError` gets a retry. **Never gate a create-this-for-me screen on the
+absence of data — gate it on the confirmed absence of data.**
+
+**Workspaces: `store/useOrgStore.ts` holds the selection, the interceptor sends it.**
+Only the org *id* is persisted (AsyncStorage); React Query owns the name and counts, which
+change server-side. `utils/apiclient.ts` turns it into the `X-Org` header on every request —
+set centrally because every contracts endpoint is org-scoped and one forgotten call site
+would read the wrong workspace. `_layout.tsx` hydrates before anything renders, since a
+request made pre-hydration is answered for the default workspace.
+
+`useSwitchOrg()` **removes** the org-scoped query caches rather than invalidating them:
+invalidation keeps serving stale data while it refetches, and showing one workspace's
+agreements under another's name is the one mistake this feature cannot make. Query keys
+deliberately do not include the org id — the server infers it — which is what makes that
+removal mandatory. `useCreateOrganization` switches into what it just created; creating a
+workspace and staying in another reads as the button having done nothing.
+
+Before this, `useCurrentOrg` returned `results[0]` from a list the backend orders by *name*,
+so a second workspace was unreachable — and the backend was merging them anyway (see
+`OrgScopedMixin` in the backend OKF).
 
 **A contract needs a `source_document`.** Extraction reads `SpaceDocument.extracted_text`, so
 `contracts/new.tsx` requires picking a space document and disables Create until one is chosen —

@@ -49,7 +49,14 @@ export default function HomeScreen() {
    const { user } = useAuth()
    const { handleScroll } = useTabHideScroll()
 
-   const { org, orgId, hasOrg, isLoading: orgLoading, refetch: refetchOrg } = useCurrentOrg()
+   const {
+      org,
+      orgId,
+      hasOrg,
+      needsOrg,
+      isLoading: orgLoading,
+      refetch: refetchOrg,
+   } = useCurrentOrg()
 
    const { data: stats, refetch: refetchStats } = useOrgStats(orgId)
    const { data: summary, refetch: refetchSummary } = useObligationSummary(hasOrg)
@@ -152,7 +159,10 @@ export default function HomeScreen() {
                {stats && stats.contract_count === 0 && <FirstContractPrompt />}
             </>
          ) : (
-            !orgLoading && <WorkspacePitch />
+            /* Only pitch a workspace to someone the server confirmed has
+             * none. Pitching on a failed request tells a user with three
+             * workspaces to go and make a fourth. */
+            needsOrg && <WorkspacePitch />
          )}
 
          <RecentScans

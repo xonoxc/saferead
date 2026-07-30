@@ -11,7 +11,7 @@ import { useContracts, useCurrentOrg, useDeleteContract } from "@/hooks/queries/
 import { Fonts, Radii, Spacing, Type, TAB_BAR_CLEARANCE } from "@/constants"
 import { contractFilterFields } from "@/constants/filters"
 import { FadeInView, PressableScale } from "@/components/motion"
-import { ContractCard, EmptyState } from "@/components/contracts"
+import { ContractCard, EmptyState, WorkspaceSwitcher } from "@/components/contracts"
 import { OrgSetupPrompt } from "@/components/contracts/OrgSetupPrompt"
 import { SettingsButton } from "@/components/settings/SettingsButton"
 import { UniversalFilter } from "@/components/filters/UniversalFilters"
@@ -37,7 +37,13 @@ import {
 export default function ContractsScreen() {
    const { colors } = useTheme()
    const { handleScroll } = useTabHideScroll()
-   const { hasOrg, isLoading: orgLoading } = useCurrentOrg()
+   const {
+      hasOrg,
+      needsOrg,
+      isLoading: orgLoading,
+      error: orgError,
+      refetch: refetchOrg,
+   } = useCurrentOrg()
    const showBottomAlert = useDrawerAlert()
    const { mutateAsync: deleteContract } = useDeleteContract()
 
@@ -135,6 +141,9 @@ export default function ContractsScreen() {
          <View style={styles.headerText}>
             <Text style={[styles.eyebrow, { color: colors.textMuted }]}>PORTFOLIO</Text>
             <Text style={[styles.title, { color: colors.text }]}>Contracts</Text>
+            {/* Which workspace this list belongs to, answered where the list
+             * is read. Renders nothing until there is an org to name. */}
+            {hasOrg && <WorkspaceSwitcher />}
          </View>
 
          <View style={styles.headerActions}>
@@ -166,11 +175,35 @@ export default function ContractsScreen() {
    }
 
    /*
+    * A failed lookup is not an empty one, and conflating them is what made
+    * this feature look broken: the setup prompt rendered whenever the request
+    * errored, told a user with workspaces that they had none, and invited them
+    * to create another. They did — repeatedly — and the duplicates are still in
+    * the database. Offer a retry instead, and say what actually went wrong.
+    * **/
+   if (orgError) {
+      return (
+         <View style={[styles.container, { backgroundColor: colors.background }]}>
+            {header}
+            <View style={styles.centre}>
+               <EmptyState
+                  icon={FileSignature}
+                  title="Could not load your workspaces"
+                  body={getErrorMessage(orgError)}
+                  actionLabel="Try again"
+                  onAction={refetchOrg}
+               />
+            </View>
+         </View>
+      )
+   }
+
+   /*
     * Without an org there is nothing to scope contracts to, and the API would
     * honestly return an empty list. Showing "no contracts" there would be
     * true but useless - the actual blocker is that no workspace exists.
     * **/
-   if (!hasOrg) {
+   if (needsOrg) {
       return (
          <View style={[styles.container, { backgroundColor: colors.background }]}>
             {header}

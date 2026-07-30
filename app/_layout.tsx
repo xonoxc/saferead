@@ -21,6 +21,7 @@ import useNetworkStatus from "@/hooks/net/useNetworkStatus"
 import { OfflineScreen } from "@/components/OfflineScreen"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { useLocaleStore } from "@/store/useLocaleStore"
+import { useOrgStore } from "@/store/useOrgStore"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -47,6 +48,17 @@ const AppContent = () => {
    useEffect(() => {
       hydrateLocale()
    }, [hydrateLocale])
+
+   /*
+    * Read the saved workspace before any contracts request goes out — the
+    * axios interceptor turns it into the `X-Org` header, and a request made
+    * before hydration finishes would be answered for the wrong workspace.
+    * **/
+   const hydrateOrg = useOrgStore(s => s.hydrate)
+
+   useEffect(() => {
+      hydrateOrg()
+   }, [hydrateOrg])
 
    useEffect(() => {
       if (!fontsLoaded) return

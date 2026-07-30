@@ -7,8 +7,10 @@ import { attempt } from "./attempt"
 import { router } from "expo-router"
 import { useUserStore } from "@/store/useUserStore"
 import { useAlertStore } from "@/store/useAlertStore"
+import { getSelectedOrgId } from "@/store/useOrgStore"
 
 const AUTH_HEADER = "Authorization"
+const ORG_HEADER = "X-Org"
 
 export async function getAccessToken(): Promise<string | null> {
    const result = await attempt(() =>
@@ -46,6 +48,22 @@ apiClient.interceptors.request.use(
       if (token) {
          config.headers[AUTH_HEADER] = `token ${token}`
       }
+
+      /*
+       * Which workspace this request acts in. The backend's `resolve_org`
+       * reads this header, falls back to the caller's first org when it is
+       * absent, and — importantly — ignores an id the caller is not a member
+       * of, so a stale value degrades to the default rather than leaking.
+       *
+       * Set here rather than per service call because *every* contracts
+       * endpoint is org-scoped, and one forgotten call site would silently
+       * read the wrong workspace.
+       */
+      const orgId = getSelectedOrgId()
+      if (orgId) {
+         config.headers[ORG_HEADER] = orgId
+      }
+
       return config
    },
    error => Promise.reject(error)

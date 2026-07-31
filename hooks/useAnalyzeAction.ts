@@ -33,7 +33,12 @@ export function useAnalyzeAction() {
          return
       }
 
-      const toastId = toast.loading("Analyzing document...")
+      /*
+       * "Uploading", not "Analyzing" - this toast is dismissed the moment the
+       * POST resolves, which is when the file has landed and the worker has not
+       * started. The analysis screen owns the progress from there.
+       * **/
+      const toastId = toast.loading("Uploading document...")
 
       let documentFile: FileDocument | File
       let filename: string

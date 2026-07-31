@@ -3,7 +3,7 @@ import { attempt } from "@/utils/attempt"
 import { buildFileUploadFormData } from "@/utils/helpers/files"
 
 import type { DocumentFilterOptions } from "@/types/docs"
-import type { UploadDocumentRequest } from "@/types/api/documents.types"
+import type { AnalysisResponse, UploadDocumentRequest } from "@/types/api/documents.types"
 
 export async function uploadDocument(data: UploadDocumentRequest) {
    const formData = buildFileUploadFormData("document_file", data.document_file, {
@@ -46,7 +46,7 @@ function prepareGetDocumentParams(page?: number, filters?: DocumentFilterOptions
 }
 
 export async function getDocumentById(documentId: string) {
-   return apiClient.get(`/scanner/documents/${documentId}/`)
+   return apiClient.get<AnalysisResponse>(`/scanner/documents/${documentId}/`)
 }
 
 export async function deleteDocument(documentId: string) {

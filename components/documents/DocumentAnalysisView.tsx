@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, Pressable, Share } from "react-native"
+import { View, Text, StyleSheet, ScrollView, Pressable, Share, ActivityIndicator } from "react-native"
 import {
    Share2,
    Download,
@@ -29,26 +29,86 @@ export const DocumentAnalysisView = ({
 }) => {
    const { colors } = useTheme()
 
+   /*
+    * Only a finished analysis gets the report layout.
+    *
+    * This screen used to render all six sections whatever the status, off a row
+    * the worker had not touched yet: empty point arrays and a null score. The
+    * result was not a blank page but a *fabricated* one - `getOverallRisk`
+    * scores 0 risks against 0 favourable points as "MEDIUM RISK", beside "0%
+    * Confidence", for a document nothing had read. Telling a user their
+    * contract is medium-risk before it has been opened is worse than telling
+    * them to wait.
+    * **/
+   const ready = analysis.status === "completed"
+
    return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-         <Header onBack={onBack} analysis={analysis} />
+         <Header onBack={onBack} analysis={analysis} showActions={ready} />
 
-         <ScrollView
-            style={styles.content}
-            contentContainerStyle={{ paddingBottom: 110 }}
-            showsVerticalScrollIndicator={false}
-         >
-            <StatusCard analysis={analysis} />
-            <SummarySection analysis={analysis} />
-            <RiskyPointsSection points={analysis.risky_points} />
-            <FavorablePointsSection points={analysis.favourable_points} />
-            <DocumentInfoSection analysis={analysis} />
-         </ScrollView>
+         {ready ? (
+            <ScrollView
+               style={styles.content}
+               contentContainerStyle={{ paddingBottom: 110 }}
+               showsVerticalScrollIndicator={false}
+            >
+               <StatusCard analysis={analysis} />
+               <SummarySection analysis={analysis} />
+               <RiskyPointsSection points={analysis.risky_points} />
+               <FavorablePointsSection points={analysis.favourable_points} />
+               <DocumentInfoSection analysis={analysis} />
+            </ScrollView>
+         ) : (
+            <UnfinishedState analysis={analysis} />
+         )}
       </View>
    )
 }
 
-const Header = ({ onBack, analysis }: { onBack: () => void; analysis: AnalysisResponse }) => {
+/*
+ * Every status that is not `completed`. Deliberately one component rather than
+ * three: pending, processing and failed differ only in the words and in whether
+ * something is spinning.
+ * **/
+const UnfinishedState = ({ analysis }: { analysis: AnalysisResponse }) => {
+   const { colors } = useTheme()
+   const failed = analysis.status === "failed"
+
+   return (
+      <View style={styles.unfinishedState}>
+         {failed ? (
+            <TriangleAlert size={44} color={colors.error} />
+         ) : (
+            <ActivityIndicator size="large" color={colors.primary} />
+         )}
+
+         <Text style={[styles.unfinishedTitle, { color: colors.text }]}>
+            {failed ? "Analysis failed" : "Reading your document"}
+         </Text>
+
+         <Text style={[styles.unfinishedBody, { color: colors.textSecondary }]}>
+            {failed
+               ? analysis.error_message ||
+                 "Something went wrong while analysing this document. Try scanning it again."
+               : "Scanned pages are read one at a time, so this can take a few minutes. You can leave this screen — the result will be waiting in your documents."}
+         </Text>
+      </View>
+   )
+}
+
+const Header = ({
+   onBack,
+   analysis,
+   showActions,
+}: {
+   onBack: () => void
+   analysis: AnalysisResponse
+   /*
+    * Hidden until there is something to act on. Sharing a scan that is still
+    * processing sends a report with an empty summary and no points.
+    * **/
+   showActions: boolean
+}) => {
    const { colors, isDark } = useTheme()
 
    const handleShare = async () => {
@@ -76,14 +136,16 @@ const Header = ({ onBack, analysis }: { onBack: () => void; analysis: AnalysisRe
          <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
             {analysis.original_filename || "Document Analysis"}
          </Text>
-         <View style={styles.headerActions}>
-            <Pressable style={styles.actionButton} onPress={handleShare}>
-               <Share2 size={20} color={colors.textSecondary} />
-            </Pressable>
-            <Pressable style={styles.actionButton}>
-               <Download size={20} color={colors.textSecondary} />
-            </Pressable>
-         </View>
+         {showActions && (
+            <View style={styles.headerActions}>
+               <Pressable style={styles.actionButton} onPress={handleShare}>
+                  <Share2 size={20} color={colors.textSecondary} />
+               </Pressable>
+               <Pressable style={styles.actionButton}>
+                  <Download size={20} color={colors.textSecondary} />
+               </Pressable>
+            </View>
+         )}
       </Animated.View>
    )
 }
@@ -356,6 +418,24 @@ const styles = StyleSheet.create({
    content: {
       flex: 1,
       padding: 20,
+   },
+   unfinishedState: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 14,
+      paddingHorizontal: 40,
+      paddingBottom: 80,
+   },
+   unfinishedTitle: {
+      fontSize: FontSizes.lg,
+      fontFamily: Fonts.semiBold,
+   },
+   unfinishedBody: {
+      fontSize: FontSizes.sm,
+      fontFamily: Fonts.regular,
+      lineHeight: 20,
+      textAlign: "center",
    },
    statusCard: {
       borderRadius: 16,

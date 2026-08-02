@@ -8,6 +8,12 @@ When the user says "run today's task", the `todays-task` skill
 (`.claude/skills/todays-task/SKILL.md`) takes the next unchecked item, does exactly that one,
 verifies it, and logs it. One ~30-minute task per run — the budget is deliberate.
 
+**UX plan:** [UX_PLAN.md](UX_PLAN.md) is a separate, audited backlog covering **navigation,
+feedback and interface consistency only** — dead ends, dead controls, misleading errors. Run
+by `/improve-ux` (`.claude/skills/improve-ux/SKILL.md`), which works a whole phase per
+invocation rather than one task. The two backlogs overlap on T-24/T-35/T-36; those are
+cross-referenced in both files and get ticked in both.
+
 ## What this is
 
 Expo Router app (SDK 57, RN 0.86, React 19) that scans/uploads legal documents (terms,
